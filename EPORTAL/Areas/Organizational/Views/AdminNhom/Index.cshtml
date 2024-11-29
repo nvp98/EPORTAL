@@ -1,0 +1,298 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using SoDoToChuc.Models
+@using PagedList.Mvc
+@model PagedList.IPagedList<AdminNhom>
+@using EPORTAL.ModelsOrganizational
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+<style>
+    /*sxxxx*/
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 90px;
+        height: 34px;
+    }
+
+        .switch input {
+            display: none;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ca2222;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #2ab934;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(55px);
+        -ms-transform: translateX(55px);
+        transform: translateX(55px);
+    }
+    /*------ ADDED CSS ---------*/
+    .on {
+        display: none;
+    }
+
+    .on, .off {
+        color: white;
+        position: absolute;
+        transform: translate(-50%,-50%);
+        top: 50%;
+        left: 50%;
+        font-size: 10px;
+        font-family: Verdana, sans-serif;
+    }
+
+    input:checked + .slider .on {
+        display: block;
+    }
+
+    input:checked + .slider .off {
+        display: none;
+    }
+
+    /*--------- END --------*/
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+    .selected {
+        background: #0bf;
+    }
+</style>
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        Quản lý thông tin Mảng Công Việc
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-header">
+                        <label class="">Thông Tin</label>
+                        <button type="button" id="btn-add" class="btn btn-primary m-l-auto"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                        <div class="modal fade" id="myModal" role="dialog" data-url='@Url.Action("Create","AdminNhom")'></div>
+                    </div>
+                    <div class="card-header">
+
+                        <div class="row" style="width:50%">
+
+                            <div class="col-md-5">
+                                @Html.DropDownList("PBList", null, "---- Phòng Ban ----", new { id = "IDPhongBan", @class = "form-control", })
+                            </div>
+                            <script>
+                                $(document).ready(function () {
+                                    var IDPB = $('#IDPhongBan').val();
+                                    $("#IDPhongBan").change(function () {
+                                        $.get("/AdminPB/GetNhomList", { id: $("#IDPhongBan").val() }, function (data) {
+
+                                            $("#IDNhom").empty();
+                                            $("#IDNhom").append("<option value ='" + null + "'>" + "--Chọn Nhóm--" + "</option>")
+                                            $.each(data, function (index, row) {
+                                                $("#IDNhom").append("<option value ='" + row.IDPX + "'>" + row.TenPX + "</option>")
+                                            });
+                                        });
+                                    })
+                                    //if (IDPB != null) {
+                                    //    $("#IDPhanXuong").click(function () {
+                                    //        $.get("/AdminTo/GetPXList", { id: IDPB }, function (data) {
+
+                                    //            $("#IDPhanXuong").empty();
+                                    //            $("#IDPhanXuong").append("<option value ='" + null + "'>" + "--Chọn Phân Xưởng--" + "</option>")
+                                    //            $.each(data, function (index, row) {
+                                    //                $("#IDPhanXuong").append("<option value ='" + row.IDPX + "'>" + row.TenPX + "</option>")
+                                    //            });
+                                    //        });
+                                    //    });
+                                    //}
+
+                                });
+                            </script>
+                            <div class="col-md-5">
+                                @Html.DropDownList("NhomList", null, "---- Tên nhóm ----", new { id = "IDNhom", @class = "form-control", })
+                            </div>
+
+
+                            <div class="col-md-1">
+                                <button type="button" style="width: 100px;" id="btsearch" class="btn btn-primary pull-left"><i class="fa fa-search">&nbsp;</i>&nbsp;Tìm kiếm </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="30px" class="text-center">STT</th>
+                                        <th width="" class="text-center">Mảng Công việc </th>
+                                        <th width="" class="text-center">Bộ Phận</th>
+                                        <th width="" class="text-center">SL TPT DB</th>
+                                        @*<th width="" class="text-center">Nhóm Phụ trách</th>*@
+                                        <th width="" class="text-center">SL Phụ trách DB</th>
+                                        <th width="" class="text-center">SL T/P Kíp DB</th>
+                                        <th width="" class="text-center">SL KTV DB</th>
+                                        <th width="" class="text-center">SL KTV Ca DB</th>
+                                        <th width="" class="text-center">SL TT/TP ĐB</th>
+                                        <th width="" class="text-center">SL NV DB</th>
+                                        <th width="" class="text-center">SL NV Ca DB</th>
+                                        <th width="" class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int pageno = (int)Model.PageNumber;
+                                        int itemperpage = (int)Model.PageSize;
+                                        int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        int index = 0;
+
+                                    }
+
+
+                                    @foreach (var item in Model)
+                                    {
+                                        index++;
+
+                                        <tr>
+                                            <td class="text">@RowNo@{RowNo++;}</td>
+                                            <td class="text">@item.TenNhom</td>
+                                            <td class="text">@item.TenPhongBan</td>
+                                            <td class="text-center">@item.TPTDB</td>
+                                            <td class="text-center">@item.PTDB</td>
+                                            <td class="text-center">@item.TPKip</td>
+                                            <td class="text-center">@item.KTVDB</td>
+                                            <td class="text-center">@item.KTVCa</td>
+                                            <td class="text-center">@item.TTTPDB</td>
+                                            <td class="text-center">@item.NVDB</td>
+                                            <td class="text-center">@item.NVCa</td>
+
+                                            <td class="text-center">
+                                                <a id="btn-edit_@item.IDNhom" title="Sửa" style="cursor:pointer;"><i class='fa fa-edit'></i></a>
+                                                <div class="modal fade" id="myModale_@item.IDNhom" role="dialog" data-url='@Url.Action("Edit","AdminNhom", new { id = item.IDNhom })'></div>
+                                                <script type="text/javascript">
+                                                $('#btn-edit_@item.IDNhom').click(function () {
+                                                    var url = $('#myModale_@item.IDNhom').data('url');
+                                                    $.get(url, function (data) {
+                                                        $("#myModale_@item.IDNhom").html(data);
+                                                        $("#ModalTitle").html("Cập nhật Nội dung");
+                                                        $("#myModale_@item.IDNhom").modal('show');
+                                                        $("#myModale_@item.IDNhom").addClass('show');
+                                                    });
+                                                });
+                                                </script>
+                                                <a title="Xóa" href="@Url.Action("Delete", "AdminNhom", new { id = item.IDNhom })"
+                                                   onclick="return confirm('Bạn muốn xóa Thông tin nhóm : @item.TenNhom')">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="pager">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", "AdminNhom", new { page }))
+                                <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+    $("#btsearch").on('click', function () {
+        var IDNhom = $('#IDNhom').val();
+        var IDPhongBan = $('#IDPhongBan').val();
+
+        window.location.href = '@Url.Action("Index", "AdminNhom")?nhomID=' + IDNhom + '&IDPhongBan=' + IDPhongBan;
+    });
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm mới Thông Tin");
+            $("#myModal").modal('show');
+            $("#myModal").addClass('show');
+        });
+    });
+</script>
+<script type="text/javascript">
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    //$("#IDNhom").chosen({
+    //    width: "100%"
+    //});
+
+</script>
+

@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="EPORTAL_SERVEYModelStoreContainer" CdmEntityContainer="EPORTAL_SERVEYEntities">
+    <EntitySetMapping Name="EmployeeServeys">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.EmployeeServey">
+        <MappingFragment StoreEntitySet="EmployeeServey">
+          <ScalarProperty Name="IDDC" ColumnName="IDDC" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="OTID" ColumnName="OTID" />
+          <ScalarProperty Name="XNSV" ColumnName="XNSV" />
+          <ScalarProperty Name="MenuOT" ColumnName="MenuOT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ListServeys">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.ListServey">
+        <MappingFragment StoreEntitySet="ListServey">
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="ContentSV" ColumnName="ContentSV" />
+          <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+          <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+          <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="OptionServeys">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.OptionServey">
+        <MappingFragment StoreEntitySet="OptionServey">
+          <ScalarProperty Name="isShow" ColumnName="isShow" />
+          <ScalarProperty Name="MaOT" ColumnName="MaOT" />
+          <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+          <ScalarProperty Name="ContentOT" ColumnName="ContentOT" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+          <ScalarProperty Name="OrderBy" ColumnName="OrderBy" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PartTogethers">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.PartTogether">
+        <MappingFragment StoreEntitySet="PartTogether">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="NamSinh" ColumnName="NamSinh" />
+          <ScalarProperty Name="IDESV" ColumnName="IDESV" />
+          <ScalarProperty Name="Re" ColumnName="Re" />
+          <ScalarProperty Name="isCom" ColumnName="isCom" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ResultServeys">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.ResultServey">
+        <MappingFragment StoreEntitySet="ResultServey">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IDES" ColumnName="IDES" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+          <ScalarProperty Name="StatusRS" ColumnName="StatusRS" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="EmployeeServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_delete" />
+    <FunctionImportMapping FunctionImportName="EmployeeServey_insert" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_insert" />
+    <FunctionImportMapping FunctionImportName="EmployeeServey_selectNV" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_selectNV">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.EmployeeServey_selectNV_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="OTID" ColumnName="OTID" />
+          <ScalarProperty Name="XNSV" ColumnName="XNSV" />
+          <ScalarProperty Name="MenuOT" ColumnName="MenuOT" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="EmployeeServey_update" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_update" />
+    <FunctionImportMapping FunctionImportName="EmployeeServey_updateOtion" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateOtion" />
+    <FunctionImportMapping FunctionImportName="EmployeeServey_updateXN" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateXN" />
+    <FunctionImportMapping FunctionImportName="ListServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_delete" />
+    <FunctionImportMapping FunctionImportName="ListServey_insert" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_insert" />
+    <FunctionImportMapping FunctionImportName="ListServey_selectNV" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_selectNV">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.ListServey_selectNV_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="OTID" ColumnName="OTID" />
+          <ScalarProperty Name="XNSV" ColumnName="XNSV" />
+          <ScalarProperty Name="MenuOT" ColumnName="MenuOT" />
+          <ScalarProperty Name="ContentSV" ColumnName="ContentSV" />
+          <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+          <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+          <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="ListServey_update" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_update" />
+    <FunctionImportMapping FunctionImportName="OptionServey_create" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_create" />
+    <FunctionImportMapping FunctionImportName="OptionServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_delete" />
+    <FunctionImportMapping FunctionImportName="OptionServey_selectOT" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_selectOT">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.OptionServey_selectOT_Result">
+          <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+          <ScalarProperty Name="ContentOT" ColumnName="ContentOT" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+          <ScalarProperty Name="OrderBy" ColumnName="OrderBy" />
+          <ScalarProperty Name="ContentSV" ColumnName="ContentSV" />
+          <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+          <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+          <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="OptionServey_update" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_update" />
+    <FunctionImportMapping FunctionImportName="PartTogether_delete" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_delete" />
+    <FunctionImportMapping FunctionImportName="PartTogether_insert" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_insert" />
+    <FunctionImportMapping FunctionImportName="PartTogether_selectCom" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_selectCom">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.PartTogether_selectCom_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="NamSinh" ColumnName="NamSinh" />
+          <ScalarProperty Name="IDESV" ColumnName="IDESV" />
+          <ScalarProperty Name="Re" ColumnName="Re" />
+          <ScalarProperty Name="isCom" ColumnName="isCom" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="PartTogether_update" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_update" />
+    <FunctionImportMapping FunctionImportName="ResultServey_create" FunctionName="EPORTAL_SERVEYModel.Store.ResultServey_create" />
+    <FunctionImportMapping FunctionImportName="ResultServey_update" FunctionName="EPORTAL_SERVEYModel.Store.ResultServey_update" />
+    <FunctionImportMapping FunctionImportName="RsultServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.RsultServey_delete" />
+    <EntitySetMapping Name="CTKhaoSats">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTKhaoSat">
+        <MappingFragment StoreEntitySet="CTKhaoSat">
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GroupKhaoSats">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.GroupKhaoSat">
+        <MappingFragment StoreEntitySet="GroupKhaoSat">
+          <ScalarProperty Name="isChon" ColumnName="isChon" />
+          <ScalarProperty Name="isShowRe" ColumnName="isShowRe" />
+          <ScalarProperty Name="TenNhom" ColumnName="TenNhom" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="MaNhom" ColumnName="MaNhom" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="CTKhaoSat_delete" FunctionName="EPORTAL_SERVEYModel.Store.CTKhaoSat_delete" />
+    <FunctionImportMapping FunctionImportName="CTKhaoSat_insert" FunctionName="EPORTAL_SERVEYModel.Store.CTKhaoSat_insert" />
+    <EntitySetMapping Name="DiaDiems">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.DiaDiem">
+        <MappingFragment StoreEntitySet="DiaDiem">
+          <ScalarProperty Name="TenDC" ColumnName="TenDC" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="EmployeeServey_updateDC" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateDC" />
+    <EntitySetMapping Name="ChiTietDKNTs">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.ChiTietDKNT">
+        <MappingFragment StoreEntitySet="ChiTietDKNT">
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+          <ScalarProperty Name="IDNguoiThan" ColumnName="IDNguoiThan" />
+          <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CTDKNguoiThans">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTDKNguoiThan">
+        <MappingFragment StoreEntitySet="CTDKNguoiThan">
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="QuanHe" ColumnName="QuanHe" />
+          <ScalarProperty Name="NamSinh" ColumnName="NamSinh" />
+          <ScalarProperty Name="IDDC" ColumnName="IDDC" />
+          <ScalarProperty Name="GioiTinh" ColumnName="GioiTinh" />
+          <ScalarProperty Name="isCom" ColumnName="isCom" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="IDNguoiThan" ColumnName="IDNguoiThan" />
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="ChiTietDKNT_delete" FunctionName="EPORTAL_SERVEYModel.Store.ChiTietDKNT_delete" />
+    <FunctionImportMapping FunctionImportName="ChiTietDKNT_insert" FunctionName="EPORTAL_SERVEYModel.Store.ChiTietDKNT_insert" />
+    <FunctionImportMapping FunctionImportName="CTDKNguoiThan_delete" FunctionName="EPORTAL_SERVEYModel.Store.CTDKNguoiThan_delete" />
+    <FunctionImportMapping FunctionImportName="CTDKNguoiThan_insert" FunctionName="EPORTAL_SERVEYModel.Store.CTDKNguoiThan_insert" />
+    <FunctionImportMapping FunctionImportName="CTDKNguoiThan_update" FunctionName="EPORTAL_SERVEYModel.Store.CTDKNguoiThan_update" />
+    <FunctionImportMapping FunctionImportName="EmployeeServey_updateOT" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateOT" />
+    <EntitySetMapping Name="GhiChus">
+      <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.GhiChu">
+        <MappingFragment StoreEntitySet="GhiChu">
+          <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+          <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

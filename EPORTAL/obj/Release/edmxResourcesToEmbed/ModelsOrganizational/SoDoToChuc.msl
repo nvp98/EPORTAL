@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="SoDoToChucModelStoreContainer" CdmEntityContainer="SoDoToChucEntities">
+    <EntitySetMapping Name="Cas">
+      <EntityTypeMapping TypeName="SoDoToChucModel.Ca">
+        <MappingFragment StoreEntitySet="Ca">
+          <ScalarProperty Name="IDCa" ColumnName="IDCa" />
+          <ScalarProperty Name="TenCa" ColumnName="TenCa" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CapBacs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.CapBac">
+        <MappingFragment StoreEntitySet="CapBac">
+          <ScalarProperty Name="IDCap" ColumnName="IDCap" />
+          <ScalarProperty Name="TT" ColumnName="TT" />
+          <ScalarProperty Name="TenCapBac" ColumnName="TenCapBac" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ChucVus">
+      <EntityTypeMapping TypeName="SoDoToChucModel.ChucVu">
+        <MappingFragment StoreEntitySet="ChucVu">
+          <ScalarProperty Name="IDChucVu" ColumnName="IDChucVu" />
+          <ScalarProperty Name="TenChucVu" ColumnName="TenChucVu" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LoaiKHs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.LoaiKH">
+        <MappingFragment StoreEntitySet="LoaiKH">
+          <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+          <ScalarProperty Name="TenLoaiKH" ColumnName="TenLoaiKH" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MaViTris">
+      <EntityTypeMapping TypeName="SoDoToChucModel.MaViTri">
+        <MappingFragment StoreEntitySet="MaViTri">
+          <ScalarProperty Name="IDMaViTri" ColumnName="IDMaViTri" />
+          <ScalarProperty Name="TenMaViTri" ColumnName="TenMaViTri" />
+          <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="NhanVienAPIs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.NhanVienAPI">
+        <MappingFragment StoreEntitySet="NhanVienAPI">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+          <ScalarProperty Name="DiaChi" ColumnName="DiaChi" />
+          <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+          <ScalarProperty Name="NgayVaoLam" ColumnName="NgayVaoLam" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IDTinhTrangLV" ColumnName="IDTinhTrangLV" />
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="CMND" ColumnName="CMND" />
+          <ScalarProperty Name="IDPhanXuong" ColumnName="IDPhanXuong" />
+          <ScalarProperty Name="IDToLV" ColumnName="IDToLV" />
+          <ScalarProperty Name="IDCa" ColumnName="IDCa" />
+          <ScalarProperty Name="IDNhomLV" ColumnName="IDNhomLV" />
+          <ScalarProperty Name="MaViTri" ColumnName="MaViTri" />
+          <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+          <ScalarProperty Name="TT_BGD" ColumnName="TT_BGD" />
+          <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="NhanVienPVSXes">
+      <EntityTypeMapping TypeName="SoDoToChucModel.NhanVienPVSX">
+        <MappingFragment StoreEntitySet="NhanVienPVSX">
+          <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+          <ScalarProperty Name="TT_BGD" ColumnName="TT_BGD" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Nhoms">
+      <EntityTypeMapping TypeName="SoDoToChucModel.Nhom">
+        <MappingFragment StoreEntitySet="Nhom">
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="TenNhom" ColumnName="TenNhom" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="NhomLVs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.NhomLV">
+        <MappingFragment StoreEntitySet="NhomLV">
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="TenNhom" ColumnName="TenNhom" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IDNhomPT" ColumnName="IDNhomPT" />
+          <ScalarProperty Name="PTDB" ColumnName="PTDB" />
+          <ScalarProperty Name="KTVDB" ColumnName="KTVDB" />
+          <ScalarProperty Name="NVDB" ColumnName="NVDB" />
+          <ScalarProperty Name="KTVCa" ColumnName="KTVCa" />
+          <ScalarProperty Name="NVCa" ColumnName="NVCa" />
+          <ScalarProperty Name="TPTDB" ColumnName="TPTDB" />
+          <ScalarProperty Name="TPKipDB" ColumnName="TPKipDB" />
+          <ScalarProperty Name="TTTPDB" ColumnName="TTTPDB" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PhanXuongs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.PhanXuong">
+        <MappingFragment StoreEntitySet="PhanXuong">
+          <ScalarProperty Name="IDPhanXuong" ColumnName="IDPhanXuong" />
+          <ScalarProperty Name="TenPhanXuong" ColumnName="TenPhanXuong" />
+          <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+          <ScalarProperty Name="PTDB" ColumnName="PTDB" />
+          <ScalarProperty Name="TPDB" ColumnName="TPDB" />
+          <ScalarProperty Name="KTVDB" ColumnName="KTVDB" />
+          <ScalarProperty Name="NVDB" ColumnName="NVDB" />
+          <ScalarProperty Name="NVHCDB" ColumnName="NVHCDB" />
+          <ScalarProperty Name="TPTT" ColumnName="TPTT" />
+          <ScalarProperty Name="KTVTT" ColumnName="KTVTT" />
+          <ScalarProperty Name="NVTT" ColumnName="NVTT" />
+          <ScalarProperty Name="TPKip" ColumnName="TPKip" />
+          <ScalarProperty Name="TTTPDB" ColumnName="TTTPDB" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PhongBans">
+      <EntityTypeMapping TypeName="SoDoToChucModel.PhongBan">
+        <MappingFragment StoreEntitySet="PhongBan">
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="NhomID" ColumnName="NhomID" />
+          <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+          <ScalarProperty Name="url" ColumnName="url" />
+          <ScalarProperty Name="TPDB" ColumnName="TPDB" />
+          <ScalarProperty Name="QDTPTDB" ColumnName="QDTPTDB" />
+          <ScalarProperty Name="PTDB" ColumnName="PTDB" />
+          <ScalarProperty Name="TPKipDB" ColumnName="TPKipDB" />
+          <ScalarProperty Name="KTVHCDB" ColumnName="KTVHCDB" />
+          <ScalarProperty Name="KTVCaDB" ColumnName="KTVCaDB" />
+          <ScalarProperty Name="TTTPHCDB" ColumnName="TTTPHCDB" />
+          <ScalarProperty Name="TTTPCaDB" ColumnName="TTTPCaDB" />
+          <ScalarProperty Name="NVHCDB" ColumnName="NVHCDB" />
+          <ScalarProperty Name="NVCaDB" ColumnName="NVCaDB" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="QuyenDangNhaps">
+      <EntityTypeMapping TypeName="SoDoToChucModel.QuyenDangNhap">
+        <MappingFragment StoreEntitySet="QuyenDangNhap">
+          <ScalarProperty Name="IDQuyen" ColumnName="IDQuyen" />
+          <ScalarProperty Name="TenQuyen" ColumnName="TenQuyen" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="sysdiagrams">
+      <EntityTypeMapping TypeName="SoDoToChucModel.sysdiagram">
+        <MappingFragment StoreEntitySet="sysdiagrams">
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+          <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+          <ScalarProperty Name="version" ColumnName="version" />
+          <ScalarProperty Name="definition" ColumnName="definition" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ToLVs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.ToLV">
+        <MappingFragment StoreEntitySet="ToLV">
+          <ScalarProperty Name="IDTo" ColumnName="IDTo" />
+          <ScalarProperty Name="TenTo" ColumnName="TenTo" />
+          <ScalarProperty Name="PhanXuongID" ColumnName="PhanXuongID" />
+          <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+          <ScalarProperty Name="SLDB" ColumnName="SLDB" />
+          <ScalarProperty Name="IDNhomPT" ColumnName="IDNhomPT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ViTris">
+      <EntityTypeMapping TypeName="SoDoToChucModel.ViTri">
+        <MappingFragment StoreEntitySet="ViTri">
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+          <ScalarProperty Name="IDChucVu" ColumnName="IDChucVu" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ViTriLViecs">
+      <EntityTypeMapping TypeName="SoDoToChucModel.ViTriLViec">
+        <MappingFragment StoreEntitySet="ViTriLViec">
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="DangKy_delete" FunctionName="SoDoToChucModel.Store.DangKy_delete" />
+    <FunctionImportMapping FunctionImportName="DangKy_insert" FunctionName="SoDoToChucModel.Store.DangKy_insert" />
+    <FunctionImportMapping FunctionImportName="DangKy_ResetPass" FunctionName="SoDoToChucModel.Store.DangKy_ResetPass" />
+    <FunctionImportMapping FunctionImportName="DangKy_update" FunctionName="SoDoToChucModel.Store.DangKy_update" />
+    <FunctionImportMapping FunctionImportName="HanhChinhNM_delete" FunctionName="SoDoToChucModel.Store.HanhChinhNM_delete" />
+    <FunctionImportMapping FunctionImportName="HanhChinhNM_insert" FunctionName="SoDoToChucModel.Store.HanhChinhNM_insert" />
+    <FunctionImportMapping FunctionImportName="HanhChinhNM_update" FunctionName="SoDoToChucModel.Store.HanhChinhNM_update" />
+    <FunctionImportMapping FunctionImportName="LoaiKH_insert_Excel" FunctionName="SoDoToChucModel.Store.LoaiKH_insert_Excel" />
+    <FunctionImportMapping FunctionImportName="LoaiKH_update_Excel" FunctionName="SoDoToChucModel.Store.LoaiKH_update_Excel" />
+    <FunctionImportMapping FunctionImportName="MaViTri_insert_Excel" FunctionName="SoDoToChucModel.Store.MaViTri_insert_Excel" />
+    <FunctionImportMapping FunctionImportName="MaViTri_update_Excel" FunctionName="SoDoToChucModel.Store.MaViTri_update_Excel" />
+    <FunctionImportMapping FunctionImportName="NhanSuCa_delete" FunctionName="SoDoToChucModel.Store.NhanSuCa_delete" />
+    <FunctionImportMapping FunctionImportName="NhanSuCa_insert" FunctionName="SoDoToChucModel.Store.NhanSuCa_insert" />
+    <FunctionImportMapping FunctionImportName="NhanSuCa_update" FunctionName="SoDoToChucModel.Store.NhanSuCa_update" />
+    <FunctionImportMapping FunctionImportName="NhanVien_delete" FunctionName="SoDoToChucModel.Store.NhanVien_delete" />
+    <FunctionImportMapping FunctionImportName="NhanVien_insert" FunctionName="SoDoToChucModel.Store.NhanVien_insert" />
+    <FunctionImportMapping FunctionImportName="NhanVien_insert_API" FunctionName="SoDoToChucModel.Store.NhanVien_insert_API" />
+    <FunctionImportMapping FunctionImportName="NhanVien_update" FunctionName="SoDoToChucModel.Store.NhanVien_update" />
+    <FunctionImportMapping FunctionImportName="NhanVien_update_API" FunctionName="SoDoToChucModel.Store.NhanVien_update_API" />
+    <FunctionImportMapping FunctionImportName="NhanVien_update_Excel" FunctionName="SoDoToChucModel.Store.NhanVien_update_Excel" />
+    <FunctionImportMapping FunctionImportName="NhanVien_update_TT" FunctionName="SoDoToChucModel.Store.NhanVien_update_TT" />
+    <FunctionImportMapping FunctionImportName="NhanVienAPI_select" FunctionName="SoDoToChucModel.Store.NhanVienAPI_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="SoDoToChucModel.NhanVienAPI_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+          <ScalarProperty Name="DiaChi" ColumnName="DiaChi" />
+          <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+          <ScalarProperty Name="NgayVaoLam" ColumnName="NgayVaoLam" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IDTinhTrangLV" ColumnName="IDTinhTrangLV" />
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="CMND" ColumnName="CMND" />
+          <ScalarProperty Name="IDPhanXuong" ColumnName="IDPhanXuong" />
+          <ScalarProperty Name="IDToLV" ColumnName="IDToLV" />
+          <ScalarProperty Name="IDCa" ColumnName="IDCa" />
+          <ScalarProperty Name="IDNhomLV" ColumnName="IDNhomLV" />
+          <ScalarProperty Name="MaViTri" ColumnName="MaViTri" />
+          <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+          <ScalarProperty Name="TT_BGD" ColumnName="TT_BGD" />
+          <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="NhanVienPVSX_delete" FunctionName="SoDoToChucModel.Store.NhanVienPVSX_delete" />
+    <FunctionImportMapping FunctionImportName="NhanVienPVSX_insert" FunctionName="SoDoToChucModel.Store.NhanVienPVSX_insert" />
+    <FunctionImportMapping FunctionImportName="NhanVienPVSX_update" FunctionName="SoDoToChucModel.Store.NhanVienPVSX_update" />
+    <FunctionImportMapping FunctionImportName="Nhom_delete" FunctionName="SoDoToChucModel.Store.Nhom_delete" />
+    <FunctionImportMapping FunctionImportName="Nhom_insert" FunctionName="SoDoToChucModel.Store.Nhom_insert" />
+    <FunctionImportMapping FunctionImportName="Nhom_insert_Excel" FunctionName="SoDoToChucModel.Store.Nhom_insert_Excel" />
+    <FunctionImportMapping FunctionImportName="Nhom_update" FunctionName="SoDoToChucModel.Store.Nhom_update" />
+    <FunctionImportMapping FunctionImportName="Nhom_update_Excel" FunctionName="SoDoToChucModel.Store.Nhom_update_Excel" />
+    <FunctionImportMapping FunctionImportName="PhanXuong_delete" FunctionName="SoDoToChucModel.Store.PhanXuong_delete" />
+    <FunctionImportMapping FunctionImportName="PhanXuong_insert" FunctionName="SoDoToChucModel.Store.PhanXuong_insert" />
+    <FunctionImportMapping FunctionImportName="PhanXuong_insert_Excel" FunctionName="SoDoToChucModel.Store.PhanXuong_insert_Excel" />
+    <FunctionImportMapping FunctionImportName="PhanXuong_insert_name" FunctionName="SoDoToChucModel.Store.PhanXuong_insert_name" />
+    <FunctionImportMapping FunctionImportName="PhanXuong_update" FunctionName="SoDoToChucModel.Store.PhanXuong_update" />
+    <FunctionImportMapping FunctionImportName="PhanXuong_update_Excel" FunctionName="SoDoToChucModel.Store.PhanXuong_update_Excel" />
+    <FunctionImportMapping FunctionImportName="PhongBan_delete" FunctionName="SoDoToChucModel.Store.PhongBan_delete" />
+    <FunctionImportMapping FunctionImportName="PhongBan_insert" FunctionName="SoDoToChucModel.Store.PhongBan_insert" />
+    <FunctionImportMapping FunctionImportName="PhongBan_insert_API" FunctionName="SoDoToChucModel.Store.PhongBan_insert_API" />
+    <FunctionImportMapping FunctionImportName="PhongBan_insert_Excel" FunctionName="SoDoToChucModel.Store.PhongBan_insert_Excel" />
+    <FunctionImportMapping FunctionImportName="PhongBan_update" FunctionName="SoDoToChucModel.Store.PhongBan_update" />
+    <FunctionImportMapping FunctionImportName="PhongBan_update_Excel" FunctionName="SoDoToChucModel.Store.PhongBan_update_Excel" />
+    <FunctionImportMapping FunctionImportName="ToLV_delete" FunctionName="SoDoToChucModel.Store.ToLV_delete" />
+    <FunctionImportMapping FunctionImportName="ToLV_insert" FunctionName="SoDoToChucModel.Store.ToLV_insert" />
+    <FunctionImportMapping FunctionImportName="ToLV_update" FunctionName="SoDoToChucModel.Store.ToLV_update" />
+    <FunctionImportMapping FunctionImportName="ViTri_insert_API" FunctionName="SoDoToChucModel.Store.ViTri_insert_API" />
+  </EntityContainerMapping>
+</Mapping>

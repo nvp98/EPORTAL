@@ -1,0 +1,41 @@
+﻿@model EPORTAL.Models.A_GroupQuyenDetailsValidation
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDQuyenHT)
+    <div class="modal-dialog" style="max-width:800px" id="formF">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="form-group col-md-12 " style="display:grid">
+                            <label class="mb-1">Tên Nhóm Quyền</label>
+                            @Html.TextAreaFor(model => model.TenQuyenHT, new { @class = "form-control", @rows = 1, placeholder = "Tên Nhóm quyền", @id = "TenQuyenHT", })
+                            @Html.ValidationMessageFor(model => model.TenQuyenHT, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" value="Xác nhận" class="btn btn-primary pull-right " />
+                        <input type="reset" value="Hủy" class="btn btn-danger pull-right button_cancel mr-1" data-dismiss="modal" />
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+@*<script>
+        $("#formF #IDPB").chosen({
+            width: "100%"
+        });
+    </script>*@
+

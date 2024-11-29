@@ -1,0 +1,324 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<NT_ExtendcardValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách đăng ký gia hạn thẻ nhà thầu
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-10 col-lg-10">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @if ((ViewBag.QUYENCN as List<String>).Contains("ADD"))
+                            {
+                                <div class="col-md-2">
+
+                                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Add","ListExtendcard",new {area="TagSign"})' style="margin-top:50px"></div>
+
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            @if ((ViewBag.QUYENCN as List<String>).Contains("DELETE") || (ViewBag.QUYENCN as List<String>).Contains("EDIT"))
+                                            {
+                                                <th class="text-center" width="100px">Thao tác</th>
+                                            }
+                                            <th class="text-center" width="200px">Trích yếu nội dung văn bản</th>
+                                            <th class="text-center" width="200px">Nhân viên NT</th>
+                                            <th class="text-center" width="200px">Nhà thầu</th>
+                                            <th class="text-center" width="200px">Hợp đồng</th>
+                                            <th class="text-center" width="100px">Tình trạng</th>
+                                            <th class="text-center" width="100px">Ngày trình ký</th>
+                                            <th class="text-center" width="200px">Ghi chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                    @if ((ViewBag.QUYENCN as List<String>).Contains("DELETE") || (ViewBag.QUYENCN as List<String>).Contains("EDIT"))
+                                                    {
+                                                        <td class="text-center">
+                                                            @if (item.IDTTTK == 0 || item.IDTTTK == 3)
+                                                            {
+                                                                if (item.IDNVTK == MyAuthentication.ID)
+                                                                {
+                                                                    <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "ListExtendcard", new { id = item.IDGH })"
+                                                                       onclick="return confirm('Bạn muốn xóa Thông tin  : @item.NoiDung')">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                    </a>
+
+                                                                    <a id="btn-Info_@item.IDGH" href="#" title="trình ký" class="btn-action"><i class="fa fa-paper-plane"></i> </a>
+                                                                    <div class="modal " id="myModaleInfo_@item.IDGH" role="dialog" data-url='@Url.Action("CheckInformation", "ListExtendcard", new { id = item.IDGH, idtt = 1 })'></div>
+                                                                    <script type="text/javascript">
+                                                                            $('#btn-Info_@item.IDGH').click(function () {
+                                                                                var url = $('#myModaleInfo_@item.IDGH').data('url');
+                                                                                $.get(url, function (data) {
+                                                                                    $("#myModaleInfo_@item.IDGH").html(data);
+                                                                                    $("#ModalTitle").html("Trình ký danh sách");
+                                                                                    $("#myModaleInfo_@item.IDGH").modal('show');
+                                                                                });
+                                                                            });
+                                                                    </script>
+                                                                }
+
+                                                            }
+                                                            else if (item.IDTTTK != 2 && item.IDNVTK == MyAuthentication.ID)
+                                                            {
+                                                                <a title="Hủy trình ký" class="btn-action" href="@Url.Action("Cancel", "ListExtendcard", new { id = item.IDGH})"
+                                                                   onclick="return confirm('Bạn muốn hủy trình ký  : @item.FullName')">
+                                                                    <i class="fa fa-ban" aria-hidden="true"></i>
+                                                                </a>
+                                                            }
+                                                            @if (item.IDTTTK == 0)
+                                                            {
+                                                                <a href="@Url.Action("Form", "Detail_ListExtendcard", new { id = item.IDGH })" class="btn-action" title="Chi tiết văn bản">
+                                                                    <i class="fa-solid fa-bars"></i>
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a href="@Url.Action("Index", "Detail_ListExtendcard", new { id = item.IDGH })" class="btn-action" title="Chi tiết văn bản">
+                                                                    <i class="fa-solid fa-bars"></i>
+                                                                </a>
+                                                            }
+                                                            @if (item.FileComplete != null && item.FileComplete.Length > 0)
+                                                            {
+
+                                                                <a class="" target="_blank" href="@Url.Content("~/UploadedFiles/PDFDangKyGH/" + item.FileComplete)"><i class="fa-solid fa-download"></i></a>
+                                                            }
+                                                        </td>
+                                                    }
+
+                                                    <td>@item.NoiDung</td>
+                                                    <td>
+                                                        @if (item.Namefile == "1")
+                                                        {
+                                                            <span>Người Việt Nam</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>Người Nước ngoài</span>
+                                                        }
+                                                    </td>
+                                                    <td>@item.FullName</td>
+
+                                                    <td>
+                                                        @if (item.HDID != null)
+                                                        {
+                                                            <span>@item.Somecontracts</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (item.IDTTTK == 0)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowRenew", new { IDGH = item.IDGH})">Chưa trình ký</a>
+
+                                                        }
+                                                        else if (item.IDTTTK == 1)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowRenew", new { IDGH = item.IDGH})">Đã trình ký</a>
+                                                            @*<td>Đang xử lý</td>*@
+                                                        }
+                                                        else if (item.IDTTTK == 2)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowRenew", new { IDGH = item.IDGH})">Đã xử lý</a>
+                                                            @*<td>Đã xử lý</td>*@
+                                                        }
+                                                        else if (item.IDTTTK == 3)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowRenew", new { IDGH = item.IDGH})">Hủy trình ký</a>
+                                                            @*<td>Hủy trình ký</td>*@
+                                                        }
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        @item.NgayTrinhKy.ToString("dd-MM-yyyy")
+                                                    </td>
+                                                    <td>@item.GhiChu</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "ListExtendcard", new { area = "TagSign", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm tiêu đề");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Add Permission");
+            $("#myModal").modal('show');
+        });
+    });
+     $("#btn-search").on('click', function () {
+         var search = $('#txtsearch').val();
+         var begind = Date.parse($('#begind').val());
+         var endd = Date.parse($('#endd').val());
+         window.location.href = '@Url.Action("Index", "ListExtendcard")?search=' + search + '&begind=' + $('#begind').val() + '&endd=' + $('#endd').val();
+     });
+    $(document).ready(function () {
+        var dateNewFormat, onlyDate, today = new Date();
+
+        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        dateLastDate = prevMonthLastDate.getFullYear() + '-';
+        if (prevMonthLastDate.getMonth() >= 9) {
+
+            dateLastDate += (prevMonthLastDate.getMonth() + 1);
+        }
+        else {
+            dateLastDate += '0' + (prevMonthLastDate.getMonth() + 1);
+        }
+
+        onlyLastDate = prevMonthLastDate.getDate();
+
+        if (onlyLastDate.toString().length == 2) {
+
+            dateLastDate += "-" + onlyLastDate;
+        }
+        else {
+            dateLastDate += '-0' + onlyLastDate;
+        }
+
+
+
+        dateNewFormat = today.getFullYear() + '-';
+        if (today.getMonth() >= 9) {
+
+            dateNewFormat += (today.getMonth() + 1);
+        }
+        else {
+            dateNewFormat += '0' + (today.getMonth() + 1);
+        }
+
+        onlyDate = today.getDate();
+        if (onlyDate.toString().length == 2) {
+
+            dateNewFormat += "-" + onlyDate;
+        }
+        else {
+            dateNewFormat += '-0' + onlyDate;
+        }
+        if ($('#begind').val() == '') {
+            $('#begind').val(dateLastDate);
+        }
+        if ($('#endd').val() == '') {
+            $('#endd').val(dateNewFormat);
+        }
+    });
+</script>
+
+
+
+
+

@@ -1,0 +1,114 @@
+﻿@model SoDoToChuc.Models.AdminPhanXuong
+@using EPORTAL.ModelsOrganizational
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Tên Phân Xưởng</label>
+                                @Html.EditorFor(model => model.TenPhanXuong, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập Tên Phân Xưởng", @id = "IDPhanXuong", @text = "Phân Xưởng" } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Phòng Ban</label>
+                                @Html.DropDownListFor(model => model.PhongBanID, ViewBag.PBList as SelectList, "--Chọn Phòng Ban--", new { @id = "IDPhongBan", @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.V_TT, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <label class="small col-md-12 font-weight-bold text-left">Nhân sự định biên</label>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Quản đốc DB</label>
+                                @Html.EditorFor(model => model.TPDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TPDB", } })
+                                @Html.ValidationMessageFor(model => model.TPDB, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Phụ trách DB</label>
+                                @Html.EditorFor(model => model.PTDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "PTDB", } })
+                                @Html.ValidationMessageFor(model => model.PTDB, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">T/P Kíp DB</label>
+                                @Html.EditorFor(model => model.TPKip, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TPKip", } })
+                                @Html.ValidationMessageFor(model => model.TPKip, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">KTV DB</label>
+                                @Html.EditorFor(model => model.KTVDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "KTVDB", } })
+                                @Html.ValidationMessageFor(model => model.KTVDB, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Tổ trưởng/Tổ phó DB</label>
+                                @Html.EditorFor(model => model.TTTP, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TTTP", } })
+                                @Html.ValidationMessageFor(model => model.TTTP, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Nhân viên HC DB</label>
+                                @Html.EditorFor(model => model.PTTT, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "PTTT", } })
+                                @Html.ValidationMessageFor(model => model.PTTT, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Nhân viên DB</label>
+                                @Html.EditorFor(model => model.NVDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NVDB", } })
+                                @Html.ValidationMessageFor(model => model.NVDB, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+
+
+
+
+
+                    </div>
+
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+                        <input type="reset" value="Hủy" class="btn btn-danger button_cancel" data-dismiss="modal" />
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+</script>
+
+

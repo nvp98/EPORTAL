@@ -1,0 +1,182 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Publish/Views/Shared/_InternalLayout2.cshtml";
+}
+@using EPORTAL.ModelsDanhBaDoiTac
+@model PagedList.IPagedList<ComplainValidation>
+
+@using PagedList.Mvc
+<link href="~/Areas/Publish/Content/assets/css/PagedList.css" rel="stylesheet" />
+<script src="//cdn.ckeditor.com/4.19.0/full/ckeditor.js"></script>
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Khiếu Nại</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700;1,900&display=swap"
+          rel="stylesheet">
+
+    <link href="~/Areas/Publish/Layout/css/plugins/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/Areas/Publish/Layout/css/plugins/splide.min.css" />
+    <link rel="stylesheet" href="~/Areas/Publish/Layout/css/reset.css" />
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+    <div class="main_wrap">
+        <div class="d_content s_main-content">
+
+            @{
+                DanhBaDoiTacEntities db_context1 = new DanhBaDoiTacEntities();
+                var ress = from t in db_context1.DB_TinhTrangKhieuNai
+                           select new TinhTrangKhieuNaiValidation
+                           {
+                               IDTTKN = t.IDTTKN,
+                               TenTTKN = t.TenTTKN
+                           };
+            }
+            <div class="card">
+                <div class="container">
+
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item active"><a class="nav-link" style="text-decoration: none; font-size:23px" data-toggle="tab" href="tryit.asp-filename=trybs_tabs_dynamic&stacked=h.html#home">Đã nhận được</a></li>
+                        @foreach (var it in ress)
+                        {
+
+                            <li class="nav-item"><a class="nav-link" style="text-decoration: none; margin-left: 15px; font-size: 23px" data-toggle="tab" href="tryit.asp-filename=trybs_tabs_dynamic&stacked=h.html#t_@it.IDTTKN">@it.TenTTKN</a></li>
+                        }
+
+
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="home" class="tab-pane fade show active" style="text-decoration: none;">
+                            @foreach (var item in Model)
+                            {
+                                <div class="s_row_noti d-flex align-items-center justify-content-between">
+                                    <div class="s_name d-flex align-items-center">
+                                        <div class="col-md-3.5">
+                                            <p class="icon-file" style="font-weight: bold">@item.MaKhieuNai</p>
+                                        </div>
+                                        <div class="row">
+                                            <div class="column">
+                                                <a style="text-decoration: none; font-weight: bold; color: darkgray; margin-left: 10px" class="name-file a" href="@Url.Action("RespondComplainDetail","ResponToComplain", new { id = item.IDKhieuNai})">@item.TieuDeKN</a>
+                                                <div class="col-md-12">
+                                                    <span style="font-size:12px; color: black"> @item.NguoiKN</span>
+                                                    <span style="font-size:12px; color: black; margin-left: 15px"> @(string.Format("{0}", Math.Round(Math.Abs(((DateTime.Now - Convert.ToDateTime(@item.NgayKN)).TotalDays)-1)).ToString())) ngày trước </span>
+                                                    <span style="font-size: 12px; color: black; margin-left: 15px"> @item.TenTTKN</span>
+                                                    <a style="text-decoration:none; margin-left:30px" class="fa fa-commenting" title="Phản Hồi" href="@Url.Action("RespondComplainDetail","ResponToComplain", new { id = item.IDKhieuNai})">@item.SLPH</a>
+                                                    <span style="margin-left: 20px; font-size:12px; color: black;" class="datetime">@item.NgayKN.ToString("dd-MM-yyyy")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-white" style="min-height:80px;">
+                                        <div class="col-md-3">
+                                            <img src="@item.ImageLogo" style="width: 130px;height: 100px; text-align:center; text-align:center">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <hr />
+                            }
+                        </div>
+                        @foreach (var item in Model)
+                        {
+                            <div id="t_@item.IDTTKN" class="tab-pane container fade">
+                                @foreach (var it in Model)
+                                {
+                                    if (it.IDTTKN == item.IDTTKN)
+                                    {
+                                        <div class="s_row_noti d-flex align-items-center justify-content-between">
+                                            <div class="s_name d-flex align-items-center">
+                                                <div class="col-md-3.5">
+                                                    <p class="icon-file" style="font-weight: bold">@it.MaKhieuNai</p>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="column">
+                                                        <a style="text-decoration: none; font-weight: bold; color: darkgray; margin-left: 10px" class="name-file a" href="@Url.Action("RespondComplainDetail","ResponToComplain", new { id = it.IDKhieuNai})">@it.TieuDeKN</a>
+                                                        <div class="col-md-12">
+                                                            <span style="font-size:12px; color: black"> @it.NguoiKN</span>
+                                                            <span style="font-size:12px; color: black; margin-left: 15px"> @(string.Format("{0}", Math.Round(Math.Abs(((DateTime.Now - Convert.ToDateTime(@it.NgayKN)).TotalDays)-1)).ToString())) ngày trước </span>
+                                                            <span style="font-size: 12px; color: black; margin-left: 15px"> @it.TenTTKN</span>
+                                                            <a style="text-decoration:none; margin-left:30px" class="fa fa-commenting" title="Phản Hồi" href="@Url.Action("RespondComplainDetail","ResponToComplain", new { id = it.IDKhieuNai})">@it.SLPH</a>
+                                                            <span style="margin-left: 20px; font-size:12px; color: black;" class="datetime">@it.NgayKN.ToString("dd-MM-yyyy")</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-white" style="min-height:80px;">
+                                                <div class=" col-md-3">
+                                                    <img src="@it.ImageLogo" style="width: 130px;height: 100px; text-align:center; text-align:center">
+                                                </div>
+                                            </div>
+                                        </div><hr />
+                                    }
+
+
+                                }
+
+                            </div>
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="~/Areas/Publish/Layout/js/plugins/jquery.min.js"></script>
+    <script src="~/Areas/Publish/Layout/js/plugins/bootstrap.bundle.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        $('#btn-add').click(function () {
+            var url = $('#myModal').data('url');
+            $.get(url, function (data) {
+                $("#myModal").html(data);
+                // $("#ModalTitle").html("Thêm Khiếu Nại");
+                $("#myModal").modal('show');
+            });
+        });
+
+        $(document).ready(function () {
+            $(".nav-tabs a").click(function () {
+                $(this).tab('show');
+            });
+            $('.nav-tabs a').on('shown.bs.tab', function (event) {
+                var x = $(event.target).text();         // active tab
+                var y = $(event.relatedTarget).text();  // previous tab
+                $(".act span").text(x);
+                $(".prev span").text(y);
+            });
+        });
+    </script>
+</body>
+
+<style>
+    .s_main-content {
+        min-height: 790px;
+    }
+</style>
+
+
+
+
+
+

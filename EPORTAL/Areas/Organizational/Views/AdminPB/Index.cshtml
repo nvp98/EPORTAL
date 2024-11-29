@@ -1,0 +1,207 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using SoDoToChuc.Models
+@using PagedList.Mvc
+@model PagedList.IPagedList<AdminPB>
+@using EPORTAL.ModelsOrganizational
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="far fa-user-circle"></i>
+                    </div>
+                    <div>
+                        Quản lý thông tin Bộ Phận
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-header">
+                        <label class="">Thông Tin</label>
+                        @*<button type="button" id="btn-Import" class="btn btn-success m-l-auto"><i class="fa fa-file-excel">&nbsp;</i>&nbsp;Nhập Danh sách </button>
+                            <span class="modal fade" id="myModalimport" role="dialog" data-url='@Url.Action("ImportExcel", "AdminPB")'></span>*@
+                        <button type="button " id="btn-add" class="btn btn-primary m-l-auto " style="margin-left:10px"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                        <div class="modal fade" id="myModal" role="dialog" data-url='@Url.Action("Create","AdminPB")'></div>
+                    </div>
+                    <div class="card-header">
+
+                        <div class="row w-75">
+                            <div class="col-5">
+                                @Html.DropDownList("NhomList", null, "---- Khối ----", new { id = "NhomID", @class = "form-control", })
+                            </div>
+                            <div class="col-md-5">
+                                @Html.DropDownList("PBList", null, "---- Bộ Phận ----", new { id = "IDPhongBan", @class = "form-control", })
+                            </div>
+
+
+
+
+
+                            <div class="col-md-1">
+                                <button type="button" style="width: 100px;" id="btsearch" class="btn btn-primary pull-left"><i class="fa fa-search">&nbsp;</i>&nbsp;Tìm kiếm </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="30px" class="text-center">STT</th>
+                                        <th width="" class="text-center">Tên Bộ Phận</th>
+                                        <th width="" class="text-center">Khối </th>
+                                        <th width="" class="text-center">Hình Ảnh</th>
+                                        @*<th width="" class="text-center">Link</th>*@
+                                        <th width="" class="text-center">T/P Bộ phận</th>
+                                        <th width="" class="text-center">QD/TPT</th>
+                                        <th width="" class="text-center">Phụ trách</th>
+                                        <th width="" class="text-center">KTV HC</th>
+                                        <th width="" class="text-center"> Tổ trưởng/phó HC</th>
+                                        <th width="" class="text-center">NV HC</th>
+                                        <th width="" class="text-center">Trưởng phó Kíp</th>
+                                        <th width="" class="text-center">KTV Ca</th>
+                                        <th width="" class="text-center">Tổ trưởng/phó Ca</th>
+                                        <th width="" class="text-center">NV Ca</th>
+                                        <th width="" class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int pageno = (int)Model.PageNumber;
+                                        int itemperpage = (int)Model.PageSize;
+                                        int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        int index = 0;
+
+                                    }
+
+
+                                    @foreach (var item in Model)
+                                    {
+                                        index++;
+
+                                        <tr>
+                                            <td class="text">@RowNo@{RowNo++;}</td>
+                                            <td class="text">@item.TenPhongBan</td>
+                                            <td class="text">@item.TenNhom</td>
+                                            <td class="text-center " style="max-width:100px">
+                                                @if (item.ImagePath != "" && item.ImagePath != null)
+                                                {
+                                                    <img src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.ImagePath))" class="d-block w-25 m-auto zoom" alt="" />
+                                                }
+                                            </td>
+                                            <td class="text-center">@item.TPDB</td>
+                                            <td class="text-center">@item.QDTPTDB</td>
+                                            <td class="text-center">@item.PTDB</td>
+                                            <td class="text-center">@item.KTVHCDB</td>
+                                            <td class="text-center">@item.TTTPHCDB</td>
+                                            <td class="text-center">@item.NVHCDB</td>
+                                            <td class="text-center">@item.TPKipDB</td>
+                                            <td class="text-center">@item.KTVCaDB</td>
+                                            <td class="text-center">@item.TTTPCaDB</td>
+                                            <td class="text-center">@item.NVCaDB</td>
+                                            <td class="text-center">
+                                                <a id="btn-edit_@item.IDPhongBan" title="Sửa" style="cursor:pointer;"><i class='fa fa-edit'></i></a>
+                                                <div class="modal fade" id="myModale_@item.IDPhongBan" role="dialog" data-url='@Url.Action("Edit","AdminPB", new { id = item.IDPhongBan })'></div>
+                                                <script type="text/javascript">
+                                                    $('#btn-edit_@item.IDPhongBan').click(function () {
+                                                        var url = $('#myModale_@item.IDPhongBan').data('url');
+                                                        $.get(url, function (data) {
+                                                            $("#myModale_@item.IDPhongBan").html(data);
+                                                            $("#ModalTitle").html("Cập nhật Nội dung");
+                                                            $("#myModale_@item.IDPhongBan").modal('show');
+                                                            $("#myModale_@item.IDPhongBan").addClass('show');
+                                                    });
+                                                });
+                                                </script>
+                                                <a title="Xóa" href="@Url.Action("Delete", "AdminPB", new { id = item.IDPhongBan })"
+                                                   onclick="return confirm('Bạn muốn xóa Thông tin phòng ban : @item.TenPhongBan')">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="pager">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", "AdminPB", new { page }))
+                                <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+    $("#btsearch").on('click', function () {
+        var NhomID = $('#NhomID').val();
+        var IDPhongBan = $('#IDPhongBan').val();
+        window.location.href = '@Url.Action("Index", "AdminPB")?NhomID=' + NhomID + '&IDPhongBan=' + IDPhongBan ;
+    });
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm mới Thông Tin");
+            $("#myModal").modal('show');
+            $("#myModal").addClass('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalimport').data('url');
+        $.get(url, function (data) {
+            $("#myModalimport").html(data);
+            $("#ModalTitle").html("Thêm mới Thông Tin");
+            $("#myModalimport").modal('show');
+        });
+    });
+</script>
+<script type="text/javascript">
+    $("#NhomID").chosen({
+        width: "100%"
+    });
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+</script>

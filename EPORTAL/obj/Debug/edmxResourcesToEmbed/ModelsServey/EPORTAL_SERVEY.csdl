@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EPORTAL_SERVEYModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="EmployeeServey">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDNV" Type="Int32" />
+    <Property Name="IDSV" Type="Int32" />
+    <Property Name="OTID" Type="Int32" />
+    <Property Name="XNSV" Type="Boolean" />
+    <Property Name="MenuOT" Type="Int32" />
+  </EntityType>
+  <EntityType Name="ListServey">
+    <Key>
+      <PropertyRef Name="IDSV" />
+    </Key>
+    <Property Name="IDSV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ContentSV" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="StartTime" Type="DateTime" Precision="0" />
+    <Property Name="EndTime" Type="DateTime" Precision="0" />
+    <Property Name="StatusSV" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="OptionServey">
+    <Key>
+      <PropertyRef Name="IDOT" />
+    </Key>
+    <Property Name="IDOT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ContentOT" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="IDSV" Type="Int32" />
+    <Property Name="FilePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="OrderBy" Type="Int32" />
+  </EntityType>
+  <EntityType Name="PartTogether">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDNV" Type="Int32" />
+    <Property Name="HoTen" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="NamSinh" Type="DateTime" Precision="0" />
+    <Property Name="IDESV" Type="Int32" />
+    <Property Name="Re" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="isCom" Type="Boolean" />
+    <Property Name="Note" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="ResultServey">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDES" Type="Int32" />
+    <Property Name="IDSV" Type="Int32" />
+    <Property Name="IDOT" Type="Int32" />
+    <Property Name="StatusRS" Type="Int32" />
+  </EntityType>
+  <EntityContainer Name="EPORTAL_SERVEYEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="EmployeeServeys" EntityType="Self.EmployeeServey" />
+    <EntitySet Name="ListServeys" EntityType="Self.ListServey" />
+    <EntitySet Name="OptionServeys" EntityType="Self.OptionServey" />
+    <EntitySet Name="PartTogethers" EntityType="Self.PartTogether" />
+    <EntitySet Name="ResultServeys" EntityType="Self.ResultServey" />
+    <FunctionImport Name="EmployeeServey_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="EmployeeServey_insert">
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="MenuOT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="EmployeeServey_selectNV" ReturnType="Collection(EPORTAL_SERVEYModel.EmployeeServey_selectNV_Result)">
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="EmployeeServey_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="MenuOT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="EmployeeServey_updateOtion">
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="OTID" Mode="In" Type="Int32" />
+      <Parameter Name="XNSV" Mode="In" Type="Boolean" />
+      <Parameter Name="MenuOT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="EmployeeServey_updateXN">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="XNSV" Mode="In" Type="Boolean" />
+    </FunctionImport>
+    <FunctionImport Name="ListServey_delete">
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="ListServey_insert">
+      <Parameter Name="ContentSV" Mode="In" Type="String" />
+      <Parameter Name="StartTime" Mode="In" Type="DateTime" />
+      <Parameter Name="EndTime" Mode="In" Type="DateTime" />
+      <Parameter Name="StatusSV" Mode="In" Type="Boolean" />
+    </FunctionImport>
+    <FunctionImport Name="ListServey_selectNV" ReturnType="Collection(EPORTAL_SERVEYModel.ListServey_selectNV_Result)">
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="TimeNow" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="ListServey_update">
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="ContentSV" Mode="In" Type="String" />
+      <Parameter Name="StartTime" Mode="In" Type="DateTime" />
+      <Parameter Name="EndTime" Mode="In" Type="DateTime" />
+      <Parameter Name="StatusSV" Mode="In" Type="Boolean" />
+    </FunctionImport>
+    <FunctionImport Name="OptionServey_create">
+      <Parameter Name="ContentOT" Mode="In" Type="String" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="FilePath" Mode="In" Type="String" />
+      <Parameter Name="OrderBy" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="OptionServey_delete">
+      <Parameter Name="IDOT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="OptionServey_selectOT" ReturnType="Collection(EPORTAL_SERVEYModel.OptionServey_selectOT_Result)">
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="OptionServey_update">
+      <Parameter Name="IDOT" Mode="In" Type="Int32" />
+      <Parameter Name="ContentOT" Mode="In" Type="String" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="FilePath" Mode="In" Type="String" />
+      <Parameter Name="OrderBy" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="PartTogether_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="PartTogether_insert">
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="NamSinh" Mode="In" Type="DateTime" />
+      <Parameter Name="IDESV" Mode="In" Type="Int32" />
+      <Parameter Name="Re" Mode="In" Type="String" />
+      <Parameter Name="isCom" Mode="In" Type="Boolean" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="PartTogether_selectCom" ReturnType="Collection(EPORTAL_SERVEYModel.PartTogether_selectCom_Result)">
+      <Parameter Name="IDESV" Mode="In" Type="Int32" />
+      <Parameter Name="isCom" Mode="In" Type="Boolean" />
+    </FunctionImport>
+    <FunctionImport Name="PartTogether_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IDNV" Mode="In" Type="Int32" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="NamSinh" Mode="In" Type="DateTime" />
+      <Parameter Name="IDESV" Mode="In" Type="Int32" />
+      <Parameter Name="Re" Mode="In" Type="String" />
+      <Parameter Name="isCom" Mode="In" Type="Boolean" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="ResultServey_create">
+      <Parameter Name="IDES" Mode="In" Type="Int32" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="IDOT" Mode="In" Type="Int32" />
+      <Parameter Name="StatusRS" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="ResultServey_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IDES" Mode="In" Type="Int32" />
+      <Parameter Name="IDSV" Mode="In" Type="Int32" />
+      <Parameter Name="IDOT" Mode="In" Type="Int32" />
+      <Parameter Name="StatusRS" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="RsultServey_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+  </EntityContainer>
+  <ComplexType Name="EmployeeServey_selectNV_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="IDNV" Nullable="true" />
+    <Property Type="Int32" Name="IDSV" Nullable="true" />
+    <Property Type="Int32" Name="OTID" Nullable="true" />
+    <Property Type="Boolean" Name="XNSV" Nullable="true" />
+    <Property Type="Int32" Name="MenuOT" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="ListServey_selectNV_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="IDNV" Nullable="true" />
+    <Property Type="Int32" Name="IDSV" Nullable="true" />
+    <Property Type="Int32" Name="OTID" Nullable="true" />
+    <Property Type="Boolean" Name="XNSV" Nullable="true" />
+    <Property Type="Int32" Name="MenuOT" Nullable="true" />
+    <Property Type="String" Name="ContentSV" Nullable="true" MaxLength="500" />
+    <Property Type="DateTime" Name="StartTime" Nullable="true" />
+    <Property Type="DateTime" Name="EndTime" Nullable="true" />
+    <Property Type="Boolean" Name="StatusSV" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="OptionServey_selectOT_Result">
+    <Property Type="Int32" Name="IDOT" Nullable="false" />
+    <Property Type="String" Name="ContentOT" Nullable="true" MaxLength="500" />
+    <Property Type="Int32" Name="IDSV" Nullable="true" />
+    <Property Type="String" Name="FilePath" Nullable="true" />
+    <Property Type="Int32" Name="OrderBy" Nullable="true" />
+    <Property Type="String" Name="ContentSV" Nullable="true" MaxLength="500" />
+    <Property Type="DateTime" Name="EndTime" Nullable="true" />
+    <Property Type="DateTime" Name="StartTime" Nullable="true" />
+    <Property Type="Boolean" Name="StatusSV" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="PartTogether_selectCom_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="IDNV" Nullable="true" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="NamSinh" Nullable="true" />
+    <Property Type="Int32" Name="IDESV" Nullable="true" />
+    <Property Type="String" Name="Re" Nullable="true" MaxLength="200" />
+    <Property Type="Boolean" Name="isCom" Nullable="true" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="200" />
+  </ComplexType>
+</Schema>

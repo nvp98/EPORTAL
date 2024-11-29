@@ -1,0 +1,292 @@
+﻿
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<DK_Detail_ListExtendcardNTValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    var IDGHT = ViewData["id"];
+    var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <a href="@Url.Action("Index", "ApproveExtension")" class="btn-action">
+                        <div class="page-title-icon">
+                            <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                            </i>
+                        </div>
+                    </a>
+
+                    <div>
+                        ĐƠN ĐỀ NGHỊ CẤP LẠI/ GIA HẠN/ ĐIỀU CHỈNH THÔNG TIN THẺ NGƯỜI
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+                <span class="m-l-auto"><a class="btn btn-primary m-3" href="@Url.Action("ExportToExcel","ApproveExtension", new { id = IDGHT})">&nbsp;Xuất danh sách</a></span>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div style="margin-top: 1%; text-align:center;">
+                        <h3>
+                            <b>
+                                ĐƠN ĐỀ NGHỊ CẤP LẠI/ GIA HẠN/ ĐIỀU CHỈNH THÔNG TIN THẺ NGƯỜI
+                            </b>
+                        </h3>
+                    </div>
+                    <div style=" margin: 1% 0% 1% 3%;">
+                        @{
+                            if (IDGHT != null)
+                            {
+                                var bmid = Convert.ToInt32(IDGHT);
+                                var ctid = db_dk.DK_CardExtend.Where(x => x.IDGHT == bmid).SingleOrDefault();
+                                var nt = db.NT_Partner.Where(x => x.ID == ctid.NTID).FirstOrDefault();
+                                var hp = db.NT_Contract.Where(x => x.IDContract == ctid.HDID).FirstOrDefault();
+                                var pb = db.PhongBans.Where(x => x.IDPhongBan == ctid.PhongBanID).FirstOrDefault();
+                                <h6>
+                                    <b>Kính gửi:</b> - Công ty Cổ phần Thép Hòa Phát Dung Quất.<br />
+                                    Căn cứ theo hợp đồng số:  giữa Nhà thầu: @nt.ShortName và HPDQ (Thời hạn hợp đồng: đến ngày ) <br />
+                                    Nhà thầu đang thực hiện gói thầu thời hạn gói thầu từ ngày  đến ngày  do BP: @pb.TenPhongBan quản lý.<br />
+                                    Để đáp ứng công việc, Nhà thầu @nt.ShortName kính đề nghị các Bộ phận cấp thẻ ra vào / lưu trú/ ĐTTM/ Ra vào Cảng cho những CBNV có tên sau:
+                                </h6>
+                                <div class="form-group pull-right">
+                                    <a style="font-size:100%;" href="@Url.Content("~/PDFHocAT/" + System.IO.Path.GetFileName(ctid.FileComplete))"> <i class="fa fa-download" aria-hidden="true"></i> Tải Folder ảnh </a>
+                                </div>
+                            }
+
+                        }
+
+                    </div>
+                    <div class="card-body" style="width:80vw;overflow-x:auto">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" style="width:100vw" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" rowspan="2" style="vertical-align:middle">TT</th>
+                                            <th class="text-center" rowspan="2" width="100px" style="vertical-align:middle">Thao tác</th>
+
+                                            <th class="text-center" rowspan="2" width="300px" style="vertical-align:middle">Họ tên</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Ngày sinh</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">CMND/CCCD</th>
+                                            <th class="text-center" rowspan="2" width="250px" style="vertical-align:middle">Hộ khẩu thường trú</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Chức vụ</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Số điện thoại</th>
+                                            <th class="text-center" colspan="5" width="200px" style="vertical-align:middle">Chọn X</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Thời hạn thẻ</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Khu vực làm việc</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Cổng đăng ký ra/vào</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Nhóm NT</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Ghi chú</th>
+                                        </tr>
+                                        <tr>
+                                            <th width="70px" class="text-center">Cấp lại</th>
+                                            <th width="70px" class="text-center">Gia hạn</th>
+                                            <th width="70px" class="text-center">Đổi thông tin lưu trú</th>
+                                            <th width="70px" class="text-center">Bổ sung điện thoai thông minh</th>
+                                            <th width="70px" class="text-center">Bổ sung ra vào Cảng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                 
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                        @if (item.TinhTrangID != 2)
+                                                        {
+                                                           <td class="text-center">
+                                                
+                                                            <a id="btn-editdsct_@item.IDCTGH" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                            <div class="modal" id="myModaleEditDS_@item.IDCTGH" role="dialog" data-url='@Url.Action("Edit","ApproveExtension", new { id = item.IDCTGH })'></div>
+                                                            <script type="text/javascript">
+                                                                            $('#btn-editdsct_@item.IDCTGH').click(function () {
+                                                                                var url = $('#myModaleEditDS_@item.IDCTGH').data('url');
+                                                                                $.get(url, function (data) {
+                                                                                    $("#myModaleEditDS_@item.IDCTGH").html(data);
+                                                                                    $("#ModalTitle").html("Cập nhật Thông Tin");
+                                                                                    $("#myModaleEditDS_@item.IDCTGH").modal('show');
+                                                                                });
+                                                                            });
+                                                            </script>
+                                                             </td>
+                                                        }
+                                                        else{
+                                                            <td></td>
+                                                        }
+   
+                                                    <td swidth="300px">@item.HoTen</td>
+                                                    <td>@item.NgaySinh.ToString("dd-MM-yyyy")</td>
+                                                    <td>@item.CCCD</td>
+                                                    <td>@item.HoKhau</td>
+                                                    <td>
+                                                        @{
+                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.ChucVu).FirstOrDefault();
+                                                        }
+                                                        @IDCV.TenCV.ToString()
+                                                    </td>
+                                                    <td>
+                                                        @item.SoDienThoai
+                                                    </td>
+                                                    @if (item.CapLai == "1" || item.CapLai == "X" || item.CapLai == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+
+                                                    @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.ThongTinLuuTru == "3" || item.ThongTinLuuTru == "X" || item.ThongTinLuuTru == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.DTTM == "4" || item.DTTM == "X" || item.DTTM == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.RaVaoCang == "4" || item.RaVaoCang == "X" || item.RaVaoCang == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    <td width="180px">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
+                                                    @{
+                                                        string ListKhuVuc = "";
+                                                        string[] arrList = item.KhuVucLamViec.Split(',');
+                                                        foreach (var ar in arrList)
+                                                        {
+                                                            if (ar != "")
+                                                            {
+                                                                int IDKV = Convert.ToInt32(ar);
+                                                                var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                                                ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
+                                                            }
+
+                                                        }
+                                                    }
+                                                    <td>
+                                                        @ListKhuVuc
+                                                    </td>
+
+                                                    @{
+                                                        string List = "";
+                                                        string[] arrListStr = item.Cong.Split(',');
+                                                        foreach (var ar in arrListStr)
+                                                        {
+                                                            int IDGate = Convert.ToInt32(ar);
+                                                            var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                                            List = String.Concat(Cong.Gate + " , " + List);
+                                                        }
+                                                    }
+                                                    <td>
+                                                        @List
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
+                                                        }
+                                                        @IDCong.NameContractorGroup
+                                                    </td>
+                                                    <td>@item.GhiChu</td>
+                                                </tr>
+                                            }
+
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div id="list_vt" style="width:100%">
+
+                        <div style="margin-left:2%;">
+                            <p style="color:red;">
+                                <b>
+                                    Lưu ý:
+                                </b><br />
+                                Ghi chú: NĐUQ/T/PBP Cảng chỉ ký duyệt trong trường hợp CBNV NT có nhu cầu đăng ký ra vào Cảng thường xuyên
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="app-wrapper-footer">
+            <div class="app-footer">
+                <div class="app-footer__inner">
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+

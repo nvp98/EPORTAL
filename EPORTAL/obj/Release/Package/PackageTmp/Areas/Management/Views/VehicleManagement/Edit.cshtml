@@ -1,0 +1,322 @@
+﻿@model EPORTAL.ModelsPartner.VehicleManagementValidation
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@using (Html.BeginForm("Edit", "VehicleManagement", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDTBNT)
+<div class="app-main__outer">
+    <div class="app-main__inner" style="display:inline-block;">
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div>
+                                <h5>
+                                    Chỉnh sửa thông tin phương tiện
+                                </h5>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" style="width: 80vw; overflow-x: auto; height: 800px;">
+                        <div class="table-responsive" style="height: 800px;">
+                            <div class="table-responsive" style="height: 800px;">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                <fieldset id="SubmitForm">
+                                    <div class="row">
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Tên thiết bị <span style="color:red;">*</span></label>
+                                                @Html.EditorFor(model => model.NameEquipment, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NameEquipment", @text = "", required = "required" } })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Loại mã định danh <span style="color:red;">*</span></label>
+                                                @Html.DropDownListFor(model => model.IDMDD, ViewBag.MDDList as SelectList, "--Chọn mã định danh--", new { @id = "IDMDD", @class = "form-control", required = "required" })
+                                                @Html.ValidationMessageFor(model => model.IDMDD, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Tên mã định danh <span style="color:red;">*</span></label>
+                                                @Html.EditorFor(model => model.IndentifierContact, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "IndentifierContact", @text = "", required = "required" } })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Biển số xe</label>
+                                                @Html.EditorFor(model => model.BienSoXe, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "BienSoXe", @text = "" } })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Người vận hành <span style="color:red;">*</span></label>
+                                                @Html.EditorFor(model => model.Operator, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Operator", @text = "", required = "required" } })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Số khung</label>
+                                                @Html.EditorFor(model => model.SoKhung, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "SoKhung", @text = "" } })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày kiểm tra</label>
+                                                @Html.EditorFor(model => model.StartDate, new { @value = ViewBag.StartDate, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "StartDate", @type = "date", @Value = ViewBag.StartDate } })
+                                                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Nhà thầu <span style="color:red;">*</span></label>
+                                                @Html.DropDownListFor(model => model.IDContact, ViewBag.NTList as SelectList, "--Chọn Nhà Thầu--", new { @id = "ID", @class = "form-control", required = "required" })
+                                                @Html.ValidationMessageFor(model => model.IDContact, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Bộ phận QLTT <span style="color:red;">*</span></label>
+                                                @Html.DropDownListFor(model => model.IDDepartment, ViewBag.IDPB as SelectList, "--Chọn Bộ Phận QLTT--", new { @id = "BP_QL", @class = "form-control", required = "required" })
+                                                @Html.ValidationMessageFor(model => model.IDDepartment, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Thời hạn thẻ từ</label>
+                                                @Html.EditorFor(model => model.ThoiHanTheTu, new { @value = ViewBag.ThoiHanTheTu, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ThoiHanTheTu", @type = "date", @Value = ViewBag.ThoiHanTheTu } })
+                                                @Html.ValidationMessageFor(model => model.ThoiHanTheTu, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Thời hạn thẻ RVTX</label>
+                                                @Html.EditorFor(model => model.ThoiHanTheRVTX, new { @value = ViewBag.ThoiHanTheRVTX, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ThoiHanTheRVTX", @type = "date", @Value = ViewBag.ThoiHanTheRVTX } })
+                                                @Html.ValidationMessageFor(model => model.ThoiHanTheRVTX, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        @{
+                                            var selectListCavet = new SelectList(
+                                                new List<SelectListItem>
+                                                {
+                                                new SelectListItem {Text = "Có", Value = "0"},
+                                                new SelectListItem {Text = "Không", Value = "1"},
+                                                }, "Value", "Text");
+                                        }
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Cavet</label>
+                                                @Html.DropDownListFor(model => model.Cavet, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.Cavet, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày hết hạn đăng kiểm</label>
+                                                @Html.EditorFor(model => model.NgayHetHanDK, new { @value = ViewBag.NgayHetHanDK, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NgayHetHanDK", @type = "date", @Value = ViewBag.NgayHetHanDK } })
+                                                @Html.ValidationMessageFor(model => model.NgayHetHanDK, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày hết hạn kiểm định</label>
+                                                @Html.EditorFor(model => model.NgayHetHanKD, new { @value = ViewBag.NgayHetHanKD, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NgayHetHanKD", @type = "date", @Value = ViewBag.NgayHetHanKD } })
+                                                @Html.ValidationMessageFor(model => model.NgayHetHanKD, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày hết hạn BHX.HH</label>
+                                                @Html.EditorFor(model => model.NgayHetHanBHX, new { @value = ViewBag.NgayHetHanBHX, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NgayHetHanBHX", @type = "date", @Value = ViewBag.NgayHetHanBHX } })
+                                                @Html.ValidationMessageFor(model => model.NgayHetHanCNKD, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        @{
+                                            var selectListCCVH = new SelectList(
+                                                new List<SelectListItem>
+                                                {
+                                                new SelectListItem {Text = "Có", Value = "0"},
+                                                new SelectListItem {Text = "Không", Value = "1"},
+                                                 }, "Value", "Text");
+                                        }
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">CCVH</label>
+                                                @Html.DropDownListFor(model => model.CCHV, selectListCCVH as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.CCHV, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày hết hạn thẻ AT-3</label>
+                                                @Html.EditorFor(model => model.NgayHetHanTAT, new { @value = ViewBag.NgayHetHanTAT, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NgayHetHanTAT", @type = "date", @Value = ViewBag.NgayHetHanTAT } })
+                                                @Html.ValidationMessageFor(model => model.NgayHetHanTAT, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày hết hạn giấy phép VCHH cháy nổ</label>
+                                                @Html.EditorFor(model => model.NgayHetHanVCHHChayNo, new { @value = ViewBag.NgayHetHanVCHHChayNo, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NgayHetHanVCHHChayNo", @type = "date", @Value = ViewBag.NgayHetHanVCHHChayNo } })
+                                                @Html.ValidationMessageFor(model => model.NgayHetHanVCHHChayNo, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ngày hết hạn chứng chỉ VCHHNH, CN</label>
+                                                @Html.EditorFor(model => model.NgayHetHanCNKD, new { @value = ViewBag.NgayHetHanCNKD, htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NgayHetHanCNKD", @type = "date", @Value = ViewBag.NgayHetHanCNKD } })
+                                                @Html.ValidationMessageFor(model => model.NgayHetHanCNKD, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Chứng chỉ PCCC-CNCH</label>
+                                                @Html.EditorFor(model => model.ChungChiPCCCCNCH, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ChungChiPCCCCNCH", @text = "" } })
+                                            </div>
+                                        </div>
+                                        @*<div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Chứng chỉ VCHHNH, CN</label>
+                                                @Html.EditorFor(model => model.ChungChiVCHHNHCN, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ChungChiVCHHNHCN", @text = "" } })
+                                            </div>
+                                        </div>*@
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Khu vực thi công <span style="color:red;">*</span></label>
+                                                @Html.EditorFor(model => model.IDKV, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "IDKV", @text = "", required = "required" } })
+                                            </div>
+                                        </div>
+
+                                        @{
+                                            var selectListTinhTrang = new SelectList(
+                                                new List<SelectListItem>
+                                                {
+                                                new SelectListItem {Text = "Đang hoạt động", Value = "0"},
+                                                new SelectListItem {Text = "Không còn hoạt động", Value = "1"},
+                                                }, "Value", "Text");
+                                        }
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Tình trạng</label>
+                                                @Html.DropDownListFor(model => model.TinhTrang, selectListTinhTrang as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.TinhTrang, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+
+                                        @{
+                                            var selectList = new SelectList(
+                                                new List<SelectListItem>
+                                                {
+                                                        new SelectListItem {Text = "Có", Value = "0"},
+                                                        new SelectListItem {Text = "Không", Value = "1"},
+                                                }, "Value", "Text");
+                                        }
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Cấp mới</label>
+                                                @Html.DropDownListFor(model => model.CapMoi, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.CapMoi, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Gia hạn</label>
+                                                @Html.DropDownListFor(model => model.GiaHan, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.GiaHan, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Mất làm lại</label>
+                                                @Html.DropDownListFor(model => model.MatThe, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.MatThe, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Cập nhật thông tin</label>
+                                                @Html.DropDownListFor(model => model.CapNhatThongTin, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.CapNhatThongTin, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Bão lãnh</label>
+                                                @Html.DropDownListFor(model => model.BaoLanh, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.BaoLanh, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Ghi chú</label>
+                                                @Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GhiChu", @text = "" } })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <fieldset id="SubmitForm">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputLastName">Tải lên File </label>
+                                                    <input type="file" id="NameFile" name="NameFile" class="form-control" />
+                                                </div>
+                                                @Html.HiddenFor(model => model.FileUpload, new { @id = "NameFile" })
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                    <div class="btn-margin-top text-center">
+                                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+                                        <a class="btn btn-danger" style="text-transform:none;" href="~/Management/VehicleManagement">Cancel</a>
+                                    </div>
+
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+<script>
+    $('#IDMDD').chosen({
+        width: "100%"
+    });
+    $("#ID").chosen({
+        width: "100%"
+    });
+    $("#BP_QL").chosen({
+        width: "100%"
+    });
+    $("#Cavet").chosen({
+        width: "100%"
+    });
+    $("#CCHV").chosen({
+        width: "100%"
+    });
+    $("#TinhTrang").chosen({
+        width: "100%"
+    });
+    $("#CapMoi").chosen({
+        width: "100%"
+    });
+    $("#GiaHan").chosen({
+        width: "100%"
+    });
+    $("#MatThe").chosen({
+        width: "100%"
+    });
+    $("#CapNhatThongTin").chosen({
+        width: "100%"
+    });
+    $("#BaoLanh").chosen({
+        width: "100%"
+    });
+</script>

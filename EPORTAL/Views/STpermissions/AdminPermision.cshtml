@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "AdminPermision";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using EPORTAL.Models
+@model PagedList.IPagedList<A_ListControllerValidation>
+@using PagedList.Mvc
+
+<link href="~/Content/assets/css/PagedList.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="~/Content/assets/DataTables/datatables.min.css" />
+<script type="text/javascript" src="~/Content/assets/DataTables/datatables.min.js" defer></script>
+
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<style type="text/css">
+    a:hover {
+        cursor: pointer;
+    }
+</style>
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-id icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Admin Quyền chi tiết EPORTAL
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+
+                <div class="col-md-9">
+                    <div class="row">
+                        <a href="@Url.Action("Sync","STpermissions")" class="btn btn-primary ml-2 pull-right"><i class="pe-7s-repeat">&nbsp;</i>&nbsp;Đồng bộ controller </a>
+                    </div>
+                </div>
+                <div class="clo-md-3 m-l-auto">
+                    <a class="btn btn-primary" style="margin-left:10px;float:right" title="Back" href="@Url.Action("Index", "STpermissions" )">
+                        Quay lại
+                    </a>
+                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm Chức năng</button>
+                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("CreateCN","STpermissions")' style="margin-top:50px"></div>
+
+                </div>
+
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="text-center" width="30px">STT</th>
+                                <th class="text-center">Tên chức năng</th>
+                                <th class="text-center">Controller</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th class="text-center">Danh sách quyền</th>
+
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int pageno = (int)Model.PageNumber;
+                                int itemperpage = (int)Model.PageSize;
+                                int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                var hd = "Hoạt động";
+                                var khd = "Không Hoạt động";
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                    <td class="">@item.Mota</td>
+                                    <td class="">@item.Controller</td>
+                                    <td class="text-center">@{if (item.isActive == 1)
+                                        {@hd}
+                                    else
+                                    { @khd};}</td>
+                                    <td class="">@item.DSTenQuyen</td>
+
+                                    <td class="text-center">
+                                        @*<a class="fa fa-trash icon_action" title="Xóa" href="@Url.Action("Delete", "STpermissions", new { id = item.IDController })"
+                                               onclick="return confirm('Bạn muốn xóa : @item.IDController')">
+                                            </a>*@
+                                        <a id="btn-edit_@item.IDController" href="#" title="Chỉnh sửa" class="btn-action fa fa-edit icon_action"> </a>
+                                        <div class="modal " id="myModaleEdit_@item.IDController" role="dialog" data-url='@Url.Action("EditController", "STpermissions", new { id = item.IDController })'></div>
+                                        @*<a id="btn-edit_@item.IDQuyenHT" title="Sửa" class="fa fa-edit icon_action " href="@Url.Action("Edit", "STpermissions", new { id = item.IDQuyenHT })"></a>*@
+                                        <script type="text/javascript">
+                                            $('#btn-edit_@item.IDController').click(function () {
+                                                var url = $('#myModaleEdit_@item.IDController').data('url');
+                                                $.get(url, function (data) {
+                                                   $("#myModal").html(data);
+                                                   $("#ModalTitle").html("Cập nhật Tên nhóm quyền");
+                                                   $("#myModal").modal('show');
+                                                });
+                                            });
+                                        </script>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm chức năng");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-add-vt').click(function () {
+        var url = $('#myModalVT').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Danh sách mã vị trí");
+            $("#myModal").modal('show');
+        });
+    });
+    $("#btn-search").on('click', function () {
+        window.location.href = '@Url.Action("Index", "STpermissions")?IDPB=' + $('#IDPB').val();
+    });
+    $(document).ready(function () {
+        $('#table').DataTable({
+            "pageLength": 50
+        });
+    });
+</script>
+
+
+

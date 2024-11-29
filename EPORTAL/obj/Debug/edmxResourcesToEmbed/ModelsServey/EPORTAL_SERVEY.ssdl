@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EPORTAL_SERVEYModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="EmployeeServey">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDNV" Type="int" />
+    <Property Name="IDSV" Type="int" />
+    <Property Name="OTID" Type="int" />
+    <Property Name="XNSV" Type="bit" />
+    <Property Name="MenuOT" Type="int" />
+  </EntityType>
+  <EntityType Name="ListServey">
+    <Key>
+      <PropertyRef Name="IDSV" />
+    </Key>
+    <Property Name="IDSV" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ContentSV" Type="nvarchar" MaxLength="500" />
+    <Property Name="StartTime" Type="date" />
+    <Property Name="EndTime" Type="date" />
+    <Property Name="StatusSV" Type="bit" />
+  </EntityType>
+  <EntityType Name="OptionServey">
+    <Key>
+      <PropertyRef Name="IDOT" />
+    </Key>
+    <Property Name="IDOT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ContentOT" Type="nvarchar" MaxLength="500" />
+    <Property Name="IDSV" Type="int" />
+    <Property Name="FilePath" Type="nvarchar(max)" />
+    <Property Name="OrderBy" Type="int" />
+  </EntityType>
+  <EntityType Name="PartTogether">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDNV" Type="int" />
+    <Property Name="HoTen" Type="nvarchar" MaxLength="200" />
+    <Property Name="NamSinh" Type="date" />
+    <Property Name="IDESV" Type="int" />
+    <Property Name="Re" Type="nvarchar" MaxLength="200" />
+    <Property Name="isCom" Type="bit" />
+    <Property Name="Note" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="ResultServey">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDES" Type="int" />
+    <Property Name="IDSV" Type="int" />
+    <Property Name="IDOT" Type="int" />
+    <Property Name="StatusRS" Type="int" />
+  </EntityType>
+  <Function Name="EmployeeServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="EmployeeServey_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="MenuOT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="EmployeeServey_selectNV" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+  </Function>
+  <Function Name="EmployeeServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="MenuOT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="EmployeeServey_updateOtion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="OTID" Type="int" Mode="In" />
+    <Parameter Name="XNSV" Type="bit" Mode="In" />
+    <Parameter Name="MenuOT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="EmployeeServey_updateXN" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="XNSV" Type="bit" Mode="In" />
+  </Function>
+  <Function Name="ListServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+  </Function>
+  <Function Name="ListServey_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ContentSV" Type="nvarchar" Mode="In" />
+    <Parameter Name="StartTime" Type="date" Mode="In" />
+    <Parameter Name="EndTime" Type="date" Mode="In" />
+    <Parameter Name="StatusSV" Type="bit" Mode="In" />
+  </Function>
+  <Function Name="ListServey_selectNV" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="TimeNow" Type="date" Mode="In" />
+  </Function>
+  <Function Name="ListServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="ContentSV" Type="nvarchar" Mode="In" />
+    <Parameter Name="StartTime" Type="date" Mode="In" />
+    <Parameter Name="EndTime" Type="date" Mode="In" />
+    <Parameter Name="StatusSV" Type="bit" Mode="In" />
+  </Function>
+  <Function Name="OptionServey_create" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ContentOT" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="FilePath" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="OrderBy" Type="int" Mode="In" />
+  </Function>
+  <Function Name="OptionServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDOT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="OptionServey_selectOT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+  </Function>
+  <Function Name="OptionServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDOT" Type="int" Mode="In" />
+    <Parameter Name="ContentOT" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="FilePath" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="OrderBy" Type="int" Mode="In" />
+  </Function>
+  <Function Name="PartTogether_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="PartTogether_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="NamSinh" Type="date" Mode="In" />
+    <Parameter Name="IDESV" Type="int" Mode="In" />
+    <Parameter Name="Re" Type="nvarchar" Mode="In" />
+    <Parameter Name="isCom" Type="bit" Mode="In" />
+    <Parameter Name="Note" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="PartTogether_selectCom" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDESV" Type="int" Mode="In" />
+    <Parameter Name="isCom" Type="bit" Mode="In" />
+  </Function>
+  <Function Name="PartTogether_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="IDNV" Type="int" Mode="In" />
+    <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="NamSinh" Type="date" Mode="In" />
+    <Parameter Name="IDESV" Type="int" Mode="In" />
+    <Parameter Name="Re" Type="nvarchar" Mode="In" />
+    <Parameter Name="isCom" Type="bit" Mode="In" />
+    <Parameter Name="Note" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="ResultServey_create" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDES" Type="int" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="IDOT" Type="int" Mode="In" />
+    <Parameter Name="StatusRS" Type="int" Mode="In" />
+  </Function>
+  <Function Name="ResultServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="IDES" Type="int" Mode="In" />
+    <Parameter Name="IDSV" Type="int" Mode="In" />
+    <Parameter Name="IDOT" Type="int" Mode="In" />
+    <Parameter Name="StatusRS" Type="int" Mode="In" />
+  </Function>
+  <Function Name="RsultServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+  </Function>
+  <EntityContainer Name="EPORTAL_SERVEYModelStoreContainer">
+    <EntitySet Name="EmployeeServey" EntityType="Self.EmployeeServey" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ListServey" EntityType="Self.ListServey" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="OptionServey" EntityType="Self.OptionServey" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PartTogether" EntityType="Self.PartTogether" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ResultServey" EntityType="Self.ResultServey" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

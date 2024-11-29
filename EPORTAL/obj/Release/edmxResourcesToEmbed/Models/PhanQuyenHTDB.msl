@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="EPORTAL_24032023ModelStoreContainer" CdmEntityContainer="PhanQuyenHTEntities">
+    <EntitySetMapping Name="A_ListController">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.A_ListController">
+        <MappingFragment StoreEntitySet="A_ListController">
+          <ScalarProperty Name="IDController" ColumnName="IDController" />
+          <ScalarProperty Name="Controller" ColumnName="Controller" />
+          <ScalarProperty Name="Mota" ColumnName="Mota" />
+          <ScalarProperty Name="isActive" ColumnName="isActive" />
+          <ScalarProperty Name="DSQuyenCN" ColumnName="DSQuyenCN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="A_QuyenCN">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.A_QuyenCN">
+        <MappingFragment StoreEntitySet="A_QuyenCN">
+          <ScalarProperty Name="IDQuyenCN" ColumnName="IDQuyenCN" />
+          <ScalarProperty Name="MaQuyenCN" ColumnName="MaQuyenCN" />
+          <ScalarProperty Name="TenQuyenCN" ColumnName="TenQuyenCN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="A_QuyenCT">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.A_QuyenCT">
+        <MappingFragment StoreEntitySet="A_QuyenCT">
+          <ScalarProperty Name="IDQuyenCT" ColumnName="IDQuyenCT" />
+          <ScalarProperty Name="IDQuyenHT" ColumnName="IDQuyenHT" />
+          <ScalarProperty Name="IDController" ColumnName="IDController" />
+          <ScalarProperty Name="IDQuyenCN" ColumnName="IDQuyenCN" />
+          <ScalarProperty Name="isActive" ColumnName="isActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="A_QuyenHT">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.A_QuyenHT">
+        <MappingFragment StoreEntitySet="A_QuyenHT">
+          <ScalarProperty Name="IDQuyenHT" ColumnName="IDQuyenHT" />
+          <ScalarProperty Name="TenQuyenHT" ColumnName="TenQuyenHT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="L_AuthorizationTV">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.L_AuthorizationTV">
+        <MappingFragment StoreEntitySet="L_AuthorizationTV">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+          <ScalarProperty Name="IDThuVien" ColumnName="IDThuVien" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="L_NhomThuVienFile">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.L_NhomThuVienFile">
+        <MappingFragment StoreEntitySet="L_NhomThuVienFile">
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="TenNhomTV" ColumnName="TenNhomTV" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="L_ThuVienFile">
+      <EntityTypeMapping TypeName="EPORTAL_24032023Model.L_ThuVienFile">
+        <MappingFragment StoreEntitySet="L_ThuVienFile">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="TenTaiLieu" ColumnName="TenTaiLieu" />
+          <ScalarProperty Name="FileName" ColumnName="FileName" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="A_CheckListQuyen" FunctionName="EPORTAL_24032023Model.Store.A_CheckListQuyen" />
+    <FunctionImportMapping FunctionImportName="A_CheckListQuyenActive" FunctionName="EPORTAL_24032023Model.Store.A_CheckListQuyenActive" />
+    <FunctionImportMapping FunctionImportName="A_CheckQuyen" FunctionName="EPORTAL_24032023Model.Store.A_CheckQuyen" />
+    <FunctionImportMapping FunctionImportName="A_ListController_delete" FunctionName="EPORTAL_24032023Model.Store.A_ListController_delete" />
+    <FunctionImportMapping FunctionImportName="A_ListController_insert" FunctionName="EPORTAL_24032023Model.Store.A_ListController_insert" />
+    <FunctionImportMapping FunctionImportName="A_ListController_searchByID" FunctionName="EPORTAL_24032023Model.Store.A_ListController_searchByID">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.A_ListController_searchByID_Result">
+          <ScalarProperty Name="IDController" ColumnName="IDController" />
+          <ScalarProperty Name="Controller" ColumnName="Controller" />
+          <ScalarProperty Name="Mota" ColumnName="Mota" />
+          <ScalarProperty Name="isActive" ColumnName="isActive" />
+          <ScalarProperty Name="DSQuyenCN" ColumnName="DSQuyenCN" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="A_ListController_select" FunctionName="EPORTAL_24032023Model.Store.A_ListController_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.A_ListController_select_Result">
+          <ScalarProperty Name="IDController" ColumnName="IDController" />
+          <ScalarProperty Name="Controller" ColumnName="Controller" />
+          <ScalarProperty Name="Mota" ColumnName="Mota" />
+          <ScalarProperty Name="isActive" ColumnName="isActive" />
+          <ScalarProperty Name="DSQuyenCN" ColumnName="DSQuyenCN" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="A_ListController_update" FunctionName="EPORTAL_24032023Model.Store.A_ListController_update" />
+    <FunctionImportMapping FunctionImportName="A_Nhanvien_update_QuyenHT" FunctionName="EPORTAL_24032023Model.Store.A_Nhanvien_update_QuyenHT" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCN_delete" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCN_delete" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCN_insert" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCN_insert" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCN_update" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCN_update" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_delete" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_delete" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_deleteCN" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_deleteCN" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_deleteController" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_deleteController" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_insert" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_insert" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_isActive" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_isActive" />
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_searchByID" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_searchByID">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.A_QuyenCT_searchByID_Result">
+          <ScalarProperty Name="IDQuyenCT" ColumnName="IDQuyenCT" />
+          <ScalarProperty Name="IDQuyenHT" ColumnName="IDQuyenHT" />
+          <ScalarProperty Name="IDController" ColumnName="IDController" />
+          <ScalarProperty Name="IDQuyenCN" ColumnName="IDQuyenCN" />
+          <ScalarProperty Name="isActive" ColumnName="isActive" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="A_QuyenCT_update" FunctionName="EPORTAL_24032023Model.Store.A_QuyenCT_update" />
+    <FunctionImportMapping FunctionImportName="A_QuyenHT_delete" FunctionName="EPORTAL_24032023Model.Store.A_QuyenHT_delete" />
+    <FunctionImportMapping FunctionImportName="A_QuyenHT_insert" FunctionName="EPORTAL_24032023Model.Store.A_QuyenHT_insert" />
+    <FunctionImportMapping FunctionImportName="A_QuyenHT_update" FunctionName="EPORTAL_24032023Model.Store.A_QuyenHT_update" />
+    <FunctionImportMapping FunctionImportName="A_TaiKhoan_ID" FunctionName="EPORTAL_24032023Model.Store.A_TaiKhoan_ID">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.A_TaiKhoan_ID_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IsGV" ColumnName="IsGV" />
+          <ScalarProperty Name="IDQuyenHT" ColumnName="IDQuyenHT" />
+          <ScalarProperty Name="GroupQuyen" ColumnName="GroupQuyen" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="A_TaiKhoan_select" FunctionName="EPORTAL_24032023Model.Store.A_TaiKhoan_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.A_TaiKhoan_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IsGV" ColumnName="IsGV" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="TenQuyenHT" ColumnName="TenQuyenHT" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="A_TK_Update_GroupQuyen" FunctionName="EPORTAL_24032023Model.Store.A_TK_Update_GroupQuyen" />
+    <FunctionImportMapping FunctionImportName="A_TK_Update_Quyen" FunctionName="EPORTAL_24032023Model.Store.A_TK_Update_Quyen" />
+    <FunctionImportMapping FunctionImportName="L_AuthorizationTV_delete" FunctionName="EPORTAL_24032023Model.Store.L_AuthorizationTV_delete" />
+    <FunctionImportMapping FunctionImportName="L_AuthorizationTV_insert" FunctionName="EPORTAL_24032023Model.Store.L_AuthorizationTV_insert" />
+    <FunctionImportMapping FunctionImportName="L_AuthorizationTV_searchByIDTV" FunctionName="EPORTAL_24032023Model.Store.L_AuthorizationTV_searchByIDTV">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.L_AuthorizationTV_searchByIDTV_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+          <ScalarProperty Name="IDThuVien" ColumnName="IDThuVien" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="L_NhomThuVienFile_delete" FunctionName="EPORTAL_24032023Model.Store.L_NhomThuVienFile_delete" />
+    <FunctionImportMapping FunctionImportName="L_NhomThuVienFile_insert" FunctionName="EPORTAL_24032023Model.Store.L_NhomThuVienFile_insert" />
+    <FunctionImportMapping FunctionImportName="L_NhomThuVienFile_update" FunctionName="EPORTAL_24032023Model.Store.L_NhomThuVienFile_update" />
+    <FunctionImportMapping FunctionImportName="L_ThuVienFile_delete" FunctionName="EPORTAL_24032023Model.Store.L_ThuVienFile_delete" />
+    <FunctionImportMapping FunctionImportName="L_ThuVienFile_insert" FunctionName="EPORTAL_24032023Model.Store.L_ThuVienFile_insert" />
+    <FunctionImportMapping FunctionImportName="L_ThuVienFile_searchByID" FunctionName="EPORTAL_24032023Model.Store.L_ThuVienFile_searchByID">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.L_ThuVienFile_searchByID_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="TenTaiLieu" ColumnName="TenTaiLieu" />
+          <ScalarProperty Name="FileName" ColumnName="FileName" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="L_ThuVienFile_select" FunctionName="EPORTAL_24032023Model.Store.L_ThuVienFile_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.L_ThuVienFile_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="TenTaiLieu" ColumnName="TenTaiLieu" />
+          <ScalarProperty Name="FileName" ColumnName="FileName" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+          <ScalarProperty Name="TenNhomTV" ColumnName="TenNhomTV" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="L_ThuVienFile_selectbyUser" FunctionName="EPORTAL_24032023Model.Store.L_ThuVienFile_selectbyUser">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.L_ThuVienFile_selectbyUser_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="FileName" ColumnName="FileName" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="TenTaiLieu" ColumnName="TenTaiLieu" />
+          <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+          <ScalarProperty Name="TenNhomTV" ColumnName="TenNhomTV" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="L_ThuVienFile_update" FunctionName="EPORTAL_24032023Model.Store.L_ThuVienFile_update" />
+    <FunctionImportMapping FunctionImportName="Account_select" FunctionName="EPORTAL_24032023Model.Store.Account_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTAL_24032023Model.Account_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IsGV" ColumnName="IsGV" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="TenQuyenHT" ColumnName="TenQuyenHT" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+  </EntityContainerMapping>
+</Mapping>

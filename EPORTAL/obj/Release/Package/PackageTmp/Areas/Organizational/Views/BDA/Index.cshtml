@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Organizational/Views/Shared/_Layout.cshtml";
+}
+@using SoDoToChuc.Models
+@using EPORTAL.ModelsOrganizational
+@model IEnumerable<NMNLValidation>
+@{
+    SoDoToChucEntities db_context = new SoDoToChucEntities();
+}
+@{
+    var ID = (KPVSXValidation)ViewData["id"];
+    var dataNS = ViewBag.DataBDA;
+}
+<div class="container-fluid px-4">
+    <h3 style="display: table-cell; font-size: 1.5rem !important; color: #fff; background-color: #0097d0; padding: 10px 15px;" class="tenpb">
+        @ID.TenPhongBan
+    </h3>
+    <div class="row tabI" style="margin-left: 6px;">
+        <div class="col-xl-4 col-md-4"><h4>Thông tin chung</h4></div>
+        <div class="col-xl-2 col-md-2 ">
+            <h4 style="color: #05418a;">@dataNS.nshc</h4>
+            <h5>Nhân sự hành chính</h5>
+        </div>
+        <div class="col-xl-2 col-md-2 border_item" style="">
+            <h4 style="color: #05418a;">@dataNS.ns1ca</h4>
+            <h5>Nhân sự ca sản xuất</h5>
+        </div>
+        <div class="col-xl-2 col-md-2 border_item" style="">
+            <h4 style="color: #05418a;">@dataNS.tongtolv</h4>
+            <h5>Tổng số tổ</h5>
+        </div>
+        <div class="col-xl-2 col-md-2 border_item" style="">
+            <h4 style="color: #05418a;">@dataNS.TongNS</h4>
+            <h5>Tổng số nhân sự</h5>
+        </div>
+    </div>
+
+    @*highchart nhân sự*@
+    <div class="row flex-row menuNS" style="padding-left:10px;flex-wrap:nowrap;margin-right:-20px;margin-top:30px">
+        <div class="menuInfo col-2 row" style="border-radius: 5px; border: 1px solid #bcbcbc;background-color: white;padding:40px 0;margin-bottom:30px;margin-left:10px">
+            <div class="list_level_wrap"><span class="dot" style="background-color: #FB7800;"></span><div class="list_level" style="color: #05418A;">Trưởng/Phó Bộ Phận</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #C70606; margin-top:10px"></span><div class="list_level" style="color: #05418A; width: 170px ">Quản Đốc/Phó Quản Đốc/Trưởng Phụ Trách</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #05418A; "></span><div class="list_level" style="color: #05418A; ">Phụ Trách</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #0097d0; "></span><div class="list_level" style="color: #05418A;">Trưởng/Phó Kíp</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #002954 "></span><div class="list_level" style="color: #05418A ">Kỹ Thuật Viên</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #506194"></span><div class="list_level" style="color: #05418A ">Tổ Trưởng/Tổ Phó</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #008d06; margin-top: 10px "></span><div class="list_level" style="color: #05418A; width: 170px ">Nhân Viên Khối Văn Phòng Chính</div></div>
+            <div class="list_level_wrap"><span class="dot" style="background-color: #001369; "></span><div class="list_level" style=" color: #05418A; ">Nhân Viên</div></div>
+            @*<div class="list_level_wrap"><span class="dot" style="background-color: orange;"></span><div class="list_level" style=" color: #05418A; ">Phó Ban GPMB</div></div>*@
+        </div>
+        <div class="row col-9 menuRig" style=" " id="chartNV">
+            <figure class="highcharts-figure-1" style="margin:auto">
+                <div id="chart_total"></div>
+                <p class="highcharts-description">
+                </p>
+            </figure>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $.getJSON("/KPVSX/GetNSTTPB", { idpb: @ID.IDPhongBan }, function (data) {
+            Highcharts.chart('chart_total', {
+                chart: {
+                    type: 'bar',
+                    style: {
+                        fontFamily: 'monospace',
+                        color: "#f00"
+                    },
+                    /*plotBackgroundImage: '/content/assets/img/HOATIET.png'*/
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                exporting: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: ['T/PBP', 'QĐ/PQĐ/TPT', 'Phụ trách', 'T/P Kíp', 'Kỹ thuật viên', 'NV Khối VP Chính', 'Tổ Trưởng/Tổ Phó',  'Nhân Viên'],
+                    title: {
+                        text: null
+                    },
+                    labels: {
+                        style: {
+                            color: '#05418A',
+                            font: '11px Trebuchet MS, Verdana, sans-serif',
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: '',
+                        align: 'high'
+                    },
+                    labels: {
+                        overflow: 'justify',
+                        style: {
+                            color: '#05418A',
+                            font: '11px Trebuchet MS, Verdana, sans-serif',
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                tooltip: {
+                    valueSuffix: ''
+                },
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        borderRadiusTopLeft: 10,
+                        borderRadiusTopRight: 10
+
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -40,
+                    y: 80,
+
+                    floating: true,
+                    enabled: false,
+                    borderWidth: 1,
+                    backgroundColor:
+                        Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+                    shadow: true
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [
+                {
+                    name: 'Thực tế',
+                    data: [{ y: data.TPTotal, color: '#FB7800', }, { y: data.QDTotal, color: '#C70606' }, { y: data.PTTotal, color: '#05418A' }, { y: data.TPKipTotal, color: '#0097d0' }, { y: data.KTVTotal, color: '#002954' }, { y: data.NVVPC, color: '#008d06' }, { y: data.TTTPTotal, color: '#506194' },  { y: data.NVTotal, color: '#001369' }]
+                }
+                ]
+            });
+        });
+    })
+</script>

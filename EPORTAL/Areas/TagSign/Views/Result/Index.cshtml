@@ -1,0 +1,218 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<DK_Detail_ListCardRegisInforNTValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsPartner;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_NTEntities db_nt = new EPORTAL_NTEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách nhân viên nhà thầu
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" id="btn-Export" class="btn btn-primary pull-right" style="margin-right: 10px; float: right"><i class="fa fa-download">&nbsp;</i>&nbsp;Download</button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    @using (Html.BeginForm("ResultUpdate", "InOutAndResult", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                        <thead>
+                                            <tr>
+                                                <th width="30px" class="text-center">STT</th>
+                                                <th class="text-center" width="200px">Mã/Code cá nhân</th>
+                                                <th class="text-center" width="150px">Họ và tên</th>
+                                                <th class="text-center" width="200px">Thông tin</th>
+                                                <th class="text-center" width="100px">Mã nhà thầu</th>
+                                                <th class="text-center" width="200px">Tên viết tắt</th>
+                                                <th class="text-center" width="100px">Ngày cấp</th>
+                                                <th class="text-center" width="100px">Hạn sử dụng</th>
+                                                <th class="text-center" width="150px">Sử dụng điện thoại</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                int pageno = (int)Model.PageNumber;
+                                                int itemperpage = (int)Model.PageSize;
+                                                int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                            }
+                                            @{
+
+                                                foreach (var item in Model)
+                                                {
+                                                    <tr>
+                                                        @{
+                                                            DateTime DayNow = DateTime.Now.Date;
+                                                        }
+                                                        <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                        <td class="text-center">@item.CCCD</td>
+                                                        <td class="text-center">@item.HoTen</td>
+                                                        <td class="text-center">@item.HoKhau</td>
+                                                         @{
+                                                            var IDNT = db.NT_Partner.Where(x => x.ID == item.NTID).FirstOrDefault();
+                                                        <td class="text-center">
+                                                           @IDNT.BPID.ToString()
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @IDNT.ShortName.ToString()
+                                                        </td>
+                                                         }
+                                                        <td ></td>
+                                                        <td class="text-center">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
+                                                        <td class="text-center">
+                                                            @item.DienThoaiTM.ToString()
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                    <div class="pager">
+                                        @Html.PagedListPager(Model, page => Url.Action("Index", "Result", new { area = "TagSign", page }))
+                                        <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+
+     $("#btn-search").on('click', function () {
+         var begind = Date.parse($('#begind').val());
+         var endd = Date.parse($('#endd').val());
+         window.location.href = '@Url.Action("Index", "Result")?begind=' + $('#begind').val() + '&endd=' + $('#endd').val();
+     });
+    $('#select-all').click(function (event) {
+        if (this.checked) {
+            // Iterate each checkbox
+            $(':checkbox').each(function () {
+                this.checked = true;
+            });
+        } else {
+            $(':checkbox').each(function () {
+                this.checked = false;
+            });
+        }
+    });
+    $('#btn-Export').click(function () {
+        var begind = Date.parse($('#begind').val());
+        var endd = Date.parse($('#endd').val());
+        window.location.href = '@Url.Action("ExportToExcel", "Result")?begind=' + $('#begind').val() + '&endd=' + $('#endd').val();
+    });
+    $(document).ready(function () {
+        var dateNewFormat, onlyDate, today = new Date();
+
+        dateNewFormat = today.getFullYear() + '-';
+        if (today.getMonth() >= 9) {
+
+            dateNewFormat += (today.getMonth() + 1);
+        }
+        else {
+            dateNewFormat += '0' + (today.getMonth() + 1);
+        }
+
+        onlyDate = today.getDate();
+        if (onlyDate.toString().length == 2) {
+
+            dateNewFormat += "-" + onlyDate;
+        }
+        else {
+            dateNewFormat += '-0' + onlyDate;
+        }
+        if ($('#begind').val() == '') {
+            $('#begind').val(dateNewFormat);
+        }
+        if ($('#endd').val() == '') {
+            $('#endd').val(dateNewFormat);
+        }
+    });
+</script>
+
+
+
+
+

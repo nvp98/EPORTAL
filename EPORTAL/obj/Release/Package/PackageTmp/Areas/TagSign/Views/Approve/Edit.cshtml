@@ -1,0 +1,65 @@
+﻿@model EPORTAL.ModelsTagSign.DK_Detail_ListCardRegisInforNTValidation
+@using EPORTAL.ModelsView360;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@{
+    EPORTALEntities db = new EPORTALEntities();
+
+}
+@using (Html.BeginForm("Edit", "Approve", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDCTDK)
+    @Html.HiddenFor(model => model.IDDKT)
+    <div class="modal-dialog" id="form" style="margin-top:5%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+                                @Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Note" } })
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<script type="text/javascript">
+    $("#NhomNT").chosen({
+        width: "100%"
+    });
+    $("#IDCA").chosen({
+        width: "100%"
+    });
+    $(function () {
+        $("#Selected").chosen({
+            width: "100%"
+        });
+    });
+    $("#Selected").val("Chọn cổng");
+    $(function () {
+        $("#SelectedKV").chosen({
+            width: "100%"
+        });
+    });
+    $("#SelectedKV").val("Chọn khu vực");
+</script>
+
+

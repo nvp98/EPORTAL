@@ -1,0 +1,902 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="EPORTAL_SERVEYModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CTDKNguoiThan">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDNV" Type="int" />
+          <Property Name="IDNguoiThan" Type="int" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
+          <Property Name="DienThoai" Type="nvarchar" MaxLength="20" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="isCom" Type="int" />
+          <Property Name="GioiTinh" Type="int" />
+          <Property Name="IDDC" Type="int" />
+          <Property Name="NamSinh" Type="nvarchar" MaxLength="12" />
+          <Property Name="QuanHe" Type="nvarchar" MaxLength="20" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="CTKhaoSat">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="IDOT" Type="int" />
+          <Property Name="IDNV" Type="int" />
+          <Property Name="IDGroup" Type="int" />
+        </EntityType>
+        <EntityType Name="ChiTietDKNT">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="IDOT" Type="int" />
+          <Property Name="IDNguoiThan" Type="int" StoreGeneratedPattern="Identity" />
+          <Property Name="IDGroup" Type="int" />
+        </EntityType>
+        <EntityType Name="DiaDiem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenDC" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="EmployeeServey">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDNV" Type="int" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="OTID" Type="int" />
+          <Property Name="XNSV" Type="bit" />
+          <Property Name="MenuOT" Type="int" />
+          <Property Name="IDDC" Type="int" />
+        </EntityType>
+        <EntityType Name="GhiChu">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="NoiDung" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="GroupKhaoSat">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaNhom" Type="int" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="TenNhom" Type="nvarchar" MaxLength="250" />
+          <Property Name="isShowRe" Type="int" />
+          <Property Name="isChon" Type="int" />
+        </EntityType>
+        <EntityType Name="ListServey">
+          <Key>
+            <PropertyRef Name="IDSV" />
+          </Key>
+          <Property Name="IDSV" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ContentSV" Type="nvarchar" MaxLength="500" />
+          <Property Name="StartTime" Type="date" />
+          <Property Name="EndTime" Type="date" />
+          <Property Name="StatusSV" Type="bit" />
+        </EntityType>
+        <EntityType Name="OptionServey">
+          <Key>
+            <PropertyRef Name="IDOT" />
+          </Key>
+          <Property Name="IDOT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ContentOT" Type="nvarchar" MaxLength="500" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="FilePath" Type="nvarchar(max)" />
+          <Property Name="OrderBy" Type="int" />
+          <Property Name="MaOT" Type="int" />
+          <Property Name="isShow" Type="int" />
+        </EntityType>
+        <EntityType Name="PartTogether">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDNV" Type="int" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="200" />
+          <Property Name="NamSinh" Type="date" />
+          <Property Name="IDESV" Type="int" />
+          <Property Name="Re" Type="nvarchar" MaxLength="200" />
+          <Property Name="isCom" Type="bit" />
+          <Property Name="Note" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="ResultServey">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDES" Type="int" />
+          <Property Name="IDSV" Type="int" />
+          <Property Name="IDOT" Type="int" />
+          <Property Name="StatusRS" Type="int" />
+        </EntityType>
+        <Function Name="ChiTietDKNT_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNguoiThan" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ChiTietDKNT_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+          <Parameter Name="IDNguoiThan" Type="int" Mode="In" />
+          <Parameter Name="IDGroup" Type="int" Mode="In" />
+        </Function>
+        <Function Name="CTDKNguoiThan_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+        </Function>
+        <Function Name="CTDKNguoiThan_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDNguoiThan" Type="int" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="DienThoai" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="isCom" Type="int" Mode="In" />
+          <Parameter Name="GioiTinh" Type="int" Mode="In" />
+          <Parameter Name="IDDC" Type="int" Mode="In" />
+          <Parameter Name="NamSinh" Type="nvarchar" Mode="In" />
+          <Parameter Name="QuanHe" Type="nvarchar" Mode="In" />
+          <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+          <Parameter Name="ID" Type="int" Mode="InOut" />
+        </Function>
+        <Function Name="CTDKNguoiThan_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDNguoiThan" Type="int" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="DienThoai" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="isCom" Type="int" Mode="In" />
+          <Parameter Name="GioiTinh" Type="int" Mode="In" />
+          <Parameter Name="IDDC" Type="int" Mode="In" />
+          <Parameter Name="NamSinh" Type="nvarchar" Mode="In" />
+          <Parameter Name="QuanHe" Type="nvarchar" Mode="In" />
+          <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CTKhaoSat_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+        </Function>
+        <Function Name="CTKhaoSat_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDGroup" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="MenuOT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_selectNV" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="MenuOT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_updateDC" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDDC" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_updateOT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_updateOtion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="OTID" Type="int" Mode="In" />
+          <Parameter Name="XNSV" Type="bit" Mode="In" />
+          <Parameter Name="MenuOT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="EmployeeServey_updateXN" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+          <Parameter Name="XNSV" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="ListServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ListServey_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ContentSV" Type="nvarchar" Mode="In" />
+          <Parameter Name="StartTime" Type="date" Mode="In" />
+          <Parameter Name="EndTime" Type="date" Mode="In" />
+          <Parameter Name="StatusSV" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="ListServey_selectNV" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="TimeNow" Type="date" Mode="In" />
+        </Function>
+        <Function Name="ListServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="ContentSV" Type="nvarchar" Mode="In" />
+          <Parameter Name="StartTime" Type="date" Mode="In" />
+          <Parameter Name="EndTime" Type="date" Mode="In" />
+          <Parameter Name="StatusSV" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="OptionServey_create" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ContentOT" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="FilePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="OrderBy" Type="int" Mode="In" />
+        </Function>
+        <Function Name="OptionServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="OptionServey_selectOT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+        </Function>
+        <Function Name="OptionServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+          <Parameter Name="ContentOT" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="FilePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="OrderBy" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PartTogether_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PartTogether_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="NamSinh" Type="date" Mode="In" />
+          <Parameter Name="IDESV" Type="int" Mode="In" />
+          <Parameter Name="Re" Type="nvarchar" Mode="In" />
+          <Parameter Name="isCom" Type="bit" Mode="In" />
+          <Parameter Name="Note" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="PartTogether_selectCom" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDESV" Type="int" Mode="In" />
+          <Parameter Name="isCom" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="PartTogether_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="NamSinh" Type="date" Mode="In" />
+          <Parameter Name="IDESV" Type="int" Mode="In" />
+          <Parameter Name="Re" Type="nvarchar" Mode="In" />
+          <Parameter Name="isCom" Type="bit" Mode="In" />
+          <Parameter Name="Note" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="ResultServey_create" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDES" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+          <Parameter Name="StatusRS" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ResultServey_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+          <Parameter Name="IDES" Type="int" Mode="In" />
+          <Parameter Name="IDSV" Type="int" Mode="In" />
+          <Parameter Name="IDOT" Type="int" Mode="In" />
+          <Parameter Name="StatusRS" Type="int" Mode="In" />
+        </Function>
+        <Function Name="RsultServey_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ID" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="EPORTAL_SERVEYModelStoreContainer">
+          <EntitySet Name="CTDKNguoiThan" EntityType="Self.CTDKNguoiThan" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CTKhaoSat" EntityType="Self.CTKhaoSat" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ChiTietDKNT" EntityType="Self.ChiTietDKNT" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DiaDiem" EntityType="Self.DiaDiem" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmployeeServey" EntityType="Self.EmployeeServey" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GhiChu" EntityType="Self.GhiChu" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GroupKhaoSat" EntityType="Self.GroupKhaoSat" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ListServey" EntityType="Self.ListServey" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OptionServey" EntityType="Self.OptionServey" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PartTogether" EntityType="Self.PartTogether" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ResultServey" EntityType="Self.ResultServey" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EPORTAL_SERVEYModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="EmployeeServey">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDNV" Type="Int32" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="OTID" Type="Int32" />
+          <Property Name="XNSV" Type="Boolean" />
+          <Property Name="MenuOT" Type="Int32" />
+          <Property Name="IDDC" Type="Int32" />
+        </EntityType>
+        <EntityType Name="ListServey">
+          <Key>
+            <PropertyRef Name="IDSV" />
+          </Key>
+          <Property Name="IDSV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ContentSV" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="StartTime" Type="DateTime" Precision="0" />
+          <Property Name="EndTime" Type="DateTime" Precision="0" />
+          <Property Name="StatusSV" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="OptionServey">
+          <Key>
+            <PropertyRef Name="IDOT" />
+          </Key>
+          <Property Name="IDOT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ContentOT" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="FilePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OrderBy" Type="Int32" />
+          <Property Name="MaOT" Type="Int32" />
+          <Property Name="isShow" Type="Int32" />
+        </EntityType>
+        <EntityType Name="PartTogether">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDNV" Type="Int32" />
+          <Property Name="HoTen" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="NamSinh" Type="DateTime" Precision="0" />
+          <Property Name="IDESV" Type="Int32" />
+          <Property Name="Re" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="isCom" Type="Boolean" />
+          <Property Name="Note" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ResultServey">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDES" Type="Int32" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="IDOT" Type="Int32" />
+          <Property Name="StatusRS" Type="Int32" />
+        </EntityType>
+        <EntityContainer Name="EPORTAL_SERVEYEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="EmployeeServeys" EntityType="Self.EmployeeServey" />
+          <EntitySet Name="ListServeys" EntityType="Self.ListServey" />
+          <EntitySet Name="OptionServeys" EntityType="Self.OptionServey" />
+          <EntitySet Name="PartTogethers" EntityType="Self.PartTogether" />
+          <EntitySet Name="ResultServeys" EntityType="Self.ResultServey" />
+          <FunctionImport Name="EmployeeServey_delete">
+          <Parameter Name="ID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="EmployeeServey_insert">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="MenuOT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="EmployeeServey_selectNV" ReturnType="Collection(EPORTAL_SERVEYModel.EmployeeServey_selectNV_Result)">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="EmployeeServey_update">
+            <Parameter Name="ID" Mode="In" Type="Int32" />
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="MenuOT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="EmployeeServey_updateOtion">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="OTID" Mode="In" Type="Int32" />
+            <Parameter Name="XNSV" Mode="In" Type="Boolean" />
+            <Parameter Name="MenuOT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="EmployeeServey_updateXN">
+            <Parameter Name="ID" Mode="In" Type="Int32" />
+            <Parameter Name="XNSV" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="ListServey_delete">
+          <Parameter Name="IDSV" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ListServey_insert">
+            <Parameter Name="ContentSV" Mode="In" Type="String" />
+            <Parameter Name="StartTime" Mode="In" Type="DateTime" />
+            <Parameter Name="EndTime" Mode="In" Type="DateTime" />
+            <Parameter Name="StatusSV" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="ListServey_selectNV" ReturnType="Collection(EPORTAL_SERVEYModel.ListServey_selectNV_Result)">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="TimeNow" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="ListServey_update">
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="ContentSV" Mode="In" Type="String" />
+            <Parameter Name="StartTime" Mode="In" Type="DateTime" />
+            <Parameter Name="EndTime" Mode="In" Type="DateTime" />
+            <Parameter Name="StatusSV" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="OptionServey_create">
+            <Parameter Name="ContentOT" Mode="In" Type="String" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="FilePath" Mode="In" Type="String" />
+            <Parameter Name="OrderBy" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="OptionServey_delete">
+          <Parameter Name="IDOT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="OptionServey_selectOT" ReturnType="Collection(EPORTAL_SERVEYModel.OptionServey_selectOT_Result)">
+          <Parameter Name="IDSV" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="OptionServey_update">
+            <Parameter Name="IDOT" Mode="In" Type="Int32" />
+            <Parameter Name="ContentOT" Mode="In" Type="String" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="FilePath" Mode="In" Type="String" />
+            <Parameter Name="OrderBy" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PartTogether_delete">
+          <Parameter Name="ID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PartTogether_insert">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="NamSinh" Mode="In" Type="DateTime" />
+            <Parameter Name="IDESV" Mode="In" Type="Int32" />
+            <Parameter Name="Re" Mode="In" Type="String" />
+            <Parameter Name="isCom" Mode="In" Type="Boolean" />
+            <Parameter Name="Note" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="PartTogether_selectCom" ReturnType="Collection(EPORTAL_SERVEYModel.PartTogether_selectCom_Result)">
+            <Parameter Name="IDESV" Mode="In" Type="Int32" />
+            <Parameter Name="isCom" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="PartTogether_update">
+            <Parameter Name="ID" Mode="In" Type="Int32" />
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="NamSinh" Mode="In" Type="DateTime" />
+            <Parameter Name="IDESV" Mode="In" Type="Int32" />
+            <Parameter Name="Re" Mode="In" Type="String" />
+            <Parameter Name="isCom" Mode="In" Type="Boolean" />
+            <Parameter Name="Note" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="ResultServey_create">
+            <Parameter Name="IDES" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDOT" Mode="In" Type="Int32" />
+            <Parameter Name="StatusRS" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ResultServey_update">
+            <Parameter Name="ID" Mode="In" Type="Int32" />
+            <Parameter Name="IDES" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDOT" Mode="In" Type="Int32" />
+            <Parameter Name="StatusRS" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="RsultServey_delete">
+          <Parameter Name="ID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="CTKhaoSats" EntityType="EPORTAL_SERVEYModel.CTKhaoSat" />
+          <EntitySet Name="GroupKhaoSats" EntityType="EPORTAL_SERVEYModel.GroupKhaoSat" />
+          <FunctionImport Name="CTKhaoSat_delete">
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CTKhaoSat_insert">
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDOT" Mode="In" Type="Int32" />
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="DiaDiems" EntityType="EPORTAL_SERVEYModel.DiaDiem" />
+          <FunctionImport Name="EmployeeServey_updateDC">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDDC" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="ChiTietDKNTs" EntityType="EPORTAL_SERVEYModel.ChiTietDKNT" />
+          <EntitySet Name="CTDKNguoiThans" EntityType="EPORTAL_SERVEYModel.CTDKNguoiThan" />
+          <FunctionImport Name="ChiTietDKNT_delete">
+          <Parameter Name="IDNguoiThan" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ChiTietDKNT_insert">
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDOT" Mode="In" Type="Int32" />
+            <Parameter Name="IDNguoiThan" Mode="In" Type="Int32" />
+            <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CTDKNguoiThan_delete">
+          <Parameter Name="ID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CTDKNguoiThan_insert">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDNguoiThan" Mode="In" Type="Int32" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="DienThoai" Mode="In" Type="String" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="isCom" Mode="In" Type="Int32" />
+            <Parameter Name="GioiTinh" Mode="In" Type="Int32" />
+            <Parameter Name="IDDC" Mode="In" Type="Int32" />
+            <Parameter Name="NamSinh" Mode="In" Type="String" />
+            <Parameter Name="QuanHe" Mode="In" Type="String" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="ID" Mode="InOut" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CTDKNguoiThan_update">
+            <Parameter Name="ID" Mode="In" Type="Int32" />
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDNguoiThan" Mode="In" Type="Int32" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="DienThoai" Mode="In" Type="String" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="isCom" Mode="In" Type="Int32" />
+            <Parameter Name="GioiTinh" Mode="In" Type="Int32" />
+            <Parameter Name="IDDC" Mode="In" Type="Int32" />
+            <Parameter Name="NamSinh" Mode="In" Type="String" />
+            <Parameter Name="QuanHe" Mode="In" Type="String" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="EmployeeServey_updateOT">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="IDSV" Mode="In" Type="Int32" />
+            <Parameter Name="IDOT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="GhiChus" EntityType="EPORTAL_SERVEYModel.GhiChu" />
+        </EntityContainer>
+        <ComplexType Name="EmployeeServey_selectNV_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="IDNV" Nullable="true" />
+          <Property Type="Int32" Name="IDSV" Nullable="true" />
+          <Property Type="Int32" Name="OTID" Nullable="true" />
+          <Property Type="Boolean" Name="XNSV" Nullable="true" />
+          <Property Type="Int32" Name="MenuOT" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="ListServey_selectNV_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="IDNV" Nullable="true" />
+          <Property Type="Int32" Name="IDSV" Nullable="true" />
+          <Property Type="Int32" Name="OTID" Nullable="true" />
+          <Property Type="Boolean" Name="XNSV" Nullable="true" />
+          <Property Type="Int32" Name="MenuOT" Nullable="true" />
+          <Property Type="String" Name="ContentSV" Nullable="true" MaxLength="500" />
+          <Property Type="DateTime" Name="StartTime" Nullable="true" />
+          <Property Type="DateTime" Name="EndTime" Nullable="true" />
+          <Property Type="Boolean" Name="StatusSV" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="OptionServey_selectOT_Result">
+          <Property Type="Int32" Name="IDOT" Nullable="false" />
+          <Property Type="String" Name="ContentOT" Nullable="true" MaxLength="500" />
+          <Property Type="Int32" Name="IDSV" Nullable="true" />
+          <Property Type="String" Name="FilePath" Nullable="true" />
+          <Property Type="Int32" Name="OrderBy" Nullable="true" />
+          <Property Type="String" Name="ContentSV" Nullable="true" MaxLength="500" />
+          <Property Type="DateTime" Name="EndTime" Nullable="true" />
+          <Property Type="DateTime" Name="StartTime" Nullable="true" />
+          <Property Type="Boolean" Name="StatusSV" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="PartTogether_selectCom_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="IDNV" Nullable="true" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="200" />
+          <Property Type="DateTime" Name="NamSinh" Nullable="true" />
+          <Property Type="Int32" Name="IDESV" Nullable="true" />
+          <Property Type="String" Name="Re" Nullable="true" MaxLength="200" />
+          <Property Type="Boolean" Name="isCom" Nullable="true" />
+          <Property Type="String" Name="Note" Nullable="true" MaxLength="200" />
+        </ComplexType>
+        <EntityType Name="CTKhaoSat">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="IDOT" Type="Int32" />
+          <Property Name="IDNV" Type="Int32" />
+          <Property Name="IDGroup" Type="Int32" />
+        </EntityType>
+        <EntityType Name="GroupKhaoSat">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaNhom" Type="Int32" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="TenNhom" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="isShowRe" Type="Int32" />
+          <Property Name="isChon" Type="Int32" />
+        </EntityType>
+        <EntityType Name="DiaDiem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenDC" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ChiTietDKNT">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="IDOT" Type="Int32" />
+          <Property Name="IDNguoiThan" Type="Int32" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDGroup" Type="Int32" />
+        </EntityType>
+        <EntityType Name="CTDKNguoiThan">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDNV" Type="Int32" />
+          <Property Name="IDNguoiThan" Type="Int32" />
+          <Property Name="HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DienThoai" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="isCom" Type="Int32" />
+          <Property Name="GioiTinh" Type="Int32" />
+          <Property Name="IDDC" Type="Int32" />
+          <Property Name="NamSinh" Type="String" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="QuanHe" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="GhiChu" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="GhiChu">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="NoiDung" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EPORTAL_SERVEYModelStoreContainer" CdmEntityContainer="EPORTAL_SERVEYEntities">
+          <EntitySetMapping Name="EmployeeServeys">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.EmployeeServey">
+              <MappingFragment StoreEntitySet="EmployeeServey">
+                <ScalarProperty Name="IDDC" ColumnName="IDDC" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="OTID" ColumnName="OTID" />
+                <ScalarProperty Name="XNSV" ColumnName="XNSV" />
+                <ScalarProperty Name="MenuOT" ColumnName="MenuOT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ListServeys">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.ListServey">
+              <MappingFragment StoreEntitySet="ListServey">
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="ContentSV" ColumnName="ContentSV" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OptionServeys">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.OptionServey">
+              <MappingFragment StoreEntitySet="OptionServey">
+                <ScalarProperty Name="isShow" ColumnName="isShow" />
+                <ScalarProperty Name="MaOT" ColumnName="MaOT" />
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+                <ScalarProperty Name="ContentOT" ColumnName="ContentOT" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="OrderBy" ColumnName="OrderBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PartTogethers">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.PartTogether">
+              <MappingFragment StoreEntitySet="PartTogether">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NamSinh" ColumnName="NamSinh" />
+                <ScalarProperty Name="IDESV" ColumnName="IDESV" />
+                <ScalarProperty Name="Re" ColumnName="Re" />
+                <ScalarProperty Name="isCom" ColumnName="isCom" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ResultServeys">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.ResultServey">
+              <MappingFragment StoreEntitySet="ResultServey">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IDES" ColumnName="IDES" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+                <ScalarProperty Name="StatusRS" ColumnName="StatusRS" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="EmployeeServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_delete" />
+          <FunctionImportMapping FunctionImportName="EmployeeServey_insert" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_insert" />
+          <FunctionImportMapping FunctionImportName="EmployeeServey_selectNV" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_selectNV">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.EmployeeServey_selectNV_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="OTID" ColumnName="OTID" />
+                <ScalarProperty Name="XNSV" ColumnName="XNSV" />
+                <ScalarProperty Name="MenuOT" ColumnName="MenuOT" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="EmployeeServey_update" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_update" />
+          <FunctionImportMapping FunctionImportName="EmployeeServey_updateOtion" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateOtion" />
+          <FunctionImportMapping FunctionImportName="EmployeeServey_updateXN" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateXN" />
+          <FunctionImportMapping FunctionImportName="ListServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_delete" />
+          <FunctionImportMapping FunctionImportName="ListServey_insert" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_insert" />
+          <FunctionImportMapping FunctionImportName="ListServey_selectNV" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_selectNV">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.ListServey_selectNV_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="OTID" ColumnName="OTID" />
+                <ScalarProperty Name="XNSV" ColumnName="XNSV" />
+                <ScalarProperty Name="MenuOT" ColumnName="MenuOT" />
+                <ScalarProperty Name="ContentSV" ColumnName="ContentSV" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ListServey_update" FunctionName="EPORTAL_SERVEYModel.Store.ListServey_update" />
+          <FunctionImportMapping FunctionImportName="OptionServey_create" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_create" />
+          <FunctionImportMapping FunctionImportName="OptionServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_delete" />
+          <FunctionImportMapping FunctionImportName="OptionServey_selectOT" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_selectOT">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.OptionServey_selectOT_Result">
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+                <ScalarProperty Name="ContentOT" ColumnName="ContentOT" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="OrderBy" ColumnName="OrderBy" />
+                <ScalarProperty Name="ContentSV" ColumnName="ContentSV" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="OptionServey_update" FunctionName="EPORTAL_SERVEYModel.Store.OptionServey_update" />
+          <FunctionImportMapping FunctionImportName="PartTogether_delete" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_delete" />
+          <FunctionImportMapping FunctionImportName="PartTogether_insert" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_insert" />
+          <FunctionImportMapping FunctionImportName="PartTogether_selectCom" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_selectCom">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_SERVEYModel.PartTogether_selectCom_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NamSinh" ColumnName="NamSinh" />
+                <ScalarProperty Name="IDESV" ColumnName="IDESV" />
+                <ScalarProperty Name="Re" ColumnName="Re" />
+                <ScalarProperty Name="isCom" ColumnName="isCom" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="PartTogether_update" FunctionName="EPORTAL_SERVEYModel.Store.PartTogether_update" />
+          <FunctionImportMapping FunctionImportName="ResultServey_create" FunctionName="EPORTAL_SERVEYModel.Store.ResultServey_create" />
+          <FunctionImportMapping FunctionImportName="ResultServey_update" FunctionName="EPORTAL_SERVEYModel.Store.ResultServey_update" />
+          <FunctionImportMapping FunctionImportName="RsultServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.RsultServey_delete" />
+          <EntitySetMapping Name="CTKhaoSats">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTKhaoSat">
+              <MappingFragment StoreEntitySet="CTKhaoSat">
+                <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GroupKhaoSats">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.GroupKhaoSat">
+              <MappingFragment StoreEntitySet="GroupKhaoSat">
+                <ScalarProperty Name="isChon" ColumnName="isChon" />
+                <ScalarProperty Name="isShowRe" ColumnName="isShowRe" />
+                <ScalarProperty Name="TenNhom" ColumnName="TenNhom" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="MaNhom" ColumnName="MaNhom" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CTKhaoSat_delete" FunctionName="EPORTAL_SERVEYModel.Store.CTKhaoSat_delete" />
+          <FunctionImportMapping FunctionImportName="CTKhaoSat_insert" FunctionName="EPORTAL_SERVEYModel.Store.CTKhaoSat_insert" />
+          <EntitySetMapping Name="DiaDiems">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.DiaDiem">
+              <MappingFragment StoreEntitySet="DiaDiem">
+                <ScalarProperty Name="TenDC" ColumnName="TenDC" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="EmployeeServey_updateDC" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateDC" />
+          <EntitySetMapping Name="ChiTietDKNTs">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.ChiTietDKNT">
+              <MappingFragment StoreEntitySet="ChiTietDKNT">
+                <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+                <ScalarProperty Name="IDNguoiThan" ColumnName="IDNguoiThan" />
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CTDKNguoiThans">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTDKNguoiThan">
+              <MappingFragment StoreEntitySet="CTDKNguoiThan">
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="QuanHe" ColumnName="QuanHe" />
+                <ScalarProperty Name="NamSinh" ColumnName="NamSinh" />
+                <ScalarProperty Name="IDDC" ColumnName="IDDC" />
+                <ScalarProperty Name="GioiTinh" ColumnName="GioiTinh" />
+                <ScalarProperty Name="isCom" ColumnName="isCom" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="IDNguoiThan" ColumnName="IDNguoiThan" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="ChiTietDKNT_delete" FunctionName="EPORTAL_SERVEYModel.Store.ChiTietDKNT_delete" />
+          <FunctionImportMapping FunctionImportName="ChiTietDKNT_insert" FunctionName="EPORTAL_SERVEYModel.Store.ChiTietDKNT_insert" />
+          <FunctionImportMapping FunctionImportName="CTDKNguoiThan_delete" FunctionName="EPORTAL_SERVEYModel.Store.CTDKNguoiThan_delete" />
+          <FunctionImportMapping FunctionImportName="CTDKNguoiThan_insert" FunctionName="EPORTAL_SERVEYModel.Store.CTDKNguoiThan_insert" />
+          <FunctionImportMapping FunctionImportName="CTDKNguoiThan_update" FunctionName="EPORTAL_SERVEYModel.Store.CTDKNguoiThan_update" />
+          <FunctionImportMapping FunctionImportName="EmployeeServey_updateOT" FunctionName="EPORTAL_SERVEYModel.Store.EmployeeServey_updateOT" />
+          <EntitySetMapping Name="GhiChus">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.GhiChu">
+              <MappingFragment StoreEntitySet="GhiChu">
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

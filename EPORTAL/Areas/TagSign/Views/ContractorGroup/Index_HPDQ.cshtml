@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "Index_HPDQ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<DataInformationValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{ 
+    var quyenAdd = (int)ViewBag.Quyen;
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Nhóm nhà thầu
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-5">
+                                <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                            </div>
+                            @if (quyenAdd != 0)
+                            {
+                                <div class="col-md-4">
+                                    <button type="button" id="btn-add" class="btn btn-primary" style="margin-left: 10px;float: right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới</button>
+                                    <div class="modal" id="myModal_Add" role="dialog" data-url='@Url.Action("Create","ContractorGroup",new {area="TagSign"})' style="margin-top:50px"></div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            @if (quyenAdd != 0)
+                                            {
+                                                <th width="100px" class="text-center">Thao tác</th>
+                                            }
+
+                                            <th class="text-center" width="500px">Tên nhóm nhà thầu</th>
+                                            <th class="text-center" width="500px">Chi tiết nhóm nhà thầu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                     @if (quyenAdd != 0)
+                                                     {
+                                                            <td class="text-center">
+
+                                                            <a id="btn-edit_@item.IDGroup" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                            <div class="modal " id="myModaleEdit_@item.IDGroup" role="dialog" data-url='@Url.Action("Edit", "ContractorGroup", new { id = item.IDGroup })'></div>
+                                                            <script type="text/javascript">
+                                                                            $('#btn-edit_@item.IDGroup').click(function () {
+                                                                                var url = $('#myModaleEdit_@item.IDGroup').data('url');
+                                                                                $.get(url, function (data) {
+                                                                                    $("#myModaleEdit_@item.IDGroup").html(data);
+                                                                                    $("#ModalTitle").html("Cập nhật Thông tin");
+                                                                                    $("#myModaleEdit_@item.IDGroup").modal('show');
+                                                                                });
+                                                                            });
+                                                            </script>
+
+                                                            </td>
+                                                     }
+
+                                                    <td>@item.NameContractorGroup</td>
+                                                    <td>@item.Describe</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index_HPDQ", "ContractorGroup", new { area = "TagSign", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal_Add').data('url');
+        $.get(url, function (data) {
+            $("#myModal_Add").html(data);
+            $("#ModalTitle").html("Thêm cổng");
+            $("#myModal_Add").modal('show');
+        });
+    });
+     $("#btn-search").on('click', function () {
+        var search = $('#txtsearch').val();
+        window.location.href = '@Url.Action("Index_HPDQ", "ContractorGroup")?search=' + search;
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

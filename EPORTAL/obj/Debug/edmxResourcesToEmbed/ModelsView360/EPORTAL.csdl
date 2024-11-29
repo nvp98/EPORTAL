@@ -1,0 +1,1726 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EPORTALModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Album">
+    <Key>
+      <PropertyRef Name="IDAlbum" />
+    </Key>
+    <Property Name="IDAlbum" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenAlbum" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Images" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Approve">
+    <Key>
+      <PropertyRef Name="IDPD" />
+    </Key>
+    <Property Name="IDPD" Type="Int32" Nullable="false" />
+    <Property Name="Nameapprove" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="AuthenticationAPI">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Password" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AuthorizationContractor">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDNhanVien" Type="Int32" />
+    <Property Name="IDLKD" Type="Int32" />
+    <Property Name="IDCVKN" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NhanVien" Relationship="Self.FK_AuthorizationContractors_NhanVien" FromRole="AuthorizationContractors" ToRole="NhanVien" />
+  </EntityType>
+  <EntityType Name="AuthorizationUSER">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ProjectID" Type="Int32" />
+    <Property Name="NhanVienID" Type="Int32" />
+    <Property Name="Createdate" Type="DateTime" Precision="0" />
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <NavigationProperty Name="NhanVien" Relationship="Self.FK_AuthorizationUSER_NhanVien" FromRole="AuthorizationUSER" ToRole="NhanVien" />
+  </EntityType>
+  <EntityType Name="AuthorizationVideo">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NhanVienID" Type="Int32" />
+    <Property Name="Createdate" Type="DateTime" Precision="0" />
+    <Property Name="VideoID" Type="Int32" />
+    <NavigationProperty Name="NhanVien" Relationship="Self.FK_AuthorizationVideo_NhanVien" FromRole="AuthorizationVideo" ToRole="NhanVien" />
+    <NavigationProperty Name="Video" Relationship="Self.FK_AuthorizationVideo_Video" FromRole="AuthorizationVideo" ToRole="Video" />
+  </EntityType>
+  <EntityType Name="Calender">
+    <Key>
+      <PropertyRef Name="IDPlan" />
+    </Key>
+    <Property Name="IDPlan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDCalendar" Type="Int32" />
+    <Property Name="LongName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="ShortName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="PhongBanID" Type="Int32" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Image" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Note" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Int32" />
+  </EntityType>
+  <EntityType Name="DangKy">
+    <Key>
+      <PropertyRef Name="IDDK" />
+    </Key>
+    <Property Name="IDDK" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenDangNhap" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MatKhau" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MaNV" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MaQuyen" Type="Int32" />
+    <Property Name="IDPhongBan" Type="Int32" />
+  </EntityType>
+  <EntityType Name="KD_KyDuyet">
+    <Key>
+      <PropertyRef Name="IDKD" />
+    </Key>
+    <Property Name="IDKD" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDNhanVien" Type="Int32" />
+    <Property Name="GhiChu" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="IDLoaiKD" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="KD_LoaiKyDuyet" Relationship="Self.FK_KD_KyDuyet_KD_LoaiKyDuyet" FromRole="KD_KyDuyet" ToRole="KD_LoaiKyDuyet" />
+    <NavigationProperty Name="NhanVien" Relationship="Self.FK_KD_KyDuyet_NhanVien1" FromRole="KD_KyDuyet" ToRole="NhanVien" />
+  </EntityType>
+  <EntityType Name="KD_LoaiKyDuyet">
+    <Key>
+      <PropertyRef Name="IDLKD" />
+    </Key>
+    <Property Name="IDLKD" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenLoaiKyDuyet" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="KD_KyDuyet" Relationship="Self.FK_KD_KyDuyet_KD_LoaiKyDuyet" FromRole="KD_LoaiKyDuyet" ToRole="KD_KyDuyet" />
+  </EntityType>
+  <EntityType Name="KD_TinhTrangXL">
+    <Key>
+      <PropertyRef Name="IDTT" />
+    </Key>
+    <Property Name="IDTT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TinhTrangXL" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="KD_TrinhKy">
+    <Key>
+      <PropertyRef Name="IDTK" />
+    </Key>
+    <Property Name="IDTK" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDDS" Type="Int32" />
+    <Property Name="IDKTV" Type="Int32" />
+    <Property Name="TKKTV" Type="Int32" />
+    <Property Name="GhiChuKTV" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="NgayKyKTV" Type="DateTime" Precision="0" />
+    <Property Name="IDBPQL" Type="Int32" />
+    <Property Name="TKBPQL" Type="Int32" />
+    <Property Name="GhiChuBPQL" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="NgayKyBPQL" Type="DateTime" Precision="0" />
+    <Property Name="IDVP1C" Type="Int32" />
+    <Property Name="TKVP1C" Type="Int32" />
+    <Property Name="GhiChuVP1C" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="NgayKyVP1C" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="NT_CardRegistrationInfor" Relationship="Self.FK_KD_TrinhKy_NT_CardRegistrationInfor" FromRole="KD_TrinhKy" ToRole="NT_CardRegistrationInfor" />
+  </EntityType>
+  <EntityType Name="KD_TrinhKyGH">
+    <Key>
+      <PropertyRef Name="IDTKGH" />
+    </Key>
+    <Property Name="IDTKGH" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDGH" Type="Int32" />
+    <Property Name="IDKTV" Type="Int32" />
+    <Property Name="TKKTV" Type="Int32" />
+    <Property Name="GhiChuKTV" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="NgayKyKTV" Type="DateTime" Precision="3" />
+    <Property Name="IDBPQL" Type="Int32" />
+    <Property Name="TKBPQL" Type="Int32" />
+    <Property Name="GhiChuBPQL" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="NgayKyBPQL" Type="DateTime" Precision="3" />
+    <Property Name="IDVP1C" Type="Int32" />
+    <Property Name="TKVP1C" Type="Int32" />
+    <Property Name="GhiChuVP1C" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="NgayKyVP1C" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="NhanVien">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="MaNV" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="MatKhau" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="HoTenKhongDau" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NgaySinh" Type="DateTime" Precision="0" />
+    <Property Name="DiaChi" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="DienThoai" Type="String" MaxLength="11" FixedLength="false" Unicode="false" />
+    <Property Name="NgayVaoLam" Type="DateTime" Precision="0" />
+    <Property Name="IDPhongBan" Type="Int32" />
+    <Property Name="IDTinhTrangLV" Type="Int32" />
+    <Property Name="IDViTri" Type="Int32" />
+    <Property Name="IsGV" Type="Boolean" />
+    <Property Name="IDQuyen" Type="Int32" />
+    <Property Name="Chukynhay" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Chukychinh" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="IDQuyenHT" Type="Int32" />
+    <Property Name="GroupQuyen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="AuthorizationContractors" Relationship="Self.FK_AuthorizationContractors_NhanVien" FromRole="NhanVien" ToRole="AuthorizationContractors" />
+    <NavigationProperty Name="AuthorizationUSERs" Relationship="Self.FK_AuthorizationUSER_NhanVien" FromRole="NhanVien" ToRole="AuthorizationUSER" />
+    <NavigationProperty Name="AuthorizationVideos" Relationship="Self.FK_AuthorizationVideo_NhanVien" FromRole="NhanVien" ToRole="AuthorizationVideo" />
+    <NavigationProperty Name="KD_KyDuyet" Relationship="Self.FK_KD_KyDuyet_NhanVien1" FromRole="NhanVien" ToRole="KD_KyDuyet" />
+    <NavigationProperty Name="PhongBan" Relationship="Self.FK_NhanVien_PhongBan" FromRole="NhanVien" ToRole="PhongBan" />
+    <NavigationProperty Name="TinhTrangLV" Relationship="Self.FK_NhanVien_TinhTrangLV" FromRole="NhanVien" ToRole="TinhTrangLV" />
+    <NavigationProperty Name="Vitri" Relationship="Self.FK_NhanVien_Vitri" FromRole="NhanVien" ToRole="Vitri" />
+    <NavigationProperty Name="ThongTinCaNhans" Relationship="Self.FK_ThongTinCaNhan_NhanVien" FromRole="NhanVien" ToRole="ThongTinCaNhan" />
+  </EntityType>
+  <EntityType Name="NT_Authority">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FullName" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="CCCD" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Phone" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+    <Property Name="Position" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Createdate" Type="DateTime" Precision="0" />
+    <Property Name="Begindate" Type="DateTime" Precision="0" />
+    <Property Name="Enddate" Type="DateTime" Precision="0" />
+    <Property Name="File_Scan" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="BPID" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_CardRegistrationInfor">
+    <Key>
+      <PropertyRef Name="IDDS" />
+    </Key>
+    <Property Name="IDDS" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Contents" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Namefile" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="ContractorsID" Type="Int32" />
+    <Property Name="ContractID" Type="Int32" />
+    <Property Name="PhongBanID" Type="Int32" />
+    <Property Name="DayUpload" Type="DateTime" Precision="3" />
+    <Property Name="Note" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="IDNVTK" Type="Int32" />
+    <Property Name="FileComplete" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="IDTTTK" Type="Int32" />
+    <Property Name="DaySchool" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="KD_TrinhKy" Relationship="Self.FK_KD_TrinhKy_NT_CardRegistrationInfor" FromRole="NT_CardRegistrationInfor" ToRole="KD_TrinhKy" />
+    <NavigationProperty Name="NT_DetailCardRegistrationInfor" Relationship="Self.FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor" FromRole="NT_CardRegistrationInfor" ToRole="NT_DetailCardRegistrationInfor" />
+  </EntityType>
+  <EntityType Name="NT_Confirm">
+    <Key>
+      <PropertyRef Name="IDTT" />
+    </Key>
+    <Property Name="IDTT" Type="Int32" Nullable="false" />
+    <Property Name="TenTT" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_Contract">
+    <Key>
+      <PropertyRef Name="IDContract" />
+    </Key>
+    <Property Name="IDContract" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Somecontracts" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Contract" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="BeginDate" Type="DateTime" Precision="0" />
+    <Property Name="EndDate" Type="DateTime" Precision="0" />
+    <Property Name="FileScan" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="IDNT" Type="Int32" />
+    <Property Name="IDBP" Type="Int32" />
+    <Property Name="TPBP" Type="Int32" />
+    <Property Name="TTXL" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_ContractorGroup">
+    <Key>
+      <PropertyRef Name="IDGroup" />
+    </Key>
+    <Property Name="IDGroup" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NameContractorGroup" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Describe" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_DetailCardRegistrationInfor">
+    <Key>
+      <PropertyRef Name="IDCT" />
+    </Key>
+    <Property Name="IDCT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FullName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="BirthDay" Type="DateTime" Precision="0" />
+    <Property Name="PermanentResidence" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Position" Type="Int32" />
+    <Property Name="Phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="PhoneInformation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="StorageCard" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="AccessCard" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="CreateDate" Type="DateTime" Precision="0" />
+    <Property Name="IDCA" Type="Int32" />
+    <Property Name="IDKV" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="IDGroup" Type="Int32" />
+    <Property Name="IDGate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Note" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="IDDS" Type="Int32" />
+    <Property Name="InOutID" Type="Int32" />
+    <Property Name="ResultID" Type="Int32" />
+    <NavigationProperty Name="NT_CardRegistrationInfor" Relationship="Self.FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor" FromRole="NT_DetailCardRegistrationInfor" ToRole="NT_CardRegistrationInfor" />
+  </EntityType>
+  <EntityType Name="NT_DetailExtendcard">
+    <Key>
+      <PropertyRef Name="IDCTGH" />
+    </Key>
+    <Property Name="IDCTGH" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="HoTen" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="CCDC" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NgaySinh" Type="DateTime" Precision="3" />
+    <Property Name="DiaChi" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="ChucVu" Type="Int32" />
+    <Property Name="Sdt" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="DoiThe" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="GiaHanThe" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="BoSungDt" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ThoiHanThe" Type="DateTime" Precision="3" />
+    <Property Name="IDCA" Type="Int32" />
+    <Property Name="IDKV" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NhomNT" Type="Int32" />
+    <Property Name="CongID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="IDGH" Type="Int32" />
+    <NavigationProperty Name="NT_Extendcard" Relationship="Self.FK_NT_DetailExtendcard_NT_Extendcard" FromRole="NT_DetailExtendcard" ToRole="NT_Extendcard" />
+  </EntityType>
+  <EntityType Name="NT_Extendcard">
+    <Key>
+      <PropertyRef Name="IDGH" />
+    </Key>
+    <Property Name="IDGH" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NoiDung" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="Namefile" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NTID" Type="Int32" />
+    <Property Name="HDID" Type="Int32" />
+    <Property Name="PhongBanID" Type="Int32" />
+    <Property Name="NgayTrinhKy" Type="DateTime" Precision="3" />
+    <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="IDTTTK" Type="Int32" />
+    <Property Name="IDNVTK" Type="Int32" />
+    <Property Name="FileComplete" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NT_DetailExtendcard" Relationship="Self.FK_NT_DetailExtendcard_NT_Extendcard" FromRole="NT_Extendcard" ToRole="NT_DetailExtendcard" />
+  </EntityType>
+  <EntityType Name="NT_Gate">
+    <Key>
+      <PropertyRef Name="IDGate" />
+    </Key>
+    <Property Name="IDGate" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Gate" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_Partner">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="BPID" Type="Int32" />
+    <Property Name="FullName" Type="String" MaxLength="400" FixedLength="false" Unicode="true" />
+    <Property Name="Taxcode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Address" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Customer" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="Vendor" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+    <Property Name="ShortName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="CodeUnis" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="NT_Permission">
+    <Key>
+      <PropertyRef Name="IDQ" />
+    </Key>
+    <Property Name="IDQ" Type="Int32" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_Position">
+    <Key>
+      <PropertyRef Name="IDCV" />
+    </Key>
+    <Property Name="IDCV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenCV" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Phone" Type="Int32" />
+    <Property Name="ChuVuTQ" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_Workingtime">
+    <Key>
+      <PropertyRef Name="IDCA" />
+    </Key>
+    <Property Name="IDCA" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenCA" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_Workplace">
+    <Key>
+      <PropertyRef Name="IDKV" />
+    </Key>
+    <Property Name="IDKV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenKV" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="PhongBan">
+    <Key>
+      <PropertyRef Name="IDPhongBan" />
+    </Key>
+    <Property Name="IDPhongBan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenPhongBan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_PhongBan" FromRole="PhongBan" ToRole="NhanVien" />
+  </EntityType>
+  <EntityType Name="Project">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Title" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="URL" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Images" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Note" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="IDPhongBan" Type="Int32" />
+    <Property Name="FilePDF" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="IDGroup" Type="Int32" />
+  </EntityType>
+  <EntityType Name="ProjectsGroup">
+    <Key>
+      <PropertyRef Name="IDGroup" />
+    </Key>
+    <Property Name="IDGroup" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="GroupName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Quyen">
+    <Key>
+      <PropertyRef Name="IDQuyen" />
+    </Key>
+    <Property Name="IDQuyen" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenQuyen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="Signingstatu">
+    <Key>
+      <PropertyRef Name="IDTT" />
+    </Key>
+    <Property Name="IDTT" Type="Int32" Nullable="false" />
+    <Property Name="NameSatus" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="ThongTinCaNhan">
+    <Key>
+      <PropertyRef Name="IDThongTin" />
+    </Key>
+    <Property Name="IDThongTin" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDNhanVien" Type="Int32" />
+    <Property Name="CMND" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+    <Property Name="CCCD" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+    <Property Name="FileHinh" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="XacNhan" Type="Boolean" />
+    <Property Name="NgayKhai" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="NhanVien" Relationship="Self.FK_ThongTinCaNhan_NhanVien" FromRole="ThongTinCaNhan" ToRole="NhanVien" />
+  </EntityType>
+  <EntityType Name="TinhTrangLV">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="TinhTrangLV1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_TinhTrangLV" FromRole="TinhTrangLV" ToRole="NhanVien" />
+  </EntityType>
+  <EntityType Name="Video">
+    <Key>
+      <PropertyRef Name="IDVideo" />
+    </Key>
+    <Property Name="IDVideo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Title" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="URL" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Images" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Note" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="IDPhongBan" Type="Int32" />
+    <Property Name="AlbumID" Type="Int32" />
+    <NavigationProperty Name="AuthorizationVideos" Relationship="Self.FK_AuthorizationVideo_Video" FromRole="Video" ToRole="AuthorizationVideo" />
+  </EntityType>
+  <EntityType Name="Vitri">
+    <Key>
+      <PropertyRef Name="IDViTri" />
+    </Key>
+    <Property Name="IDViTri" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenViTri" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_Vitri" FromRole="Vitri" ToRole="NhanVien" />
+  </EntityType>
+  <Association Name="FK_AuthorizationContractors_NhanVien">
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
+    <End Role="AuthorizationContractors" Type="Self.AuthorizationContractor" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NhanVien">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthorizationContractors">
+        <PropertyRef Name="IDNhanVien" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthorizationUSER_NhanVien">
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
+    <End Role="AuthorizationUSER" Type="Self.AuthorizationUSER" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NhanVien">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthorizationUSER">
+        <PropertyRef Name="NhanVienID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthorizationVideo_NhanVien">
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
+    <End Role="AuthorizationVideo" Type="Self.AuthorizationVideo" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NhanVien">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="AuthorizationVideo">
+        <PropertyRef Name="NhanVienID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_AuthorizationVideo_Video">
+    <End Role="Video" Type="Self.Video" Multiplicity="0..1" />
+    <End Role="AuthorizationVideo" Type="Self.AuthorizationVideo" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Video">
+        <PropertyRef Name="IDVideo" />
+      </Principal>
+      <Dependent Role="AuthorizationVideo">
+        <PropertyRef Name="VideoID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_KD_KyDuyet_KD_LoaiKyDuyet">
+    <End Role="KD_LoaiKyDuyet" Type="Self.KD_LoaiKyDuyet" Multiplicity="1" />
+    <End Role="KD_KyDuyet" Type="Self.KD_KyDuyet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="KD_LoaiKyDuyet">
+        <PropertyRef Name="IDLKD" />
+      </Principal>
+      <Dependent Role="KD_KyDuyet">
+        <PropertyRef Name="IDLoaiKD" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_KD_KyDuyet_NhanVien1">
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
+    <End Role="KD_KyDuyet" Type="Self.KD_KyDuyet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NhanVien">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="KD_KyDuyet">
+        <PropertyRef Name="IDNhanVien" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_KD_TrinhKy_NT_CardRegistrationInfor">
+    <End Role="NT_CardRegistrationInfor" Type="Self.NT_CardRegistrationInfor" Multiplicity="0..1" />
+    <End Role="KD_TrinhKy" Type="Self.KD_TrinhKy" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NT_CardRegistrationInfor">
+        <PropertyRef Name="IDDS" />
+      </Principal>
+      <Dependent Role="KD_TrinhKy">
+        <PropertyRef Name="IDDS" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NhanVien_PhongBan">
+    <End Role="PhongBan" Type="Self.PhongBan" Multiplicity="0..1" />
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="PhongBan">
+        <PropertyRef Name="IDPhongBan" />
+      </Principal>
+      <Dependent Role="NhanVien">
+        <PropertyRef Name="IDPhongBan" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NhanVien_TinhTrangLV">
+    <End Role="TinhTrangLV" Type="Self.TinhTrangLV" Multiplicity="0..1" />
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TinhTrangLV">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="NhanVien">
+        <PropertyRef Name="IDTinhTrangLV" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NhanVien_Vitri">
+    <End Role="Vitri" Type="Self.Vitri" Multiplicity="0..1" />
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Vitri">
+        <PropertyRef Name="IDViTri" />
+      </Principal>
+      <Dependent Role="NhanVien">
+        <PropertyRef Name="IDViTri" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ThongTinCaNhan_NhanVien">
+    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
+    <End Role="ThongTinCaNhan" Type="Self.ThongTinCaNhan" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NhanVien">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="ThongTinCaNhan">
+        <PropertyRef Name="IDNhanVien" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor">
+    <End Role="NT_CardRegistrationInfor" Type="Self.NT_CardRegistrationInfor" Multiplicity="0..1" />
+    <End Role="NT_DetailCardRegistrationInfor" Type="Self.NT_DetailCardRegistrationInfor" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NT_CardRegistrationInfor">
+        <PropertyRef Name="IDDS" />
+      </Principal>
+      <Dependent Role="NT_DetailCardRegistrationInfor">
+        <PropertyRef Name="IDDS" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NT_DetailExtendcard_NT_Extendcard">
+    <End Role="NT_Extendcard" Type="Self.NT_Extendcard" Multiplicity="0..1" />
+    <End Role="NT_DetailExtendcard" Type="Self.NT_DetailExtendcard" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NT_Extendcard">
+        <PropertyRef Name="IDGH" />
+      </Principal>
+      <Dependent Role="NT_DetailExtendcard">
+        <PropertyRef Name="IDGH" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="EPORTALEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Albums" EntityType="Self.Album" />
+    <EntitySet Name="Approves" EntityType="Self.Approve" />
+    <EntitySet Name="AuthenticationAPIs" EntityType="Self.AuthenticationAPI" />
+    <EntitySet Name="AuthorizationContractors" EntityType="Self.AuthorizationContractor" />
+    <EntitySet Name="AuthorizationUSERs" EntityType="Self.AuthorizationUSER" />
+    <EntitySet Name="AuthorizationVideos" EntityType="Self.AuthorizationVideo" />
+    <EntitySet Name="Calenders" EntityType="Self.Calender" />
+    <EntitySet Name="DangKies" EntityType="Self.DangKy" />
+    <EntitySet Name="KD_KyDuyet" EntityType="Self.KD_KyDuyet" />
+    <EntitySet Name="KD_LoaiKyDuyet" EntityType="Self.KD_LoaiKyDuyet" />
+    <EntitySet Name="KD_TinhTrangXL" EntityType="Self.KD_TinhTrangXL" />
+    <EntitySet Name="KD_TrinhKy" EntityType="Self.KD_TrinhKy" />
+    <EntitySet Name="KD_TrinhKyGH" EntityType="Self.KD_TrinhKyGH" />
+    <EntitySet Name="NhanViens" EntityType="Self.NhanVien" />
+    <EntitySet Name="NT_Authority" EntityType="Self.NT_Authority" />
+    <EntitySet Name="NT_CardRegistrationInfor" EntityType="Self.NT_CardRegistrationInfor" />
+    <EntitySet Name="NT_Confirm" EntityType="Self.NT_Confirm" />
+    <EntitySet Name="NT_Contract" EntityType="Self.NT_Contract" />
+    <EntitySet Name="NT_ContractorGroup" EntityType="Self.NT_ContractorGroup" />
+    <EntitySet Name="NT_DetailCardRegistrationInfor" EntityType="Self.NT_DetailCardRegistrationInfor" />
+    <EntitySet Name="NT_DetailExtendcard" EntityType="Self.NT_DetailExtendcard" />
+    <EntitySet Name="NT_Extendcard" EntityType="Self.NT_Extendcard" />
+    <EntitySet Name="NT_Gate" EntityType="Self.NT_Gate" />
+    <EntitySet Name="NT_Partner" EntityType="Self.NT_Partner" />
+    <EntitySet Name="NT_Permission" EntityType="Self.NT_Permission" />
+    <EntitySet Name="NT_Position" EntityType="Self.NT_Position" />
+    <EntitySet Name="NT_Workingtime" EntityType="Self.NT_Workingtime" />
+    <EntitySet Name="NT_Workplace" EntityType="Self.NT_Workplace" />
+    <EntitySet Name="PhongBans" EntityType="Self.PhongBan" />
+    <EntitySet Name="Projects" EntityType="Self.Project" />
+    <EntitySet Name="ProjectsGroups" EntityType="Self.ProjectsGroup" />
+    <EntitySet Name="Quyens" EntityType="Self.Quyen" />
+    <EntitySet Name="Signingstatus" EntityType="Self.Signingstatu" />
+    <EntitySet Name="ThongTinCaNhans" EntityType="Self.ThongTinCaNhan" />
+    <EntitySet Name="TinhTrangLVs" EntityType="Self.TinhTrangLV" />
+    <EntitySet Name="Videos" EntityType="Self.Video" />
+    <EntitySet Name="Vitris" EntityType="Self.Vitri" />
+    <AssociationSet Name="FK_AuthorizationContractors_NhanVien" Association="Self.FK_AuthorizationContractors_NhanVien">
+      <End Role="NhanVien" EntitySet="NhanViens" />
+      <End Role="AuthorizationContractors" EntitySet="AuthorizationContractors" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthorizationUSER_NhanVien" Association="Self.FK_AuthorizationUSER_NhanVien">
+      <End Role="NhanVien" EntitySet="NhanViens" />
+      <End Role="AuthorizationUSER" EntitySet="AuthorizationUSERs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthorizationVideo_NhanVien" Association="Self.FK_AuthorizationVideo_NhanVien">
+      <End Role="NhanVien" EntitySet="NhanViens" />
+      <End Role="AuthorizationVideo" EntitySet="AuthorizationVideos" />
+    </AssociationSet>
+    <AssociationSet Name="FK_AuthorizationVideo_Video" Association="Self.FK_AuthorizationVideo_Video">
+      <End Role="Video" EntitySet="Videos" />
+      <End Role="AuthorizationVideo" EntitySet="AuthorizationVideos" />
+    </AssociationSet>
+    <AssociationSet Name="FK_KD_KyDuyet_KD_LoaiKyDuyet" Association="Self.FK_KD_KyDuyet_KD_LoaiKyDuyet">
+      <End Role="KD_LoaiKyDuyet" EntitySet="KD_LoaiKyDuyet" />
+      <End Role="KD_KyDuyet" EntitySet="KD_KyDuyet" />
+    </AssociationSet>
+    <AssociationSet Name="FK_KD_KyDuyet_NhanVien1" Association="Self.FK_KD_KyDuyet_NhanVien1">
+      <End Role="NhanVien" EntitySet="NhanViens" />
+      <End Role="KD_KyDuyet" EntitySet="KD_KyDuyet" />
+    </AssociationSet>
+    <AssociationSet Name="FK_KD_TrinhKy_NT_CardRegistrationInfor" Association="Self.FK_KD_TrinhKy_NT_CardRegistrationInfor">
+      <End Role="NT_CardRegistrationInfor" EntitySet="NT_CardRegistrationInfor" />
+      <End Role="KD_TrinhKy" EntitySet="KD_TrinhKy" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NhanVien_PhongBan" Association="Self.FK_NhanVien_PhongBan">
+      <End Role="PhongBan" EntitySet="PhongBans" />
+      <End Role="NhanVien" EntitySet="NhanViens" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NhanVien_TinhTrangLV" Association="Self.FK_NhanVien_TinhTrangLV">
+      <End Role="TinhTrangLV" EntitySet="TinhTrangLVs" />
+      <End Role="NhanVien" EntitySet="NhanViens" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NhanVien_Vitri" Association="Self.FK_NhanVien_Vitri">
+      <End Role="Vitri" EntitySet="Vitris" />
+      <End Role="NhanVien" EntitySet="NhanViens" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ThongTinCaNhan_NhanVien" Association="Self.FK_ThongTinCaNhan_NhanVien">
+      <End Role="NhanVien" EntitySet="NhanViens" />
+      <End Role="ThongTinCaNhan" EntitySet="ThongTinCaNhans" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor" Association="Self.FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor">
+      <End Role="NT_CardRegistrationInfor" EntitySet="NT_CardRegistrationInfor" />
+      <End Role="NT_DetailCardRegistrationInfor" EntitySet="NT_DetailCardRegistrationInfor" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NT_DetailExtendcard_NT_Extendcard" Association="Self.FK_NT_DetailExtendcard_NT_Extendcard">
+      <End Role="NT_Extendcard" EntitySet="NT_Extendcard" />
+      <End Role="NT_DetailExtendcard" EntitySet="NT_DetailExtendcard" />
+    </AssociationSet>
+    <FunctionImport Name="Album_delete">
+      <Parameter Name="IDAlbum" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Album_insert">
+      <Parameter Name="TenAlbum" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Album_searchByID" ReturnType="Collection(EPORTALModel.Album_searchByID_Result)">
+      <Parameter Name="IDAlbum" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Album_select" ReturnType="Collection(EPORTALModel.Album_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Album_update">
+      <Parameter Name="IDAlbum" Mode="In" Type="Int32" />
+      <Parameter Name="TenAlbum" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="AuthenticationAPI_login" ReturnType="Collection(EPORTALModel.AuthenticationAPI_login_Result)">
+      <Parameter Name="UserName" Mode="In" Type="String" />
+      <Parameter Name="Password" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractors_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractors_insert">
+      <Parameter Name="IDNhanVien" Mode="In" Type="Int32" />
+      <Parameter Name="IDLKD" Mode="In" Type="Int32" />
+      <Parameter Name="IDCVKN" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractors_searchByID" ReturnType="Collection(EPORTALModel.AuthorizationContractors_searchByID_Result)">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractors_select" ReturnType="Collection(EPORTALModel.AuthorizationContractors_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractors_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IDNhanVien" Mode="In" Type="Int32" />
+      <Parameter Name="IDLKD" Mode="In" Type="Int32" />
+      <Parameter Name="IDCVKN" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractorsLKD_insert">
+      <Parameter Name="IDNhanVien" Mode="In" Type="Int32" />
+      <Parameter Name="IDLKD" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationContractorsLKD_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IDLoaiKD" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationUSER_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="AuthorizationVideo_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Calender_Confirm">
+      <Parameter Name="IDPlan" Mode="In" Type="Int32" />
+      <Parameter Name="Status" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Calender_delete">
+      <Parameter Name="IDPlan" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Calender_insert">
+      <Parameter Name="IDCalendar" Mode="In" Type="Int32" />
+      <Parameter Name="LongName" Mode="In" Type="String" />
+      <Parameter Name="ShortName" Mode="In" Type="String" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Image" Mode="In" Type="String" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="Status" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Calender_update">
+      <Parameter Name="IDPlan" Mode="In" Type="Int32" />
+      <Parameter Name="IDCalendar" Mode="In" Type="Int32" />
+      <Parameter Name="LongName" Mode="In" Type="String" />
+      <Parameter Name="ShortName" Mode="In" Type="String" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Image" Mode="In" Type="String" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="DangKy_delete">
+      <Parameter Name="IDDK" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="DangKy_insert">
+      <Parameter Name="TenDangNhap" Mode="In" Type="String" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="MaQuyen" Mode="In" Type="Int32" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="DangKy_ResetPass">
+      <Parameter Name="IDDK" Mode="In" Type="Int32" />
+      <Parameter Name="TenDangNhap" Mode="In" Type="String" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="DangKy_update">
+      <Parameter Name="IDDK" Mode="In" Type="Int32" />
+      <Parameter Name="TenDangNhap" Mode="In" Type="String" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="MaQuyen" Mode="In" Type="Int32" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_KyDuyet_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_KyDuyet_insert">
+      <Parameter Name="IDNhanVien" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDLoaiKD" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_KyDuyet_searchByID" ReturnType="Collection(EPORTALModel.KD_KyDuyet_searchByID_Result)">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_KyDuyet_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="ghichu" Mode="In" Type="String" />
+      <Parameter Name="IDLoaiKD" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_LoaiKyDuyet_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_LoaiKyDuyet_insert">
+      <Parameter Name="TenLoaiKyDuyet" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="KD_LoaiKyDuyet_searchByID" ReturnType="Collection(EPORTALModel.KD_LoaiKyDuyet_searchByID_Result)">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_LoaiKyDuyet_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="TenLoaiKyDuyet" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TaiKhoan_select" ReturnType="Collection(EPORTALModel.KD_TaiKhoan_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKy_delete">
+      <Parameter Name="IDTK" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKy_Insert">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="IDKTV" Mode="In" Type="Int32" />
+      <Parameter Name="TKKTV" Mode="In" Type="Int32" />
+      <Parameter Name="IDBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="TKBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="IDVP1C" Mode="In" Type="Int32" />
+      <Parameter Name="TKVP1C" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKy_updateBPQL">
+      <Parameter Name="IDTK" Mode="In" Type="Int32" />
+      <Parameter Name="TKBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuBPQL" Mode="In" Type="String" />
+      <Parameter Name="NgayKyBPQL" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKy_updateKTV">
+      <Parameter Name="IDTK" Mode="In" Type="Int32" />
+      <Parameter Name="TKKTV" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuKTV" Mode="In" Type="String" />
+      <Parameter Name="NgayKyKTV" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKy_UpdateTK">
+      <Parameter Name="IDTK" Mode="In" Type="Int32" />
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="IDKTV" Mode="In" Type="Int32" />
+      <Parameter Name="TKKTV" Mode="In" Type="Int32" />
+      <Parameter Name="IDBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="TKBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="IDVP1C" Mode="In" Type="Int32" />
+      <Parameter Name="TKVP1C" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKy_updateVP1C">
+      <Parameter Name="IDTK" Mode="In" Type="Int32" />
+      <Parameter Name="TKVP1C" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuVP1C" Mode="In" Type="String" />
+      <Parameter Name="NgayKyVP1C" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKyGH_delete">
+      <Parameter Name="IDTKGH" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKyGH_Insert">
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+      <Parameter Name="IDKTV" Mode="In" Type="Int32" />
+      <Parameter Name="TKKTV" Mode="In" Type="Int32" />
+      <Parameter Name="IDBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="TKBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="IDVP1C" Mode="In" Type="Int32" />
+      <Parameter Name="TKVP1C" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKyGH_updateBPQL">
+      <Parameter Name="IDTKGH" Mode="In" Type="Int32" />
+      <Parameter Name="TKBPQL" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuBPQL" Mode="In" Type="String" />
+      <Parameter Name="NgayKyBPQL" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKyGH_updateKTV">
+      <Parameter Name="IDTKGH" Mode="In" Type="Int32" />
+      <Parameter Name="TKKTV" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuKTV" Mode="In" Type="String" />
+      <Parameter Name="NgayKyKTV" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="KD_TrinhKyGH_updateVP1C">
+      <Parameter Name="IDTKGH" Mode="In" Type="Int32" />
+      <Parameter Name="TKVP1C" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuVP1C" Mode="In" Type="String" />
+      <Parameter Name="NgayKyVP1C" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="NhanVien_DaDangKy" ReturnType="Collection(EPORTALModel.NhanVien_DaDangKy_Result)">
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Nhanvien_insert_API">
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="HoTenKhongdau" Mode="In" Type="String" />
+      <Parameter Name="DiaChi" Mode="In" Type="String" />
+      <Parameter Name="DienThoai" Mode="In" Type="String" />
+      <Parameter Name="NgayVaolam" Mode="In" Type="DateTime" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="IDTinhTrangLV" Mode="In" Type="Int32" />
+      <Parameter Name="IDViTri" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NhanVien_KhaiBao_ChuaKhaiBao" ReturnType="Collection(EPORTALModel.NhanVien_KhaiBao_ChuaKhaiBao_Result)">
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NhanVien_select" ReturnType="Collection(EPORTALModel.NhanVien_select_Result)" />
+    <FunctionImport Name="Nhanvien_update_API">
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="DiaChi" Mode="In" Type="String" />
+      <Parameter Name="DienThoai" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="IDTinhTrangLV" Mode="In" Type="Int32" />
+      <Parameter Name="IDViTri" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Authority_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Authority_insert">
+      <Parameter Name="FullName" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="Phone" Mode="In" Type="String" />
+      <Parameter Name="Position" Mode="In" Type="String" />
+      <Parameter Name="Createdate" Mode="In" Type="DateTime" />
+      <Parameter Name="Begindate" Mode="In" Type="DateTime" />
+      <Parameter Name="Enddate" Mode="In" Type="DateTime" />
+      <Parameter Name="File_Scan" Mode="In" Type="String" />
+      <Parameter Name="BPID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Authority_searchByID" ReturnType="Collection(EPORTALModel.NT_Authority_searchByID_Result)">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Authority_select" ReturnType="Collection(EPORTALModel.NT_Authority_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Authority_SelectNT" ReturnType="Collection(EPORTALModel.NT_Authority_SelectNT_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+      <Parameter Name="BPID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Authority_update">
+      <Parameter Name="FullName" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="Phone" Mode="In" Type="String" />
+      <Parameter Name="Position" Mode="In" Type="String" />
+      <Parameter Name="Createdate" Mode="In" Type="DateTime" />
+      <Parameter Name="Begindate" Mode="In" Type="DateTime" />
+      <Parameter Name="Enddate" Mode="In" Type="DateTime" />
+      <Parameter Name="File_Scan" Mode="In" Type="String" />
+      <Parameter Name="BPID" Mode="In" Type="Int32" />
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_DaySchool">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="DaySchool" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_delete">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_Detail">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="Namefile" Mode="In" Type="String" />
+      <Parameter Name="ContractorsID" Mode="In" Type="Int32" />
+      <Parameter Name="ContractID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_insertAll">
+      <Parameter Name="Contents" Mode="In" Type="String" />
+      <Parameter Name="Namefile" Mode="In" Type="String" />
+      <Parameter Name="ContractorsID" Mode="In" Type="Int32" />
+      <Parameter Name="ContractID" Mode="In" Type="Int32" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="DayUpload" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDNVTK" Mode="In" Type="Int32" />
+      <Parameter Name="IDTTTK" Mode="In" Type="Int32" />
+      <Parameter Name="IDDS" Mode="InOut" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_select" ReturnType="Collection(EPORTALModel.NT_CardRegistrationInfor_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_update">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="Contents" Mode="In" Type="String" />
+      <Parameter Name="Namefile" Mode="In" Type="String" />
+      <Parameter Name="ContractorsID" Mode="In" Type="Int32" />
+      <Parameter Name="ContractID" Mode="In" Type="Int32" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="DayUpload" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_updateFC">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="FileComplete" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardRegistrationInfor_updateTK">
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="IDTTTK" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Contract_delete">
+      <Parameter Name="IDContract" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Contract_insert">
+      <Parameter Name="Somecontracts" Mode="In" Type="String" />
+      <Parameter Name="Contract" Mode="In" Type="String" />
+      <Parameter Name="EndDate" Mode="In" Type="DateTime" />
+      <Parameter Name="BeginDate" Mode="In" Type="DateTime" />
+      <Parameter Name="FileScan" Mode="In" Type="String" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="IDBP" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Contract_select" ReturnType="Collection(EPORTALModel.NT_Contract_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Contract_update">
+      <Parameter Name="IDContract" Mode="In" Type="Int32" />
+      <Parameter Name="Somecontracts" Mode="In" Type="String" />
+      <Parameter Name="Contract" Mode="In" Type="String" />
+      <Parameter Name="EndDate" Mode="In" Type="DateTime" />
+      <Parameter Name="BeginDate" Mode="In" Type="DateTime" />
+      <Parameter Name="FileScan" Mode="In" Type="String" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="IDBP" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Contract_updateTK">
+      <Parameter Name="IDContract" Mode="In" Type="Int32" />
+      <Parameter Name="TPBP" Mode="In" Type="Int32" />
+      <Parameter Name="TTXL" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContractorGroup_delete">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContractorGroup_insert">
+      <Parameter Name="NameContractorGroup" Mode="In" Type="String" />
+      <Parameter Name="Describe" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContractorGroup_searchByID" ReturnType="Collection(EPORTALModel.NT_ContractorGroup_searchByID_Result)">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContractorGroup_select" ReturnType="Collection(EPORTALModel.NT_ContractorGroup_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContractorGroup_update">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+      <Parameter Name="NameContractorGroup" Mode="In" Type="String" />
+      <Parameter Name="Describe" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCardRegistrationInfor_delete">
+      <Parameter Name="IDCT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCardRegistrationInfor_InOut">
+      <Parameter Name="IDCT" Mode="In" Type="Int32" />
+      <Parameter Name="InOutID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCardRegistrationInfor_insert">
+      <Parameter Name="FullName" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="BirthDay" Mode="In" Type="DateTime" />
+      <Parameter Name="PermanentResidence" Mode="In" Type="String" />
+      <Parameter Name="Position" Mode="In" Type="Int32" />
+      <Parameter Name="Phone" Mode="In" Type="String" />
+      <Parameter Name="StorageCard" Mode="In" Type="String" />
+      <Parameter Name="AccessCard" Mode="In" Type="String" />
+      <Parameter Name="CreateDate" Mode="In" Type="DateTime" />
+      <Parameter Name="IDCA" Mode="In" Type="Int32" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+      <Parameter Name="IDGate" Mode="In" Type="String" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="InOutID" Mode="In" Type="Int32" />
+      <Parameter Name="ResultID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCardRegistrationInfor_Result">
+      <Parameter Name="IDCT" Mode="In" Type="Int32" />
+      <Parameter Name="ResultID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCardRegistrationInfor_update">
+      <Parameter Name="IDCT" Mode="In" Type="Int32" />
+      <Parameter Name="FullName" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="BirthDay" Mode="In" Type="DateTime" />
+      <Parameter Name="PermanentResidence" Mode="In" Type="String" />
+      <Parameter Name="Position" Mode="In" Type="Int32" />
+      <Parameter Name="Phone" Mode="In" Type="String" />
+      <Parameter Name="StorageCard" Mode="In" Type="String" />
+      <Parameter Name="AccessCard" Mode="In" Type="String" />
+      <Parameter Name="CreateDate" Mode="In" Type="DateTime" />
+      <Parameter Name="IDCA" Mode="In" Type="Int32" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+      <Parameter Name="IDGate" Mode="In" Type="String" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDDS" Mode="In" Type="Int32" />
+      <Parameter Name="InOutID" Mode="In" Type="Int32" />
+      <Parameter Name="ResultID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailExtendcard_delete">
+      <Parameter Name="IDCTGH" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailExtendcard_insert">
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="CCDC" Mode="In" Type="String" />
+      <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+      <Parameter Name="DiaChi" Mode="In" Type="String" />
+      <Parameter Name="ChucVu" Mode="In" Type="Int32" />
+      <Parameter Name="Sdt" Mode="In" Type="String" />
+      <Parameter Name="DoiThe" Mode="In" Type="String" />
+      <Parameter Name="GiaHanThe" Mode="In" Type="String" />
+      <Parameter Name="BoSungDt" Mode="In" Type="String" />
+      <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
+      <Parameter Name="IDCA" Mode="In" Type="Int32" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="NhomNT" Mode="In" Type="Int32" />
+      <Parameter Name="CongID" Mode="In" Type="String" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailExtendcard_update">
+      <Parameter Name="IDCTGH" Mode="In" Type="Int32" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="CCDC" Mode="In" Type="String" />
+      <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+      <Parameter Name="DiaChi" Mode="In" Type="String" />
+      <Parameter Name="ChucVu" Mode="In" Type="Int32" />
+      <Parameter Name="Sdt" Mode="In" Type="String" />
+      <Parameter Name="DoiThe" Mode="In" Type="String" />
+      <Parameter Name="GiaHanThe" Mode="In" Type="String" />
+      <Parameter Name="BoSungDt" Mode="In" Type="String" />
+      <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
+      <Parameter Name="IDCA" Mode="In" Type="Int32" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="NhomNT" Mode="In" Type="Int32" />
+      <Parameter Name="CongID" Mode="In" Type="String" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_delete">
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_Detail">
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+      <Parameter Name="NameFile" Mode="In" Type="String" />
+      <Parameter Name="NTID" Mode="In" Type="Int32" />
+      <Parameter Name="HDID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_insertAll">
+      <Parameter Name="NoiDung" Mode="In" Type="String" />
+      <Parameter Name="Namefile" Mode="In" Type="String" />
+      <Parameter Name="NTID" Mode="In" Type="Int32" />
+      <Parameter Name="HDID" Mode="In" Type="Int32" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="NgayTrinhKy" Mode="In" Type="DateTime" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDTTTK" Mode="In" Type="Int32" />
+      <Parameter Name="IDNVTK" Mode="In" Type="Int32" />
+      <Parameter Name="IDGH" Mode="InOut" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_select" ReturnType="Collection(EPORTALModel.NT_Extendcard_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_update">
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+      <Parameter Name="NoiDung" Mode="In" Type="String" />
+      <Parameter Name="NTID" Mode="In" Type="Int32" />
+      <Parameter Name="HDID" Mode="In" Type="Int32" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="NgayTrinhKy" Mode="In" Type="DateTime" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDTTTK" Mode="In" Type="Int32" />
+      <Parameter Name="IDNVTK" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_updateFC">
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+      <Parameter Name="FileComplete" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Extendcard_updateTK">
+      <Parameter Name="IDGH" Mode="In" Type="Int32" />
+      <Parameter Name="IDTTTK" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Gate_delete">
+      <Parameter Name="IDGate" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Gate_insert">
+      <Parameter Name="Gate" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Gate_searchByID" ReturnType="Collection(EPORTALModel.NT_Gate_searchByID_Result)">
+      <Parameter Name="IDGate" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Gate_select" ReturnType="Collection(EPORTALModel.NT_Gate_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Gate_update">
+      <Parameter Name="IDGate" Mode="In" Type="Int32" />
+      <Parameter Name="Gate" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_Additional">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="ShortName" Mode="In" Type="String" />
+      <Parameter Name="CodeUnis" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_FullName">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="FullName" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_insert">
+      <Parameter Name="BPID" Mode="In" Type="Int32" />
+      <Parameter Name="FullName" Mode="In" Type="String" />
+      <Parameter Name="Taxcode" Mode="In" Type="String" />
+      <Parameter Name="Address" Mode="In" Type="String" />
+      <Parameter Name="Customer" Mode="In" Type="String" />
+      <Parameter Name="Vendor" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="ShortName" Mode="In" Type="String" />
+      <Parameter Name="CodeUnis" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_searchByID" ReturnType="Collection(EPORTALModel.NT_Partner_searchByID_Result)">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_select" ReturnType="Collection(EPORTALModel.NT_Partner_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Partner_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="BPID" Mode="In" Type="Int32" />
+      <Parameter Name="FullName" Mode="In" Type="String" />
+      <Parameter Name="Taxcode" Mode="In" Type="String" />
+      <Parameter Name="Address" Mode="In" Type="String" />
+      <Parameter Name="Customer" Mode="In" Type="String" />
+      <Parameter Name="Vendor" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="ShortName" Mode="In" Type="String" />
+      <Parameter Name="CodeUnis" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="PhongBan_insert">
+      <Parameter Name="IDPhongBan" Mode="InOut" Type="Int32" />
+      <Parameter Name="TenPhongBan" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Project_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Project_select" ReturnType="Collection(EPORTALModel.Project_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Project_select_USER" ReturnType="Collection(EPORTALModel.Project_select_USER_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+      <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Projects_insert">
+      <Parameter Name="title" Mode="In" Type="String" />
+      <Parameter Name="URL" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="FilePDF" Mode="In" Type="String" />
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Projects_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="title" Mode="In" Type="String" />
+      <Parameter Name="URL" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="FilePDF" Mode="In" Type="String" />
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="ProjectsGroup_delete">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="ProjectsGroup_insert">
+      <Parameter Name="GroupName" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="ProjectsGroup_update">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+      <Parameter Name="GroupName" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="TaiKhoan_ID" ReturnType="Collection(EPORTALModel.TaiKhoan_ID_Result)">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="TaiKhoan_Img">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="Chukynhay" Mode="In" Type="String" />
+      <Parameter Name="Chukychinh" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="TaiKhoan_select" ReturnType="Collection(EPORTALModel.TaiKhoan_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="TaiKhoan_Update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="ThongTinCaNhan_delete">
+      <Parameter Name="IDThongTin" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="ThongTinCaNhan_insert">
+      <Parameter Name="IDNhanVien" Mode="In" Type="Int32" />
+      <Parameter Name="CMND" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="FileHinh" Mode="In" Type="String" />
+      <Parameter Name="XacNhan" Mode="In" Type="Boolean" />
+      <Parameter Name="NgayKhai" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="ThongTinCaNhan_searchByID" ReturnType="Collection(EPORTALModel.ThongTinCaNhan_searchByID_Result)">
+      <Parameter Name="IDThongTin" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="ThongTinCaNhan_select" ReturnType="Collection(EPORTALModel.ThongTinCaNhan_select_Result)" />
+    <FunctionImport Name="ThongTinCaNhan_selectNV" ReturnType="Collection(EPORTALModel.ThongTinCaNhan_selectNV_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="ThongTinCaNhan_update">
+      <Parameter Name="IDThongTin" Mode="In" Type="Int32" />
+      <Parameter Name="IDNhanVien" Mode="In" Type="Int32" />
+      <Parameter Name="CMND" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="FileHinh" Mode="In" Type="String" />
+      <Parameter Name="XacNhan" Mode="In" Type="Boolean" />
+    </FunctionImport>
+    <FunctionImport Name="ThongTinCaNhan_upload">
+      <Parameter Name="IDThongTin" Mode="In" Type="Int32" />
+      <Parameter Name="XacNhan" Mode="In" Type="Boolean" />
+    </FunctionImport>
+    <FunctionImport Name="TK_Update_Quyen">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IDQuyen" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Video_delete">
+      <Parameter Name="IDVideo" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Video_insert">
+      <Parameter Name="Title" Mode="In" Type="String" />
+      <Parameter Name="URL" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="AlbumID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Video_searchByID" ReturnType="Collection(EPORTALModel.Video_searchByID_Result)">
+      <Parameter Name="IDVideo" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Video_select" ReturnType="Collection(EPORTALModel.Video_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+      <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Video_selectAlbum" ReturnType="Collection(EPORTALModel.Video_selectAlbum_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Video_selectID" ReturnType="Collection(EPORTALModel.Video_selectID_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+      <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+      <Parameter Name="AlbumID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Video_update">
+      <Parameter Name="IDVideo" Mode="In" Type="Int32" />
+      <Parameter Name="Title" Mode="In" Type="String" />
+      <Parameter Name="URL" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="AlbumID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Vitri_insert">
+      <Parameter Name="IDVitri" Mode="InOut" Type="Int32" />
+      <Parameter Name="TenVitri" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Get_ID" ReturnType="Collection(Int32)" />
+    <FunctionImport Name="Get_IDGroup" ReturnType="Collection(EPORTALModel.Get_IDGroup_Result)">
+      <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+    </FunctionImport>
+  </EntityContainer>
+  <ComplexType Name="Album_searchByID_Result">
+    <Property Type="Int32" Name="IDAlbum" Nullable="false" />
+    <Property Type="String" Name="TenAlbum" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+  </ComplexType>
+  <ComplexType Name="Album_select_Result">
+    <Property Type="Int32" Name="IDAlbum" Nullable="false" />
+    <Property Type="String" Name="TenAlbum" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+  </ComplexType>
+  <ComplexType Name="AuthenticationAPI_login_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="UserName" Nullable="true" MaxLength="20" />
+    <Property Type="String" Name="Password" Nullable="false" MaxLength="20" />
+  </ComplexType>
+  <ComplexType Name="AuthorizationContractors_searchByID_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="Int32" Name="IDLKD" Nullable="true" />
+    <Property Type="String" Name="IDCVKN" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="AuthorizationContractors_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="Int32" Name="IDLKD" Nullable="true" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="IDCVKN" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="KD_KyDuyet_searchByID_Result">
+    <Property Type="Int32" Name="IDKD" Nullable="false" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="300" />
+    <Property Type="Int32" Name="IDLoaiKD" Nullable="false" />
+  </ComplexType>
+  <ComplexType Name="KD_LoaiKyDuyet_searchByID_Result">
+    <Property Type="Int32" Name="IDLKD" Nullable="false" />
+    <Property Type="String" Name="TenLoaiKyDuyet" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="KD_TaiKhoan_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDKD" Nullable="false" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="300" />
+    <Property Type="Int32" Name="IDLoaiKD" Nullable="false" />
+    <Property Type="String" Name="TenLoaiKyDuyet" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="NhanVien_DaDangKy_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="MatKhau" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="HoTenKhongDau" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="NgaySinh" Nullable="true" />
+    <Property Type="String" Name="DiaChi" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="DienThoai" Nullable="true" MaxLength="11" />
+    <Property Type="DateTime" Name="NgayVaoLam" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="Int32" Name="IDTinhTrangLV" Nullable="true" />
+    <Property Type="Int32" Name="IDViTri" Nullable="true" />
+    <Property Type="Boolean" Name="IsGV" Nullable="true" />
+    <Property Type="Int32" Name="IDQuyen" Nullable="true" />
+    <Property Type="String" Name="Chukynhay" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="Chukychinh" Nullable="true" MaxLength="100" />
+    <Property Type="Int32" Name="IDQuyenHT" Nullable="true" />
+    <Property Type="String" Name="GroupQuyen" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="NhanVien_KhaiBao_ChuaKhaiBao_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="TenViTri" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="NhanVien_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="NT_Authority_searchByID_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="20" />
+    <Property Type="String" Name="Email" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="Phone" Nullable="true" MaxLength="15" />
+    <Property Type="String" Name="Position" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="Createdate" Nullable="true" />
+    <Property Type="DateTime" Name="Begindate" Nullable="true" />
+    <Property Type="DateTime" Name="Enddate" Nullable="true" />
+    <Property Type="String" Name="File_Scan" Nullable="true" MaxLength="150" />
+    <Property Type="Int32" Name="BPID" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="NT_Authority_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="20" />
+    <Property Type="String" Name="Email" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="Phone" Nullable="true" MaxLength="15" />
+    <Property Type="String" Name="Position" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="Createdate" Nullable="true" />
+    <Property Type="DateTime" Name="Begindate" Nullable="true" />
+    <Property Type="DateTime" Name="Enddate" Nullable="true" />
+    <Property Type="String" Name="File_Scan" Nullable="true" MaxLength="150" />
+    <Property Type="Int32" Name="BPID" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="NT_Authority_SelectNT_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="20" />
+    <Property Type="String" Name="Email" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="Phone" Nullable="true" MaxLength="15" />
+    <Property Type="String" Name="Position" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="Createdate" Nullable="true" />
+    <Property Type="DateTime" Name="Begindate" Nullable="true" />
+    <Property Type="DateTime" Name="Enddate" Nullable="true" />
+    <Property Type="String" Name="File_Scan" Nullable="true" MaxLength="150" />
+    <Property Type="Int32" Name="BPID" Nullable="true" />
+    <Property Type="Int32" Name="BPID1" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="NT_CardRegistrationInfor_select_Result">
+    <Property Type="Int32" Name="IDDS" Nullable="false" />
+    <Property Type="String" Name="Contents" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="Namefile" Nullable="true" MaxLength="500" />
+    <Property Type="Int32" Name="ContractorsID" Nullable="true" />
+    <Property Type="Int32" Name="ContractID" Nullable="true" />
+    <Property Type="Int32" Name="PhongBanID" Nullable="true" />
+    <Property Type="DateTime" Name="DayUpload" Nullable="true" Precision="23" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="200" />
+    <Property Type="Int32" Name="IDNVTK" Nullable="true" />
+    <Property Type="String" Name="FileComplete" Nullable="true" MaxLength="200" />
+    <Property Type="Int32" Name="IDTTTK" Nullable="true" />
+    <Property Type="DateTime" Name="DaySchool" Nullable="true" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+    <Property Type="String" Name="Somecontracts" Nullable="true" MaxLength="150" />
+  </ComplexType>
+  <ComplexType Name="NT_Contract_select_Result">
+    <Property Type="Int32" Name="IDContract" Nullable="false" />
+    <Property Type="String" Name="Somecontracts" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Contract" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="BeginDate" Nullable="true" />
+    <Property Type="DateTime" Name="EndDate" Nullable="true" />
+    <Property Type="String" Name="FileScan" Nullable="true" MaxLength="150" />
+    <Property Type="Int32" Name="IDNT" Nullable="true" />
+    <Property Type="Int32" Name="IDBP" Nullable="true" />
+    <Property Type="Int32" Name="TPBP" Nullable="true" />
+    <Property Type="Int32" Name="TTXL" Nullable="true" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+  </ComplexType>
+  <ComplexType Name="NT_ContractorGroup_searchByID_Result">
+    <Property Type="Int32" Name="IDGroup" Nullable="false" />
+    <Property Type="String" Name="NameContractorGroup" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="Describe" Nullable="true" MaxLength="200" />
+  </ComplexType>
+  <ComplexType Name="NT_ContractorGroup_select_Result">
+    <Property Type="Int32" Name="IDGroup" Nullable="false" />
+    <Property Type="String" Name="NameContractorGroup" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="Describe" Nullable="true" MaxLength="200" />
+  </ComplexType>
+  <ComplexType Name="NT_Extendcard_select_Result">
+    <Property Type="Int32" Name="IDGH" Nullable="false" />
+    <Property Type="String" Name="NoiDung" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="Namefile" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="NTID" Nullable="true" />
+    <Property Type="Int32" Name="HDID" Nullable="true" />
+    <Property Type="Int32" Name="PhongBanID" Nullable="true" />
+    <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" Precision="23" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="250" />
+    <Property Type="Int32" Name="IDTTTK" Nullable="true" />
+    <Property Type="Int32" Name="IDNVTK" Nullable="true" />
+    <Property Type="String" Name="FileComplete" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+    <Property Type="String" Name="Somecontracts" Nullable="true" MaxLength="150" />
+  </ComplexType>
+  <ComplexType Name="NT_Gate_searchByID_Result">
+    <Property Type="Int32" Name="IDGate" Nullable="false" />
+    <Property Type="String" Name="Gate" Nullable="true" MaxLength="200" />
+  </ComplexType>
+  <ComplexType Name="NT_Gate_select_Result">
+    <Property Type="Int32" Name="IDGate" Nullable="false" />
+    <Property Type="String" Name="Gate" Nullable="true" MaxLength="200" />
+  </ComplexType>
+  <ComplexType Name="NT_Partner_searchByID_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="BPID" Nullable="true" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+    <Property Type="String" Name="Taxcode" Nullable="true" MaxLength="20" />
+    <Property Type="String" Name="Address" Nullable="true" MaxLength="500" />
+    <Property Type="String" Name="Customer" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="Vendor" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="Email" Nullable="true" MaxLength="40" />
+    <Property Type="String" Name="ShortName" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="CodeUnis" Nullable="true" MaxLength="10" />
+  </ComplexType>
+  <ComplexType Name="NT_Partner_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Address" Nullable="true" MaxLength="500" />
+    <Property Type="Int32" Name="BPID" Nullable="true" />
+    <Property Type="String" Name="CodeUnis" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="Customer" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="Email" Nullable="true" MaxLength="40" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+    <Property Type="String" Name="ShortName" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="Taxcode" Nullable="true" MaxLength="20" />
+    <Property Type="String" Name="Vendor" Nullable="true" MaxLength="10" />
+  </ComplexType>
+  <ComplexType Name="Project_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="FilePDF" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDGroup" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="Project_select_USER_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="FilePDF" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDGroup" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="TaiKhoan_ID_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="HoTenKhongDau" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="Boolean" Name="IsGV" Nullable="true" />
+    <Property Type="Int32" Name="IDQuyen" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="TaiKhoan_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="HoTenKhongDau" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="Boolean" Name="IsGV" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="TenQuyen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="TenViTri" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="ThongTinCaNhan_searchByID_Result">
+    <Property Type="Int32" Name="IDThongTin" Nullable="false" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="String" Name="CMND" Nullable="true" MaxLength="30" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="30" />
+    <Property Type="String" Name="FileHinh" Nullable="true" MaxLength="300" />
+    <Property Type="Boolean" Name="XacNhan" Nullable="true" />
+    <Property Type="DateTime" Name="NgayKhai" Nullable="true" Precision="16" />
+  </ComplexType>
+  <ComplexType Name="ThongTinCaNhan_select_Result">
+    <Property Type="Int32" Name="IDThongTin" Nullable="false" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="String" Name="CMND" Nullable="true" MaxLength="30" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="30" />
+    <Property Type="String" Name="FileHinh" Nullable="true" MaxLength="300" />
+    <Property Type="Boolean" Name="XacNhan" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="ThongTinCaNhan_selectNV_Result">
+    <Property Type="Int32" Name="IDThongTin" Nullable="false" />
+    <Property Type="String" Name="CMND" Nullable="true" MaxLength="30" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="30" />
+    <Property Type="String" Name="FileHinh" Nullable="true" MaxLength="300" />
+    <Property Type="Boolean" Name="XacNhan" Nullable="true" />
+    <Property Type="DateTime" Name="NgayKhai" Nullable="true" Precision="16" />
+    <Property Type="Int32" Name="IDNhanVien" Nullable="true" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="TenViTri" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="Video_searchByID_Result">
+    <Property Type="Int32" Name="IDVideo" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="Int32" Name="AlbumID" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="Video_select_Result">
+    <Property Type="Int32" Name="IDVideo" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="AlbumID" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="Video_selectAlbum_Result">
+    <Property Type="Int32" Name="IDVideo" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="AlbumID" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="Video_selectID_Result">
+    <Property Type="Int32" Name="IDVideo" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="AlbumID" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="Get_IDGroup_Result">
+    <Property Type="Int32" Name="IDGroup" Nullable="true" />
+    <Property Type="Int32" Name="NhanVienID" Nullable="true" />
+  </ComplexType>
+</Schema>

@@ -1,0 +1,76 @@
+﻿@model EPORTAL.ModelsServey.PartTogetherValidation
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@using (Html.BeginForm("Edit", "ServeyID", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDSV)
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Cự ly <span style="color:red;">*</span></label>
+                                @Html.DropDownListFor(model => model.IDCuLy, ViewBag.LSCuLy as SelectList, "--Chọn mã định danh--", new { @id = "IDCuLy", @class = "form-control", required = "required" })
+                                @Html.ValidationMessageFor(model => model.IDCuLy, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                       
+
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+<script>
+    //$('#IDMDD').chosen({
+    //    width: "100%"
+    //});
+    //$("#ID").chosen({
+    //    width: "100%"
+    //});
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $("#Cavet").chosen({
+        width: "100%"
+    });
+    $("#CCHV").chosen({
+        width: "100%"
+    });
+    $("#TinhTrang").chosen({
+        width: "100%"
+    });
+    $("#CapMoi").chosen({
+        width: "100%"
+    });
+    $("#GiaHan").chosen({
+        width: "100%"
+    });
+    $("#MatThe").chosen({
+        width: "100%"
+    });
+    $("#CapNhatThongTin").chosen({
+        width: "100%"
+    });
+    $("#BaoLanh").chosen({
+        width: "100%"
+    });
+</script>

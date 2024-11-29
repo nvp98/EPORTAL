@@ -1,0 +1,148 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsView360
+@model PagedList.IPagedList<ProjectValidation>
+@using PagedList.Mvc
+@using EPORTAL.Models;
+
+<style>
+    /* Style the buttons */
+    .btn_nav {
+        border: none;
+        outline: none;
+        padding: 10px 16px;
+        background-color: #f1f1f1;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+        /* Style the active class, and buttons on mouse-over */
+        .active, .btn_nav:hover {
+            background-color: #05428c;
+            color: white;
+        }
+</style>
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header" style="padding:0px;">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-8 col-lg-8" style="display:flex;padding:8px;" id="myDIV">
+                                <div id="myDIV">
+                                    @{
+                                        EPORTALEntities db = new EPORTALEntities();
+                                        var List_Group = db.Get_IDGroup(MyAuthentication.ID).ToList();
+                                        foreach (var item in List_Group)
+                                        {
+                                            var Group = db.ProjectsGroups.Where(x => x.IDGroup == item.IDGroup).FirstOrDefault();
+                                            <a href="@Url.Action("Index", "ListProject", new {@id = @item.IDGroup})"><button class="btn_nav" id="@Group.IDGroup">@Group.GroupName</button></a>
+                                            }
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4">
+
+                                <div class="div_search">
+                                    <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-controls" value="@ViewBag.search" style="width:300px">
+                                    <button class="form-controls btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <div class="row">
+                            @foreach (var item in Model)
+                            {
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" style="padding: 10px;">
+                                    <div style="background: #f1f1f1;">
+                                        <div class="box" style="border-radius: 0px; background: none; box-shadow: 2px 2px 10px gray;">
+                                            <a class="preview" style="border-radius: 0px; margin-top: 0px;" href="@Url.Action("Details", "ListProject", new {@id = @item.ID})"><img style="border-radius: 0px; height:250px;" src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.Images))" /></a>
+                                        </div>
+                                        <div class="link" style="text-align: center; background: #f1f1f1; height: 100px; box-shadow: 2px 2px 10px gray; padding: 0 3% 0 3%;">
+                                            <h3 placeholder="Name"><a style="color: black;font-size: 15px;" href="@Url.Action("Details", "ListProject", new {@id = @item.ID})">@item.Title</a> </h3>
+                                            <p placeholder="Description" class="desc">@item.Note</p>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+                            }
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <div class="pager">
+                            @Html.PagedListPager(Model, page => Url.Action("Index", "ListProject", new { area = "View360", page }))
+                            <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item">
+                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
+                    </div>
+                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
+                        <ul class="d-flex justify-content-center">
+
+                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+     $("#btn-search").on('click', function () {
+        var search = $('#txtsearch').val();
+        window.location.href = '@Url.Action("Index", "ListProject")?search=' + search;
+     });
+
+    var url = window.location.pathname;
+    var id = url.substring(url.lastIndexOf('/') + 1);
+   
+    var header = document.getElementById("myDIV");
+    var btns = header.getElementsByClassName("btn_nav");
+    for (var i = 0; i < btns.length; i++) {
+        var myId = $(btns[i]).attr('id');
+        if (myId == id) {
+            btns[i].className += " active";
+        }
+    }
+</script>
+
+
+

@@ -1,0 +1,133 @@
+﻿@model EPORTAL.ModelsEquipment.NV_QuanLyThietBiValidation
+
+@using (Html.BeginForm("Edit", "EquipmentManagement", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDQLTB)
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @{var IDquyen = (int)ViewBag.Quyen; 
+                                if (IDquyen == 1)
+                                {
+                                    <div class="form-group">
+                                        <label class="small mb-1">Bộ Phận/ Nhà máy</label>
+                                        @Html.DropDownListFor(model => model.IDPhongBan, ViewBag.PBList as SelectList, "--Chọn BP--", new { @id = "IDPhongBan", @class = "form-control" })
+                                        <span id="ErrorIDPhongBan" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="small mb-1">Mã nhân viên</label>
+                                        @Html.DropDownListFor(model => model.MaNV, ViewBag.Selected as SelectList, "--Chọn Nhân viên--", new { @id = "MaNV", @class = "form-control" })
+                                        @*@Html.EditorFor(model => model.MaNV, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "MaNV", @text = "", @value = EPORTAL.Models.MyAuthentication.Username, @readonly = "true" } })*@
+                                        <span id="ErrorMaNV" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>
+                                }
+                            }
+                            <div class="form-group">
+                                <label class="small mb-1">Service Tag</label>
+                                @Html.EditorFor(model => model.ServiceTag, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ServiceTag", @text = "" } })
+                                <span id="ErrorServiceTag" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">Tên thiết bị</label>
+                                @Html.DropDownListFor(model => model.IDTB, ViewBag.TBList as SelectList, "--Chọn thiết bị--", new { @id = "IDTB", @class = "form-control" })
+                                <span id="ErrorIDTB" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">Số điện thoại</label>
+                                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Phone", @text = "" } })
+                                <span id="ErrorPhone" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">Lỗi sự cố thiết bị</label>
+                                @Html.DropDownListFor(model => model.IDSC, ViewBag.LSCList as SelectList, "--Chọn lỗi sự cố--", new { @id = "IDSC", @class = "form-control" })
+                                <span id="ErrorIDSC" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+                                @Html.TextArea("GhiChu", null, new { @class = "form-control" })
+                                @*@Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GhiChu", @text = "" } })*@
+                                <span id="ErrorGhiChu" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                            @{
+                                if (IDquyen == 1)
+                                {
+                                    <div class="form-group">
+                                        <label class="small mb-1">Trạng thái</label>
+                                        <select name="Status" id="Status">
+                                            <option value="0">Chờ xử lý</option>
+                                            <option value="1">Đang xử lý</option>
+                                            <option value="2">Đã xử lý</option>
+                                            <option value="3">Đã giao máy</option>
+                                        </select>
+                                        <span id="ErrorGhiChu" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="small mb-1">Ngày lập</label>
+                                        @Html.TextBox("NgayLap", null, new { @id = "NgayLap", @type = "date", @class = "form-control", @Value = ViewBag.NgayLap })
+                                        <span id="ErrorNgayLap" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="small mb-1">Ngày xử lý</label>
+                                        @Html.TextBox("NgayXL", null, new { @id = "NgayXL", @type = "date", @class = "form-control", @Value = ViewBag.NgayXL })
+                                        <span id="ErrorNgayXL" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="small mb-1">Ngày giao máy</label>
+                                        @Html.TextBox("NgayHT", null, new { @id = "NgayHT", @type = "date", @class = "form-control", @Value = ViewBag.NgayHT })
+                                        <span id="ErrorNgayHT" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>
+                                    @*<div class="form-group">
+                                        <label class="small mb-1">Ngày giao máy</label>
+                                        @Html.TextBox("NgayNM", null, new { @id = "NgayNM", @type = "date", @class = "form-control", @Value = ViewBag.NgayNM })
+                                        <span id="ErrorNgayNM" style="color: red; text-transform: none; font-weight: normal "></span>
+                                    </div>*@
+                                }
+                                else
+                                {
+                                    @Html.HiddenFor(model => model.NgayLap)
+                                    @Html.HiddenFor(model => model.Status)
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $("#IDTB").chosen({
+        width: "100%"
+    });
+    $("#IDSC").chosen({
+        width: "100%"
+    });
+    $("#MaNV").chosen({
+        width: "100%"
+    });
+    $(document).ready(function () {
+            if ("0" == "@Model.Status") {
+                $("#Status").val("0").change();
+            } else if ("1" == "@Model.Status") {
+                $("#Status").val("1").change();
+            } else if ("2" == "@Model.Status") {
+                $("#Status").val("2").change();
+            } else if ("3" == "@Model.Status") {
+                $("#Status").val("3").change();
+            }
+    });
+</script>

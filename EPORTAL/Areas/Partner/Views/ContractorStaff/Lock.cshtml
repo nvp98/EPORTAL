@@ -1,0 +1,55 @@
+﻿@model EPORTAL.ModelsPartner.ContractorStaffValidation
+@using (Html.BeginForm("Lock", "ContractorStaff", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDNVNT)
+    <div class="modal-dialog" id="form" style="margin-top: 5%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày bắt đầu</label>
+                                @Html.TextBox("NgayCap", null, new { @id = "NgayCap", @type = "date", @class = "form-control", @Value = ViewBag.NgayCap })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày kết thúc</label>
+                                @Html.TextBox("HanSuDung", null, new { @id = "HanSuDung", @type = "date", @class = "form-control", @Value = ViewBag.HanSuDung })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tình trạng thẻ</label>
+                                @Html.DropDownList("TTLV", null, new { id = "TTLV", @class = "form-control", })
+                                @Html.ValidationMessageFor(model => model.TTLV, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $("#TTLV").chosen({
+        width: "100%"
+    });
+</script>
+
+

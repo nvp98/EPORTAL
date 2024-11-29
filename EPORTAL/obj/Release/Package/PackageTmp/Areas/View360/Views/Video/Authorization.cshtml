@@ -1,0 +1,195 @@
+﻿
+@{
+    ViewBag.Title = "Authorization";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsView360
+@model PagedList.IPagedList<AuthorizationVideoValidation>
+@using PagedList.Mvc
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách video
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-8 col-lg-8">
+                                Danh sách cấp quyền cho video: @ViewBag.Title_Project
+                            </div>
+                            <div class="col-md-4">
+
+                                <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("AddPermission", "Video", new { id = @Url.RequestContext.RouteData.Values["id"] })' style="margin-top:50px"></div>
+
+                                <button type="button" id="btn-delete" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-trash">&nbsp;</i>&nbsp; Xóa </button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th width="50px" class="text-center">Chọn</th>
+                                            @*<th class="text-center" width="100px">Thao tác</th>*@
+                                            <th class="text-center" width="220px">Mã Nhân viên</th>
+                                            <th class="text-center">Họ tên</th>
+                                            <th class="text-center" width="250px">Ngày cấp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                    <td class="text-center">
+                                                        <input type="checkbox" id="checkbox_@item.ID" name="newsletter" value="@item.ID">
+                                                       
+                                                    </td>
+                                                    
+                                                    @*<td class="text-center">
+                                                        <a title="Xóa" class="btn-action" href="@Url.Action("DeleteAutho", "Video", new { id = item.ID, ProjectID= @Url.RequestContext.RouteData.Values["id"]})"
+                                                           onclick="return confirm('Bạn muốn xóa Thông tin  : @item.MaNV')">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                    </td>*@
+                                                    <td class="text-center">
+                                                        @item.MaNV
+                                                    </td>
+                                                    <td class="text-center">@item.HoTen</td>
+
+                                                    <td class="text-center">@item.Createdate.ToString("dd-MM-yyyy")</td>
+
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Authorization", "Video", new { page, id = Url.RequestContext.RouteData.Values["id"] }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script>
+    var arr = [];
+    $("input[type=checkbox]").on("click", function () {
+        var id = $(this).attr("value");
+        if ($(this).is(":checked")) {
+            arr.push(id);
+        }
+        else if ($(this).is(":not(:checked)")){
+            const index = arr.indexOf(id);
+            if (index > -1) { // only splice array when item is found
+                arr.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+
+        console.log(arr);
+    });
+
+    $('#btn-delete').click(function () {
+        var result_check = confirm("Bạn muốn xóa thông tin?");
+        if (result_check) {
+            var theIds = JSON.stringify(arr);
+            console.log(theIds)
+            $.ajax({
+                url: '/Video/DeleteAutho',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST',
+                data: JSON.stringify({ IDdata: arr }),
+                traditional: true,
+                //beforeSend: function () {
+                //},
+                success: function (result) {
+                    alert(result);
+                    location.reload(false);
+                }
+            });
+        }
+        
+    });
+</script>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("@ViewBag.Title_Project");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Import tài khoản mới");
+            $("#myModal").modal('show');
+        });
+    });
+
+</script>
+
+

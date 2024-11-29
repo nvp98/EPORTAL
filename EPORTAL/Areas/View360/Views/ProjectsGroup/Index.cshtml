@@ -1,0 +1,156 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsView360
+@model List<ProjectsGroup>
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách nhóm dự án
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-10 col-lg-10">
+                                <div class="row">
+                                    @*<div class="col-md-5">
+                                            <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                        </div>
+                                        <div class="col-md-5">
+                                            @Html.DropDownList("NTList", null, "Chọn nhà thầu", new { id = "IDNT", @class = "form-control", })
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                        </div>*@
+                                </div>
+                            </div>
+                            @*@if (nd.IDQuyen == 2 || nd.IDQuyen == 1)
+                                {*@
+                            <div class="col-md-2">
+
+                                <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","ProjectsGroup")' style="margin-top:50px"></div>
+
+                                <button type="button" id="btn-TV" class="btn btn-warning m-l-auto pull-right"><i class="fa fa-list">&nbsp;</i>&nbsp;QL dự án </button>
+                            </div>
+                            @*}*@
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th class="text-center">Tên nhóm dự án</th>
+                                            <th class="text-center">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int RowNo = 1;
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                    <td class="text-center">@item.GroupName</td>
+                                                    <td class="text-center">
+                                                        <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "ProjectsGroup", new { id = item.IDGroup })"
+                                                           onclick="return confirm('Bạn muốn xóa Thông tin  : @item.GroupName')">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+
+                                                        <a id="btn-edit_@item.IDGroup" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                        <div class="modal " id="myModaleEdit_@item.IDGroup" role="dialog" data-url='@Url.Action("Edit", "ProjectsGroup", new { id = item.IDGroup })'></div>
+                                                        <script type="text/javascript">
+                                                                $('#btn-edit_@item.IDGroup').click(function () {
+                                                                    var url = $('#myModaleEdit_@item.IDGroup').data('url');
+                                                                    $.get(url, function (data) {
+                                                                        $("#myModal").html(data);
+                                                                        $("#ModalTitle").html("Cập nhật Thông Tin nhóm dự án");
+                                                                        $("#myModal").modal('show');
+                                                                    });
+                                                                });
+                                                        </script>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm nhóm dự án");
+            $("#myModal").modal('show');
+        });
+    });
+     $('#btn-TV').click(function () {
+
+        window.location.href = '@Url.Action("index", "Projects")';
+    });
+</script>
+
+
+
+
+
+
+

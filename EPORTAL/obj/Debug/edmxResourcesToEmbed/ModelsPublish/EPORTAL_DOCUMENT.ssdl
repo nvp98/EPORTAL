@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EPORTAL_DOCUMENTModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="VB_DetailDocument">
+    <Key>
+      <PropertyRef Name="IDCTVB" />
+    </Key>
+    <Property Name="IDCTVB" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDVB" Type="int" />
+    <Property Name="SoVB" Type="nvarchar" MaxLength="150" />
+    <Property Name="NoiDungVB" Type="nvarchar" MaxLength="500" />
+    <Property Name="NgayVB" Type="date" />
+    <Property Name="NgayBĐ" Type="date" />
+    <Property Name="NgayKT" Type="date" />
+    <Property Name="TenFile" Type="nvarchar" MaxLength="150" />
+    <Property Name="Status" Type="int" />
+  </EntityType>
+  <EntityType Name="VB_Document">
+    <Key>
+      <PropertyRef Name="IDVB" />
+    </Key>
+    <Property Name="IDVB" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TenVB" Type="nvarchar" MaxLength="150" />
+    <Property Name="NgayCapNhat" Type="date" />
+    <Property Name="NhanVienID" Type="int" />
+    <Property Name="IDPage" Type="int" />
+    <Property Name="IDLoai" Type="int" />
+  </EntityType>
+  <EntityContainer Name="EPORTAL_DOCUMENTModelStoreContainer">
+    <EntitySet Name="VB_DetailDocument" EntityType="Self.VB_DetailDocument" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="VB_Document" EntityType="Self.VB_Document" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

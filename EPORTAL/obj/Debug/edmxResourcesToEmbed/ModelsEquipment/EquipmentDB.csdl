@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EquipmentDB" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="NV_LoiSuCoTB">
+    <Key>
+      <PropertyRef Name="IDSC" />
+    </Key>
+    <Property Name="IDSC" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenLoiSC" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NV_QuanLyThietBi" Relationship="Self.FK_NV_QuanLyThietBi_NV_LoiSuCoTB" FromRole="NV_LoiSuCoTB" ToRole="NV_QuanLyThietBi" />
+  </EntityType>
+  <EntityType Name="NV_QuanLyThietBi">
+    <Key>
+      <PropertyRef Name="IDQLTB" />
+    </Key>
+    <Property Name="IDQLTB" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDPhongBan" Type="Int32" />
+    <Property Name="ServiceTag" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+    <Property Name="IDTB" Type="Int32" />
+    <Property Name="MaNV" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="Phone" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="IDSC" Type="Int32" />
+    <Property Name="NgayLap" Type="DateTime" Precision="0" />
+    <Property Name="Status" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+    <Property Name="NgayXL" Type="DateTime" Precision="0" />
+    <Property Name="NgayHT" Type="DateTime" Precision="0" />
+    <Property Name="NgayNM" Type="DateTime" Precision="0" />
+    <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="AdminNM" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="NV_LoiSuCoTB" Relationship="Self.FK_NV_QuanLyThietBi_NV_LoiSuCoTB" FromRole="NV_QuanLyThietBi" ToRole="NV_LoiSuCoTB" />
+    <NavigationProperty Name="NV_ThietBi" Relationship="Self.FK_NV_QuanLyThietBi_NV_ThietBi" FromRole="NV_QuanLyThietBi" ToRole="NV_ThietBi" />
+  </EntityType>
+  <EntityType Name="NV_ThietBi">
+    <Key>
+      <PropertyRef Name="IDTB" />
+    </Key>
+    <Property Name="IDTB" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenThietBi" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="NV_QuanLyThietBi" Relationship="Self.FK_NV_QuanLyThietBi_NV_ThietBi" FromRole="NV_ThietBi" ToRole="NV_QuanLyThietBi" />
+  </EntityType>
+  <Association Name="FK_NV_QuanLyThietBi_NV_LoiSuCoTB">
+    <End Role="NV_LoiSuCoTB" Type="Self.NV_LoiSuCoTB" Multiplicity="0..1" />
+    <End Role="NV_QuanLyThietBi" Type="Self.NV_QuanLyThietBi" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NV_LoiSuCoTB">
+        <PropertyRef Name="IDSC" />
+      </Principal>
+      <Dependent Role="NV_QuanLyThietBi">
+        <PropertyRef Name="IDSC" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NV_QuanLyThietBi_NV_ThietBi">
+    <End Role="NV_ThietBi" Type="Self.NV_ThietBi" Multiplicity="0..1" />
+    <End Role="NV_QuanLyThietBi" Type="Self.NV_QuanLyThietBi" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NV_ThietBi">
+        <PropertyRef Name="IDTB" />
+      </Principal>
+      <Dependent Role="NV_QuanLyThietBi">
+        <PropertyRef Name="IDTB" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="NV_LoiSuCoTB" EntityType="Self.NV_LoiSuCoTB" />
+    <EntitySet Name="NV_QuanLyThietBi" EntityType="Self.NV_QuanLyThietBi" />
+    <EntitySet Name="NV_ThietBi" EntityType="Self.NV_ThietBi" />
+    <AssociationSet Name="FK_NV_QuanLyThietBi_NV_LoiSuCoTB" Association="Self.FK_NV_QuanLyThietBi_NV_LoiSuCoTB">
+      <End Role="NV_LoiSuCoTB" EntitySet="NV_LoiSuCoTB" />
+      <End Role="NV_QuanLyThietBi" EntitySet="NV_QuanLyThietBi" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NV_QuanLyThietBi_NV_ThietBi" Association="Self.FK_NV_QuanLyThietBi_NV_ThietBi">
+      <End Role="NV_ThietBi" EntitySet="NV_ThietBi" />
+      <End Role="NV_QuanLyThietBi" EntitySet="NV_QuanLyThietBi" />
+    </AssociationSet>
+    <FunctionImport Name="NV_LoiSuCoTB_delete">
+      <Parameter Name="IDSC" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NV_LoiSuCoTB_insert">
+      <Parameter Name="TenLoiSC" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NV_LoiSuCoTB_update">
+      <Parameter Name="IDSC" Mode="In" Type="Int32" />
+      <Parameter Name="TenLoiSC" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NV_QuanLyThietBi_delete">
+      <Parameter Name="IDQLTB" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NV_QuanLyThietBi_insert">
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="ServiceTag" Mode="In" Type="String" />
+      <Parameter Name="IDTB" Mode="In" Type="Int32" />
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="Phone" Mode="In" Type="String" />
+      <Parameter Name="IDSC" Mode="In" Type="Int32" />
+      <Parameter Name="NgayLap" Mode="In" Type="DateTime" />
+      <Parameter Name="Status" Mode="In" Type="String" />
+      <Parameter Name="NgayXL" Mode="In" Type="DateTime" />
+      <Parameter Name="NgayHT" Mode="In" Type="DateTime" />
+      <Parameter Name="NgayNM" Mode="In" Type="DateTime" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NV_QuanLyThietBi_searchByID" ReturnType="Collection(EquipmentDB.NV_QuanLyThietBi_searchByID_Result)">
+      <Parameter Name="IDQLTB" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NV_QuanLyThietBi_select" ReturnType="Collection(EquipmentDB.NV_QuanLyThietBi_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NV_QuanLyThietBi_update">
+      <Parameter Name="IDQLTB" Mode="In" Type="Int32" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="ServiceTag" Mode="In" Type="String" />
+      <Parameter Name="IDTB" Mode="In" Type="Int32" />
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="Phone" Mode="In" Type="String" />
+      <Parameter Name="IDSC" Mode="In" Type="Int32" />
+      <Parameter Name="NgayLap" Mode="In" Type="DateTime" />
+      <Parameter Name="Status" Mode="In" Type="String" />
+      <Parameter Name="NgayXL" Mode="In" Type="DateTime" />
+      <Parameter Name="NgayHT" Mode="In" Type="DateTime" />
+      <Parameter Name="NgayNM" Mode="In" Type="DateTime" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NV_ThietBi_delete">
+      <Parameter Name="IDTB" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NV_ThietBi_insert">
+      <Parameter Name="TenThietBi" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NV_ThietBi_update">
+      <Parameter Name="IDTB" Mode="In" Type="Int32" />
+      <Parameter Name="TenThietBi" Mode="In" Type="String" />
+    </FunctionImport>
+  </EntityContainer>
+  <ComplexType Name="NV_QuanLyThietBi_searchByID_Result">
+    <Property Type="Int32" Name="IDQLTB" Nullable="false" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="ServiceTag" Nullable="true" MaxLength="30" />
+    <Property Type="Int32" Name="IDTB" Nullable="true" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="Phone" Nullable="true" MaxLength="10" />
+    <Property Type="Int32" Name="IDSC" Nullable="true" />
+    <Property Type="DateTime" Name="NgayLap" Nullable="true" />
+    <Property Type="String" Name="Status" Nullable="true" MaxLength="1" />
+    <Property Type="DateTime" Name="NgayXL" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHT" Nullable="true" />
+    <Property Type="DateTime" Name="NgayNM" Nullable="true" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+    <Property Type="String" Name="AdminNM" Nullable="true" MaxLength="10" />
+  </ComplexType>
+  <ComplexType Name="NV_QuanLyThietBi_select_Result">
+    <Property Type="Int32" Name="IDQLTB" Nullable="false" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="ServiceTag" Nullable="true" MaxLength="30" />
+    <Property Type="Int32" Name="IDTB" Nullable="true" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="Phone" Nullable="true" MaxLength="10" />
+    <Property Type="Int32" Name="IDSC" Nullable="true" />
+    <Property Type="DateTime" Name="NgayLap" Nullable="true" />
+    <Property Type="String" Name="Status" Nullable="true" MaxLength="1" />
+    <Property Type="DateTime" Name="NgayXL" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHT" Nullable="true" />
+    <Property Type="DateTime" Name="NgayNM" Nullable="true" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+    <Property Type="String" Name="AdminNM" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="TenThietBi" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="TenLoiSC" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+  </ComplexType>
+</Schema>

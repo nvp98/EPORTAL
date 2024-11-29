@@ -1,0 +1,45 @@
+﻿@model EPORTAL.ModelsTagSign.DataInformationValidation
+
+@using (Html.BeginForm("Edit", "ContractorGroup", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDGroup)
+    <div class="modal-dialog" id="form" style=" margin-top: 5%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên nhóm nhà thầu</label>
+                                @Html.EditorFor(model => model.NameContractorGroup, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Gate", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Mô tả</label>
+                                @Html.EditorFor(model => model.Describe, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Gate", @text = "" } })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+

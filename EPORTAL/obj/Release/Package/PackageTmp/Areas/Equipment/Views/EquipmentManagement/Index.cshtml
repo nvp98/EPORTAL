@@ -1,0 +1,372 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsView360
+@using EPORTAL.ModelsEquipment
+@model PagedList.IPagedList<NV_QuanLyThietBiValidation>
+@using PagedList.Mvc
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{var IDquyen = (int)ViewBag.Quyen;
+    var Begindd = Request.QueryString["begind"];
+    var End = Request.QueryString["endd"];
+    var StatusCheck = Request.QueryString["statusCheck"];}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<style>
+    .labelV {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 0;
+    }
+
+    .checkmark {
+        height: calc(2.25rem + 2px);
+        margin-right: 5px;
+        margin-left: 5px;
+    }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+</style>
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách sự cố thiết bị
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-9">
+                                <div class="row">
+
+                                    <div class="col-md-2">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+                                    <label class="labelV" for="begind">Từ ngày</label>
+                                    <div class="col-md-2">
+                                        <input type="date" id="begind" name="begind" placeholder="Từ ngày" class="form-control" value="@ViewBag.begind">
+                                    </div>
+                                    <label class="labelV" for="endd">Đến ngày</label>
+                                    <div class="col-md-2">
+                                        <input type="date" id="endd" name="endd" placeholder="Đến ngày" class="form-control" value="@ViewBag.endd">
+                                    </div>
+                                    <label class="labelV">Chờ xử lý</label>
+                                    <input type="checkbox" id="statusCheck" name="" class="checkmark">
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+
+                                <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create", "EquipmentManagement")' style="margin-top:50px"></div>
+                                @{ if (IDquyen == 1)
+                                    {
+                                        <button type="button" id="btn-Export" class="btn btn-primary m-l-auto" style="margin-right: 10px; float: right"><i class="fa fa-download">&nbsp;</i>&nbsp;Download</button>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th class="text-center">Bộ phận/Nhà máy</th>
+                                            <th class="text-center">Service Tag</th>
+                                            <th class="text-center">Tên thiết bị</th>
+                                            <th class="text-center">Mã NV</th>
+                                            <th class="text-center">Số điện thoại</th>
+                                            <th class="text-center">Lỗi sự cố thiết bị</th>
+                                            <th class="text-center">Ngày nhận máy</th>
+                                            <th class="text-center">Tình trạng</th>
+                                            @{ if (IDquyen == 1)
+                                                {
+                                                    <th class="text-center">Admin nhận máy</th>
+                                                    @*<th class="text-center">Ngày xử lý</th>*@
+                                                    @*<th class="text-center">Ngày hoàn thành</th>*@
+                                                    <th class="text-center">Ngày giao máy</th>
+                                                }
+
+                                            }
+                                            <th class="text-center" width="200px">Ghi chú</th>
+                                            <th class="text-center" width="50px">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                            var cxl = "Chờ xử lý";
+                                            var dxl = "Đang xử lý";
+                                            //var daxl = "Đã xử lý";
+                                            var gm = "Đã giao máy";
+
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@RowNo@{RowNo++;}</td>
+                                                    <td class="text-center">@item.TenPhongBan</td>
+                                                    <td class="text-center">@item.ServiceTag</td>
+                                                    <td class="text-center">@item.TenThietBi</td>
+                                                    <td class="text-center">@item.MaNV</td>
+                                                    <td class="text-center">@item.Phone</td>
+                                                    <td class="text-center">@item.TenLoiSC</td>
+                                                    <td class="text-center">@{if (item.NgayLap.HasValue)
+                                                        { @item.NgayLap.Value.ToString("dd-MM-yyyy")}}</td>
+                                                    <td class="text-center">
+                                                        @{switch (item.Status)
+                                                            {
+                                                                case "0":
+                                                                    if (IDquyen == 1)
+                                                                    {
+                                                                        <a class="btn btn-primary btn-sm" href="@Url.Action("EditStatus", "EquipmentManagement", new { id = item.IDQLTB })" onclick="return confirm('Bạn muốn thay đổi trạng thái  : @dxl')">@cxl</a>
+                                                                    }
+                                                                    else
+                                                                    { @cxl};
+                                                                break;
+                                                            case "1":
+                                                                if (IDquyen == 1)
+                                                                {
+                                                                    <a class="btn btn-primary btn-sm" href="@Url.Action("EditStatus", "EquipmentManagement", new { id = item.IDQLTB })" onclick="return confirm('Bạn muốn thay đổi trạng thái  : @gm')">@dxl</a>
+                                                                }
+                                                                else
+                                                                { @dxl};
+                                                            break;
+                                                        @*case "2":
+                                                                if (IDquyen == 1)
+                                                                {
+                                                                    <a class="btn btn-primary btn-sm" href="@Url.Action("EditStatus", "EquipmentManagement", new { id = item.IDQLTB })" onclick="return confirm('Bạn muốn thay đổi trạng thái  : @gm')">@daxl</a>
+                                                                }
+                                                                else
+                                                                { @daxl};
+                                                            break;*@
+                                                        case "2":
+                                                            @gm
+                                                            break;
+                                                        default:
+                                                            // code block
+                                                            break;
+                                                    }
+                                                        }
+                                                    </td>
+                                                    @{ if (IDquyen == 1)
+                                                        {
+                                                            <td class="text-center">@item.AdminNM</td>
+                                                            @*<td class="text-center">@{if (item.NgayXL.HasValue){ @item.NgayXL.Value.ToString("dd-MM-yyyy")}}</td>*@
+                                                            <td class="text-center">@{if (item.NgayHT.HasValue)
+                                                                { @item.NgayHT.Value.ToString("dd-MM-yyyy")}}</td>
+                                                            @*<td class="text-center">@{if (item.NgayNM.HasValue){ @item.NgayNM.Value.ToString("dd-MM-yyyy")}}</td>*@
+                                                        }
+                                                    }
+                                                    <td class="text-center">@item.GhiChu</td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            if (IDquyen != 1 && item.Status != "0")
+                                                            {
+
+                                                            }
+                                                            else
+                                                            {
+                                                                if (item.Status == "0")
+                                                                {
+                                                                    <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "EquipmentManagement", new { id = item.IDQLTB })"
+                                                                       onclick="return confirm('Bạn muốn xóa Thông tin  : @item.ServiceTag')">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                    </a>
+                                                                }
+
+                                                                <a id="btn-edit_@item.IDQLTB" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                                <div class="modal " id="myModaleEdit_@item.IDQLTB" role="dialog" data-url='@Url.Action("Edit", "EquipmentManagement", new { id = item.IDQLTB })'></div>
+                                                                <script type="text/javascript">
+                                                                $('#btn-edit_@item.IDQLTB').click(function () {
+                                                                    var url = $('#myModaleEdit_@item.IDQLTB').data('url');
+                                                                    $.get(url, function (data) {
+                                                                        $("#myModal").html(data);
+                                                                        $("#ModalTitle").html("Cập nhật Thông Tin sự cố thiết bị");
+                                                                        $("#myModal").modal('show');
+                                                                    });
+                                                                });
+                                                                </script>
+                                                            }
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "EquipmentManagement", new { area = "Equipment", page, begind = Begindd, endd = End, statusCheck = StatusCheck }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+            if ("0" == "@ViewBag.statusCheck") {
+                $("#statusCheck").prop("checked", true);
+            }
+        });
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm yêu cầu xử lý sự cố thiết bị");
+            $("#myModal").modal('show');
+        });
+    });
+
+    $("#btn-search").on('click', function () {
+        var search = $('#txtsearch').val();
+        var begind = $('#begind').val();
+        var endd = $('#endd').val();
+        var begindc = Date.parse($('#begind').val());
+        var enddc = Date.parse($('#endd').val());
+        if (begindc > enddc) {
+            alert('Vui lòng chọn từ ngày phải nhỏ hơn đến ngày');
+            return false;
+        } else if (begindc > Date.now()) {
+            alert('Vui lòng chọn từ ngày phải nhỏ hơn ngày hiện tại');
+            return false;
+        }
+        else if (enddc > Date.now()) {
+            alert('Vui lòng chọn đến ngày phải nhỏ hơn ngày hiện tại');
+            return false;
+        }
+        var statusCheck = "";
+        if (document.getElementById('statusCheck').checked) {
+            statusCheck = "0";
+        }
+
+        window.location.href = '@Url.Action("Index", "EquipmentManagement")?search=' + search + '&begind=' + begind + '&endd=' + endd  + '&statusCheck=' + statusCheck;
+     });
+    $('#btn-Export').click(function () {
+        var search = $('#txtsearch').val();
+        var begind = $('#begind').val();
+        var endd = $('#endd').val();
+        var begindc = Date.parse($('#begind').val());
+        var enddc = Date.parse($('#endd').val());
+        if (begindc > enddc) {
+            alert('Vui lòng chọn từ ngày phải nhỏ hơn đến ngày');
+            return false;
+        } else if (begindc > Date.now()) {
+            alert('Vui lòng chọn từ ngày phải nhỏ hơn ngày hiện tại');
+            return false;
+        }
+        else if (enddc > Date.now()) {
+            alert('Vui lòng chọn đến ngày phải nhỏ hơn ngày hiện tại');
+            return false;
+        }
+        var statusCheck = "";
+        if (document.getElementById('statusCheck').checked) {
+            statusCheck = "0";
+        }
+
+        window.location.href = '@Url.Action("ExportToExcel", "EquipmentManagement")?search=' + search + '&begind=' + begind + '&endd=' + endd  + '&statusCheck=' + statusCheck;
+    });
+
+    function submitForm(event) {
+        var ErrorIDPhongBan = document.getElementById("ErrorIDPhongBan");
+        var ErrorServiceTag = document.getElementById("ErrorServiceTag");
+        var ErrorIDTB = document.getElementById("ErrorIDTB");
+        //var ErrorPhone = document.getElementById("ErrorPhone");
+        var ErrorIDSC = document.getElementById("ErrorIDSC");
+
+        if ($('#IDPhongBan').val() == "") {
+            ErrorIDPhongBan.innerHTML = "Vui lòng chọn phòng ban!";
+            event.preventDefault();
+            return false;
+        } else { ErrorIDPhongBan.innerHTML = "" };
+
+        if ($('#ServiceTag').val() == "") {
+            ErrorServiceTag.innerHTML = "Vui lòng nhập Service Tag!";
+            event.preventDefault();
+            return false;
+        } else { ErrorServiceTag.innerHTML = "" };
+
+        if ($('#IDTB').val() == "") {
+            ErrorIDTB.innerHTML = "Vui lòng chọn thiết bị!";
+            event.preventDefault();
+            return false;
+        } else { ErrorIDTB.innerHTML = "" };
+
+        //if ($('#Phone').val() == "") {
+        //    ErrorPhone.innerHTML = "Vui lòng nhập số điện thoại!";
+        //    event.preventDefault();
+        //    return false;
+        //} else { ErrorPhone.innerHTML = "" };
+
+        if ($('#IDSC').val() == "") {
+            ErrorIDSC.innerHTML = "Vui lòng chọn lỗi sự cố!";
+            event.preventDefault();
+            return false;
+        } else { ErrorIDSC.innerHTML = "" };
+
+        return true;
+    };
+</script>
+
+
+
+
+

@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="EquipmentDBStoreContainer" CdmEntityContainer="Entities">
+    <EntitySetMapping Name="NV_LoiSuCoTB">
+      <EntityTypeMapping TypeName="EquipmentDB.NV_LoiSuCoTB">
+        <MappingFragment StoreEntitySet="NV_LoiSuCoTB">
+          <ScalarProperty Name="IDSC" ColumnName="IDSC" />
+          <ScalarProperty Name="TenLoiSC" ColumnName="TenLoiSC" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="NV_QuanLyThietBi">
+      <EntityTypeMapping TypeName="EquipmentDB.NV_QuanLyThietBi">
+        <MappingFragment StoreEntitySet="NV_QuanLyThietBi">
+          <ScalarProperty Name="IDQLTB" ColumnName="IDQLTB" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="ServiceTag" ColumnName="ServiceTag" />
+          <ScalarProperty Name="IDTB" ColumnName="IDTB" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="Phone" ColumnName="Phone" />
+          <ScalarProperty Name="IDSC" ColumnName="IDSC" />
+          <ScalarProperty Name="NgayLap" ColumnName="NgayLap" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="NgayXL" ColumnName="NgayXL" />
+          <ScalarProperty Name="NgayHT" ColumnName="NgayHT" />
+          <ScalarProperty Name="NgayNM" ColumnName="NgayNM" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="AdminNM" ColumnName="AdminNM" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="NV_ThietBi">
+      <EntityTypeMapping TypeName="EquipmentDB.NV_ThietBi">
+        <MappingFragment StoreEntitySet="NV_ThietBi">
+          <ScalarProperty Name="IDTB" ColumnName="IDTB" />
+          <ScalarProperty Name="TenThietBi" ColumnName="TenThietBi" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="NV_LoiSuCoTB_delete" FunctionName="EquipmentDB.Store.NV_LoiSuCoTB_delete" />
+    <FunctionImportMapping FunctionImportName="NV_LoiSuCoTB_insert" FunctionName="EquipmentDB.Store.NV_LoiSuCoTB_insert" />
+    <FunctionImportMapping FunctionImportName="NV_LoiSuCoTB_update" FunctionName="EquipmentDB.Store.NV_LoiSuCoTB_update" />
+    <FunctionImportMapping FunctionImportName="NV_QuanLyThietBi_delete" FunctionName="EquipmentDB.Store.NV_QuanLyThietBi_delete" />
+    <FunctionImportMapping FunctionImportName="NV_QuanLyThietBi_insert" FunctionName="EquipmentDB.Store.NV_QuanLyThietBi_insert" />
+    <FunctionImportMapping FunctionImportName="NV_QuanLyThietBi_searchByID" FunctionName="EquipmentDB.Store.NV_QuanLyThietBi_searchByID">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EquipmentDB.NV_QuanLyThietBi_searchByID_Result">
+          <ScalarProperty Name="IDQLTB" ColumnName="IDQLTB" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="ServiceTag" ColumnName="ServiceTag" />
+          <ScalarProperty Name="IDTB" ColumnName="IDTB" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="Phone" ColumnName="Phone" />
+          <ScalarProperty Name="IDSC" ColumnName="IDSC" />
+          <ScalarProperty Name="NgayLap" ColumnName="NgayLap" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="NgayXL" ColumnName="NgayXL" />
+          <ScalarProperty Name="NgayHT" ColumnName="NgayHT" />
+          <ScalarProperty Name="NgayNM" ColumnName="NgayNM" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="AdminNM" ColumnName="AdminNM" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="NV_QuanLyThietBi_select" FunctionName="EquipmentDB.Store.NV_QuanLyThietBi_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EquipmentDB.NV_QuanLyThietBi_select_Result">
+          <ScalarProperty Name="IDQLTB" ColumnName="IDQLTB" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="ServiceTag" ColumnName="ServiceTag" />
+          <ScalarProperty Name="IDTB" ColumnName="IDTB" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="Phone" ColumnName="Phone" />
+          <ScalarProperty Name="IDSC" ColumnName="IDSC" />
+          <ScalarProperty Name="NgayLap" ColumnName="NgayLap" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="NgayXL" ColumnName="NgayXL" />
+          <ScalarProperty Name="NgayHT" ColumnName="NgayHT" />
+          <ScalarProperty Name="NgayNM" ColumnName="NgayNM" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="AdminNM" ColumnName="AdminNM" />
+          <ScalarProperty Name="TenThietBi" ColumnName="TenThietBi" />
+          <ScalarProperty Name="TenLoiSC" ColumnName="TenLoiSC" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="NV_QuanLyThietBi_update" FunctionName="EquipmentDB.Store.NV_QuanLyThietBi_update" />
+    <FunctionImportMapping FunctionImportName="NV_ThietBi_delete" FunctionName="EquipmentDB.Store.NV_ThietBi_delete" />
+    <FunctionImportMapping FunctionImportName="NV_ThietBi_insert" FunctionName="EquipmentDB.Store.NV_ThietBi_insert" />
+    <FunctionImportMapping FunctionImportName="NV_ThietBi_update" FunctionName="EquipmentDB.Store.NV_ThietBi_update" />
+  </EntityContainerMapping>
+</Mapping>

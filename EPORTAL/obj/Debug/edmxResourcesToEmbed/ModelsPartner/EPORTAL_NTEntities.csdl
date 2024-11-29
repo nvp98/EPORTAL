@@ -1,0 +1,572 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EPORTAL_NTModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="NT_CardTemp">
+    <Key>
+      <PropertyRef Name="IDThe" />
+    </Key>
+    <Property Name="IDThe" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="MaThe" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="TenThe" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="UserID" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="EmployeeID" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="IDCong" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_CarteTemporaire">
+    <Key>
+      <PropertyRef Name="IDTTT" />
+    </Key>
+    <Property Name="IDTTT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NoiDung" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="NguoiTaoID" Type="Int32" />
+    <Property Name="NgayTao" Type="DateTime" Precision="0" />
+    <Property Name="TinhTrang" Type="Int32" />
+    <Property Name="NTID" Type="Int32" />
+    <Property Name="PhongBanID" Type="Int32" />
+    <Property Name="HangMuc" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="ThoiHan" Type="DateTime" Precision="0" />
+    <Property Name="GhiChu" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="isNT" Type="Int32" />
+    <NavigationProperty Name="NT_DetailCarteTemporaire" Relationship="Self.FK_NT_DetailCarteTemporaire_NT_CarteTemporaire" FromRole="NT_CarteTemporaire" ToRole="NT_DetailCarteTemporaire" />
+  </EntityType>
+  <EntityType Name="NT_ContactEquipment">
+    <Key>
+      <PropertyRef Name="IDTBNT" />
+    </Key>
+    <Property Name="IDTBNT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NameEquipment" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="IndentifierContact" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="BienSoXe" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="IDContact" Type="Int32" />
+    <Property Name="Operator" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="IDDepartment" Type="Int32" />
+    <Property Name="Cavet" Type="Int32" />
+    <Property Name="NgayHetHanDK" Type="DateTime" Precision="0" />
+    <Property Name="SoNgayHetHanDK" Type="Int32" />
+    <Property Name="NgayHetHanKD" Type="DateTime" Precision="0" />
+    <Property Name="SoNgayHetHanKD" Type="Int32" />
+    <Property Name="NgayHetHanBHX" Type="DateTime" Precision="0" />
+    <Property Name="SoNgayHetHanBHX" Type="Int32" />
+    <Property Name="CCHV" Type="Int32" />
+    <Property Name="NgayHetHanTAT" Type="DateTime" Precision="0" />
+    <Property Name="SoNgayHetHanTAT" Type="Int32" />
+    <Property Name="NgayHetHanVCHHChayNo" Type="DateTime" Precision="0" />
+    <Property Name="SoNgayHetHanVCHHChayNo" Type="Int32" />
+    <Property Name="NgayHetHanCNKD" Type="DateTime" Precision="0" />
+    <Property Name="SoNgayHetHanCNKD" Type="Int32" />
+    <Property Name="ChungChiPCCCCNCH" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ChungChiVCHHNHCN" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="StartDate" Type="DateTime" Precision="0" />
+    <Property Name="KhuVucThiCong" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NguoiNhap" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="TinhTrang" Type="Int32" />
+    <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="FileUpload" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="IDMDD" Type="Int32" />
+    <Property Name="SoKhung" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ThoiHanTheTu" Type="DateTime" Precision="0" />
+    <Property Name="ThoiHanTheRVTX" Type="DateTime" Precision="0" />
+  </EntityType>
+  <EntityType Name="NT_DetailCarteTemporaire">
+    <Key>
+      <PropertyRef Name="IDCTTTT" />
+    </Key>
+    <Property Name="IDCTTTT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="HoVaTen" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="CCCD" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="NgaySinh" Type="DateTime" Precision="0" />
+    <Property Name="MucDich" Type="Int32" />
+    <Property Name="Sdt" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="BienSo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Cong" Type="Int32" />
+    <Property Name="GhiChu" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="IDTTT" Type="Int32" />
+    <NavigationProperty Name="NT_CarteTemporaire" Relationship="Self.FK_NT_DetailCarteTemporaire_NT_CarteTemporaire" FromRole="NT_DetailCarteTemporaire" ToRole="NT_CarteTemporaire" />
+  </EntityType>
+  <EntityType Name="NT_Handle">
+    <Key>
+      <PropertyRef Name="IDXL" />
+    </Key>
+    <Property Name="IDXL" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDTTT" Type="Int32" />
+    <Property Name="IDCTTTT" Type="Int32" />
+    <Property Name="NguoiXuLy" Type="Int32" />
+    <Property Name="ThoiGianXuLy" Type="DateTime" Precision="3" />
+    <Property Name="IDThe" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_HistoryBlackList">
+    <Key>
+      <PropertyRef Name="IDHis" />
+    </Key>
+    <Property Name="IDHis" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="NVVPID" Type="Int32" />
+    <Property Name="NgayUpdate" Type="DateTime" Precision="3" />
+    <Property Name="IDNVUpdate" Type="Int32" />
+    <Property Name="StatusUpdate" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_HoatDongNV">
+    <Key>
+      <PropertyRef Name="IDHD" />
+    </Key>
+    <Property Name="IDHD" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IDNVNT" Type="Int32" />
+    <Property Name="IDNT" Type="Int32" />
+    <Property Name="NgayCap" Type="DateTime" Precision="0" />
+    <Property Name="HanSuDung" Type="DateTime" Precision="0" />
+    <Property Name="IDKV" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="IDCA" Type="Int32" />
+    <Property Name="GhiChu" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_NhanVienNT">
+    <Key>
+      <PropertyRef Name="IDNVNT" />
+    </Key>
+    <Property Name="IDNVNT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="HoTen" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DiaChi" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="Sdt" Type="Int32" />
+    <Property Name="SoThe" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="IDNT" Type="Int32" />
+    <Property Name="NgayCap" Type="DateTime" Precision="0" />
+    <Property Name="HanSuDung" Type="DateTime" Precision="0" />
+    <Property Name="TTLV" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_NhanVienVP">
+    <Key>
+      <PropertyRef Name="IDNVVP" />
+    </Key>
+    <Property Name="IDNVVP" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="HoTen" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="CMND" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="NgaySinh" Type="DateTime" Precision="3" />
+    <Property Name="LyDoCam" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="CreateDay" Type="DateTime" Precision="3" />
+    <Property Name="CreateIDNV" Type="Int32" />
+    <Property Name="TinhTrang" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_Purpose">
+    <Key>
+      <PropertyRef Name="IDMD" />
+    </Key>
+    <Property Name="IDMD" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TenMD" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_TTHD">
+    <Key>
+      <PropertyRef Name="IDHD" />
+    </Key>
+    <Property Name="IDHD" Type="Int32" Nullable="false" />
+    <Property Name="TenHD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="NT_UserTemp">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MatKhau" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="IDNT" Type="Int32" />
+    <Property Name="TinhTrang" Type="Int32" />
+  </EntityType>
+  <EntityType Name="NT_MaDinhDanh">
+    <Key>
+      <PropertyRef Name="IDDD" />
+    </Key>
+    <Property Name="IDDD" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="MaDinhDanh" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="TenMaDinhDanh" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <Association Name="FK_NT_DetailCarteTemporaire_NT_CarteTemporaire">
+    <End Role="NT_CarteTemporaire" Type="Self.NT_CarteTemporaire" Multiplicity="0..1" />
+    <End Role="NT_DetailCarteTemporaire" Type="Self.NT_DetailCarteTemporaire" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NT_CarteTemporaire">
+        <PropertyRef Name="IDTTT" />
+      </Principal>
+      <Dependent Role="NT_DetailCarteTemporaire">
+        <PropertyRef Name="IDTTT" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="EPORTAL_NTEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="NT_CardTemp" EntityType="Self.NT_CardTemp" />
+    <EntitySet Name="NT_CarteTemporaire" EntityType="Self.NT_CarteTemporaire" />
+    <EntitySet Name="NT_ContactEquipment" EntityType="Self.NT_ContactEquipment" />
+    <EntitySet Name="NT_DetailCarteTemporaire" EntityType="Self.NT_DetailCarteTemporaire" />
+    <EntitySet Name="NT_Handle" EntityType="Self.NT_Handle" />
+    <EntitySet Name="NT_HistoryBlackList" EntityType="Self.NT_HistoryBlackList" />
+    <EntitySet Name="NT_HoatDongNV" EntityType="Self.NT_HoatDongNV" />
+    <EntitySet Name="NT_NhanVienNT" EntityType="Self.NT_NhanVienNT" />
+    <EntitySet Name="NT_NhanVienVP" EntityType="Self.NT_NhanVienVP" />
+    <EntitySet Name="NT_Purpose" EntityType="Self.NT_Purpose" />
+    <EntitySet Name="NT_TTHD" EntityType="Self.NT_TTHD" />
+    <EntitySet Name="NT_UserTemp" EntityType="Self.NT_UserTemp" />
+    <EntitySet Name="NT_MaDinhDanh" EntityType="Self.NT_MaDinhDanh" />
+    <AssociationSet Name="FK_NT_DetailCarteTemporaire_NT_CarteTemporaire" Association="Self.FK_NT_DetailCarteTemporaire_NT_CarteTemporaire">
+      <End Role="NT_CarteTemporaire" EntitySet="NT_CarteTemporaire" />
+      <End Role="NT_DetailCarteTemporaire" EntitySet="NT_DetailCarteTemporaire" />
+    </AssociationSet>
+    <FunctionImport Name="NT_CardTemp_delete">
+      <Parameter Name="IDThe" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardTemp_insert">
+      <Parameter Name="MaThe" Mode="In" Type="String" />
+      <Parameter Name="TenThe" Mode="In" Type="String" />
+      <Parameter Name="UserID" Mode="In" Type="String" />
+      <Parameter Name="EmployeeID" Mode="In" Type="String" />
+      <Parameter Name="IDCong" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CardTemp_update">
+      <Parameter Name="IDThe" Mode="In" Type="Int32" />
+      <Parameter Name="MaThe" Mode="In" Type="String" />
+      <Parameter Name="TenThe" Mode="In" Type="String" />
+      <Parameter Name="UserID" Mode="In" Type="String" />
+      <Parameter Name="EmployeeID" Mode="In" Type="String" />
+      <Parameter Name="IDCong" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CarteTemporaire_Cancel">
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CarteTemporaire_delete">
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CarteTemporaire_insert">
+      <Parameter Name="NoiDung" Mode="In" Type="String" />
+      <Parameter Name="NguoiTaoID" Mode="In" Type="Int32" />
+      <Parameter Name="NgayTao" Mode="In" Type="DateTime" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+      <Parameter Name="NTID" Mode="In" Type="Int32" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="HangMuc" Mode="In" Type="String" />
+      <Parameter Name="ThoiHan" Mode="In" Type="DateTime" />
+      <Parameter Name="isNT" Mode="In" Type="Int32" />
+      <Parameter Name="IDTTT" Mode="InOut" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CarteTemporaire_Select" ReturnType="Collection(EPORTAL_NTModel.NT_CarteTemporaire_Select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CarteTemporaire_update">
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+      <Parameter Name="NoiDung" Mode="In" Type="String" />
+      <Parameter Name="NguoiTaoID" Mode="In" Type="Int32" />
+      <Parameter Name="NgayTao" Mode="In" Type="DateTime" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+      <Parameter Name="NTID" Mode="In" Type="Int32" />
+      <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+      <Parameter Name="HangMuc" Mode="In" Type="String" />
+      <Parameter Name="ThoiHan" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="NT_CarteTemporaire_Update_XL">
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContactEquipment_delete">
+      <Parameter Name="IDTBNT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContactEquipment_insert">
+      <Parameter Name="NameEquipment" Mode="In" Type="String" />
+      <Parameter Name="IndentifierContact" Mode="In" Type="String" />
+      <Parameter Name="BienSoXe" Mode="In" Type="String" />
+      <Parameter Name="IDContact" Mode="In" Type="Int32" />
+      <Parameter Name="Operator" Mode="In" Type="String" />
+      <Parameter Name="IDDepartment" Mode="In" Type="Int32" />
+      <Parameter Name="Cavet" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanDK" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHethanDK" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanKD" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanKD" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanBHX" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanBHX" Mode="In" Type="Int32" />
+      <Parameter Name="CCHV" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanTAT" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanTAT" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanVCHHChayNo" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanVCHHChayNo" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanCNKD" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanCNKD" Mode="In" Type="Int32" />
+      <Parameter Name="ChungChiPCCCCNCH" Mode="In" Type="String" />
+      <Parameter Name="ChungChiVCHHCHCN" Mode="In" Type="String" />
+      <Parameter Name="StartDate" Mode="In" Type="DateTime" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="NguoiNhap" Mode="In" Type="String" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="FileUpload" Mode="In" Type="String" />
+      <Parameter Name="IDMDD" Mode="In" Type="Int32" />
+      <Parameter Name="SoKhung" Mode="In" Type="String" />
+      <Parameter Name="ThoiHanTheTu" Mode="In" Type="DateTime" />
+      <Parameter Name="ThoiHanTheRVTX" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContactEquipment_Select" ReturnType="Collection(EPORTAL_NTModel.NT_ContactEquipment_Select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_ContactEquipment_update">
+      <Parameter Name="IDTBNT" Mode="In" Type="Int32" />
+      <Parameter Name="NameEquipment" Mode="In" Type="String" />
+      <Parameter Name="IndentifierContact" Mode="In" Type="String" />
+      <Parameter Name="BienSoXe" Mode="In" Type="String" />
+      <Parameter Name="IDContact" Mode="In" Type="Int32" />
+      <Parameter Name="Operator" Mode="In" Type="String" />
+      <Parameter Name="IDDepartment" Mode="In" Type="Int32" />
+      <Parameter Name="Cavet" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanDK" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHethanDK" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanKD" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanKD" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanBHX" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanBHX" Mode="In" Type="Int32" />
+      <Parameter Name="CCHV" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanTAT" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanTAT" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanVCHHChayNo" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanVCHHChayNo" Mode="In" Type="Int32" />
+      <Parameter Name="NgayHetHanCNKD" Mode="In" Type="DateTime" />
+      <Parameter Name="SoNgayHetHanCNKD" Mode="In" Type="Int32" />
+      <Parameter Name="ChungChiPCCCCNCH" Mode="In" Type="String" />
+      <Parameter Name="ChungChiVCHHCHCN" Mode="In" Type="String" />
+      <Parameter Name="StartDate" Mode="In" Type="DateTime" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="NguoiNhap" Mode="In" Type="String" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="FileUpload" Mode="In" Type="String" />
+      <Parameter Name="IDMDD" Mode="In" Type="Int32" />
+      <Parameter Name="SoKhung" Mode="In" Type="String" />
+      <Parameter Name="ThoiHanTheTu" Mode="In" Type="DateTime" />
+      <Parameter Name="ThoiHanTheRVTX" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCarteTemporaire_delete">
+      <Parameter Name="IDCTTTT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCarteTemporaire_insert">
+      <Parameter Name="HoVaTen" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+      <Parameter Name="MucDich" Mode="In" Type="Int32" />
+      <Parameter Name="Sdt" Mode="In" Type="String" />
+      <Parameter Name="BienSo" Mode="In" Type="String" />
+      <Parameter Name="Cong" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_DetailCarteTemporaire_update">
+      <Parameter Name="IDCTTTT" Mode="In" Type="Int32" />
+      <Parameter Name="HoVaTen" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+      <Parameter Name="MucDich" Mode="In" Type="Int32" />
+      <Parameter Name="Sdt" Mode="In" Type="String" />
+      <Parameter Name="BienSo" Mode="In" Type="String" />
+      <Parameter Name="Cong" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Handle_insert">
+      <Parameter Name="IDTTT" Mode="In" Type="Int32" />
+      <Parameter Name="IDCTTTT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_Handle_update">
+      <Parameter Name="IDXL" Mode="In" Type="Int32" />
+      <Parameter Name="NguoiXuLy" Mode="In" Type="Int32" />
+      <Parameter Name="ThoiGianXuLy" Mode="In" Type="DateTime" />
+      <Parameter Name="IDThe" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_HistoryBlackList_insert">
+      <Parameter Name="NVVPID" Mode="In" Type="Int32" />
+      <Parameter Name="NgayUpdate" Mode="In" Type="DateTime" />
+      <Parameter Name="IDNVUpdate" Mode="In" Type="Int32" />
+      <Parameter Name="StatusUpdate" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_HistoryBlackList_Select" ReturnType="Collection(EPORTAL_NTModel.NT_HistoryBlackList_Select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_HoatDongNV_insert">
+      <Parameter Name="IDNVNT" Mode="In" Type="Int32" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="NgayCap" Mode="In" Type="DateTime" />
+      <Parameter Name="HanSuDung" Mode="In" Type="DateTime" />
+      <Parameter Name="IDKV" Mode="In" Type="String" />
+      <Parameter Name="IDCA" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienNT_delete">
+      <Parameter Name="IDNVNT" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienNT_insert">
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="DiaChi" Mode="In" Type="String" />
+      <Parameter Name="Sdt" Mode="In" Type="Int32" />
+      <Parameter Name="SoThe" Mode="In" Type="String" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="NgayCap" Mode="In" Type="DateTime" />
+      <Parameter Name="HanSuDung" Mode="In" Type="DateTime" />
+      <Parameter Name="TTLV" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienNT_lock">
+      <Parameter Name="IDNVNT" Mode="In" Type="Int32" />
+      <Parameter Name="TTLV" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienNT_Select" ReturnType="Collection(EPORTAL_NTModel.NT_NhanVienNT_Select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienNT_update">
+      <Parameter Name="IDNVNT" Mode="In" Type="Int32" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="DiaChi" Mode="In" Type="String" />
+      <Parameter Name="Sdt" Mode="In" Type="Int32" />
+      <Parameter Name="SoThe" Mode="In" Type="String" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="NgayCap" Mode="In" Type="DateTime" />
+      <Parameter Name="HanSuDung" Mode="In" Type="DateTime" />
+      <Parameter Name="TTLV" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienNT_updateday">
+      <Parameter Name="IDNVNT" Mode="In" Type="Int32" />
+      <Parameter Name="NgayCap" Mode="In" Type="DateTime" />
+      <Parameter Name="HanSuDung" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienVP_delete">
+      <Parameter Name="IDNVVP" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienVP_insert">
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="CMND" Mode="In" Type="String" />
+      <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+      <Parameter Name="LyDoCam" Mode="In" Type="String" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="CreateDay" Mode="In" Type="DateTime" />
+      <Parameter Name="CreateIDNV" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienVP_Select" ReturnType="Collection(EPORTAL_NTModel.NT_NhanVienVP_Select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienVP_update">
+      <Parameter Name="IDNVVP" Mode="In" Type="Int32" />
+      <Parameter Name="HoTen" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+      <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+      <Parameter Name="LyDoCam" Mode="In" Type="String" />
+      <Parameter Name="GhiChu" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NT_NhanVienVP_updateLock">
+      <Parameter Name="IDNVVP" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_UserTemp_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_UserTemp_insert">
+      <Parameter Name="UserName" Mode="In" Type="String" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_UserTemp_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="UserName" Mode="In" Type="String" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+      <Parameter Name="IDNT" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NT_UserTemp_updatePass">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="MatKhau" Mode="In" Type="String" />
+    </FunctionImport>
+  </EntityContainer>
+  <ComplexType Name="NT_CarteTemporaire_Select_Result">
+    <Property Type="Int32" Name="IDTTT" Nullable="false" />
+    <Property Type="String" Name="NoiDung" Nullable="true" MaxLength="200" />
+    <Property Type="Int32" Name="NguoiTaoID" Nullable="true" />
+    <Property Type="DateTime" Name="NgayTao" Nullable="true" />
+    <Property Type="Int32" Name="TinhTrang" Nullable="true" />
+    <Property Type="Int32" Name="NTID" Nullable="true" />
+    <Property Type="Int32" Name="PhongBanID" Nullable="true" />
+    <Property Type="String" Name="HangMuc" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="ThoiHan" Nullable="true" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="200" />
+    <Property Type="Int32" Name="isNT" Nullable="true" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="10" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+    <Property Type="String" Name="ShortName" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="NT_ContactEquipment_Select_Result">
+    <Property Type="Int32" Name="IDTBNT" Nullable="false" />
+    <Property Type="String" Name="NameEquipment" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="IndentifierContact" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="BienSoXe" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDContact" Nullable="true" />
+    <Property Type="String" Name="Operator" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDDepartment" Nullable="true" />
+    <Property Type="Int32" Name="Cavet" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHanDK" Nullable="true" />
+    <Property Type="Int32" Name="SoNgayHetHanDK" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHanKD" Nullable="true" />
+    <Property Type="Int32" Name="SoNgayHetHanKD" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHanBHX" Nullable="true" />
+    <Property Type="Int32" Name="SoNgayHetHanBHX" Nullable="true" />
+    <Property Type="Int32" Name="CCHV" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHanTAT" Nullable="true" />
+    <Property Type="Int32" Name="SoNgayHetHanTAT" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHanVCHHChayNo" Nullable="true" />
+    <Property Type="Int32" Name="SoNgayHetHanVCHHChayNo" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHanCNKD" Nullable="true" />
+    <Property Type="Int32" Name="SoNgayHetHanCNKD" Nullable="true" />
+    <Property Type="String" Name="ChungChiPCCCCNCH" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="ChungChiVCHHNHCN" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="StartDate" Nullable="true" />
+    <Property Type="String" Name="KhuVucThiCong" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="NguoiNhap" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="TinhTrang" Nullable="true" />
+    <Property Type="String" Name="GhiChu" Nullable="true" />
+    <Property Type="String" Name="FileUpload" Nullable="true" />
+    <Property Type="Int32" Name="IDMDD" Nullable="true" />
+    <Property Type="String" Name="SoKhung" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="ThoiHanTheTu" Nullable="true" />
+    <Property Type="DateTime" Name="ThoiHanTheRVTX" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="NT_HistoryBlackList_Select_Result">
+    <Property Type="DateTime" Name="NgayUpdate" Nullable="true" Precision="23" />
+    <Property Type="Int32" Name="NVVPID" Nullable="true" />
+    <Property Type="Int32" Name="IDNVUpdate" Nullable="true" />
+    <Property Type="Int32" Name="StatusUpdate" Nullable="true" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="CreateIDNV" Nullable="true" />
+    <Property Type="String" Name="CMND" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="NgaySinh" Nullable="true" Precision="23" />
+  </ComplexType>
+  <ComplexType Name="NT_NhanVienNT_Select_Result">
+    <Property Type="Int32" Name="IDNVNT" Nullable="false" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="DiaChi" Nullable="true" MaxLength="250" />
+    <Property Type="Int32" Name="Sdt" Nullable="true" />
+    <Property Type="String" Name="SoThe" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDNT" Nullable="true" />
+    <Property Type="DateTime" Name="NgayCap" Nullable="true" />
+    <Property Type="DateTime" Name="HanSuDung" Nullable="true" />
+    <Property Type="Int32" Name="TTLV" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="NT_NhanVienVP_Select_Result">
+    <Property Type="Int32" Name="IDNVVP" Nullable="false" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="CCCD" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="NgaySinh" Nullable="true" Precision="23" />
+    <Property Type="String" Name="LyDoCam" Nullable="true" MaxLength="200" />
+    <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="CMND" Nullable="true" MaxLength="50" />
+    <Property Type="DateTime" Name="CreateDay" Nullable="true" Precision="23" />
+    <Property Type="Int32" Name="CreateIDNV" Nullable="true" />
+    <Property Type="Int32" Name="TinhTrang" Nullable="true" />
+  </ComplexType>
+</Schema>

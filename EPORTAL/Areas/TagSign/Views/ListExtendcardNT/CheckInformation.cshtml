@@ -1,0 +1,179 @@
+﻿@model EPORTAL.ModelsTagSign.TK_CardExtendValidation
+@using EPORTAL.ModelsTagSign;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@using (Html.BeginForm("CheckInformation", "ListExtendcardNT", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.GHTID)
+    <div class="modal-dialog" id="form" style="margin-top: 7%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                @{
+                    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+                    var IDGHT = (int)ViewBag.ID;
+                    var ID = db_dk.DK_CardExtend.Where(x => x.IDGHT == IDGHT).FirstOrDefault();
+                    if (ID.LoaiNT == 1)
+                    {
+                        <fieldset id="SubmitForm">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">Kỹ thuật viên &nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.KTV, ViewBag.KTVList as SelectList, "----- Chọn KTV ký nháy -----", new { @id = "KTV", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.KTV, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">BP quản lý &nbsp; &nbsp;&nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.BPQL, ViewBag.TPBPList as SelectList, "----- Chọn Tr/P BP/NM -----", new { @id = "BPQL", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.BPQL, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">BP liên quan &nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.BPLQ, ViewBag.BPLQList as SelectList, "----- Chọn BPLQ -----", new { @id = "BPLQ", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.BPLQ, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">VP1C  &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.VP1C, ViewBag.VP1CList as SelectList, "----- Chọn CBNV VP1C -----", new { @id = "VP1C", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.VP1C, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-margin-top text-center">
+
+                                <input type="submit" value="Trình ký" class="btn btn-success pull-right" />
+                            </div>
+
+                        </fieldset>
+                    }
+                    else
+                    {
+                        <fieldset id="SubmitForm">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">BP quản lý &nbsp; &nbsp;&nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.KTV, ViewBag.TPBPList as SelectList, "----- Chọn Tr/P BP/NM -----", new { @id = "TPBP", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.KTV, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">TP P. HCĐN &nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.BPQL, ViewBag.TPHCDNList as SelectList, "----- Chọn Tr/P P. HCĐN-----", new { @id = "PHCDN", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.BPQL, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">BP liên quan &nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.BPLQ, ViewBag.BPLQList as SelectList, "----- Chọn BPLQ -----", new { @id = "BPLQ", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.BPLQ, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group" style="display:flex;width:100%;">
+                                        <div class="col-md-4" style="padding-top:1%;">
+                                            <span class="small mb-2" style="font-size:15px;">VP1C &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;: </span>
+                                        </div>
+                                        <div class="col-md-8" style="text-align:left;">
+                                            @Html.DropDownListFor(model => model.VP1C, ViewBag.VP1CList as SelectList, "----- Chọn CBNV VP1C -----", new { @id = "VP1CNN", @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.VP1C, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-margin-top text-center">
+
+                                <input type="submit" value="Trình ký" class="btn btn-success pull-right" />
+                            </div>
+
+                        </fieldset>
+                    }
+                }
+
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<script>
+    $(document).ready(function () {
+        $("#bnt-hide").click(function () {
+            $("p").hide();
+        });
+</script>
+<script type="text/javascript">
+
+    $("#KTV").chosen({
+        width: "100%"
+    });
+    $("#BPQL").chosen({
+        width: "100%"
+    });
+    $("#VP1C").chosen({
+        width: "100%"
+    });
+    $("#TPBP").chosen({
+        width: "100%"
+    });
+    $("#PHCDN").chosen({
+        width: "100%"
+    });
+    $("#VP1CNN").chosen({
+        width: "100%"
+    });
+        $("#BPLQ").chosen({
+        width: "100%"
+    }); 
+
+
+</script>
+
+
+
+
+

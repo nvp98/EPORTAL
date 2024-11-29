@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>E-Learning HPDQ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <meta name="description" content="This is an example dashboard created using build-in elements and components." />
+    <meta name="msapplication-tap-highlight" content="no" />
+    @*<link href="~/Content/main.css" rel="stylesheet" />
+        <link href="~/Content/backgroundHP.css" rel="stylesheet" />*@
+    <script src="~/Content/assets/plotly-latest.min.js"></script>
+    <script src="~/Content/jquery-3.0.0.min.js"></script>
+    <script src="~/Content/bootstrap.min.js"></script>
+    <link href="~/Content/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <script src="https://cdn.jwplayer.com/libraries/HV0iiS3W.js"></script>
+    <STYLE TYPE="text/css">
+        .breakhere {
+            page-break-after: always
+        }
+        tr {
+            page-break-inside: avoid !important;
+        }
+        .watermarked::before {
+            height: 100%;
+            width: 90%;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            z-index: 999;
+            opacity: 0.25;
+        }
+        .watermark1 {
+            color: black;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+        }
+        #watermark {
+            position: fixed;
+            top: 35%;
+            left: 105px;
+            transform: rotate(45deg);
+            transform-origin: 50% 50%;
+            opacity: .3;
+            font-size: 120px;
+            color: white;
+            width: 480px;
+            text-align: center;
+            background-color: black;
+        }
+        #background {
+            position: absolute;
+            display: block;
+            min-width: 100%;
+            opacity: 0.5;
+            text-align: center;
+            background-color: transparent;
+            padding-top: 50%;
+        }
+
+        #bg-text {
+            position: fixed;
+            color: lightgrey;
+            font-size: 120px;
+            opacity: 0.9;
+            filter: alpha(opacity=50);
+            background-color: transparent;
+        }
+        .watermarkss::before {
+            height: 95%;
+            width: 90%;
+            content: "E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background-repeat: repeat-y;
+            z-index: 9999;
+            opacity: 0.2;
+        }
+        .footer1 {
+            color: black;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+
+            page-break-after: always;
+
+        }
+    </STYLE>
+</head>
+<body class="" style="margin: 50px; font-size: .88rem; font-weight: 400; line-height: 1.5; color: #000000 !important; text-align: left; -webkit-print-color-adjust: exact !important; border: 0 ">
+    @*<div id="watermark"> E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd") E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd") E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")</div>*@
+    @*<div class="watermarked" data-watermark="E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")"></div>*@
+    @*<div class="bg-text">E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")</div>*@
+    @*<div id="background">
+            <p id="bg-text">Draft</p>
+        </div>*@
+    @*<div class="watermarkss" data-watermark="E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")"></div>*@
+    @*<div id="background">
+            <p id="bg-text">E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")  E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd") E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd") E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd") E-Learing Hòa Phát Dung Quất @DateTime.Now.ToString("yyyy-MM-dd")</p>
+        </div>*@
+    @*<div id="watermark">watemark</div>*@
+    @*<div class="footer1">Tài liệu này thuộc sở hữu của Hòa Phát Dung Quất. Việc phát tán, sử dụng trái phép bị nghiêm cấm</div>*@
+    @RenderBody()
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+﻿
+@{
+    ViewBag.Title = "Video";
+    Layout = "~/Areas/Publish/Views/Shared/_InternalLayout.cshtml";
+}
+@using EPORTAL.ModelsPublish
+@using System.Net
+@model PagedList.IPagedList<DocumentValidation>
+@using PagedList.Mvc
+@{
+    EPORTAL_DOCUMENTEntities db_doc = new EPORTAL_DOCUMENTEntities();
+}
+<head>
+
+
+    <title>Tin tức &#8211; Công ty CP Thép Hòa Phát Dung Quất</title>
+    <link rel="stylesheet" href="~/Areas/Publish/Content/assets/css/reset.css" />
+    @*<link rel="stylesheet" href="~/Layout/css/style_home.css" />*@
+
+    <style type="text/css">
+        img.wp-smiley,
+        img.emoji {
+            display: inline !important;
+            border: none !important;
+            box-shadow: none !important;
+            height: 1em !important;
+            width: 1em !important;
+            margin: 0 .07em !important;
+            vertical-align: -0.1em !important;
+            background: none !important;
+            padding: 0 !important;
+        }
+    </style>
+    <style id='woocommerce-inline-inline-css' type='text/css'>
+        .woocommerce form .form-row .required {
+            visibility: visible;
+        }
+    </style>
+
+
+    <link rel='stylesheet' id='custom-css' href='~/Areas/Publish/Content/Custom.css' type='text/css' media='all' />
+    <noscript>
+        <style>
+            .woocommerce-product-gallery {
+                opacity: 1 !important;
+            }
+        </style>
+    </noscript>
+    <link rel="stylesheet" href="~/Areas/Publish/Layout/css/style_home.css" />
+</head>
+<body>
+    <div class="show-list-posts">
+        <div style="display: flex; background: #00529C;">
+            <h1 class="title-vacancies" style="text-align: center; margin: auto; height: 100px; font-size: 30px; padding: 1.5%; "><i class="fa fa-pause-circle" aria-hidden="true" style="height:100px;"></i> VIDEO</h1>
+            <div class="col-md-9" style="padding: 1.5%;">
+                <div style="float: right; width: 60%; ">
+                    <div class="col-md-7">
+                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                    </div>
+                    <div class="col-md-5">
+                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="container">
+            <div class="row">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead style="background: #018bbf; color: white; text-transform: uppercase; height: 45px; font-weight: 700; ">
+                                    <tr>
+                                        <th width="30px" class="text-center">STT</th>
+                                        <th class="text-center" width="400px">Nội dung văn bản</th>
+                                        <th class="text-center" width="200px">Số văn bản</th>
+                                        <th class="text-center" width="200px">Ngày Upload</th>
+                                        <th class="text-center" width="200px">Ngày ban hành</th>
+                                        <th class="text-center" width="200px">Ngày kết thúc</th>
+                                        <th class="text-center" width="150px">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int pageno = (int)Model.PageNumber;
+                                        int itemperpage = (int)Model.PageSize;
+                                        int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                    }
+                                    @{
+                                        foreach (var item in Model)
+                                        {
+                                            <tr style="color:black;">
+                                                <th colspan="7" class="font-weight-bold">@item.TenVB</th>
+                                            </tr>
+
+                                            var ct = db_doc.VB_DetailDocument.Where(x => x.IDVB == item.IDVB).ToList();
+                                            foreach (var item1 in ct)
+                                            {
+                                                <tr style="color:black;">
+                                                    <td class="text-center">@RowNo@{RowNo++;}</td>
+                                                    <td>@item1.NoiDungVB</td>
+                                                    <td class="text-center">@item1.SoVB</td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            string date = item1.NgayVB.ToString();
+                                                            DateTime DayUpload = DateTime.Parse(date);
+                                                            @DayUpload.ToString("dd-MM-yyyy")
+                                                        }
+
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            string date1 = item1.NgayBĐ.ToString();
+                                                            DateTime DayUpload1 = DateTime.Parse(date1);
+                                                            @DayUpload1.ToString("dd-MM-yyyy")
+                                                        }
+
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            string date2 = item1.NgayKT.ToString();
+                                                            DateTime DayUpload2 = DateTime.Parse(date2);
+                                                            @DayUpload2.ToString("dd-MM-yyyy")
+                                                        }
+
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a class="" target="_blank" href="@Url.Content("~/UploadedFiles/PDFDangKyGH/")" style="color: black;"><i class="fa fa-download"> Download</i></a>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="pager">
+                                @Html.PagedListPager(Model, page => Url.Action("ISO", "HomeDBDT", new { area = "Publish", page }))
+                                <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    </div>
+
+
+</body>
+<style>
+    .show-list-posts {
+        margin-top: 46px;
+    }
+</style>
+
+

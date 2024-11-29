@@ -1,0 +1,141 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Areas/Publish/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Areas/Publish/Content/assets/css/PagedList.css" rel="stylesheet" />
+@model EPORTAL.ModelsDanhBaDoiTac.OverViewTDValidation
+
+
+@using (Html.BeginForm("Create", "ManageOverViewTD", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <script src="//cdn.ckeditor.com/4.19.0/full/ckeditor.js"></script>
+    <div class="app-main__outer">
+        <div class="app-main__inner">
+            <div class="app-page-title">
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon">
+                            <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                            </i>
+                        </div>
+                        <div>
+                            THÊM MỚI TỔNG QUAN TẬP ĐOÀN
+                            <div class="page-title-subheading">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card col-lg-12">
+                        <div class="modal-content">
+                            <div class="modal-body">
+
+
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                <fieldset id="SubmitForm">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Tiêu đề</label>
+                                                @Html.EditorFor(model => model.TieuDe, new { htmlAttributes = new { @class = "form-control", placeholder = "Tiêu đề", @id = "TieuDe" } })
+                                                @Html.ValidationMessageFor(model => model.TieuDe, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Nội Dung</label>
+                                                @Html.TextArea("NoiDung", null, new { @class = "form-control", @id = "NoiDung" })
+                                                @Html.ValidationMessageFor(model => model.NoiDung, "", new { @class = "text-danger" })
+                                            </div>
+                                            <script>
+                                                CKEDITOR.replace("NoiDung");
+                                            </script>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Chú thích số 1</label>
+                                                @Html.EditorFor(model => model.Note1, new { htmlAttributes = new { @class = "form-control", placeholder = "Chú thích số 1", @id = "Note1" } })
+                                                @Html.ValidationMessageFor(model => model.Note1, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Chú thích số 2</label>
+                                                @Html.EditorFor(model => model.Note2, new { htmlAttributes = new { @class = "form-control", placeholder = "Chú thích số 2", @id = "Note2" } })
+                                                @Html.ValidationMessageFor(model => model.Note2, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <fieldset id="SubmitForm">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputLastName">Tải hình ảnh lên </label>
+                                                    <input type="file" id="NameFile" name="NameFile" class="form-control" />
+                                                </div>
+                                                @Html.HiddenFor(model => model.HinhAnh, new { @id = "NameFile" })
+                                            </fieldset>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="btn-margin-top text-center">
+                                        <input type="submit" id="btnSubmit" value="Thêm Mới" class="btn btn-success button_submit" />
+                                        @Html.ActionLink("Quay Lại", "")
+                                    </div>
+                                </fieldset>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    function checkfile(sender) {
+        var validExts = new Array(".jpg", ".png", ".gif", ".bmp", ".tiff", ".jpeg", ".heic", ".raw", ".svg");
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            alert("Vui lòng chọn file hình ảnh: " +
+                validExts.toString() + "");
+            $('#NameFile').val() = '';
+            return false;
+        }
+        else { return true; }
+    };
+
+    $("#btnSubmit").on('click', function () {
+        var file = $('#NameFile').val();
+        if (file.length == 0) {
+            alert('Vui lòng chọn file hình ảnh.');
+            return false;
+        } else {
+            var validExts = new Array(".jpg", ".png", ".gif", ".bmp", ".tiff", ".jpeg", ".heic", ".raw", ".svg");
+            var fileExt = file;
+            fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+            if (validExts.indexOf(fileExt) < 0) {
+                alert("Vui lòng chọn file hình ảnh: " +
+                    validExts.toString() + "");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    });
+</script>
+
+
+
+

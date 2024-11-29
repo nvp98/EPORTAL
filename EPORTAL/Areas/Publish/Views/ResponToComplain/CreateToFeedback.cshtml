@@ -1,0 +1,150 @@
+﻿
+@{
+    ViewBag.Title = "CreateToFeedback";
+    Layout = "~/Areas/Publish/Views/Shared/_InternalLayout2.cshtml";
+}
+
+@using EPORTAL.ModelsDanhBaDoiTac
+@model EPORTAL.ModelsDanhBaDoiTac.RespondToComplaintsValidation
+<script src="//cdn.ckeditor.com/4.19.0/full/ckeditor.js"></script>
+<link rel="stylesheet" href="~/Layout/css/reset.css" />
+
+<link rel="stylesheet" href="~/Layout/css/style_home.css" />
+<body>
+    @using (Html.BeginForm("CreateToFeedback", "ResponToComplain", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="d_content s_main-content" style="">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card col-lg-12">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                <fieldset id="SubmitForm">
+                                    <div class="row">
+
+
+
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Mã Phản Hồi</label>
+                                                @Html.TextBox("MaPhanHoi", null, new { @class = "form-control", @readonly = "true" })
+                                                @Html.ValidationMessageFor(model => model.MaPhanHoi, "", new { @class = "text-danger" })
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Mã Khiếu Nại</label>
+                                                @Html.DropDownListFor(model => model.IDKhieuNai, ViewBag.KNList as SelectList, new { @class = "form-control", @id = "IDKhieuNai" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Tiêu Đề Phản Hồi</label>
+                                                @Html.EditorFor(model => model.TieuDePH, new { htmlAttributes = new { @class = "form-control", placeholder = "Tiêu Đề Phản Hồi", @id = "TieuDePH" } })
+                                                @Html.ValidationMessageFor(model => model.TieuDePH, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1">Nội Dung Phản Hồi</label>
+                                                @Html.TextArea("NoiDungPH", null, new { @class = "form-control", @id = "NoiDungPH" })
+                                                @Html.ValidationMessageFor(model => model.NoiDungPH, "", new { @class = "text-danger" })
+                                            </div>
+                                            <script>
+                                                CKEDITOR.replace("NoiDungPH");
+                                            </script>
+                                        </div>
+
+
+
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+
+                                                <label class="small mb-1">Nội Dung Phản Hồi Chi Tiết</label>
+
+                                                @*@Html.EditorFor(model => model.ImagePath, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ImagePath", @readonly = "true" } })*@
+                                                <div class="col-md-12">
+                                                    <input type="file" name="NotiFile" style="width:100%;" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                        @*<div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="small mb-1">ID Đối Tác</label>
+                                                    @Html.EditorFor(model => model.IDDoiTac, new { htmlAttributes = new { @class = "form-control", placeholder = "ID Đối Tác", @id = "IDDoiTac" } })
+                                                    @Html.ValidationMessageFor(model => model.IDDoiTac, "", new { @class = "text-danger" })
+
+                                                </div>
+                                            </div>*@
+
+
+
+
+
+
+                                    </div>
+                                    @{
+                                        DanhBaDoiTacEntities db_context1 = new DanhBaDoiTacEntities();
+                                        int id = Convert.ToInt32(@Url.RequestContext.RouteData.Values["id"]);
+                                        var ress = (from d in db_context1.DB_KhieuNai
+                                                                    .Where(y => y.IDKhieuNai == id)
+                                                    join e in db_context1.DB_TTDoiTac on d.IDDoiTac equals e.IDDoiTac
+                                                    join w in db_context1.DB_PhanHoiDoiTac on d.IDKhieuNai equals w.KhieuNaiID into IDPhanHoi
+                                                    join x in db_context1.DB_TinhTrangKhieuNai on d.IDTTKN equals x.IDTTKN
+                                                    select new ComplainValidation
+                                                    {
+                                                        IDKhieuNai = d.IDKhieuNai,
+                                                        MaKhieuNai = d.MaKhieuNai,
+                                                        NoiDungKN = d.NoiDungKN,
+                                                        FileDinhKem = d.FileDinhKem,
+                                                        NguoiKN = d.NguoiKN,
+                                                        IDDoiTac = e.IDDoiTac,
+                                                        IDBP = e.BPID,
+                                                        NgayKN = (DateTime)d.NgayKN,
+                                                        SLPH = IDPhanHoi.Count(),
+                                                        IDTTKN = (int)d.IDTTKN,
+                                                        TenTTKN = x.TenTTKN
+                                                    });
+                                    }
+                                    <div class="btn-margin-top text-center">
+                                        <input type="submit" value="Thêm Mới" class="btn btn-success button_submit" />
+                                        @Html.ActionLink("Quay Lại", "RespondComplainDetail", new { id = @Url.RequestContext.RouteData.Values["id"] })
+                                    </div>
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    }
+</body>
+<style>
+    .modal-body {
+        min-height: 680px
+    }
+
+    .d_content {
+        margin-top: 80px;
+        min-height: 835px
+    }
+</style>
+
+

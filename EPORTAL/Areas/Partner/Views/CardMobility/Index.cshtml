@@ -1,0 +1,325 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<CardMobilityValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsPartner;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_NTEntities db_nt = new EPORTAL_NTEntities();
+    var quyenAdd = (int)ViewBag.Quyen;
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách thẻ cơ động nhân viên nhà thầu
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-8 col-lg-8">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <span>
+                                            @Html.DropDownList("BPList", null, "----- Chọn nhà thầu -----", new { id = "IDNT", @class = "form-control", })
+                                        </span>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (quyenAdd != 0)
+                            {
+                                <div class="col-md-4 col-lg-4 ">
+
+                                    <button style="margin-right: 5px;" type="button" id="btn-Import" class="btn btn-primary m-l-auto pull-right"><i class="fa fa-upload">&nbsp;</i>&nbsp; Upload Excel </button>
+                                    <div class="modal" id="myModalImport" role="dialog" data-url='@Url.Action("ImportExcel","CardMobility")' style="margin-top: 50px;"></div>
+                                    &nbsp;
+                                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-right:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","CardMobility")' style="margin-top:50px"></div>
+                                    &nbsp;
+
+                                    &nbsp;
+                                </div>
+                            }
+
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            @if (quyenAdd != 0)
+                                            {
+                                                <th class="text-center" width="70px">Thao tác</th>
+                                            }
+
+
+                                            <th class="text-center" width="200px">Họ và tên</th>
+                                            <th class="text-center" width="150px">CMND/CCCD</th>
+                                            <th class="text-center" width="200px">Tên nhà thầu</th>
+                                            <th class="text-center" width="200px">Loại phương tiện</th>
+                                            <th class="text-center" width="200px">Hãng xe</th>
+                                            <th class="text-center" width="200px">Dòng xe</th>
+                                            <th class="text-center" width="200px">Màu sắc</th>
+                                            <th class="text-center" width="200px">Biển số</th>
+                                            <th class="text-center" width="400px">Hạn sử dụng</th>
+                                            <th class="text-center" width="200px">Số thẻ</th>
+                                            <th class="text-center" width="100px">Tình trạng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                   @if (quyenAdd != 0) { 
+                                                         <td class="text-center">
+                                                            <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "CardMobility", new { id = item.IDCD })"
+                                                               onclick="return confirm('Bạn muốn xóa Thông tin  : @item.HoTen')">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+                                                            <a id="btn-edit_@item.IDCD" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                            <div class="modal " id="myModaleEdit_@item.IDCD" role="dialog" data-url='@Url.Action("Edit", "CardMobility", new { id = item.IDCD })'></div>
+                                                            <script type="text/javascript">
+                                                                    $('#btn-edit_@item.IDCD').click(function () {
+                                                                        var url = $('#myModaleEdit_@item.IDCD').data('url');
+                                                                        $.get(url, function (data) {
+                                                                            $("#myModaleEdit_@item.IDCD").html(data);
+                                                                            $("#ModalTitle").html("Chỉnh sửa thông tin");
+                                                                            $("#myModaleEdit_@item.IDCD").modal('show');
+                                                                        });
+                                                                    });
+                                                            </script>
+                                                        </td>
+                                                   }
+                                                                
+
+                                                    <td>
+                                                        <a href="@Url.Action("Index", "HistoryCardMobility", new { idnv = item.IDNVNT})"> @item.HoTen</a>
+
+                                                    </td>
+                                                    <td>
+                                                        @item.CCCD
+                                                    </td>
+                                                    @{
+                                                        var NhaThau = db.NT_Partner.Where(x => x.ID == item.IDNT).FirstOrDefault();
+                                                        if (NhaThau != null)
+                                                        {
+                                                            <td>
+                                                                @NhaThau.FullName.ToString()
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td></td>
+                                                        }
+
+                                                    }
+                                                    <td>
+                                                        @item.LoaiPT
+                                                    </td>
+                                                    <td>
+                                                        @item.Hangxe
+                                                    </td>
+                                                    <td>
+                                                        @item.Dongxe
+                                                    </td>
+                                                    <td>
+                                                        @item.Mausac
+                                                    </td>
+                                                    <td>
+                                                        @item.Bienso
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @item.Tungay.ToString("dd-MM-yyyy")   &nbsp;  <i class="fa fa-arrows-h" aria-hidden="true"></i>   &nbsp;
+                                                        @if (item.Denngay == DateTime.Parse("0001/01/01"))
+                                                        {
+
+                                                            <span>Không thời hạn</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @item.Denngay.ToString("dd-MM-yyyy")
+                                                        }
+
+
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @item.Sothe
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @item.TenHD
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "CardMobility", new { area = "Partner", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm thẻ xe cơ động");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModalImport").html(data);
+            $("#ModalTitle").html("Thêm nhân viên nhà thầu");
+            $("#myModalImport").modal('show');
+        });
+    });
+    $("#btn-search").on('click', function () {
+        var IDNT = $('#IDNT').val();
+        var search = $('#txtsearch').val();
+        window.location.href = '@Url.Action("Index", "CardMobility")?search=' + search + '&IDNT=' + IDNT;
+    });
+    $('#btn-Export').click(function () {
+        window.location.href = '@Url.Action("ExportToExcel", "CardMobility")';
+    });
+    $('#btn-History').click(function () {
+        window.location.href = '@Url.Action("History", "ContractorStaff")';
+    });
+    $('#btn-Sync').click(function () {
+        window.location.href = '@Url.Action("Sync_NV", "EmployeeAPI_NT")';
+    });
+    $("#IDNT").chosen({
+        width: "100%"
+    });
+
+    $(document).ready(function () {
+        var dateNewFormat, onlyDate, today = new Date();
+
+        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        dateLastDate = prevMonthLastDate.getFullYear() + '-';
+        if (prevMonthLastDate.getMonth() >= 9) {
+
+            dateLastDate += (prevMonthLastDate.getMonth() + 1);
+        }
+        else {
+            dateLastDate += '0' + (prevMonthLastDate.getMonth() + 1);
+        }
+
+        onlyLastDate = prevMonthLastDate.getDate();
+
+        if (onlyLastDate.toString().length == 2) {
+
+            dateLastDate += "-" + onlyLastDate;
+        }
+        else {
+            dateLastDate += '-0' + onlyLastDate;
+        }
+
+
+
+        dateNewFormat = today.getFullYear() + '-';
+        if (today.getMonth() >= 9) {
+
+            dateNewFormat += (today.getMonth() + 1);
+        }
+        else {
+            dateNewFormat += '0' + (today.getMonth() + 1);
+        }
+
+        onlyDate = today.getDate();
+        if (onlyDate.toString().length == 2) {
+
+            dateNewFormat += "-" + onlyDate;
+        }
+        else {
+            dateNewFormat += '-0' + onlyDate;
+        }
+        if ($('#begind').val() == '') {
+            $('#begind').val(dateLastDate);
+        }
+        if ($('#endd').val() == '') {
+            $('#endd').val(dateNewFormat);
+        }
+    });
+</script>
+
+
+
+
+

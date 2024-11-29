@@ -1,0 +1,136 @@
+﻿@model EPORTAL.ModelsView360.NT_Authority
+
+@using (Html.BeginForm("Create", "ListAuthority", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên người đại diện</label>
+                                @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "FullName", @text = "" } })
+                                <span id="ErrorFullName" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Chức vụ</label>
+                                @Html.EditorFor(model => model.Position, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Position", @text = "" } })
+                                <span id="ErrorPosition" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">CCCD</label>
+                                @Html.EditorFor(model => model.CCCD, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "CCCD", @text = "" } })
+                                <span id="ErrorCCCD" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Email</label>
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Email", @text = "", @onchange = "ValidateEmail();" } })
+                                <span id="ErrorMail" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Số điện thoại</label>
+                                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Phone", @text = "", @onchange = "phonenumber();" } })
+                                <span id="ErrorSdt" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Đại diện nhà thầu</label>
+                                @Html.DropDownListFor(model => model.BPID, ViewBag.BPList as SelectList, "--Chọn nhà thầu--", new { @id = "BPID", @class = "form-control" })
+                            <span id="ErrorBPID" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày bắt đầu</label>
+                                @Html.TextBox("Begindate", null, new { @id = "Begindate", @type = "date", @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày kết thúc</label>
+                                @Html.TextBox("Enddate", null, new { @id = "Enddate", @type = "date", @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">File Scan ủy quyền</label>
+                                @*@Html.LabelFor(model => model.ImagePath, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                                <div class="col-md-10">
+                                    <input type="file" name="File" />
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-md-12">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <fieldset id="SubmitForm">
+                                <div class="form-group">
+                                    <label class="small mb-1" for="inputLastName">Tải lên File </label>
+                                    <input type="file" id="FileUpload" name="FileUpload" class="form-control" onchange="checkfile(this);" />
+                                </div>
+                            </fieldset>
+                        </div>*@
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+    $("#BPID").chosen({
+        width: "100%"
+    });
+    //$("#ChucVuID").chosen({
+    //    width: "100%"
+    //});
+    //$("#IDNhom").chosen({
+    //    width: "100%"
+    //});
+    //$("#IDViTri").chosen({
+    //    width: "100%"
+    //});
+
+</script>
+
+<script>
+    function checkfile(sender) {
+        var validExts = new Array(".pdf");
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            alert("Vui lòng chọn file Excel: " +
+                validExts.toString() + "");
+            $('#FileUpload').val() = '';
+            return false;
+        }
+        else { return true; }
+    };
+   
+</script>

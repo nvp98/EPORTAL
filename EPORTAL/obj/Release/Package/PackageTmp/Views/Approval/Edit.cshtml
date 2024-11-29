@@ -1,0 +1,59 @@
+﻿@model EPORTAL.Models.Approve
+
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+@using (Html.BeginForm("Edit", "Approval", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.id)
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhân Viên Ký Duyệt</label>
+                                @Html.DropDownListFor(model => model.idnhanvien, ViewBag.NVList as SelectList, new { @class = "form-control", @id = "IDNhanVien", @disabled = "disabled" })
+                                
+
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Loại Ký Duyệt</label>
+                                @Html.DropDownListFor(model => model.idloaikd, ViewBag.LKDList as SelectList, new { @class = "form-control", @id = "IDLKD"})
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+
+</script>

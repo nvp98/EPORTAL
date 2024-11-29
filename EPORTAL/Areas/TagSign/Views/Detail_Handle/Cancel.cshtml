@@ -1,0 +1,46 @@
+﻿@model EPORTAL.ModelsTagSign.NT_CarteTemporaireValidation
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@using (Html.BeginForm("Cancel", "Detail_Handle", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDTTT)
+    @Html.HiddenFor(x=>x.NoiDung)
+    @Html.HiddenFor(x=>x.NguoiTaoID)
+    @Html.HiddenFor(x=>x.NgayTao)
+    @Html.HiddenFor(x=>x.NTID)
+    @Html.HiddenFor(x=>x.PhongBanID)
+    @Html.HiddenFor(x=>x.HangMuc)
+    @Html.HiddenFor(x=>x.ThoiHan)
+    @Html.HiddenFor(x=>x.kyTruoc)
+    @Html.HiddenFor(x=>x.isNT)
+    @Html.HiddenFor(x=>x.FileHosoDK)
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Lý do hủy</label>
+                                @Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Contract", @text = "" } })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+

@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="EPORTALModelStoreContainer" CdmEntityContainer="EPORTALEntities">
+    <EntitySetMapping Name="AuthorizationUSERs">
+      <EntityTypeMapping TypeName="EPORTALModel.AuthorizationUSER">
+        <MappingFragment StoreEntitySet="AuthorizationUSER">
+          <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DangKies">
+      <EntityTypeMapping TypeName="EPORTALModel.DangKy">
+        <MappingFragment StoreEntitySet="DangKy">
+          <ScalarProperty Name="IDDK" ColumnName="IDDK" />
+          <ScalarProperty Name="TenDangNhap" ColumnName="TenDangNhap" />
+          <ScalarProperty Name="MatKhau" ColumnName="MatKhau" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="MaQuyen" ColumnName="MaQuyen" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="NhanViens">
+      <EntityTypeMapping TypeName="EPORTALModel.NhanVien">
+        <MappingFragment StoreEntitySet="NhanVien">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="MatKhau" ColumnName="MatKhau" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+          <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+          <ScalarProperty Name="DiaChi" ColumnName="DiaChi" />
+          <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+          <ScalarProperty Name="NgayVaoLam" ColumnName="NgayVaoLam" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IDTinhTrangLV" ColumnName="IDTinhTrangLV" />
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="IsGV" ColumnName="IsGV" />
+          <ScalarProperty Name="IDQuyen" ColumnName="IDQuyen" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Projects">
+      <EntityTypeMapping TypeName="EPORTALModel.Project">
+        <MappingFragment StoreEntitySet="Projects">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Images" ColumnName="Images" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="FilePDF" ColumnName="FilePDF" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PhongBans">
+      <EntityTypeMapping TypeName="EPORTALModel.PhongBan">
+        <MappingFragment StoreEntitySet="PhongBan">
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Quyens">
+      <EntityTypeMapping TypeName="EPORTALModel.Quyen">
+        <MappingFragment StoreEntitySet="Quyen">
+          <ScalarProperty Name="IDQuyen" ColumnName="IDQuyen" />
+          <ScalarProperty Name="TenQuyen" ColumnName="TenQuyen" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TinhTrangLVs">
+      <EntityTypeMapping TypeName="EPORTALModel.TinhTrangLV">
+        <MappingFragment StoreEntitySet="TinhTrangLV">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="TinhTrangLV1" ColumnName="TinhTrangLV" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Vitris">
+      <EntityTypeMapping TypeName="EPORTALModel.Vitri">
+        <MappingFragment StoreEntitySet="Vitri">
+          <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="AuthorizationUSER_delete" FunctionName="EPORTALModel.Store.AuthorizationUSER_delete" />
+    <FunctionImportMapping FunctionImportName="DangKy_delete" FunctionName="EPORTALModel.Store.DangKy_delete" />
+    <FunctionImportMapping FunctionImportName="DangKy_insert" FunctionName="EPORTALModel.Store.DangKy_insert" />
+    <FunctionImportMapping FunctionImportName="DangKy_ResetPass" FunctionName="EPORTALModel.Store.DangKy_ResetPass" />
+    <FunctionImportMapping FunctionImportName="DangKy_update" FunctionName="EPORTALModel.Store.DangKy_update" />
+    <FunctionImportMapping FunctionImportName="Nhanvien_insert_API" FunctionName="EPORTALModel.Store.Nhanvien_insert_API" />
+    <FunctionImportMapping FunctionImportName="NhanVien_select" FunctionName="EPORTALModel.Store.NhanVien_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.NhanVien_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="Nhanvien_update_API" FunctionName="EPORTALModel.Store.Nhanvien_update_API" />
+    <FunctionImportMapping FunctionImportName="PhongBan_insert" FunctionName="EPORTALModel.Store.PhongBan_insert" />
+    <FunctionImportMapping FunctionImportName="Project_delete" FunctionName="EPORTALModel.Store.Project_delete" />
+    <FunctionImportMapping FunctionImportName="Project_select" FunctionName="EPORTALModel.Store.Project_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.Project_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Images" ColumnName="Images" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+          <ScalarProperty Name="FilePDF" ColumnName="FilePDF" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="Project_select_USER" FunctionName="EPORTALModel.Store.Project_select_USER">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.Project_select_USER_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Images" ColumnName="Images" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+          <ScalarProperty Name="FilePDF" ColumnName="FilePDF" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="Projects_insert" FunctionName="EPORTALModel.Store.Projects_insert" />
+    <FunctionImportMapping FunctionImportName="Projects_update" FunctionName="EPORTALModel.Store.Projects_update" />
+    <FunctionImportMapping FunctionImportName="TaiKhoan_ID" FunctionName="EPORTALModel.Store.TaiKhoan_ID">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.TaiKhoan_ID_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IsGV" ColumnName="IsGV" />
+          <ScalarProperty Name="IDQuyen" ColumnName="IDQuyen" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="TaiKhoan_select" FunctionName="EPORTALModel.Store.TaiKhoan_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.TaiKhoan_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="IsGV" ColumnName="IsGV" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="TenQuyen" ColumnName="TenQuyen" />
+          <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="TaiKhoan_Update" FunctionName="EPORTALModel.Store.TaiKhoan_Update" />
+    <FunctionImportMapping FunctionImportName="TK_Update_Quyen" FunctionName="EPORTALModel.Store.TK_Update_Quyen" />
+    <FunctionImportMapping FunctionImportName="Vitri_insert" FunctionName="EPORTALModel.Store.Vitri_insert" />
+  </EntityContainerMapping>
+</Mapping>

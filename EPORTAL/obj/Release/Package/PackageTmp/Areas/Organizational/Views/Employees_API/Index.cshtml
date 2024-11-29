@@ -1,0 +1,253 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+
+@*@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/AdminLayout.cshtml";
+}*@
+@using SoDoToChuc.Models
+@using PagedList.Mvc
+@model PagedList.IPagedList<DataNhanVienAPI>
+@using EPORTAL.ModelsOrganizational
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        Quản lý thông tin Nhân viên
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-header">
+                        <label class="">Thông Tin</label>
+                        <div class="row" style="width:90%;justify-content:end">
+                            <button type="button" id="btn-Import" class="btn btn-success " style="margin-right:10px"><i class="fa fa-file-excel">&nbsp;</i>&nbsp;Nhập Danh sách </button>
+                            <span class="modal fade" id="myModalimport" role="dialog" data-url='@Url.Action("ImportExcel", "Employees_API")'></span>
+                          
+                            @{
+                                string manv = EPORTAL.Models.MyAuthentication.Username != null ? EPORTAL.Models.MyAuthentication.Username.ToString() : "";
+                                if (manv == "HPDQ18461" || manv == "HPDQ12806")
+                                {
+                                    <a title="Đồng bộ" href="@Url.Action("Sync", "Employees_API")" 
+                                       onclick="return confirm('Bạn muốn cập nhật dữ liệu nhân viên ')" style="width:100px;padding-top:5px">
+                                       <i class="fa fa-sync" aria-hidden="true"></i>
+                                        Đồng bộ
+                                    </a>
+                                }
+                            }
+
+
+                        </div>
+                    </div>    
+                    <div class="card-header ">
+                        <div class="col-md-5">
+                            <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                        </div>
+                        @*<span>*@
+                        @*<span class="col-md-2">
+                            @Html.DropDownList("MaNV", null, "----- Mã Nhân Viên ---", new { id = "MaNV", @class = "form-control", })
+                        </span>*@
+                        <div class="col-md-2">
+                            @Html.DropDownList("PBList", null, "---- Tên Bộ Phận ----", new { id = "IDPhongBan", @class = "form-control", })
+                        </div>
+
+
+                        <div class="col-md-2">
+                            @Html.DropDownList("MaVT", null, "---- Mã Vị Trí ----", new { id = "IDMaVT", @class = "form-control", })
+                        </div>
+
+                        <div class="col-md-1">
+                            <button type="button" style="width: 100px;" id="btsearch" class="btn btn-primary pull-left"><i class="fa fa-search">&nbsp;</i>&nbsp;Tìm kiếm </button>
+                        </div>
+                    </div>
+                        @*</span>*@
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="30px" class="text-center">STT</th>
+                                        <th class="text-center">Thao tác</th>
+                                        <th width="" class="text-center">Mã NV</th>
+                                        <th width="" class="text-center">Họ Tên </th>
+                                        <th width="" class="text-center">Vị trí</th>
+                                        <th width="" class="text-center">Bộ Phận</th>
+                                        @*<th width="" class="text-center">Tình trạng LV</th>*@
+                                        <th width="" class="text-center">Tổ làm việc</th>
+                                        <th width="" class="text-center">Phân Xưởng</th>
+                                        <th width="" class="text-center">Ca/Kíp</th>
+                                        <th width="" class="text-center">Mảng Công việc</th>
+                                        <th width="" class="text-center">Mã Vị Trí</th>
+                                        <th width="" class="text-center">Avatar</th>
+                                        <th width="" class="text-center">Sắp xếp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int pageno = (int)Model.PageNumber;
+                                        int itemperpage = (int)Model.PageSize;
+                                        int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        int index = 0;
+
+                                    }
+
+
+                                    @foreach (var item in Model)
+                                    {
+                                        index++;
+
+                                    <tr>
+                                        <td class="text-center">@RowNo@{RowNo++;}</td>
+                                        <td class="text-center">
+                                            <a id="btn-edit_@item.ID" href="#" title="Cập nhật" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                            <div class="modal fade" id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "Employees_API", new { id = item.ID })'></div>
+                                            <script type="text/javascript">
+                                                            $('#btn-edit_@item.ID').click(function () {
+                                                                var url = $('#myModaleEdit_@item.ID').data('url');
+                                                                $.get(url, function (data) {
+                                                                    $("#myModaleEdit_@item.ID").html(data);
+                                                                    $("#ModalTitle").html("Cập nhật Hình ảnh");
+                                                                    $("#myModaleEdit_@item.ID").modal('show');
+                                                                    $("#myModaleEdit_@item.ID").addClass('show');
+                                                                });
+                                                            });
+                                            </script>
+                                        </td>
+                                        <td class="text">@item.manv</td>
+                                        <td class="text">@item.hoten</td>
+                                        <td class="text">@item.vitri</td>
+                                        <td class="">@item.phongban</td>
+                                        @*<td class="text-center">@item.tinhtranglamviec</td>*@
+                                        <td class="">@item.tento</td>
+                                        <td class="">@item.tenphanxuong</td>
+                                        <td class="">@item.tenkip</td>
+                                        <td class="">@item.tennhom</td>
+                                        <td class="">@item.Mavitri</td>
+                                        <td class="text-center " style="max-width:100px">
+                                            @if (item.ImagePath != "" &&item.ImagePath !=null)
+                                            {
+                                                <img src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.ImagePath))"  class="d-block w-25 m-auto zoom" alt="" />
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (item.TT_BGD != 0)
+                                            {<span>@item.TT_BGD</span>}
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="pager">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", "Employees_API", new { page, IDPhongBan = Request.QueryString["IDPhongBan"], IDTinhTrangLV = Request.QueryString["IDTinhTrangLV"], IDMaVT =Request.QueryString["IDMaVT"] }))
+                                <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+    $("#btsearch").on('click', function () {
+     var search = $('#txtsearch').val();
+     var IDPhongBan = $('#IDPhongBan').val();
+     var MaNV = $('#MaNV').val();
+        var IDMaVT = $('#IDMaVT').val();
+        window.location.href = '@Url.Action("Index", "Employees_API")?IDPhongBan=' + IDPhongBan + '&IDMaVT=' + IDMaVT + '&search=' + search;
+    });
+    //$('#btn-sync').click(function () {
+    //    /* $("#myModal").html(data);*/
+    //    $("#ModalTitle").html("Thêm tài khoản");
+    //    $("#myModal").modal('show');
+    //    $("#loading-image").show();
+    //    var url = $('#btn-sync').href;
+    //    console.log(url);
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Employees_API/Sync",
+    //        beforeSend: function () {
+    //            $("#loading-image").show();
+    //        },
+    //        success: function (msg) {
+    //            /*$("#" + div_id).html(divIdHtml + msg);*/
+    //            $("#loading-image").hide();
+    //            $("#myModal").modal('hide');
+    //        }
+    //    });
+    //});
+    //$('#btn-add').click(function () {
+    //    var url = $('#myModal').data('url');
+    //    $.get(url, function (data) {
+    //        $("#myModal").html(data);
+    //        $("#ModalTitle").html("Thêm mới Thông Tin");
+    //        $("#myModal").modal('show');
+    //    });
+    //});
+    $('#btn-Import').click(function () {
+        var url = $('#myModalimport').data('url');
+        $.get(url, function (data) {
+            $("#myModalimport").html(data);
+            $("#ModalTitle").html("Thêm mới Thông Tin");
+            $("#myModalimport").modal('show');
+            $("#myModalimport").addClass('show');
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $("#MaNV").chosen({
+        width: "100%"
+    });
+    $("#IDMaVT").chosen({
+        width: "100%"
+    });
+</script>

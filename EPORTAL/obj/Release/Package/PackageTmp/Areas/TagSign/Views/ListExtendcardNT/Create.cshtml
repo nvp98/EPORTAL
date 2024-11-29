@@ -1,0 +1,382 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<DK_ListCardRegisInforNTValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+@using (Html.BeginForm("Create", "ListExtendcardNT", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="app-main__outer" style="margin-top: -3%;">
+        <div class="app-main__inner" style="display:block;">
+            <div class="app-page-title" style="margin-bottom: 15px;">
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon">
+                            <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                            </i>
+                        </div>
+                        <div>
+                            ĐƠN ĐỀ NGHỊ CẤP LẠI/ GIA HẠN/ ĐIỀU CHỈNH THÔNG TIN THẺ NGƯỜI
+                            <div class="page-title-subheading">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card">
+                        <div class="card-header" style="height: 250px;">
+                            <div class="row" style="width:100%">
+                                <div class="col-md-12 col-lg-12">
+                                    <h6><b>THÔNG TIN TRÌNH KÝ</b></h6>
+                                </div>
+                                <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
+                                    <span class="text-center" style="margin-top: 8px">Nội dung trích yếu <span style="color:red;">(*)</span> : </span>
+                                </div>
+                                <div class="col-md-12 col-lg-12" style="text-transform: math-auto;">
+                                    <textarea style="width: 100%;" type="text" id="NoiDung" name="NoiDung"></textarea>
+                                </div>
+                                <div class="col-md-12 col-lg-12">
+                                    <div class="row">
+                                        <span class="text-center" style="margin-top: 8px">Nhà thầu &nbsp;&nbsp;<span style="color:red;">(*)</span> : </span>
+                                        <div class="col-md-3">
+                                            @Html.DropDownList("IDNT", null, "--Chọn tên nhà thầu--", new { id = "IDNT", name = "IDNT", @class = "marginTB5", })
+                                        </div>
+                                        <span class="text-center" style="margin-top: 8px">Hợp đồng :</span>
+                                        <div class="col-md-2">
+                                            <select class="form-control marginTB5" name="IDHD" id="IDHD">
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12 col-lg-12" style=" padding-bottom: 1%;">
+                                    <div class="row">
+                                        <span class="text-center" style="margin-top: 8px">BP Quản lý  <span style="color:red;">(*)</span> : </span>
+                                        <div class="col-md-3">
+                                            @Html.DropDownList("IDPhongBan", null, "--Chọn tên BP/NM quản lý--", new { id = "IDPhongBan", name = "IDPhongBan", @class = "marginTB5", })
+                                        </div>
+                                        <span class="text-center" style="margin-top: 0.5%;">Người Việt Nam : &nbsp;</span>
+                                        <div class="col-md-1" style="margin-top: 0.5%;">
+                                            <input type="radio" id="nvn" name="NT" value="1">
+                                        </div>
+                                        <span class="text-center" style="margin-top: 0.5%;">Người Nước Ngoài : &nbsp;</span>
+                                        <div class="col-md-1" style="margin-top: 0.5%;">
+                                            <input type="radio" id="nnn" name="NT" value="2">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header" style="margin-top: 3.5%; border-bottom-width: 0px; margin-bottom: 3.5%;">
+                            <div class="row" style="width: 100%;">
+                                <div class="col-md-12 col-lg-12">
+                                    <div class="row">
+                                        <span class="text-center" style="margin-top: 8px">Chọn Folder ảnh <span style="color:red;">(*)</span> : &nbsp;</span>
+                                        <div class="col-md-2">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <fieldset id="SubmitForm">
+                                                <div class="form-group">
+                                                    <input type="file" id="FileExcel" name="FileAnh" class="form-control" onchange="checkfile(this);" />
+                                                </div>
+                                            </fieldset>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12 col-lg-12">
+                                    <div class="row">
+                                        <span class="text-center" style="margin-top: 8px">Chọn Excel<span style="color:red;">(*)</span> : &nbsp;</span>
+                                        <div class="col-md-2">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <fieldset id="SubmitForm">
+                                                <div class="form-group">
+                                                    <input type="file" id="FileExcel" name="FileExcel" class="form-control" onchange="checkfile(this);" />
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                        <div class="col-md-1.5">
+                                            <button type="submit" id="Imoprt" class="btn btn-primary " name="Imoprt"><i class="fa fa-upload">&nbsp;</i>&nbsp;Import Excel </button>
+                                        </div>
+                                        <div class="col-md-2">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <fieldset id="SubmitForm">
+                                                <div class="form-group">
+                                                    <a style="font-size:70%;" href="@Url.Action("DownloadExcel", "ListExtendcardNT")"> <i class="fa fa-download" aria-hidden="true"></i> Tải biểu mẫu Excel </a>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        @*<div style="margin-top: 1%; margin-left: 3%; height: 100px;">
+        </div>*@
+                        <div class="card-body">
+
+                            <div style="width:80vw;overflow-x:auto">
+                                <table class="table table-bordered table-hover" id="table" style="width:100vw" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" rowspan="2" style="vertical-align:middle">TT</th>
+                                            <th class="text-center" rowspan="2" width="300px" style="vertical-align:middle">Họ tên</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Ngày sinh</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">CMND/CCCD</th>
+                                            <th class="text-center" rowspan="2" width="250px" style="vertical-align:middle">Hộ khẩu thường trú</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Chức vụ</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Số điện thoại</th>
+                                            <th class="text-center" colspan="5" width="200px" style="vertical-align:middle">Chọn X</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Thời hạn thẻ</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Khu vực làm việc</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Cổng đăng ký ra/vào</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Nhóm NT</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Ghi chú</th>
+                                        </tr>
+                                        <tr>
+                                            <th width="70px" class="text-center">Cấp lại</th>
+                                            <th width="70px" class="text-center">Gia hạn</th>
+                                            <th width="70px" class="text-center">Đổi thông tin lưu trú</th>
+                                            <th width="70px" class="text-center">Bổ sung điện thoai thông minh</th>
+                                            <th width="70px" class="text-center">Bổ sung ra vào Cảng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int b = 0;
+                                        }
+                                    </tbody>
+                                    @*<tr id="vt">
+                                        <th colspan="14" class="font-weight-bold font-size-lg">
+                                            <button id="add-vt" type="button" class="btn btn-light border border-white"><i class="fas fa-plus"></i></button>
+
+                                        </th>
+                                    </tr>*@
+
+                                </table>
+
+                            </div>
+
+                            @*<input style="margin-top: 1%;" type="submit" value="Xác nhận" class="btn btn-primary pull-right " />*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="app-wrapper-footer">
+            <div class="app-footer">
+                <div class="app-footer__inner">
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+}
+
+
+
+<script>
+     $(document).ready(function () {
+            var i = 2;
+            $("#add-vt").click(function () {
+                var renderList = $(`<tr>
+                                                                        <td class='text-center delItem' > <i class="fa fa-trash" aria-hidden="true"></i> </td>
+                                                                        <td >
+                                                                            <textarea class='form-control' cols='20' id='HoTen_${i}' name='HoTen_${i}' placeholder='Họ và tên' rows='1'></textarea>
+                                                                            <span id="Errorfullname_${i}" style="color: red; text-transform: none; font-weight: normal "></span>
+                                                                        </td>
+
+                                                                         <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field BirthDay must be a number.' id='NgaySinh_${i}'  name='NgaySinh_${i}' placeholder='' type='date' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='BirthDay' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field CCCD must be a number.' id='CCCD_${i}'  name='CCCD_${i}' placeholder='CCCD' type='text' value=''>
+                                                                           <span class='field-validation-valid text-danger' data-valmsg-for='CCCD' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoKhau_${i}'  name='HoKhau_${i}' placeholder='Hộ khẩu thường trú' type='text' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                       <td style=''>
+                                                                            <select class="form-control marginTB5 SelectCV" name="ChucVu_${i}" id="ChucVu_${i}">
+                                                                              <option value ='null'>-Chức Vụ-</option>
+                                                                              @foreach (var item in ViewBag.IDCV)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_${i}'  name='SoDienThoai_${i}' placeholder='Số điện thoại' type='number' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                          <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='CapLai_${i}'  name='luutru_${i}' placeholder='' type='radio' value='1'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='GiaHan_${i}'  name='luutru_${i}' placeholder='' type='radio' value='2'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='LuuTru_${i}'  name='luutru_${i}' placeholder='' type='radio' value='3'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='DienThoaiTM_${i}'  name='luutru_${i}' placeholder='' type='radio' value='4'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='RaVaoCang_${i}'  name='luutru_${i}' placeholder='' type='radio' value='5'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field CreateDate must be a number.' id='ThoiHanThe_${i}'  name='ThoiHanThe_${i}' placeholder='' type='date' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='CreateDate' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                         <td style=''>
+                                                                            <select class="form-control marginTB5 SelectKV" name="KhuVucLamViec_${i}" id="KhuVucLamViec_${i}" multiple="multiple">
+                                                                              <option value ='null'>-Khu vực-</option>
+                                                                              @foreach (var item in ViewBag.IDKV)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                         <td style=''>
+                                                                            <select class="form-control marginTB5 SelectCong" name="Cong_${i}" id="Cong_${i}" multiple="multiple">
+                                                                              <option value ='null'>-Cổng-</option>
+                                                                              @foreach (var item in ViewBag.IDGate)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                         <td style=''>
+                                                                            <select class="form-control marginTB5 SelectNhom" name="NhomNT_${i}" id="NhomNT_${i}">
+                                                                              <option value ='null'>-Nhóm-</option>
+                                                                              @foreach (var item in ViewBag.IDGroup)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field Note must be a number.' id='GhiChu_${i}'  name='GhiChu_${i}' placeholder='Ghi chú' type='text' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='Note' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                    </tr>`);
+                i++;
+                $("#vt").before(renderList);
+                $(".SelectCong").chosen({
+                    width: "100%",
+                });
+                $("#table .chosen-search-input").val("Chọn cổng");
+                $(".SelectKV").chosen({
+                    width: "100%",
+                });
+                $("#table .chosen-search-input").val("Chọn khu vực");
+            });
+
+         $("#IDNT").change(function () {
+             const params = new URLSearchParams(window.location.search);
+             $.get("/ListCardRegisInforNT/GetHD", { IDNT: $("#IDNT").val() }, function (data) {
+                 console.log(data)
+                 if (data[0] != null) {
+                     $("#IDHD").empty();
+                     $("#IDHD").append("<option value ='" + null + "'>" + "--Chọn hợp đồng--" + "</option>")
+                     $.each(data, function (index, row) {
+                         console.log(row)
+                         $("#IDHD").append("<option value ='" + row.IDContract + "'>" + row.Somecontracts + "</option>")
+                     });
+                 }
+                 else {
+                     $("#IDHD").empty();
+                     $("#IDHD").append("<option value ='" + 0 + "'>" + "--Không hợp đồng--" + "</option>")
+                 }
+             });
+         });
+     });
+
+    $("#table").on("click", ".delItem", function () {
+        $(this).closest("tr").remove();
+    });
+
+
+
+</script>
+<script type="text/javascript">
+    $("#IDNT").chosen({
+        width: "100%"
+    });
+
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $('#btn-add-ds').click(function () {
+        var url = $('#myModal_add').data('url');
+        $.get(url, function (data) {
+            $("#myModal_add").html(data);
+            $("#ModalTitle").html("Thêm Dự án");
+            $("#myModal_add").modal('show');
+        });
+    });
+    $('#btn-Download').click(function () {
+        var url = $('#myModal_Download').data('url');
+        $.get(url, function (data) {
+            $("#myModal_Download").html(data);
+        });
+    });
+</script>
+
+
+
+
+
+

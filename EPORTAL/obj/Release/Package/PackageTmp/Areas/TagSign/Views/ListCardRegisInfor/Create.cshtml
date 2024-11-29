@@ -1,0 +1,98 @@
+﻿@model EPORTAL.ModelsTagSign.NT_CardRegistrationInforValidation
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@using (Html.BeginForm("Create", "ListCardRegisInfor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Trích yếu nội dung văn bản</label>
+                                @Html.EditorFor(model => model.Contents, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Contents", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhà thầu</label>
+                                @Html.DropDownListFor(model => model.ContractorsID, ViewBag.NTList as SelectList, "--Chọn nhà thầu--", new { @id = "ContractorsID", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.ContractorsID, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Hợp đồng</label>
+                                @Html.DropDownListFor(model => model.ContractID, ViewBag.HDList as SelectList, "--Chọn hợp đồng--", new { @id = "ContractID", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.ContractID, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày trình ký</label>
+                                @Html.TextBox("DayUpload", null, new { @id = "DayUpload", @type = "date", @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+
+                                @Html.EditorFor(model => model.Note, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Note" } })
+                                @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <fieldset id="SubmitForm">
+                                <div class="form-group">
+                                    <label class="small mb-1" for="inputLastName">Tải lên File </label>
+                                    <input type="file" id="FileUpload" name="FileUpload" class="form-control" onchange="checkfile(this);" />
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+                        <input type="reset" value="Hủy" class="btn btn-danger pull-right button_cancel mr-1" data-dismiss="modal" />
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    function checkfile(sender) {
+        var validExts = new Array(".pdf");
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            alert("Vui lòng chọn file Excel: " +
+                validExts.toString() + "");
+            $('#FileUpload').val() = '';
+            return false;
+        }
+        else { return true; }
+    };
+    $("#ContractorsID").chosen({
+        width: "100%"
+    });
+    $("#ContractID").chosen({
+        width: "100%"
+    });
+</script>
+

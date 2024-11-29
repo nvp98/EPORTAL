@@ -1,0 +1,62 @@
+﻿@model EPORTAL.ModelsPartner.ViolateValidation
+@using (Html.BeginForm("Edit", "Violate", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDNVVP)
+    <div class="modal-dialog" id="form" style="margin-top: 5%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Họ Và Tên</label>
+                                @Html.EditorFor(model => model.HoTen, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "HoTen", @text = "", @readonly = "readonly" } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">CMND/CCCD</label>
+                                @Html.EditorFor(model => model.CCCD, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "CCCD", @text = "", @readonly = "readonly" } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày Sinh</label>
+                                @Html.TextBox("NgaySinh", null, new { @id = "NgaySinh", @type = "date", @class = "form-control", @Value = ViewBag.NgaySinh })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Lý do cấm</label>
+                                @Html.EditorFor(model => model.LyDoCam, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "LyDoCam" } })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi Chú</label>
+                                @Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GhiChu", @text = "" } })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+

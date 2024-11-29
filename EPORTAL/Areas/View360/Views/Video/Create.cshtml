@@ -1,0 +1,91 @@
+﻿@model EPORTAL.ModelsView360.Video
+
+@using (Html.BeginForm("Create", "Video", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên Video</label>
+                                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Title", @text = "", @required = true } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Bộ Phận Yêu cầu</label>
+
+                                @Html.DropDownListFor(model => model.IDPhongBan, ViewBag.PBList as SelectList, "--Chọn Phòng Ban--", new { @id = "IDPhongBan", @class = "form-control", @required = true })
+                                @*@Html.ValidationMessageFor(model => model.V_TT, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày thực hiện</label>
+                                @Html.TextBox("Date", null, new { @id = "Date", @type = "date", @class = "form-control", @required = true })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Link truy cập</label>
+
+                                @Html.EditorFor(model => model.URL, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "URL", @required = true } })
+                                @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+
+                                @Html.EditorFor(model => model.Note, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Note" } })
+                                @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Hình Ảnh (Kích thước chuẩn 200px X 200px)</label>
+                                @*@Html.LabelFor(model => model.ImagePath, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                                <div class="col-md-10">
+                                    <input type="file" name="ImageFile"  require = true/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Album Video</label>
+
+                                @Html.DropDownListFor(model => model.AlbumID, ViewBag.ALList as SelectList, "--Chọn Album--", new { @id = "AlbumID", @class = "form-control", @required = true })
+                                @*@Html.ValidationMessageFor(model => model.V_TT, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        //$("#IDPhongBan").chosen({
+        //    width: "100%"
+        //});
+        //$("#AlbumID").chosen({
+        //    width: "100%"
+        //});
+    </script>
+}
+

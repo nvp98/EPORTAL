@@ -1,0 +1,328 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*@using EPORTAL.ModelsTagSign*@
+@model PagedList.IPagedList<DK_ListCardRegisInforNTValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsPartner;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    EPORTAL_NTEntities db_nt = new EPORTAL_NTEntities();
+    var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        ĐƠN ĐĂNG KÝ LÀM THẺ (THẺ RA VÀO TÍCH HỢP LƯU TRÚ/ ĐTTM)
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-10 col-lg-10">
+                                <div class="row">
+                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span>
+                                            @Html.DropDownList("IDList", null, "----- Chọn nhà thầu -----", new { id = "IDList", @class = "form-control", })
+                                        </span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th class="text-center" width="100px">Thao tác</th>
+                                            <th class="text-center" width="200px">Trích yếu nội dung văn bản</th>
+                                            <th class="text-center" width="200px">Nhân viên NT</th>
+                                            <th class="text-center" width="150px">Tài khoản</th>
+                                            <th class="text-center" width="200px">Nhà thầu</th>
+                                            <th class="text-center" width="200px">Hợp đồng</th>
+                                            <th class="text-center" width="100px">Tình trạng</th>
+                                            <th class="text-center" width="150px">Ngày trình ký</th>
+                                            <th class="text-center" width="100px">File đính kèm</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                    <td class="text-center">
+                                                        <a href="@Url.Action("Index", "Detail_ListCardRegisInfor", new { id = item.IDDKT })" class="btn-action" title="Chi tiết danh sách">
+                                                            <i class="fa-solid fa-bars"></i>
+                                                        </a>
+                                                        <a title="Luồng mới" class="btn-action" href="@Url.Action("Test_View", "ListCardRegisInforNT", new { id =item.IDDKT})">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+                                                        <a id="btn-edit_@item.IDDKT" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                        <div class="modal " id="myModaleEdit_@item.IDDKT" role="dialog" data-url='@Url.Action("Edit", "ListCardRegisInfor", new { id = item.IDDKT })'></div>
+                                                        <script type="text/javascript">
+                                                                $('#btn-edit_@item.IDDKT').click(function () {
+                                                                    var url = $('#myModaleEdit_@item.IDDKT').data('url');
+                                                                    $.get(url, function (data) {
+                                                                        $("#myModaleEdit_@item.IDDKT").html(data);
+                                                                        $("#ModalTitle").html("Cập nhật Thông Tin");
+                                                                        $("#myModaleEdit_@item.IDDKT").modal('show');
+                                                                    });
+                                                                });
+                                                        </script>
+                                                        @if (item.TinhTrangID == 2)
+                                                        {
+
+                                                            <a href="@Url.Action("TestView", "ListCardRegisInforNT", new { id =item.IDDKT})">
+                                                                <i class="fa fa-eye-slash"></i>
+                                                            </a>
+                                                        }
+                                                    </td>
+                                                    <td>@item.NoiDung</td>
+                                                    <td>
+                                                        @if (item.LoaiNT == 1)
+                                                        {
+                                                            <span>Người Việt Nam</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>Người Nước ngoài</span>
+                                                        }
+                                                    </td>
+                                                    @{
+                                                        var User = db_nt.NT_UserTemp.Where(x => x.ID == item.NhanVienID).FirstOrDefault();
+                                                        if (User != null)
+                                                        {
+                                                            <td>
+                                                                @User.UserName
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                            </td>
+                                                        }
+                                                    }
+                                                    <td>
+                                                        @{
+                                                            var IDNT = db.NT_Partner.Where(x => x.ID == item.NTID).FirstOrDefault();
+                                                        }
+                                                        @if (IDNT != null)
+                                                        {
+                                                            @IDNT.FullName
+                                                        }
+
+                                                    </td>
+
+                                                    <td>
+                                                        @if (item.HDID != 0 && item.HDID != 1)
+                                                        {
+                                                            var Name = db.NT_Contract.Where(x => x.IDContract == item.HDID).FirstOrDefault();
+                                                            <span>@Name.Somecontracts</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>Chưa có hợp đồng</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (item.TinhTrangID == 0)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowTheSiger", new { IDDKT = item.IDDKT})">Chưa trình ký</a>
+
+                                                        }
+                                                        else if (item.TinhTrangID == 1)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowTheSiger", new { IDDKT = item.IDDKT})">Đã trình ký</a>
+                                                            @*<td>Đang xử lý</td>*@
+                                                        }
+                                                        else if (item.TinhTrangID == 2)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowTheSiger", new { IDDKT = item.IDDKT})">Đã xử lý</a>
+                                                            @*<td>Đã xử lý</td>*@
+                                                        }
+                                                        else if (item.TinhTrangID == 3)
+                                                        {
+                                                            <a href="@Url.Action("Show", "FollowTheSiger", new { IDDKT = item.IDDKT})">Hủy trình ký</a>
+                                                            @*<td>Hủy trình ký</td>*@
+                                                        }
+                                                    </td>
+
+                                                    <td class="text-center">@item.NgayDangKy.ToString("dd-MM-yyyy")</td>
+
+                                                    <td class="text-center">
+                                                        @if (item.FileUpload != null && item.FileUpload.Length > 0)
+                                                        {
+
+                                                            <i class="fa-solid fa-eye mr-2"></i><a class="text-download" target="_blank" href="@Url.Content("~/PDFHocAT/" + System.IO.Path.GetFileName(item.FileUpload))">Xem file</a>
+                                                        }
+
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "ListCardRegisInfor", new { area = "TagSign", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm tiêu đề");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Add Permission");
+            $("#myModal").modal('show');
+        });
+    });
+     $("#btn-search").on('click', function () {
+         var search = $('#txtsearch').val();
+         var begind = Date.parse($('#begind').val());
+         var endd = Date.parse($('#endd').val());
+         var IDList = $('#IDList').val();
+         window.location.href = '@Url.Action("Index", "ListCardRegisInfor")?search=' + search + '&begind=' + $('#begind').val() + '&endd=' + $('#endd').val() + '&IDList=' + IDList;
+     });
+    $("#IDList").chosen({
+        width: "100%"
+    });
+    $(document).ready(function () {
+        var dateNewFormat, onlyDate, today = new Date();
+
+        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        dateLastDate = prevMonthLastDate.getFullYear() + '-';
+        if (prevMonthLastDate.getMonth() >= 9) {
+
+            dateLastDate += (prevMonthLastDate.getMonth() + 1);
+        }
+        else {
+            dateLastDate += '0' + (prevMonthLastDate.getMonth() + 1);
+        }
+
+        onlyLastDate = prevMonthLastDate.getDate();
+
+        if (onlyLastDate.toString().length == 2) {
+
+            dateLastDate += "-" + onlyLastDate;
+        }
+        else {
+            dateLastDate += '-0' + onlyLastDate;
+        }
+
+
+
+        dateNewFormat = today.getFullYear() + '-';
+        if (today.getMonth() >= 9) {
+
+            dateNewFormat += (today.getMonth() + 1);
+        }
+        else {
+            dateNewFormat += '0' + (today.getMonth() + 1);
+        }
+
+        onlyDate = today.getDate();
+        if (onlyDate.toString().length == 2) {
+
+            dateNewFormat += "-" + onlyDate;
+        }
+        else {
+            dateNewFormat += '-0' + onlyDate;
+        }
+        if ($('#begind').val() == '') {
+            $('#begind').val(dateLastDate);
+        }
+        if ($('#endd').val() == '') {
+            $('#endd').val(dateNewFormat);
+        }
+    });
+</script>
+
+
+
+
+
+

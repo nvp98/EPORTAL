@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<AuthorizationContractorsValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    var quyenAdd = (int)ViewBag.Quyen;
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách tài khoản
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+                                    <div class="col-md-3">
+                                        @Html.DropDownList("PBList", null, "Chọn BP/NM", new { id = "IDPhongBan", @class = "form-control", })
+                                    </div>
+                                    <div class="col-md-3">
+                                        @Html.DropDownList("KDList", null, "Chọn loại KD", new { id = "IDLKD", @class = "form-control", })
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (quyenAdd != 0)
+                            {
+                                <div class="col-md-3">
+
+                                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","DelegationPowers")' style="margin-top:50px"></div>
+
+                                    <button style="margin-right: 5px;" type="button" id="btn-Import" class="btn btn-primary m-l-auto pull-right"><i class="fa fa-upload">&nbsp;</i>&nbsp; Upload Excel </button>
+                                    <div class="modal" id="myModalImport" role="dialog" data-url='@Url.Action("ImportExcel","DelegationPowers")' style="margin-top: 50px;"></div>
+                                </div>
+                            }
+
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            @if (quyenAdd != 0)
+                                            {
+                                                <th class="text-center" width="100px">Thao tác</th>
+                                            }
+
+                                            <th class="text-center" width="200px">Mã nhân viên</th>
+                                            <th class="text-center" width="250px">Họ và tên</th>
+                                            <th class="text-center" width="200px">Phòng ban</th>
+                                            <th class="text-center" width="200px">Chức vụ đương nhiệm</th>
+                                            <th class="text-center" width="200px">Quyền</th>
+                                            <th class="text-center" width="200px">Chữ ký chính</th>
+                                            <th class="text-center" width="200px">Chữ ký nháy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                       @if (quyenAdd != 0) { 
+                                                                                                                      
+                                                            <td class="text-center">
+                                                                <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "DelegationPowers", new { id = item.ID })"
+                                                                   onclick="return confirm('Bạn muốn xóa Thông tin  : @item.HoVaTen')">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+
+                                                                <a id="btn-edit_@item.ID" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                                <div class="modal " id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "DelegationPowers", new { id = item.ID })'></div>
+                                                                <script type="text/javascript">
+                                                                    $('#btn-edit_@item.ID').click(function () {
+                                                                        var url = $('#myModaleEdit_@item.ID').data('url');
+                                                                        $.get(url, function (data) {
+                                                                            $("#myModal").html(data);
+                                                                            $("#ModalTitle").html("Cập nhật User");
+                                                                            $("#myModal").modal('show');
+                                                                        });
+                                                                    });
+                                                                </script>
+                                                            </td>
+                                                       }
+
+                                                    <td>@item.MaNV</td>
+                                                    <td>@item.HoVaTen</td>
+                                                    <td>@item.TenPhongBan</td>
+                                                    <td>
+                                                        @{
+                                                            string List = "";
+                                                            if (item.IDCVKN != null)
+                                                            {
+                                                                string[] arrListStr = item.IDCVKN.Split(',');
+                                                                foreach (var ar in arrListStr)
+                                                                {
+                                                                    int IPPB = Convert.ToInt32(ar);
+                                                                    var pb = db.PhongBans.Where(x => x.IDPhongBan == IPPB).FirstOrDefault();
+                                                                    List = String.Concat(pb.TenPhongBan + ", " + List);
+                                                                }
+                                                                @List
+                                                            }
+
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @{ 
+                                                            var KD = db.KD_LoaiKyDuyet.Where(x => x.IDLKD == item.IDLKD).FirstOrDefault();
+                                                            if(KD != null)
+                                                            { 
+                                                                @KD.TenLoaiKyDuyet
+                                                            }
+                                                        }
+                                                    </td>
+                                                    @{
+
+                                                        var ID = db.NhanViens.Where(x => x.ID == item.IDNhanVien).FirstOrDefault();
+                                                        <td class="text-center">
+                                                            @if (ID.Chukychinh != null)
+                                                            {
+                                                                <a target="_blank" href="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(ID.Chukychinh))"><i class="fa fa-download mr-3" style="margin-right : 0px;"></i>Ảnh ký chính</a>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @if (ID.Chukynhay != null)
+                                                            {
+                                                                <a target="_blank" href="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(ID.Chukynhay))"><i class="fa fa-download mr-3" style="margin-right : 0px;"></i>Ảnh ký nháy</a>
+                                                            }
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "DelegationPowers", new { area = "TagSign", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm User");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModalImport").html(data);
+            $("#ModalTitle").html("Thêm nhân viên nhà thầu");
+            $("#myModalImport").modal('show');
+        });
+    });
+    $("#btn-search").on('click', function () {
+        var IDPhongBan = $('#IDPhongBan').val(); 
+        var IDLKD = $('#IDLKD').val(); 
+        var search = $('#txtsearch').val();
+        window.location.href = '@Url.Action("Index", "DelegationPowers")?search=' + search + '&IDPhongBan=' + IDPhongBan + '&IDLKD=' + IDLKD;
+     });
+
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $("#IDLKD").chosen({
+        width: "100%"
+    });
+</script>
+
+
+
+
+

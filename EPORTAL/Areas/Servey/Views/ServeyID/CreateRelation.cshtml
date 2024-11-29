@@ -1,0 +1,336 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsServey
+@model DKNguoiThan
+@using PagedList.Mvc
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+<style>
+    input[type=checkbox] {
+        transform: scale(1.5);
+    }
+
+    /* Using css var aka custom properies, don't use them if you don't use tools such as postCss */
+    :root {
+        --color-blue: #5897fc;
+        --color-blue-grayed: #e0ecff;
+    }
+    /* First hide radios */
+    .questions input[type="radio"] {
+        display: none;
+    }
+
+    /* Generate new radio buttons, which we can style via css */
+    .questions label:before {
+        content: attr(data-question-number);
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 5px;
+    }
+    /* Applying styles when checking the buttons */
+    .questions input[type="radio"]:checked ~ label {
+        background-color: #87cefa;
+        border-color: var(--color-blue);
+    }
+
+        .questions input[type="radio"]:checked ~ label:before {
+            background-color: #ffffe0;
+            border-color: var(--color-blue);
+            /*color: white;*/
+        }
+
+    .questions label {
+        display: block;
+        cursor: pointer;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: white;
+        border: 2px solid white;
+        border-radius: 8px;
+        box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+    }
+
+    .questions__servey {
+        background-color: white;
+        min-height: 100px;
+        border: 2px solid white;
+        border-radius: 8px;
+        margin: 15px 0;
+        text-align: center;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+
+    .questions {
+        background-color: #e0f3ff;
+        padding: 20px;
+    }
+</style>
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <!--<div class="app-page-title">-->
+        @*<div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách khảo sát
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>*@
+        <!--</div>-->
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-10 col-lg-10">
+                            </div>
+                            <div class="col-md-2">
+                                @*<a class=" float-right btn btn-warning font-weight-bold" title="Xác nhận khảo sát" style="font-size:0.8rem" href="@Url.Action("XNServey", "ServeyID", new { IDSV = Model[0].IDSV ,IDNV = Model[0].IDNV })"
+                       onclick="return confirm('Xác nhận khảo sát? ')">
+                        <i class="fa-regular fa-square-check"></i>&nbsp;Xác nhận khảo sát
+                    </a>*@
+
+                                @*<button id="submit-all" type="button" class="btn btn-success border border-white float-right"><i class="fa fa-plus-circle"></i>&nbsp;Gửi kết quả</button>*@
+                                @*@if (Model[0].XNSV == true && Model[0].Status == false)*@
+                                @*{
+                        <div class="text-center"> <div class="btn btn-success m-l-auto font-size-lg font-weight-bold disabled">Đã gửi kết quả</div></div>
+                    }
+                    else
+                    {
+                        <div class="text-center"><input class="btn btn-success m-l-auto font-size-lg font-weight-bold" id="submitOT" type="button" value="Gửi kết quả" /></div>
+                    }*@
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="font-weight-bold">1. Form Đăng ký:</h4>
+                    @using (Html.BeginForm("ConfirmRe", "ServeyID", FormMethod.Post, new { id = "submit-op" }))
+                    {
+                        @*@Html.HiddenFor(model => Model[0].ID)*@
+                        @*@Html.HiddenFor(model => model.ID)*@
+                        @Html.HiddenFor(model => model.IDSV)
+                        <div class="btn-margin-top text-center">
+                            <input type="submit" id="submitButton" value="Gửi kết quả" onclick="disableButton()" class="btn btn-success button_submit fa-2x" />
+
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <div class="table-responsive">
+                                    <div class="questions">
+                                        <div class="questions__servey">
+                                            <h3 style="margin: revert;" class="font-weight-bold"> @ViewBag.TenDK</h3>
+                                        </div>
+                                        @{ var dem = 0; var n = 0;}
+
+                                    <div class="row col-12">
+
+                                        <div class="form-group col-12">
+                                            Người thân cùng công ty?
+                                            @Html.CheckBoxFor(m => m.IsChecked, new { @class = "fa-2x" })
+                                        </div>
+                                        <div class="col-md-12" id="cty" style="display:none">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Nhân viên</div>
+                                                @Html.DropDownListFor(model => model.IDNV, ViewBag.IDNV as SelectList, new { @class = "form-control", @id = "IDNV" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 nhap">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Họ và tên</div>
+                                                @Html.EditorFor(model => model.HoTen, new { htmlAttributes = new { @class = "form-control", placeholder = "HoTen", @id = "HoTen" } })
+                                                @Html.ValidationMessageFor(model => model.HoTen, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 nhap">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Số điện thoại</div>
+                                                @Html.EditorFor(model => model.DienThoai, new { htmlAttributes = new { @class = "form-control", placeholder = "Số điện thoại", @id = "DienThoai" } })
+                                                @Html.ValidationMessageFor(model => model.DienThoai, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 nhap">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Giới tính</div>
+                                                @Html.DropDownListFor(model => model.GioiTinh, ViewBag.LSOP as SelectList, new { @class = "form-control", @id = "GioiTinh", })
+
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 ">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Ngày Sinh</div>
+                                                @*@Html.EditorFor(model => model.NamSinh, new { htmlAttributes = new { @class = "form-control", placeholder = "Năm sinh", @id = "NamSinh" } })*@
+                                                @Html.TextBox("NamSinh", null, new { @id = "NamSinh", @type = "date", @class = "form-control", @required = true })
+                                                @Html.ValidationMessageFor(model => model.DienThoai, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                        @{
+                                            List<SelectListItem> selectListQHItems = new List<SelectListItem>
+                                                                        {
+                                                new SelectListItem { Text = "Vợ/Chồng", Value = "Vợ/Chồng" },
+                                                new SelectListItem { Text = "Con", Value = "Con" },
+                                                new SelectListItem { Text = "Khác", Value = "Khác" }
+                                            };
+                                        }
+                                        <div class="col-md-6 ">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Mối quan hệ</div>
+                                                @Html.DropDownListFor(model => model.QuanHe, selectListQHItems, new { @class = "form-control", @id = "QuanHe", })
+                                                @*@Html.EditorFor(model => model.NamSinh, new { htmlAttributes = new { @class = "form-control", placeholder = "Số điện thoại", @id = "DienThoai" } })*@
+                                                @*@Html.ValidationMessageFor(model => model.DienThoai, "", new { @class = "text-danger" })*@
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 ">
+                                            <div class="form-group">
+                                                <div class="small mb-1">Ghi chú</div>
+                                                @Html.DropDownListFor(model => model.GhiChu, ViewBag.GhiChu as SelectList, new { @class = "form-control", @id = "GhiChu", })
+
+                                            </div>
+                                        </div>
+                                        <div class="row col-12">
+
+
+                                            @*<div class="col-md-12">
+                <div class="form-group">
+                    <div class="font-weight-bold mb-1">Địa điểm gửi áo</div>
+                    @Html.DropDownListFor(model => model.IDDC, ViewBag.IDDC as SelectList, new { @class = "form-control", @id = "IDDC", })
+
+
+                </div>
+            </div>*@
+                                        </div>
+                                    </div>
+
+                                        @foreach (var gr in Model.listGroup)
+                                        {
+                                            var checkHide = gr.ID == 5 ? "d-none" : "";
+                                            dem++;
+                                            <div class="font-weight-bold font-size-xlg @checkHide">
+                                                @gr.TenNhom
+                                            </div>
+                                            for (int i = 0; i < gr.OptionList.OptionLS.Count; i++)
+                                            {
+                                                var k = i + 1; n++;
+                                                if (gr.OptionList.XNSV == true && gr.OptionList.Status == false)
+                                                {
+                                                    var checkShow = @gr.OptionList.OptionLS[i].isShow == 0 ? "d-none" : "";
+                                                    <div class="questions__question @checkHide @checkShow" style=@(gr.OptionList.XNSV ==true?"opacity:0.7":"")>
+                                                        @*@Html.RadioButtonFor(m => gr.OptionList.Answer, gr.OptionList.OptionLS[i].IDOT, new { id = @n, disabled = "disabled",})*@
+                                                        <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
+                                                        <label for="@k" data-question-number="@n" class="font-weight-bold">
+                                                            @gr.OptionList.OptionLS[i].ContentOT
+                                                            @if (gr.OptionList.OptionLS[i].FilePath != null && gr.OptionList.OptionLS[i].FilePath.Length > 0)
+                                                            {
+                                                                <a href="@Url.Content("~/UploadedFiles/FileServey/" + System.IO.Path.GetFileName(gr.OptionList.OptionLS[i].FilePath))" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>File đính kèm</a>
+                                                            }
+                                                        </label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    var checkShow = @gr.OptionList.OptionLS[i].isShow == 0 ? "d-none" : "";
+                                                    <div class="questions__question @checkHide @checkShow" style=@(gr.OptionList.XNSV ==true && gr.OptionList.Status == false?"opacity:0.7":"")>
+                                                        @*@Html.RadioButtonFor(m => gr.OptionList.Answer, gr.OptionList.OptionLS[i].IDOT, new { id = @n,  })*@
+                                       
+                                                        <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
+                                                        <label for="@n" data-question-number="@k" class="font-weight-bold">
+                                                            @gr.OptionList.OptionLS[i].ContentOT
+                                                            @if (gr.OptionList.OptionLS[i].FilePath != null && gr.OptionList.OptionLS[i].FilePath.Length > 0)
+                                                            {
+                                                                <a href="@Url.Content("~/UploadedFiles/FileServey/" + System.IO.Path.GetFileName(gr.OptionList.OptionLS[i].FilePath))" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>File đính kèm</a>
+                                                            }
+                                                        </label>
+                                                    </div>
+                                                }
+
+                                            }
+                                        }
+
+
+                                        @*<div class="questions__question">
+                                <input type="radio" name="answer" id="answer-2">
+                                <label for="answer-2" data-question-number="2">Kralj</label>
+                            </div>*@
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    }
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="app-wrapper-footer">
+            <div class="app-footer">
+                <div class="app-footer__inner">
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<script type="text/javascript">
+    function disableButton() {
+        document.getElementById("submitButton").disabled = true;
+        document.getElementById("submit-op").submit();
+    }
+    $("#IsChecked").on("change", function () {
+        // Check if the checkbox is checked
+        if ($(this).prop("checked")) {
+            $("#cty").css("display", "block");
+            $(".nhap").css("display", "none");
+            // Perform actions when the checkbox is checked
+        } else {
+            $("#cty").css("display", "none");
+            $(".nhap").css("display", "block");
+            // Perform actions when the checkbox is unchecked
+        }
+    });
+    $(" #IDNV").chosen({
+        width: "100%",
+
+    });
+</script>
+
+
+
+
+

@@ -1,0 +1,316 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsPartner
+@model PagedList.IPagedList<NT_AuthorityValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+
+    var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+    var quyenAdd = (int)ViewBag.Quyen;
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách người ủy quyền
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-8 col-lg-8">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.DropDownList("NTList", null, "Chọn nhà thầu", new { id = "IDNT", @class = "form-control", })
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (quyenAdd != 0)
+                            {
+                                <div class="col-md-4">
+
+                                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","ListAuthority")' style="margin-top:50px"></div>
+
+                                    <button type="button" id="btn-Export" class="btn btn-primary m-l-auto" style="margin-right: 10px; float: right"><i class="fa fa-download">&nbsp;</i>&nbsp;Download</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            @if (quyenAdd != 0)
+                                            {
+                                                <th class="text-center" width="100px">Thao tác</th>
+                                            }
+                                            <th class="text-center">Người ủy quyền</th>
+                                            <th class="text-center">Chức vụ</th>
+                                            <th class="text-center">CCCD</th>
+                                            <th class="text-center">Số điện thoại</th>
+                                            <th class="text-center" width="500px">Đại diện nhà thầu</th>
+                                            <th class="text-center">Ngày bắt đầu</th>
+                                            <th class="text-center">Ngày kết thúc</th>
+                                            <th class="text-center" width="90px">File ủy quyền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                    @if(quyenAdd != 0)
+                                                    { 
+                                                        <td class="text-center">
+                                                            <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "ListAuthority", new { id = item.ID })"
+                                                               onclick="return confirm('Bạn muốn xóa Thông tin  : @item.FullName')">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+
+                                                            <a id="btn-edit_@item.ID" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                            <div class="modal " id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "ListAuthority", new { id = item.ID })'></div>
+                                                            <script type="text/javascript">
+                                                                $('#btn-edit_@item.ID').click(function () {
+                                                                    var url = $('#myModaleEdit_@item.ID').data('url');
+                                                                    $.get(url, function (data) {
+                                                                        $("#myModal").html(data);
+                                                                        $("#ModalTitle").html("Cập nhật Thông Tin");
+                                                                        $("#myModal").modal('show');
+                                                                    });
+                                                                });
+                                                            </script>
+                                                        </td>
+                                                    }
+                                                    <td>@item.FullName</td>
+                                                    <td>@item.Position</td>
+                                                    <td>@item.CCCD</td>
+                                                    <td>@item.Phone</td>
+                                                    <td>
+                                                        @{
+                                                            var nt = db.NT_Partner.Where(x => x.BPID == item.BPID).FirstOrDefault();
+                                                            var a = " - ";
+                                                            if (nt != null)
+                                                            {@item.BPID @a @nt.FullName }
+
+
+
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @{if (item.Begindate.HasValue)
+                                                            {
+                                                                @item.Begindate.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @{if (item.Enddate.HasValue)
+                                                            {
+                                                                @item.Enddate.Value.ToString("dd-MM-yyyy")
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if (item.File_Scan != null && item.File_Scan.Length > 0)
+                                                        {
+                                                           
+                                                            <a target="_blank" href="@Url.Content("~/UploadedFiles/Authority/" + System.IO.Path.GetFileName(item.File_Scan))"><i class="fa fa-download mr-3" style="margin-right : 0px;"></i>Tải về</a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "ListAuthority", new { area = "Partner", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+
+    $("#IDNT").chosen({
+        width: "100%"
+    });
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm người đại diện");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm người đại diện");
+            $("#myModal").modal('show');
+        });
+    });
+    $("#btn-search").on('click', function () {
+        var IDNT = $('#IDNT').val();
+        var search = $('#txtsearch').val();
+        window.location.href = '@Url.Action("Index", "ListAuthority")?search=' + search + '&IDNT=' + IDNT;
+     });
+    $('#btn-Export').click(function () {
+
+        window.location.href = '@Url.Action("ExportToExcel", "ListAuthority")';
+    });
+    function phonenumber() {
+        var phoneno = /^\d{10}$/;
+        var ErrorSdt = document.getElementById("ErrorSdt");
+        ErrorSdt.innerHTML = "";
+        if ($('#Phone').val() != "") {
+            if (!$('#Phone').val().match(phoneno)) {
+                //alert("SĐT bị sai, Vui lòng nhập lại!");
+                ErrorSdt.innerHTML = "SĐT bị sai, Vui lòng nhập lại!";
+                return false;
+            }
+        }
+        return true;
+    }
+    function ValidateEmail() {
+
+        var reg = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        var email = $('#Email').val();
+        var ErrorMail = document.getElementById("ErrorMail");
+        ErrorMail.innerHTML = "";
+        if (email != "") {
+            if (!reg.test(email)) {
+                //alert('Sai định dạng email, vui lòng nhập lại!');
+                ErrorMail.innerHTML = "Sai định dạng email, vui lòng nhập lại!";
+                return false;
+            }
+        }
+        return true;
+    };
+    function submitForm(event) {
+        var ErrorFullName = document.getElementById("ErrorFullName");
+        var ErrorPosition = document.getElementById("ErrorPosition");
+        var ErrorCCCD = document.getElementById("ErrorCCCD");
+        var ErrorSdt = document.getElementById("ErrorSdt");
+        var ErrorBPID = document.getElementById("ErrorBPID");
+
+        if ($('#FullName').val() == "") {
+            ErrorFullName.innerHTML = "Vui lòng nhập tên người đại diện!";
+            event.preventDefault();
+            return false;
+        } else { ErrorFullName.innerHTML = "" };
+
+        if ($('#Position').val() == "") {
+            ErrorPosition.innerHTML = "Vui lòng nhập chức vụ!";
+            event.preventDefault();
+            return false;
+        } else { ErrorPosition.innerHTML = "" };
+
+        if ($('#CCCD').val() == "") {
+            ErrorCCCD.innerHTML = "Vui lòng nhập CCCD!";
+            event.preventDefault();
+            return false;
+        } else { ErrorCCCD.innerHTML = "" };
+
+        if ($('#Phone').val() == "") {
+            ErrorSdt.innerHTML = "Vui lòng nhập CCCD!";
+            event.preventDefault();
+            return false;
+        } else { ErrorSdt.innerHTML = "" };
+
+        if ($('#BPID').val() == "") {
+            ErrorBPID.innerHTML = "Vui lòng chọn nhà thầu đại diện!";
+            event.preventDefault();
+            return false;
+        } else { ErrorBPID.innerHTML = "" };
+
+        if (ValidateEmail() == false) {
+            event.preventDefault();
+            return false;
+        }
+        if (phonenumber() == false) {
+            event.preventDefault();
+            return false;
+        }
+        var Begindate = Date.parse($('#Begindate').val());
+        var Enddate = Date.parse($('#Enddate').val());
+        if (Enddate < Begindate) {
+            alert('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu');
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    };
+</script>
+
+
+
+
+

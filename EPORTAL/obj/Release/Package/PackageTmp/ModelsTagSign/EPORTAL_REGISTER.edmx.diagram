@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="3fb95616b4a64f9b817338ae012de45e" Name="Diagram1">
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.DK_CardRegistrationInfor" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.DK_DetailCardRegistrationInfor" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.DK_CardExtend" Width="1.5" PointX="5.375" PointY="0.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.DK_DetailCardExtend" Width="1.5" PointX="5.375" PointY="4.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.TK_CardExtend" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.TK_CardRegistrationInfor" Width="1.5" PointX="2.75" PointY="6.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.CollectMoney" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.Detail_RegisterPeople" Width="1.5" PointX="7.375" PointY="3.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.Flow" Width="1.5" PointX="9.375" PointY="0.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.RegisterPeople" Width="1.5" PointX="9.375" PointY="3.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.SignerType" Width="1.5" PointX="7.5" PointY="9.25" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.SignOff_Flow" Width="1.5" PointX="9.375" PointY="8.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

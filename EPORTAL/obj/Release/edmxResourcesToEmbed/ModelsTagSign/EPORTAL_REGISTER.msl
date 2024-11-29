@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="EPORTAL_REGISTERModelStoreContainer" CdmEntityContainer="EPORTAL_REGISTEREntities">
+    <EntitySetMapping Name="DK_CardRegistrationInfor">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_CardRegistrationInfor">
+        <MappingFragment StoreEntitySet="DK_CardRegistrationInfor">
+          <ScalarProperty Name="IDDKT" ColumnName="IDDKT" />
+          <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+          <ScalarProperty Name="NTID" ColumnName="NTID" />
+          <ScalarProperty Name="HDID" ColumnName="HDID" />
+          <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+          <ScalarProperty Name="NgayDangKy" ColumnName="NgayDangKy" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+          <ScalarProperty Name="FileUpload" ColumnName="FileUpload" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="LoaiNT" ColumnName="LoaiNT" />
+          <ScalarProperty Name="FileComplete" ColumnName="FileComplete" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DK_DetailCardRegistrationInfor">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_DetailCardRegistrationInfor">
+        <MappingFragment StoreEntitySet="DK_DetailCardRegistrationInfor">
+          <ScalarProperty Name="IDCTDK" ColumnName="IDCTDK" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+          <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+          <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
+          <ScalarProperty Name="ChucVu" ColumnName="ChucVu" />
+          <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
+          <ScalarProperty Name="TheLuuTru" ColumnName="TheLuuTru" />
+          <ScalarProperty Name="TheRaVaoKLH" ColumnName="TheRaVaoKLH" />
+          <ScalarProperty Name="DienThoaiTM" ColumnName="DienThoaiTM" />
+          <ScalarProperty Name="RaVaoCang" ColumnName="RaVaoCang" />
+          <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
+          <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
+          <ScalarProperty Name="Cong" ColumnName="Cong" />
+          <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="IDDKT" ColumnName="IDDKT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Delete" />
+    <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Insert" />
+    <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Update" />
+    <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Delete" />
+    <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Insert" />
+    <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Update" />
+    <EntitySetMapping Name="DK_CardExtend">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_CardExtend">
+        <MappingFragment StoreEntitySet="DK_CardExtend">
+          <ScalarProperty Name="FileComplete" ColumnName="FileComplete" />
+          <ScalarProperty Name="LoaiNT" ColumnName="LoaiNT" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="NgayDangKy" ColumnName="NgayDangKy" />
+          <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+          <ScalarProperty Name="HDID" ColumnName="HDID" />
+          <ScalarProperty Name="NTID" ColumnName="NTID" />
+          <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+          <ScalarProperty Name="IDGHT" ColumnName="IDGHT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DK_DetailCardExtend">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_DetailCardExtend">
+        <MappingFragment StoreEntitySet="DK_DetailCardExtend">
+          <ScalarProperty Name="IDGHT" ColumnName="IDGHT" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
+          <ScalarProperty Name="Cong" ColumnName="Cong" />
+          <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
+          <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
+          <ScalarProperty Name="RaVaoCang" ColumnName="RaVaoCang" />
+          <ScalarProperty Name="DTTM" ColumnName="DTTM" />
+          <ScalarProperty Name="ThongTinLuuTru" ColumnName="ThongTinLuuTru" />
+          <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+          <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+          <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
+          <ScalarProperty Name="ChucVu" ColumnName="ChucVu" />
+          <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
+          <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+          <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="IDCTGH" ColumnName="IDCTGH" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="DK_CardExtend_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Delete" />
+    <FunctionImportMapping FunctionImportName="DK_CardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Insert" />
+    <FunctionImportMapping FunctionImportName="DK_CardExtend_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Update" />
+    <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Delete" />
+    <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Insert" />
+    <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Update" />
+    <EntitySetMapping Name="TK_CardExtend">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.TK_CardExtend">
+        <MappingFragment StoreEntitySet="TK_CardExtend">
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+          <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+          <ScalarProperty Name="GHTID" ColumnName="GHTID" />
+          <ScalarProperty Name="IDTKGHT" ColumnName="IDTKGHT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TK_CardRegistrationInfor">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.TK_CardRegistrationInfor">
+        <MappingFragment StoreEntitySet="TK_CardRegistrationInfor">
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+          <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+          <ScalarProperty Name="DKTID" ColumnName="DKTID" />
+          <ScalarProperty Name="IDTKDKT" ColumnName="IDTKDKT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Insert" />
+    <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_UpdateTK" />
+    <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_UpdateTK" />
+    <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Cancel" />
+    <FunctionImportMapping FunctionImportName="DK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_UpdateTK" />
+    <FunctionImportMapping FunctionImportName="TK_CardExtend_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_Cancel" />
+    <FunctionImportMapping FunctionImportName="TK_CardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_Insert" />
+    <FunctionImportMapping FunctionImportName="TK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_UpdateTK" />
+    <FunctionImportMapping FunctionImportName="DK_CardExtend_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Up" />
+    <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Up" />
+    <EntitySetMapping Name="CollectMoneys">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CollectMoney">
+        <MappingFragment StoreEntitySet="CollectMoney">
+          <ScalarProperty Name="TongSoTien" ColumnName="TongSoTien" />
+          <ScalarProperty Name="TongSoThe" ColumnName="TongSoThe" />
+          <ScalarProperty Name="SoPhieuThu" ColumnName="SoPhieuThu" />
+          <ScalarProperty Name="NgayThu" ColumnName="NgayThu" />
+          <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
+          <ScalarProperty Name="ID_PT" ColumnName="ID_PT" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Detail_RegisterPeople">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.Detail_RegisterPeople">
+        <MappingFragment StoreEntitySet="Detail_RegisterPeople">
+          <ScalarProperty Name="Price" ColumnName="Price" />
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
+          <ScalarProperty Name="CongLamViec" ColumnName="CongLamViec" />
+          <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
+          <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
+          <ScalarProperty Name="ChuyenNT" ColumnName="ChuyenNT" />
+          <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+          <ScalarProperty Name="BoSungCong" ColumnName="BoSungCong" />
+          <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+          <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+          <ScalarProperty Name="SoDienThoai_QuanLy" ColumnName="SoDienThoai_QuanLy" />
+          <ScalarProperty Name="HoTen_QuanLy" ColumnName="HoTen_QuanLy" />
+          <ScalarProperty Name="Ten_NTP" ColumnName="Ten_NTP" />
+          <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
+          <ScalarProperty Name="CV_ID" ColumnName="CV_ID" />
+          <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
+          <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+          <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+          <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
+          <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
+          <ScalarProperty Name="ID_CT_DKTN" ColumnName="ID_CT_DKTN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Flows">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.Flow">
+        <MappingFragment StoreEntitySet="Flow">
+          <ScalarProperty Name="TenXuLy" ColumnName="TenXuLy" />
+          <ScalarProperty Name="ID_XL" ColumnName="ID_XL" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="RegisterPeoples">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.RegisterPeople">
+        <MappingFragment StoreEntitySet="RegisterPeople">
+          <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
+          <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+          <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+          <ScalarProperty Name="File_IMG" ColumnName="File_IMG" />
+          <ScalarProperty Name="File_CCAT" ColumnName="File_CCAT" />
+          <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+          <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+          <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+          <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+          <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+          <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+          <ScalarProperty Name="ID_DKTN" ColumnName="ID_DKTN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SignerTypes">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.SignerType">
+        <MappingFragment StoreEntitySet="SignerType">
+          <ScalarProperty Name="TenLoai" ColumnName="TenLoai" />
+          <ScalarProperty Name="ID_LTK" ColumnName="ID_LTK" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SignOff_Flow">
+      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.SignOff_Flow">
+        <MappingFragment StoreEntitySet="SignOff_Flow">
+          <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+          <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+          <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="LuongXuLy" ColumnName="LuongXuLy" />
+          <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+          <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
+          <ScalarProperty Name="ID_TK_TN" ColumnName="ID_TK_TN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Delete" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Delete" />
+    <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Insert" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Insert" />
+    <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Price" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Price" />
+    <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Update" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Update" />
+    <FunctionImportMapping FunctionImportName="RegisterPeople_Delete" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Delete" />
+    <FunctionImportMapping FunctionImportName="RegisterPeople_Insert" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Insert" />
+    <FunctionImportMapping FunctionImportName="RegisterPeople_Update" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Update" />
+    <FunctionImportMapping FunctionImportName="RegisterPeople_UpdateFlow" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_UpdateFlow" />
+    <FunctionImportMapping FunctionImportName="SignOff_Flow_Delete" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Delete" />
+    <FunctionImportMapping FunctionImportName="SignOff_Flow_Insert" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Insert" />
+    <FunctionImportMapping FunctionImportName="SignOff_Flow_Update" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Update" />
+    <FunctionImportMapping FunctionImportName="TK_CarteTemp_Delete" FunctionName="EPORTAL_REGISTERModel.Store.TK_CarteTemp_Delete" />
+  </EntityContainerMapping>
+</Mapping>

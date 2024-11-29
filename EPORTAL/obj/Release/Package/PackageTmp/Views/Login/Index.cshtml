@@ -1,0 +1,85 @@
+﻿@{
+    Layout = null;
+}
+@model EPORTAL.Models.LoginValidation
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome-free-6.0.0-web/css/all.min.css" rel="stylesheet" />
+    <link href="~/Content/login.css" rel="stylesheet" />
+</head>
+<body class="bg-login" onselectstart="return false" oncontextmenu="return false">
+    @if (TempData["msgSuccess"] != null)
+        {
+            @Html.Raw(TempData["msgSuccess"])
+        }
+    @if (TempData["msgError"] != null)
+    {
+        @Html.Raw(TempData["msgError"])
+    }
+    <div id="bg_container">
+        <iframe class="ku-embed" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="https://kuula.co/share/collection/7qVVl?logo=1&info=0&logosize=40&fs=1&vr=1&zoom=1&autorotate=0.1&autop=10&autopalt=1&thumbs=4"></iframe>
+
+    </div>
+    <div id="content">
+        <div class="container" style="height:100vh">
+            <div class="main-content">
+                <div class="content-centered">
+                    <div class="card shadow-lg border-0 rounded-lg" style="">
+                        <div class="card-header">
+                            <img src="~/Content/images/logo-inverse.png" style="width:100%; height:auto; max-width:230px; margin: 0 auto;" />
+                        </div>
+                        <div class="card-body">
+                            <p class="text-center" style="margin:0 auto;padding:0">CÔNG TY CỔ PHẦN THÉP HÒA PHÁT </p>
+                            <p class="text-center" style="margin: 0 auto; padding: 0px 0px 10px 0px; font-size: 25px; color: #027bb9">DUNG QUẤT</p>
+                            @using (Html.BeginForm("LoginUser", "Login", new { id = "myForm" }))
+                            {
+                                <div class="form-group">
+                                    <label class="small mb-1" for="inputEmailAddress">Tài khoản <span class="text-danger">(* Nhập mã nhân viên )</span></label>
+                                    <div class="login__field">
+                                        <i class="login__icon fas fa-user"></i>
+                                       @Html.TextBoxFor(m => m.MaNV, new { @class = "form-control", @placeholder = "Mã nhân viên" })
+                                       @Html.ValidationMessageFor(m => m.MaNV, "", new { @class = "text-danger" })
+                                        <div id="show_error_user"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="small mb-1" for="inputPassword">Mật khẩu <span class="text-danger">(* Nhập Mật khẩu)</span></label>
+                                    <div class="login__field">
+                                        <i class="login__icon fas fa-lock"></i>
+                                        @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control", @placeholder = "Mật khẩu" })
+                                        @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger" })
+                                        <div id="show_error_pass"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button id="LoginUser" type="submit" class="form-control submit px-3"><strong>Đăng Nhập</strong></button>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0px">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="rememberPasswordCheck" type="checkbox" style="color: #0097d0" checked="checked" />
+                                        <label class="custom-control-label" for="rememberPasswordCheck" style="color: #0097d0">Nhớ tài khoản</label>
+                                    </div>
+                                </div>
+                                <div style="width:100%;margin-top:-2%">
+                                    <div style="height:60px;">
+                                        <img style="width: 17%; margin-left: 83%;" src="/Images/360.png">
+                                    </div>
+                                    <div style="font-size: 9px; margin-left: 80%;">
+                                        <label class="custom-control-label" for="rememberPasswordCheck" style="color: #0097d0; ">B.CNTT - HPDQ</label>
+                                    </div>
+
+                                </div>
+                              }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

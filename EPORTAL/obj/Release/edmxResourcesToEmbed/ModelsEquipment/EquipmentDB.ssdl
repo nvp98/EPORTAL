@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EquipmentDB.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="NV_LoiSuCoTB">
+    <Key>
+      <PropertyRef Name="IDSC" />
+    </Key>
+    <Property Name="IDSC" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TenLoiSC" Type="nvarchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="NV_QuanLyThietBi">
+    <Key>
+      <PropertyRef Name="IDQLTB" />
+    </Key>
+    <Property Name="IDQLTB" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDPhongBan" Type="int" />
+    <Property Name="ServiceTag" Type="varchar" MaxLength="30" />
+    <Property Name="IDTB" Type="int" />
+    <Property Name="MaNV" Type="varchar" MaxLength="10" />
+    <Property Name="Phone" Type="varchar" MaxLength="10" />
+    <Property Name="IDSC" Type="int" />
+    <Property Name="NgayLap" Type="date" />
+    <Property Name="Status" Type="char" MaxLength="1" />
+    <Property Name="NgayXL" Type="date" />
+    <Property Name="NgayHT" Type="date" />
+    <Property Name="NgayNM" Type="date" />
+    <Property Name="GhiChu" Type="nvarchar" MaxLength="500" />
+    <Property Name="AdminNM" Type="varchar" MaxLength="10" />
+  </EntityType>
+  <EntityType Name="NV_ThietBi">
+    <Key>
+      <PropertyRef Name="IDTB" />
+    </Key>
+    <Property Name="IDTB" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TenThietBi" Type="nvarchar" MaxLength="100" />
+  </EntityType>
+  <Association Name="FK_NV_QuanLyThietBi_NV_LoiSuCoTB">
+    <End Role="NV_LoiSuCoTB" Type="Self.NV_LoiSuCoTB" Multiplicity="0..1" />
+    <End Role="NV_QuanLyThietBi" Type="Self.NV_QuanLyThietBi" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NV_LoiSuCoTB">
+        <PropertyRef Name="IDSC" />
+      </Principal>
+      <Dependent Role="NV_QuanLyThietBi">
+        <PropertyRef Name="IDSC" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_NV_QuanLyThietBi_NV_ThietBi">
+    <End Role="NV_ThietBi" Type="Self.NV_ThietBi" Multiplicity="0..1" />
+    <End Role="NV_QuanLyThietBi" Type="Self.NV_QuanLyThietBi" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NV_ThietBi">
+        <PropertyRef Name="IDTB" />
+      </Principal>
+      <Dependent Role="NV_QuanLyThietBi">
+        <PropertyRef Name="IDTB" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Function Name="NV_LoiSuCoTB_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDSC" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NV_LoiSuCoTB_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TenLoiSC" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NV_LoiSuCoTB_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDSC" Type="int" Mode="In" />
+    <Parameter Name="TenLoiSC" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NV_QuanLyThietBi_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDQLTB" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NV_QuanLyThietBi_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+    <Parameter Name="ServiceTag" Type="varchar" Mode="In" />
+    <Parameter Name="IDTB" Type="int" Mode="In" />
+    <Parameter Name="MaNV" Type="varchar" Mode="In" />
+    <Parameter Name="Phone" Type="varchar" Mode="In" />
+    <Parameter Name="IDSC" Type="int" Mode="In" />
+    <Parameter Name="NgayLap" Type="date" Mode="In" />
+    <Parameter Name="Status" Type="char" Mode="In" />
+    <Parameter Name="NgayXL" Type="date" Mode="In" />
+    <Parameter Name="NgayHT" Type="date" Mode="In" />
+    <Parameter Name="NgayNM" Type="date" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NV_QuanLyThietBi_searchByID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDQLTB" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NV_QuanLyThietBi_select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="NV_QuanLyThietBi_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDQLTB" Type="int" Mode="In" />
+    <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+    <Parameter Name="ServiceTag" Type="varchar" Mode="In" />
+    <Parameter Name="IDTB" Type="int" Mode="In" />
+    <Parameter Name="MaNV" Type="varchar" Mode="In" />
+    <Parameter Name="Phone" Type="varchar" Mode="In" />
+    <Parameter Name="IDSC" Type="int" Mode="In" />
+    <Parameter Name="NgayLap" Type="date" Mode="In" />
+    <Parameter Name="Status" Type="char" Mode="In" />
+    <Parameter Name="NgayXL" Type="date" Mode="In" />
+    <Parameter Name="NgayHT" Type="date" Mode="In" />
+    <Parameter Name="NgayNM" Type="date" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NV_ThietBi_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTB" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NV_ThietBi_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="TenThietBi" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NV_ThietBi_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTB" Type="int" Mode="In" />
+    <Parameter Name="TenThietBi" Type="nvarchar" Mode="In" />
+  </Function>
+  <EntityContainer Name="EquipmentDBStoreContainer">
+    <EntitySet Name="NV_LoiSuCoTB" EntityType="Self.NV_LoiSuCoTB" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NV_QuanLyThietBi" EntityType="Self.NV_QuanLyThietBi" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NV_ThietBi" EntityType="Self.NV_ThietBi" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_NV_QuanLyThietBi_NV_LoiSuCoTB" Association="Self.FK_NV_QuanLyThietBi_NV_LoiSuCoTB">
+      <End Role="NV_LoiSuCoTB" EntitySet="NV_LoiSuCoTB" />
+      <End Role="NV_QuanLyThietBi" EntitySet="NV_QuanLyThietBi" />
+    </AssociationSet>
+    <AssociationSet Name="FK_NV_QuanLyThietBi_NV_ThietBi" Association="Self.FK_NV_QuanLyThietBi_NV_ThietBi">
+      <End Role="NV_ThietBi" EntitySet="NV_ThietBi" />
+      <End Role="NV_QuanLyThietBi" EntitySet="NV_QuanLyThietBi" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

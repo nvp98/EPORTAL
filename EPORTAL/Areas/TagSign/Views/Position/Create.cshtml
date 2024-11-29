@@ -1,0 +1,59 @@
+﻿@model EPORTAL.ModelsTagSign.DataInformationValidation
+
+@using (Html.BeginForm("Create", "Position", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên chức vụ</label>
+                                @Html.EditorFor(model => model.TenCV, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Gate", @text = "" } })
+                            </div>
+                        </div>
+                        @{
+                            var selectListCavet = new SelectList(
+                                  new List<SelectListItem> {
+                                      new SelectListItem { Value = "0" , Text = "Không sử dụng điện thoại" },
+                                        new SelectListItem { Value = "1" , Text = "Sử dụng điện thoại" }
+                                    }, "Value", "Text");
+                        }
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Loại tình trạng</label>
+                                @Html.DropDownListFor(model => model.Phone, selectListCavet as SelectList, "--Chọn--", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhóm chức vụ</label>
+                                @Html.EditorFor(model => model.ChuVuTQ, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Gate", @text = "" } })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+

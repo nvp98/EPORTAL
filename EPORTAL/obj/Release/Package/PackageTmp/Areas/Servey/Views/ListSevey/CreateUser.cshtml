@@ -1,0 +1,107 @@
+﻿@model EPORTAL.ModelsServey.EmployeeServeyValidation
+
+@*<link href="~/Content/assets/css/PagedList.css" rel="stylesheet" />
+    <script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+    <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />*@
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="formE">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+
+                @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+                @Html.HiddenFor(model => model.IDSV)
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class=" mb-1 ">Bộ Phận</label>
+                            @Html.DropDownList("IDPB", null, "--Bộ Phận--", new { id = "IDPB", @class = "form-control marginTB5 SelectBP", @style = "width:100%", })
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group text-xl-left font-weight-bold">
+                                <label class=" mb-1 ">Chọn nhân viên</label>
+                                @Html.DropDownList("Selected", null, "", new { id = "multiSelectDropDownQAs", @class = "form-control multiSelectDropDownQAs", multiple = "multiple", })
+                                @*@Html.ListBox("Selected", ViewBag.Selected, new { style = "width:90%" })*@
+
+                            </div>
+                        </div>
+                        <div class=" col-md-12 mb-1" style="display:grid">
+                            <label class="mb-1 font-weight-bold text-left">Copy DS mã nhân viên</label>
+                            @Html.TextAreaFor(model => model.LIDSNV, new { @class = "form-control", @rows = 2, placeholder = "Nhập danh sách nhân viên", @id = "LIDSNV", })
+                            @Html.ValidationMessageFor(model => model.LIDSNV, "", new { @class = "text-danger" })
+                        </div>
+                        <div id="checkNV" style="width:70px" class="btn btn-primary form-group col-md-3 checkNV m-auto ">
+                            Check
+                        </div>
+                        <div class="col-md-11 overflow-auto border border-success rounded text-left mt-1" style="display: grid; min-height: 40px; max-height: 70px; margin: 0 auto;margin-bottom:10px" id="dsnv">
+                        </div>
+                    </div>
+
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" value="Xác nhận" class="btn btn-primary pull-right" />
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(".multiSelectDropDownQAs").chosen({
+            width: "100%",
+        });
+        //$(".chosen-search-input").val("Chọn nhân viên");
+        $(document).on("change", "#IDPB", function () {
+            var idpb = $(this).val();
+            $.get("/STpermissions/CheckNVID", { IDPB: idpb }, function (data) {
+                if (data[0] != null) {
+                    $("#multiSelectDropDownQAs").empty();
+                    $("#multiSelectDropDownQAs").append("<option value ='" + null + "'>" + "--Chọn Nhân viên--" + "</option>");
+                    $.each(data, function (index, row) {
+                        $("#multiSelectDropDownQAs").append("<option value ='" + row.ID + "'>" + row.HoTen + "</option>")
+                    });
+                    $('#multiSelectDropDownQAs').trigger("chosen:updated");
+                }
+                else {
+                    $('#multiSelectDropDownQAs').empty();
+                }
+            });
+        });
+    });
+
+    $(document).on("click", ".checkNV", function () {
+        /*var iddex = $(this).attr('id').split("_")[1];*/
+        var id = $("#LIDSNV").val();
+        $.get("/STpermissions/CheckLSNV", { lsnv: id  }, function (data) {
+            if (data[0] != null) {
+                $("#dsnv").empty();
+                /*$("#dsnv").append("<option value ='" + null + "'>" + "--Chọn Phân Xưởng--" + "</option>")*/
+                $.each(data, function (index, row) {
+                    $("#dsnv").append("<div>" + row.HoTen + "</div>")
+                });
+
+            }
+            else {
+                $("#dsnv").empty();
+            }
+        });
+    });
+
+    $(".SelectBP").chosen({
+        width: "100%",
+    });
+</script>
+
+
+

@@ -1,0 +1,12 @@
+- Trang chủ
+- Tin tức
+- Trang đối tác(Danh sách và chi tiết đối tác)
+- Thông báo (Có thể tất cả cùng xem trên trang thông báo hoặc một số người xem cụ thể)
+- Khiếu nại (Đối tác sẽ khiếu nại và HPDQ phản hồi"bằng comment or file")
+- Trang thống kê
+
+
+
+***Trang Phản hồi
+**MKN**
+stt mkn Madoitac noidung file ngày id ten

@@ -1,0 +1,1688 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="SoDoToChucModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Ca">
+          <Key>
+            <PropertyRef Name="IDCa" />
+          </Key>
+          <Property Name="IDCa" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenCa" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="CapBac">
+          <Key>
+            <PropertyRef Name="IDCap" />
+          </Key>
+          <Property Name="IDCap" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TT" Type="int" />
+          <Property Name="TenCapBac" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ChucVu">
+          <Key>
+            <PropertyRef Name="IDChucVu" />
+          </Key>
+          <Property Name="IDChucVu" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenChucVu" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="LoaiKH">
+          <Key>
+            <PropertyRef Name="IDLoai" />
+          </Key>
+          <Property Name="IDLoai" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenLoaiKH" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="MaViTri">
+          <Key>
+            <PropertyRef Name="IDMaViTri" />
+          </Key>
+          <Property Name="IDMaViTri" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenMaViTri" Type="nvarchar" MaxLength="20" />
+          <Property Name="IDLoai" Type="int" />
+        </EntityType>
+        <EntityType Name="NhanVienAPI">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaNV" Type="varchar" MaxLength="12" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
+          <Property Name="NgaySinh" Type="date" />
+          <Property Name="DiaChi" Type="nvarchar" MaxLength="150" />
+          <Property Name="DienThoai" Type="varchar" MaxLength="11" />
+          <Property Name="NgayVaoLam" Type="date" />
+          <Property Name="IDPhongBan" Type="int" />
+          <Property Name="IDTinhTrangLV" Type="int" />
+          <Property Name="IDViTri" Type="int" />
+          <Property Name="CMND" Type="varchar" MaxLength="14" />
+          <Property Name="IDPhanXuong" Type="int" />
+          <Property Name="IDToLV" Type="int" />
+          <Property Name="IDCa" Type="int" />
+          <Property Name="IDNhomLV" Type="int" />
+          <Property Name="MaViTri" Type="nvarchar" MaxLength="20" />
+          <Property Name="IDLoai" Type="int" />
+          <Property Name="TT_BGD" Type="int" />
+          <Property Name="ImagePath" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="NhanVienPVSX">
+          <Key>
+            <PropertyRef Name="IDNV" />
+          </Key>
+          <Property Name="IDNV" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaNV" Type="nvarchar" MaxLength="50" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="100" />
+          <Property Name="IDPhongBan" Type="int" />
+          <Property Name="IDViTri" Type="int" />
+          <Property Name="ImagePath" Type="nvarchar(max)" />
+          <Property Name="TT_BGD" Type="int" />
+        </EntityType>
+        <EntityType Name="Nhom">
+          <Key>
+            <PropertyRef Name="IDNhom" />
+          </Key>
+          <Property Name="IDNhom" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenNhom" Type="nchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="NhomLV">
+          <Key>
+            <PropertyRef Name="IDNhom" />
+          </Key>
+          <Property Name="IDNhom" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenNhom" Type="nvarchar" MaxLength="200" />
+          <Property Name="IDPhongBan" Type="int" />
+          <Property Name="IDNhomPT" Type="int" />
+          <Property Name="PTDB" Type="int" />
+          <Property Name="KTVDB" Type="int" />
+          <Property Name="NVDB" Type="int" />
+          <Property Name="KTVCa" Type="int" />
+          <Property Name="NVCa" Type="int" />
+          <Property Name="TPTDB" Type="int" />
+          <Property Name="TPKipDB" Type="int" />
+          <Property Name="TTTPDB" Type="int" />
+        </EntityType>
+        <EntityType Name="PhanXuong">
+          <Key>
+            <PropertyRef Name="IDPhanXuong" />
+          </Key>
+          <Property Name="IDPhanXuong" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenPhanXuong" Type="nvarchar" MaxLength="50" />
+          <Property Name="PhongBanID" Type="int" />
+          <Property Name="PTDB" Type="int" />
+          <Property Name="TPDB" Type="int" />
+          <Property Name="KTVDB" Type="int" />
+          <Property Name="NVDB" Type="int" />
+          <Property Name="NVHCDB" Type="int" />
+          <Property Name="TPTT" Type="int" />
+          <Property Name="KTVTT" Type="int" />
+          <Property Name="NVTT" Type="int" />
+          <Property Name="TPKip" Type="int" />
+          <Property Name="TTTPDB" Type="int" />
+        </EntityType>
+        <EntityType Name="PhongBan">
+          <Key>
+            <PropertyRef Name="IDPhongBan" />
+          </Key>
+          <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenPhongBan" Type="nvarchar" MaxLength="100" />
+          <Property Name="NhomID" Type="int" />
+          <Property Name="ImagePath" Type="nvarchar(max)" />
+          <Property Name="url" Type="nvarchar" MaxLength="150" />
+          <Property Name="TPDB" Type="int" />
+          <Property Name="QDTPTDB" Type="int" />
+          <Property Name="PTDB" Type="int" />
+          <Property Name="TPKipDB" Type="int" />
+          <Property Name="KTVHCDB" Type="int" />
+          <Property Name="KTVCaDB" Type="int" />
+          <Property Name="TTTPHCDB" Type="int" />
+          <Property Name="TTTPCaDB" Type="int" />
+          <Property Name="NVHCDB" Type="int" />
+          <Property Name="NVCaDB" Type="int" />
+        </EntityType>
+        <EntityType Name="QuyenDangNhap">
+          <Key>
+            <PropertyRef Name="IDQuyen" />
+          </Key>
+          <Property Name="IDQuyen" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenQuyen" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="ToLV">
+          <Key>
+            <PropertyRef Name="IDTo" />
+          </Key>
+          <Property Name="IDTo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenTo" Type="nvarchar" MaxLength="100" />
+          <Property Name="PhanXuongID" Type="int" />
+          <Property Name="PhongBanID" Type="int" />
+          <Property Name="SLDB" Type="int" />
+          <Property Name="IDNhomPT" Type="int" />
+        </EntityType>
+        <EntityType Name="ViTri">
+          <Key>
+            <PropertyRef Name="IDViTri" />
+          </Key>
+          <Property Name="IDViTri" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenViTri" Type="nvarchar" MaxLength="200" />
+          <Property Name="IDChucVu" Type="int" />
+        </EntityType>
+        <EntityType Name="ViTriLViec">
+          <Key>
+            <PropertyRef Name="IDViTri" />
+          </Key>
+          <Property Name="IDViTri" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenViTri" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <Association Name="FK_NhanVienAPI_PhanXuong">
+          <End Role="PhanXuong" Type="Self.PhanXuong" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PhanXuong">
+              <PropertyRef Name="IDPhanXuong" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDPhanXuong" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_PhongBan">
+          <End Role="PhongBan" Type="Self.PhongBan" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PhongBan">
+              <PropertyRef Name="IDPhongBan" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDPhongBan" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_ToLV">
+          <End Role="ToLV" Type="Self.ToLV" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ToLV">
+              <PropertyRef Name="IDTo" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDToLV" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_ViTri">
+          <End Role="ViTri" Type="Self.ViTri" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ViTri">
+              <PropertyRef Name="IDViTri" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDViTri" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_ViTriLViec">
+          <End Role="ViTriLViec" Type="Self.ViTriLViec" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ViTriLViec">
+              <PropertyRef Name="IDViTri" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDViTri" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienPVSX_ViTri">
+          <End Role="ViTri" Type="Self.ViTri" Multiplicity="0..1" />
+          <End Role="NhanVienPVSX" Type="Self.NhanVienPVSX" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ViTri">
+              <PropertyRef Name="IDViTri" />
+            </Principal>
+            <Dependent Role="NhanVienPVSX">
+              <PropertyRef Name="IDViTri" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PhongBan_Nhom">
+          <End Role="Nhom" Type="Self.Nhom" Multiplicity="0..1" />
+          <End Role="PhongBan" Type="Self.PhongBan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Nhom">
+              <PropertyRef Name="IDNhom" />
+            </Principal>
+            <Dependent Role="PhongBan">
+              <PropertyRef Name="NhomID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="DangKy_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDDK" Type="int" Mode="In" />
+        </Function>
+        <Function Name="DangKy_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenDangNhap" Type="nvarchar" Mode="In" />
+          <Parameter Name="MatKhau" Type="nvarchar" Mode="In" />
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="Email" Type="nvarchar" Mode="In" />
+          <Parameter Name="MaQuyen" Type="int" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+        </Function>
+        <Function Name="DangKy_ResetPass" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDDK" Type="int" Mode="In" />
+          <Parameter Name="TenDangNhap" Type="nvarchar" Mode="In" />
+          <Parameter Name="MatKhau" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="DangKy_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDDK" Type="int" Mode="In" />
+          <Parameter Name="TenDangNhap" Type="nvarchar" Mode="In" />
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="Email" Type="nvarchar" Mode="In" />
+          <Parameter Name="MaQuyen" Type="int" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+        </Function>
+        <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+        <Function Name="HanhChinhNM_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNSHC" Type="int" Mode="In" />
+        </Function>
+        <Function Name="HanhChinhNM_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPHC" Type="int" Mode="In" />
+          <Parameter Name="QDHC" Type="int" Mode="In" />
+          <Parameter Name="PTHC" Type="int" Mode="In" />
+          <Parameter Name="KTVHC" Type="int" Mode="In" />
+          <Parameter Name="NVHC" Type="int" Mode="In" />
+        </Function>
+        <Function Name="HanhChinhNM_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNSHC" Type="int" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPHC" Type="int" Mode="In" />
+          <Parameter Name="QDHC" Type="int" Mode="In" />
+          <Parameter Name="PTHC" Type="int" Mode="In" />
+          <Parameter Name="KTVHC" Type="int" Mode="In" />
+          <Parameter Name="NVHC" Type="int" Mode="In" />
+        </Function>
+        <Function Name="LoaiKH_insert_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenLoaiKH" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="LoaiKH_update_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDLoai" Type="int" Mode="In" />
+          <Parameter Name="TenLoaiKH" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="MaViTri_insert_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenMaViTri" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDLoai" Type="int" Mode="In" />
+        </Function>
+        <Function Name="MaViTri_update_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDMaViTri" Type="int" Mode="In" />
+          <Parameter Name="TenMaViTri" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDLoai" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanSuCa_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDCa" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanSuCa_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="PTCa" Type="int" Mode="In" />
+          <Parameter Name="KTVCa" Type="int" Mode="In" />
+          <Parameter Name="NVCa" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanSuCa_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDCa" Type="int" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="PTCa" Type="int" Mode="In" />
+          <Parameter Name="KTVCa" Type="int" Mode="In" />
+          <Parameter Name="NVCa" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="NgaySinh" Type="datetime" Mode="In" />
+          <Parameter Name="DiaChi" Type="nvarchar" Mode="In" />
+          <Parameter Name="Email" Type="nvarchar" Mode="In" />
+          <Parameter Name="DienThoai" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="PhanXuongID" Type="int" Mode="In" />
+          <Parameter Name="ChucVuID" Type="int" Mode="In" />
+          <Parameter Name="CapBac" Type="int" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_insert_API" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="Hoten" Type="nvarchar" Mode="In" />
+          <Parameter Name="NgaySinh" Type="date" Mode="In" />
+          <Parameter Name="DiaChi" Type="nvarchar" Mode="In" />
+          <Parameter Name="DienThoai" Type="varchar" Mode="In" />
+          <Parameter Name="NgayVaoLam" Type="date" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="IDTinhTrangLV" Type="int" Mode="In" />
+          <Parameter Name="IDViTri" Type="int" Mode="In" />
+          <Parameter Name="CMND" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="NgaySinh" Type="datetime" Mode="In" />
+          <Parameter Name="DiaChi" Type="nvarchar" Mode="In" />
+          <Parameter Name="Email" Type="nvarchar" Mode="In" />
+          <Parameter Name="DienThoai" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="PhanXuongID" Type="int" Mode="In" />
+          <Parameter Name="ChucVuID" Type="int" Mode="In" />
+          <Parameter Name="CapBac" Type="int" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_update_API" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="Hoten" Type="nvarchar" Mode="In" />
+          <Parameter Name="NgaySinh" Type="date" Mode="In" />
+          <Parameter Name="DiaChi" Type="nvarchar" Mode="In" />
+          <Parameter Name="DienThoai" Type="varchar" Mode="In" />
+          <Parameter Name="NgayVaoLam" Type="date" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="IDTinhTrangLV" Type="int" Mode="In" />
+          <Parameter Name="IDViTri" Type="int" Mode="In" />
+          <Parameter Name="CMND" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_update_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDToLV" Type="int" Mode="In" />
+          <Parameter Name="IDCa" Type="int" Mode="In" />
+          <Parameter Name="IDPhanXuong" Type="int" Mode="In" />
+          <Parameter Name="MaViTri" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDNhomLV" Type="int" Mode="In" />
+          <Parameter Name="IDLoai" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanVien_update_TT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="TT_BGD" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanVienAPI_select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+        </Function>
+        <Function Name="NhanVienPVSX_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanVienPVSX_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="Hoten" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="IDViTri" Type="int" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="TT_BGD" Type="int" Mode="In" />
+        </Function>
+        <Function Name="NhanVienPVSX_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNV" Type="int" Mode="In" />
+          <Parameter Name="MaNV" Type="nvarchar" Mode="In" />
+          <Parameter Name="Hoten" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="TT_BGD" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Nhom_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNhom" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Nhom_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenNhom" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCa" Type="int" Mode="In" />
+          <Parameter Name="NVCa" Type="int" Mode="In" />
+          <Parameter Name="TTTPDB" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Nhom_insert_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenNhom" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCa" Type="int" Mode="In" />
+          <Parameter Name="NVCa" Type="int" Mode="In" />
+          <Parameter Name="TTTPDB" Type="int" Mode="In" />
+          <Parameter Name="IDNhomPT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Nhom_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNhom" Type="int" Mode="In" />
+          <Parameter Name="TenNhom" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCa" Type="int" Mode="In" />
+          <Parameter Name="NVCa" Type="int" Mode="In" />
+          <Parameter Name="TTTPDB" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Nhom_update_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDNhom" Type="int" Mode="In" />
+          <Parameter Name="TenNhom" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCa" Type="int" Mode="In" />
+          <Parameter Name="NVCa" Type="int" Mode="In" />
+          <Parameter Name="TTTPDB" Type="int" Mode="In" />
+          <Parameter Name="IDNhomPT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhanXuong_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhanXuong" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhanXuong_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenPhanXuong" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="PTTT" Type="int" Mode="In" />
+          <Parameter Name="TPTT" Type="int" Mode="In" />
+          <Parameter Name="KTVTT" Type="int" Mode="In" />
+          <Parameter Name="NVTT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhanXuong_insert_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenPhanXuong" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKip" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="NVHCDB" Type="int" Mode="In" />
+          <Parameter Name="TTTP" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhanXuong_insert_name" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenPhanXuong" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhanXuong_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhanXuong" Type="int" Mode="In" />
+          <Parameter Name="TenPhanXuong" Type="nvarchar" Mode="In" />
+          <Parameter Name="PhongBanID" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="PTTT" Type="int" Mode="In" />
+          <Parameter Name="TPTT" Type="int" Mode="In" />
+          <Parameter Name="KTVTT" Type="int" Mode="In" />
+          <Parameter Name="NVTT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhanXuong_update_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhanXuong" Type="int" Mode="In" />
+          <Parameter Name="TenPhanXuong" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKip" Type="int" Mode="In" />
+          <Parameter Name="KTVDB" Type="int" Mode="In" />
+          <Parameter Name="NVDB" Type="int" Mode="In" />
+          <Parameter Name="NVHCDB" Type="int" Mode="In" />
+          <Parameter Name="TTTP" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhongBan_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhongBan_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenPhongBan" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDNhom" Type="int" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="QDTPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVHCDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCaDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPHCDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPCaDB" Type="int" Mode="In" />
+          <Parameter Name="NVHCDB" Type="int" Mode="In" />
+          <Parameter Name="NVCaDB" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhongBan_insert_API" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenPhongBan" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="PhongBan_insert_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenPhongBan" Type="nvarchar" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="QDTPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVHCDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCaDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPHCDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPCaDB" Type="int" Mode="In" />
+          <Parameter Name="NVHCDB" Type="int" Mode="In" />
+          <Parameter Name="NVCaDB" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhongBan_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TenPhongBan" Type="nvarchar" Mode="In" />
+          <Parameter Name="IDNhom" Type="int" Mode="In" />
+          <Parameter Name="ImagePath" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="QDTPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVHCDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCaDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPHCDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPCaDB" Type="int" Mode="In" />
+          <Parameter Name="NVHCDB" Type="int" Mode="In" />
+          <Parameter Name="NVCaDB" Type="int" Mode="In" />
+        </Function>
+        <Function Name="PhongBan_update_Excel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+          <Parameter Name="TenPhongBan" Type="nvarchar" Mode="In" />
+          <Parameter Name="TPDB" Type="int" Mode="In" />
+          <Parameter Name="QDTPTDB" Type="int" Mode="In" />
+          <Parameter Name="PTDB" Type="int" Mode="In" />
+          <Parameter Name="TPKipDB" Type="int" Mode="In" />
+          <Parameter Name="KTVHCDB" Type="int" Mode="In" />
+          <Parameter Name="KTVCaDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPHCDB" Type="int" Mode="In" />
+          <Parameter Name="TTTPCaDB" Type="int" Mode="In" />
+          <Parameter Name="NVHCDB" Type="int" Mode="In" />
+          <Parameter Name="NVCaDB" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ToLV_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IDTo" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ToLV_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenTo" Type="nvarchar" Mode="In" />
+          <Parameter Name="PhanXuongID" Type="int" Mode="In" />
+          <Parameter Name="PhongBanID" Type="int" Mode="In" />
+          <Parameter Name="SLDB" Type="int" Mode="In" />
+          <Parameter Name="IDNhomPT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ToLV_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenTo" Type="nvarchar" Mode="In" />
+          <Parameter Name="PhanXuongID" Type="int" Mode="In" />
+          <Parameter Name="PhongBanID" Type="int" Mode="In" />
+          <Parameter Name="SLDB" Type="int" Mode="In" />
+          <Parameter Name="IDNhomPT" Type="int" Mode="In" />
+          <Parameter Name="IDTo" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ViTri_insert_API" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="TenViTri" Type="nvarchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="SoDoToChucModelStoreContainer">
+          <EntitySet Name="Ca" EntityType="Self.Ca" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CapBac" EntityType="Self.CapBac" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ChucVu" EntityType="Self.ChucVu" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LoaiKH" EntityType="Self.LoaiKH" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MaViTri" EntityType="Self.MaViTri" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NhanVienAPI" EntityType="Self.NhanVienAPI" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NhanVienPVSX" EntityType="Self.NhanVienPVSX" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Nhom" EntityType="Self.Nhom" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NhomLV" EntityType="Self.NhomLV" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PhanXuong" EntityType="Self.PhanXuong" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PhongBan" EntityType="Self.PhongBan" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="QuyenDangNhap" EntityType="Self.QuyenDangNhap" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ToLV" EntityType="Self.ToLV" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ViTri" EntityType="Self.ViTri" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ViTriLViec" EntityType="Self.ViTriLViec" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_NhanVienAPI_PhanXuong" Association="Self.FK_NhanVienAPI_PhanXuong">
+            <End Role="PhanXuong" EntitySet="PhanXuong" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPI" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_PhongBan" Association="Self.FK_NhanVienAPI_PhongBan">
+            <End Role="PhongBan" EntitySet="PhongBan" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPI" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_ToLV" Association="Self.FK_NhanVienAPI_ToLV">
+            <End Role="ToLV" EntitySet="ToLV" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPI" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_ViTri" Association="Self.FK_NhanVienAPI_ViTri">
+            <End Role="ViTri" EntitySet="ViTri" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPI" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_ViTriLViec" Association="Self.FK_NhanVienAPI_ViTriLViec">
+            <End Role="ViTriLViec" EntitySet="ViTriLViec" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPI" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienPVSX_ViTri" Association="Self.FK_NhanVienPVSX_ViTri">
+            <End Role="ViTri" EntitySet="ViTri" />
+            <End Role="NhanVienPVSX" EntitySet="NhanVienPVSX" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PhongBan_Nhom" Association="Self.FK_PhongBan_Nhom">
+            <End Role="Nhom" EntitySet="Nhom" />
+            <End Role="PhongBan" EntitySet="PhongBan" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SoDoToChucModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Ca">
+          <Key>
+            <PropertyRef Name="IDCa" />
+          </Key>
+          <Property Name="IDCa" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenCa" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CapBac">
+          <Key>
+            <PropertyRef Name="IDCap" />
+          </Key>
+          <Property Name="IDCap" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TT" Type="Int32" />
+          <Property Name="TenCapBac" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ChucVu">
+          <Key>
+            <PropertyRef Name="IDChucVu" />
+          </Key>
+          <Property Name="IDChucVu" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenChucVu" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="LoaiKH">
+          <Key>
+            <PropertyRef Name="IDLoai" />
+          </Key>
+          <Property Name="IDLoai" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenLoaiKH" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="MaViTri">
+          <Key>
+            <PropertyRef Name="IDMaViTri" />
+          </Key>
+          <Property Name="IDMaViTri" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenMaViTri" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="IDLoai" Type="Int32" />
+        </EntityType>
+        <EntityType Name="NhanVienAPI">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaNV" Type="String" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NgaySinh" Type="DateTime" Precision="0" />
+          <Property Name="DiaChi" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="DienThoai" Type="String" MaxLength="11" FixedLength="false" Unicode="false" />
+          <Property Name="NgayVaoLam" Type="DateTime" Precision="0" />
+          <Property Name="IDPhongBan" Type="Int32" />
+          <Property Name="IDTinhTrangLV" Type="Int32" />
+          <Property Name="IDViTri" Type="Int32" />
+          <Property Name="CMND" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="IDPhanXuong" Type="Int32" />
+          <Property Name="IDToLV" Type="Int32" />
+          <Property Name="IDCa" Type="Int32" />
+          <Property Name="IDNhomLV" Type="Int32" />
+          <Property Name="MaViTri" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="IDLoai" Type="Int32" />
+          <Property Name="TT_BGD" Type="Int32" />
+          <Property Name="ImagePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="PhanXuong" Relationship="Self.FK_NhanVienAPI_PhanXuong" FromRole="NhanVienAPI" ToRole="PhanXuong" />
+          <NavigationProperty Name="PhongBan" Relationship="Self.FK_NhanVienAPI_PhongBan" FromRole="NhanVienAPI" ToRole="PhongBan" />
+          <NavigationProperty Name="ToLV" Relationship="Self.FK_NhanVienAPI_ToLV" FromRole="NhanVienAPI" ToRole="ToLV" />
+          <NavigationProperty Name="ViTri" Relationship="Self.FK_NhanVienAPI_ViTri" FromRole="NhanVienAPI" ToRole="ViTri" />
+          <NavigationProperty Name="ViTriLViec" Relationship="Self.FK_NhanVienAPI_ViTriLViec" FromRole="NhanVienAPI" ToRole="ViTriLViec" />
+        </EntityType>
+        <EntityType Name="NhanVienPVSX">
+          <Key>
+            <PropertyRef Name="IDNV" />
+          </Key>
+          <Property Name="IDNV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaNV" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="HoTen" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="IDPhongBan" Type="Int32" />
+          <Property Name="IDViTri" Type="Int32" />
+          <Property Name="ImagePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TT_BGD" Type="Int32" />
+          <NavigationProperty Name="ViTri" Relationship="Self.FK_NhanVienPVSX_ViTri" FromRole="NhanVienPVSX" ToRole="ViTri" />
+        </EntityType>
+        <EntityType Name="Nhom">
+          <Key>
+            <PropertyRef Name="IDNhom" />
+          </Key>
+          <Property Name="IDNhom" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenNhom" Type="String" MaxLength="50" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="PhongBans" Relationship="Self.FK_PhongBan_Nhom" FromRole="Nhom" ToRole="PhongBan" />
+        </EntityType>
+        <EntityType Name="NhomLV">
+          <Key>
+            <PropertyRef Name="IDNhom" />
+          </Key>
+          <Property Name="IDNhom" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenNhom" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="IDPhongBan" Type="Int32" />
+          <Property Name="IDNhomPT" Type="Int32" />
+          <Property Name="PTDB" Type="Int32" />
+          <Property Name="KTVDB" Type="Int32" />
+          <Property Name="NVDB" Type="Int32" />
+          <Property Name="KTVCa" Type="Int32" />
+          <Property Name="NVCa" Type="Int32" />
+          <Property Name="TPTDB" Type="Int32" />
+          <Property Name="TPKipDB" Type="Int32" />
+          <Property Name="TTTPDB" Type="Int32" />
+        </EntityType>
+        <EntityType Name="PhanXuong">
+          <Key>
+            <PropertyRef Name="IDPhanXuong" />
+          </Key>
+          <Property Name="IDPhanXuong" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenPhanXuong" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="PhongBanID" Type="Int32" />
+          <Property Name="PTDB" Type="Int32" />
+          <Property Name="TPDB" Type="Int32" />
+          <Property Name="KTVDB" Type="Int32" />
+          <Property Name="NVDB" Type="Int32" />
+          <Property Name="NVHCDB" Type="Int32" />
+          <Property Name="TPTT" Type="Int32" />
+          <Property Name="KTVTT" Type="Int32" />
+          <Property Name="NVTT" Type="Int32" />
+          <Property Name="TPKip" Type="Int32" />
+          <Property Name="TTTPDB" Type="Int32" />
+          <NavigationProperty Name="NhanVienAPIs" Relationship="Self.FK_NhanVienAPI_PhanXuong" FromRole="PhanXuong" ToRole="NhanVienAPI" />
+        </EntityType>
+        <EntityType Name="PhongBan">
+          <Key>
+            <PropertyRef Name="IDPhongBan" />
+          </Key>
+          <Property Name="IDPhongBan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenPhongBan" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="NhomID" Type="Int32" />
+          <Property Name="ImagePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="url" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="TPDB" Type="Int32" />
+          <Property Name="QDTPTDB" Type="Int32" />
+          <Property Name="PTDB" Type="Int32" />
+          <Property Name="TPKipDB" Type="Int32" />
+          <Property Name="KTVHCDB" Type="Int32" />
+          <Property Name="KTVCaDB" Type="Int32" />
+          <Property Name="TTTPHCDB" Type="Int32" />
+          <Property Name="TTTPCaDB" Type="Int32" />
+          <Property Name="NVHCDB" Type="Int32" />
+          <Property Name="NVCaDB" Type="Int32" />
+          <NavigationProperty Name="NhanVienAPIs" Relationship="Self.FK_NhanVienAPI_PhongBan" FromRole="PhongBan" ToRole="NhanVienAPI" />
+          <NavigationProperty Name="Nhom" Relationship="Self.FK_PhongBan_Nhom" FromRole="PhongBan" ToRole="Nhom" />
+        </EntityType>
+        <EntityType Name="QuyenDangNhap">
+          <Key>
+            <PropertyRef Name="IDQuyen" />
+          </Key>
+          <Property Name="IDQuyen" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenQuyen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="ToLV">
+          <Key>
+            <PropertyRef Name="IDTo" />
+          </Key>
+          <Property Name="IDTo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenTo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="PhanXuongID" Type="Int32" />
+          <Property Name="PhongBanID" Type="Int32" />
+          <Property Name="SLDB" Type="Int32" />
+          <Property Name="IDNhomPT" Type="Int32" />
+          <NavigationProperty Name="NhanVienAPIs" Relationship="Self.FK_NhanVienAPI_ToLV" FromRole="ToLV" ToRole="NhanVienAPI" />
+        </EntityType>
+        <EntityType Name="ViTri">
+          <Key>
+            <PropertyRef Name="IDViTri" />
+          </Key>
+          <Property Name="IDViTri" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenViTri" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="IDChucVu" Type="Int32" />
+          <NavigationProperty Name="NhanVienAPIs" Relationship="Self.FK_NhanVienAPI_ViTri" FromRole="ViTri" ToRole="NhanVienAPI" />
+          <NavigationProperty Name="NhanVienPVSXes" Relationship="Self.FK_NhanVienPVSX_ViTri" FromRole="ViTri" ToRole="NhanVienPVSX" />
+        </EntityType>
+        <EntityType Name="ViTriLViec">
+          <Key>
+            <PropertyRef Name="IDViTri" />
+          </Key>
+          <Property Name="IDViTri" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenViTri" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="NhanVienAPIs" Relationship="Self.FK_NhanVienAPI_ViTriLViec" FromRole="ViTriLViec" ToRole="NhanVienAPI" />
+        </EntityType>
+        <Association Name="FK_NhanVienAPI_PhanXuong">
+          <End Role="PhanXuong" Type="Self.PhanXuong" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PhanXuong">
+              <PropertyRef Name="IDPhanXuong" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDPhanXuong" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_PhongBan">
+          <End Role="PhongBan" Type="Self.PhongBan" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PhongBan">
+              <PropertyRef Name="IDPhongBan" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDPhongBan" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_ToLV">
+          <End Role="ToLV" Type="Self.ToLV" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ToLV">
+              <PropertyRef Name="IDTo" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDToLV" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_ViTri">
+          <End Role="ViTri" Type="Self.ViTri" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ViTri">
+              <PropertyRef Name="IDViTri" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDViTri" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienAPI_ViTriLViec">
+          <End Role="ViTriLViec" Type="Self.ViTriLViec" Multiplicity="0..1" />
+          <End Role="NhanVienAPI" Type="Self.NhanVienAPI" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ViTriLViec">
+              <PropertyRef Name="IDViTri" />
+            </Principal>
+            <Dependent Role="NhanVienAPI">
+              <PropertyRef Name="IDViTri" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NhanVienPVSX_ViTri">
+          <End Role="ViTri" Type="Self.ViTri" Multiplicity="0..1" />
+          <End Role="NhanVienPVSX" Type="Self.NhanVienPVSX" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ViTri">
+              <PropertyRef Name="IDViTri" />
+            </Principal>
+            <Dependent Role="NhanVienPVSX">
+              <PropertyRef Name="IDViTri" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PhongBan_Nhom">
+          <End Role="Nhom" Type="Self.Nhom" Multiplicity="0..1" />
+          <End Role="PhongBan" Type="Self.PhongBan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Nhom">
+              <PropertyRef Name="IDNhom" />
+            </Principal>
+            <Dependent Role="PhongBan">
+              <PropertyRef Name="NhomID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="SoDoToChucEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Cas" EntityType="Self.Ca" />
+          <EntitySet Name="CapBacs" EntityType="Self.CapBac" />
+          <EntitySet Name="ChucVus" EntityType="Self.ChucVu" />
+          <EntitySet Name="LoaiKHs" EntityType="Self.LoaiKH" />
+          <EntitySet Name="MaViTris" EntityType="Self.MaViTri" />
+          <EntitySet Name="NhanVienAPIs" EntityType="Self.NhanVienAPI" />
+          <EntitySet Name="NhanVienPVSXes" EntityType="Self.NhanVienPVSX" />
+          <EntitySet Name="Nhoms" EntityType="Self.Nhom" />
+          <EntitySet Name="NhomLVs" EntityType="Self.NhomLV" />
+          <EntitySet Name="PhanXuongs" EntityType="Self.PhanXuong" />
+          <EntitySet Name="PhongBans" EntityType="Self.PhongBan" />
+          <EntitySet Name="QuyenDangNhaps" EntityType="Self.QuyenDangNhap" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+          <EntitySet Name="ToLVs" EntityType="Self.ToLV" />
+          <EntitySet Name="ViTris" EntityType="Self.ViTri" />
+          <EntitySet Name="ViTriLViecs" EntityType="Self.ViTriLViec" />
+          <AssociationSet Name="FK_NhanVienAPI_PhanXuong" Association="Self.FK_NhanVienAPI_PhanXuong">
+            <End Role="PhanXuong" EntitySet="PhanXuongs" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPIs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_PhongBan" Association="Self.FK_NhanVienAPI_PhongBan">
+            <End Role="PhongBan" EntitySet="PhongBans" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPIs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_ToLV" Association="Self.FK_NhanVienAPI_ToLV">
+            <End Role="ToLV" EntitySet="ToLVs" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPIs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_ViTri" Association="Self.FK_NhanVienAPI_ViTri">
+            <End Role="ViTri" EntitySet="ViTris" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPIs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienAPI_ViTriLViec" Association="Self.FK_NhanVienAPI_ViTriLViec">
+            <End Role="ViTriLViec" EntitySet="ViTriLViecs" />
+            <End Role="NhanVienAPI" EntitySet="NhanVienAPIs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NhanVienPVSX_ViTri" Association="Self.FK_NhanVienPVSX_ViTri">
+            <End Role="ViTri" EntitySet="ViTris" />
+            <End Role="NhanVienPVSX" EntitySet="NhanVienPVSXes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PhongBan_Nhom" Association="Self.FK_PhongBan_Nhom">
+            <End Role="Nhom" EntitySet="Nhoms" />
+            <End Role="PhongBan" EntitySet="PhongBans" />
+          </AssociationSet>
+          <FunctionImport Name="DangKy_delete">
+            <Parameter Name="IDDK" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DangKy_insert">
+            <Parameter Name="TenDangNhap" Mode="In" Type="String" />
+            <Parameter Name="MatKhau" Mode="In" Type="String" />
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="Email" Mode="In" Type="String" />
+            <Parameter Name="MaQuyen" Mode="In" Type="Int32" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DangKy_ResetPass">
+            <Parameter Name="IDDK" Mode="In" Type="Int32" />
+            <Parameter Name="TenDangNhap" Mode="In" Type="String" />
+            <Parameter Name="MatKhau" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="DangKy_update">
+            <Parameter Name="IDDK" Mode="In" Type="Int32" />
+            <Parameter Name="TenDangNhap" Mode="In" Type="String" />
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="Email" Mode="In" Type="String" />
+            <Parameter Name="MaQuyen" Mode="In" Type="Int32" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="HanhChinhNM_delete">
+            <Parameter Name="IDNSHC" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="HanhChinhNM_insert">
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPHC" Mode="In" Type="Int32" />
+            <Parameter Name="QDHC" Mode="In" Type="Int32" />
+            <Parameter Name="PTHC" Mode="In" Type="Int32" />
+            <Parameter Name="KTVHC" Mode="In" Type="Int32" />
+            <Parameter Name="NVHC" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="HanhChinhNM_update">
+            <Parameter Name="IDNSHC" Mode="In" Type="Int32" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPHC" Mode="In" Type="Int32" />
+            <Parameter Name="QDHC" Mode="In" Type="Int32" />
+            <Parameter Name="PTHC" Mode="In" Type="Int32" />
+            <Parameter Name="KTVHC" Mode="In" Type="Int32" />
+            <Parameter Name="NVHC" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="LoaiKH_insert_Excel">
+            <Parameter Name="TenLoaiKH" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="LoaiKH_update_Excel">
+            <Parameter Name="IDLoai" Mode="In" Type="Int32" />
+            <Parameter Name="TenLoaiKH" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="MaViTri_insert_Excel">
+            <Parameter Name="TenMaViTri" Mode="In" Type="String" />
+            <Parameter Name="IDLoai" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="MaViTri_update_Excel">
+            <Parameter Name="IDMaViTri" Mode="In" Type="Int32" />
+            <Parameter Name="TenMaViTri" Mode="In" Type="String" />
+            <Parameter Name="IDLoai" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanSuCa_delete">
+            <Parameter Name="IDCa" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanSuCa_insert">
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="PTCa" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCa" Mode="In" Type="Int32" />
+            <Parameter Name="NVCa" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanSuCa_update">
+            <Parameter Name="IDCa" Mode="In" Type="Int32" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="PTCa" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCa" Mode="In" Type="Int32" />
+            <Parameter Name="NVCa" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_delete">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_insert">
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="DiaChi" Mode="In" Type="String" />
+            <Parameter Name="Email" Mode="In" Type="String" />
+            <Parameter Name="DienThoai" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="PhanXuongID" Mode="In" Type="Int32" />
+            <Parameter Name="ChucVuID" Mode="In" Type="Int32" />
+            <Parameter Name="CapBac" Mode="In" Type="Int32" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_insert_API">
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="Hoten" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="DiaChi" Mode="In" Type="String" />
+            <Parameter Name="DienThoai" Mode="In" Type="String" />
+            <Parameter Name="NgayVaoLam" Mode="In" Type="DateTime" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="IDTinhTrangLV" Mode="In" Type="Int32" />
+            <Parameter Name="IDViTri" Mode="In" Type="Int32" />
+            <Parameter Name="CMND" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_update">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="DiaChi" Mode="In" Type="String" />
+            <Parameter Name="Email" Mode="In" Type="String" />
+            <Parameter Name="DienThoai" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="PhanXuongID" Mode="In" Type="Int32" />
+            <Parameter Name="ChucVuID" Mode="In" Type="Int32" />
+            <Parameter Name="CapBac" Mode="In" Type="Int32" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_update_API">
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="Hoten" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="DiaChi" Mode="In" Type="String" />
+            <Parameter Name="DienThoai" Mode="In" Type="String" />
+            <Parameter Name="NgayVaoLam" Mode="In" Type="DateTime" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="IDTinhTrangLV" Mode="In" Type="Int32" />
+            <Parameter Name="IDViTri" Mode="In" Type="Int32" />
+            <Parameter Name="CMND" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_update_Excel">
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="IDToLV" Mode="In" Type="Int32" />
+            <Parameter Name="IDCa" Mode="In" Type="Int32" />
+            <Parameter Name="IDPhanXuong" Mode="In" Type="Int32" />
+            <Parameter Name="MaViTri" Mode="In" Type="String" />
+            <Parameter Name="IDNhomLV" Mode="In" Type="Int32" />
+            <Parameter Name="IDLoai" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVien_update_TT">
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="TT_BGD" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVienAPI_select" ReturnType="Collection(SoDoToChucModel.NhanVienAPI_select_Result)">
+            <Parameter Name="search" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVienPVSX_delete">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVienPVSX_insert">
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="Hoten" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="IDViTri" Mode="In" Type="Int32" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="TT_BGD" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="NhanVienPVSX_update">
+            <Parameter Name="IDNV" Mode="In" Type="Int32" />
+            <Parameter Name="MaNV" Mode="In" Type="String" />
+            <Parameter Name="Hoten" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="TT_BGD" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Nhom_delete">
+            <Parameter Name="IDNhom" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Nhom_insert">
+            <Parameter Name="TenNhom" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCa" Mode="In" Type="Int32" />
+            <Parameter Name="NVCa" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPDB" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Nhom_insert_Excel">
+            <Parameter Name="TenNhom" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCa" Mode="In" Type="Int32" />
+            <Parameter Name="NVCa" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPDB" Mode="In" Type="Int32" />
+            <Parameter Name="IDNhomPT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Nhom_update">
+            <Parameter Name="IDNhom" Mode="In" Type="Int32" />
+            <Parameter Name="TenNhom" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCa" Mode="In" Type="Int32" />
+            <Parameter Name="NVCa" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPDB" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Nhom_update_Excel">
+            <Parameter Name="IDNhom" Mode="In" Type="Int32" />
+            <Parameter Name="TenNhom" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCa" Mode="In" Type="Int32" />
+            <Parameter Name="NVCa" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPDB" Mode="In" Type="Int32" />
+            <Parameter Name="IDNhomPT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhanXuong_delete">
+            <Parameter Name="IDPhanXuong" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhanXuong_insert">
+            <Parameter Name="TenPhanXuong" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTTT" Mode="In" Type="Int32" />
+            <Parameter Name="TPTT" Mode="In" Type="Int32" />
+            <Parameter Name="KTVTT" Mode="In" Type="Int32" />
+            <Parameter Name="NVTT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhanXuong_insert_Excel">
+            <Parameter Name="TenPhanXuong" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKip" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTP" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhanXuong_insert_name">
+            <Parameter Name="TenPhanXuong" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhanXuong_update">
+            <Parameter Name="IDPhanXuong" Mode="In" Type="Int32" />
+            <Parameter Name="TenPhanXuong" Mode="In" Type="String" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTTT" Mode="In" Type="Int32" />
+            <Parameter Name="TPTT" Mode="In" Type="Int32" />
+            <Parameter Name="KTVTT" Mode="In" Type="Int32" />
+            <Parameter Name="NVTT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhanXuong_update_Excel">
+            <Parameter Name="IDPhanXuong" Mode="In" Type="Int32" />
+            <Parameter Name="TenPhanXuong" Mode="In" Type="String" />
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKip" Mode="In" Type="Int32" />
+            <Parameter Name="KTVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTP" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhongBan_delete">
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhongBan_insert">
+            <Parameter Name="TenPhongBan" Mode="In" Type="String" />
+            <Parameter Name="IDNhom" Mode="In" Type="Int32" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="QDTPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVCaDB" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhongBan_insert_API">
+            <Parameter Name="TenPhongBan" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="PhongBan_insert_Excel">
+            <Parameter Name="TenPhongBan" Mode="In" Type="String" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="QDTPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVCaDB" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhongBan_update">
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TenPhongBan" Mode="In" Type="String" />
+            <Parameter Name="IDNhom" Mode="In" Type="Int32" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="QDTPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVCaDB" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="PhongBan_update_Excel">
+            <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+            <Parameter Name="TenPhongBan" Mode="In" Type="String" />
+            <Parameter Name="TPDB" Mode="In" Type="Int32" />
+            <Parameter Name="QDTPTDB" Mode="In" Type="Int32" />
+            <Parameter Name="PTDB" Mode="In" Type="Int32" />
+            <Parameter Name="TPKipDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="KTVCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="TTTPCaDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVHCDB" Mode="In" Type="Int32" />
+            <Parameter Name="NVCaDB" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ToLV_delete">
+            <Parameter Name="IDTo" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ToLV_insert">
+            <Parameter Name="TenTo" Mode="In" Type="String" />
+            <Parameter Name="PhanXuongID" Mode="In" Type="Int32" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="SLDB" Mode="In" Type="Int32" />
+            <Parameter Name="IDNhomPT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ToLV_update">
+            <Parameter Name="TenTo" Mode="In" Type="String" />
+            <Parameter Name="PhanXuongID" Mode="In" Type="Int32" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="SLDB" Mode="In" Type="Int32" />
+            <Parameter Name="IDNhomPT" Mode="In" Type="Int32" />
+            <Parameter Name="IDTo" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ViTri_insert_API">
+            <Parameter Name="TenViTri" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="NhanVienAPI_select_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="MaNV" Nullable="true" MaxLength="12" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+          <Property Type="DateTime" Name="NgaySinh" Nullable="true" />
+          <Property Type="String" Name="DiaChi" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="DienThoai" Nullable="true" MaxLength="11" />
+          <Property Type="DateTime" Name="NgayVaoLam" Nullable="true" />
+          <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+          <Property Type="Int32" Name="IDTinhTrangLV" Nullable="true" />
+          <Property Type="Int32" Name="IDViTri" Nullable="true" />
+          <Property Type="String" Name="CMND" Nullable="true" MaxLength="14" />
+          <Property Type="Int32" Name="IDPhanXuong" Nullable="true" />
+          <Property Type="Int32" Name="IDToLV" Nullable="true" />
+          <Property Type="Int32" Name="IDCa" Nullable="true" />
+          <Property Type="Int32" Name="IDNhomLV" Nullable="true" />
+          <Property Type="String" Name="MaViTri" Nullable="true" MaxLength="20" />
+          <Property Type="Int32" Name="IDLoai" Nullable="true" />
+          <Property Type="Int32" Name="TT_BGD" Nullable="true" />
+          <Property Type="String" Name="ImagePath" Nullable="true" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="TenViTri" Nullable="true" MaxLength="200" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SoDoToChucModelStoreContainer" CdmEntityContainer="SoDoToChucEntities">
+          <EntitySetMapping Name="Cas">
+            <EntityTypeMapping TypeName="SoDoToChucModel.Ca">
+              <MappingFragment StoreEntitySet="Ca">
+                <ScalarProperty Name="IDCa" ColumnName="IDCa" />
+                <ScalarProperty Name="TenCa" ColumnName="TenCa" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CapBacs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.CapBac">
+              <MappingFragment StoreEntitySet="CapBac">
+                <ScalarProperty Name="IDCap" ColumnName="IDCap" />
+                <ScalarProperty Name="TT" ColumnName="TT" />
+                <ScalarProperty Name="TenCapBac" ColumnName="TenCapBac" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ChucVus">
+            <EntityTypeMapping TypeName="SoDoToChucModel.ChucVu">
+              <MappingFragment StoreEntitySet="ChucVu">
+                <ScalarProperty Name="IDChucVu" ColumnName="IDChucVu" />
+                <ScalarProperty Name="TenChucVu" ColumnName="TenChucVu" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LoaiKHs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.LoaiKH">
+              <MappingFragment StoreEntitySet="LoaiKH">
+                <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+                <ScalarProperty Name="TenLoaiKH" ColumnName="TenLoaiKH" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MaViTris">
+            <EntityTypeMapping TypeName="SoDoToChucModel.MaViTri">
+              <MappingFragment StoreEntitySet="MaViTri">
+                <ScalarProperty Name="IDMaViTri" ColumnName="IDMaViTri" />
+                <ScalarProperty Name="TenMaViTri" ColumnName="TenMaViTri" />
+                <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NhanVienAPIs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.NhanVienAPI">
+              <MappingFragment StoreEntitySet="NhanVienAPI">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+                <ScalarProperty Name="DiaChi" ColumnName="DiaChi" />
+                <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+                <ScalarProperty Name="NgayVaoLam" ColumnName="NgayVaoLam" />
+                <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+                <ScalarProperty Name="IDTinhTrangLV" ColumnName="IDTinhTrangLV" />
+                <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+                <ScalarProperty Name="CMND" ColumnName="CMND" />
+                <ScalarProperty Name="IDPhanXuong" ColumnName="IDPhanXuong" />
+                <ScalarProperty Name="IDToLV" ColumnName="IDToLV" />
+                <ScalarProperty Name="IDCa" ColumnName="IDCa" />
+                <ScalarProperty Name="IDNhomLV" ColumnName="IDNhomLV" />
+                <ScalarProperty Name="MaViTri" ColumnName="MaViTri" />
+                <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+                <ScalarProperty Name="TT_BGD" ColumnName="TT_BGD" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NhanVienPVSXes">
+            <EntityTypeMapping TypeName="SoDoToChucModel.NhanVienPVSX">
+              <MappingFragment StoreEntitySet="NhanVienPVSX">
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+                <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="TT_BGD" ColumnName="TT_BGD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Nhoms">
+            <EntityTypeMapping TypeName="SoDoToChucModel.Nhom">
+              <MappingFragment StoreEntitySet="Nhom">
+                <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+                <ScalarProperty Name="TenNhom" ColumnName="TenNhom" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NhomLVs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.NhomLV">
+              <MappingFragment StoreEntitySet="NhomLV">
+                <ScalarProperty Name="IDNhom" ColumnName="IDNhom" />
+                <ScalarProperty Name="TenNhom" ColumnName="TenNhom" />
+                <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+                <ScalarProperty Name="IDNhomPT" ColumnName="IDNhomPT" />
+                <ScalarProperty Name="PTDB" ColumnName="PTDB" />
+                <ScalarProperty Name="KTVDB" ColumnName="KTVDB" />
+                <ScalarProperty Name="NVDB" ColumnName="NVDB" />
+                <ScalarProperty Name="KTVCa" ColumnName="KTVCa" />
+                <ScalarProperty Name="NVCa" ColumnName="NVCa" />
+                <ScalarProperty Name="TPTDB" ColumnName="TPTDB" />
+                <ScalarProperty Name="TPKipDB" ColumnName="TPKipDB" />
+                <ScalarProperty Name="TTTPDB" ColumnName="TTTPDB" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PhanXuongs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.PhanXuong">
+              <MappingFragment StoreEntitySet="PhanXuong">
+                <ScalarProperty Name="IDPhanXuong" ColumnName="IDPhanXuong" />
+                <ScalarProperty Name="TenPhanXuong" ColumnName="TenPhanXuong" />
+                <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+                <ScalarProperty Name="PTDB" ColumnName="PTDB" />
+                <ScalarProperty Name="TPDB" ColumnName="TPDB" />
+                <ScalarProperty Name="KTVDB" ColumnName="KTVDB" />
+                <ScalarProperty Name="NVDB" ColumnName="NVDB" />
+                <ScalarProperty Name="NVHCDB" ColumnName="NVHCDB" />
+                <ScalarProperty Name="TPTT" ColumnName="TPTT" />
+                <ScalarProperty Name="KTVTT" ColumnName="KTVTT" />
+                <ScalarProperty Name="NVTT" ColumnName="NVTT" />
+                <ScalarProperty Name="TPKip" ColumnName="TPKip" />
+                <ScalarProperty Name="TTTPDB" ColumnName="TTTPDB" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PhongBans">
+            <EntityTypeMapping TypeName="SoDoToChucModel.PhongBan">
+              <MappingFragment StoreEntitySet="PhongBan">
+                <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+                <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+                <ScalarProperty Name="NhomID" ColumnName="NhomID" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="url" ColumnName="url" />
+                <ScalarProperty Name="TPDB" ColumnName="TPDB" />
+                <ScalarProperty Name="QDTPTDB" ColumnName="QDTPTDB" />
+                <ScalarProperty Name="PTDB" ColumnName="PTDB" />
+                <ScalarProperty Name="TPKipDB" ColumnName="TPKipDB" />
+                <ScalarProperty Name="KTVHCDB" ColumnName="KTVHCDB" />
+                <ScalarProperty Name="KTVCaDB" ColumnName="KTVCaDB" />
+                <ScalarProperty Name="TTTPHCDB" ColumnName="TTTPHCDB" />
+                <ScalarProperty Name="TTTPCaDB" ColumnName="TTTPCaDB" />
+                <ScalarProperty Name="NVHCDB" ColumnName="NVHCDB" />
+                <ScalarProperty Name="NVCaDB" ColumnName="NVCaDB" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="QuyenDangNhaps">
+            <EntityTypeMapping TypeName="SoDoToChucModel.QuyenDangNhap">
+              <MappingFragment StoreEntitySet="QuyenDangNhap">
+                <ScalarProperty Name="IDQuyen" ColumnName="IDQuyen" />
+                <ScalarProperty Name="TenQuyen" ColumnName="TenQuyen" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="SoDoToChucModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ToLVs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.ToLV">
+              <MappingFragment StoreEntitySet="ToLV">
+                <ScalarProperty Name="IDTo" ColumnName="IDTo" />
+                <ScalarProperty Name="TenTo" ColumnName="TenTo" />
+                <ScalarProperty Name="PhanXuongID" ColumnName="PhanXuongID" />
+                <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+                <ScalarProperty Name="SLDB" ColumnName="SLDB" />
+                <ScalarProperty Name="IDNhomPT" ColumnName="IDNhomPT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViTris">
+            <EntityTypeMapping TypeName="SoDoToChucModel.ViTri">
+              <MappingFragment StoreEntitySet="ViTri">
+                <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+                <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+                <ScalarProperty Name="IDChucVu" ColumnName="IDChucVu" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ViTriLViecs">
+            <EntityTypeMapping TypeName="SoDoToChucModel.ViTriLViec">
+              <MappingFragment StoreEntitySet="ViTriLViec">
+                <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+                <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="DangKy_delete" FunctionName="SoDoToChucModel.Store.DangKy_delete" />
+          <FunctionImportMapping FunctionImportName="DangKy_insert" FunctionName="SoDoToChucModel.Store.DangKy_insert" />
+          <FunctionImportMapping FunctionImportName="DangKy_ResetPass" FunctionName="SoDoToChucModel.Store.DangKy_ResetPass" />
+          <FunctionImportMapping FunctionImportName="DangKy_update" FunctionName="SoDoToChucModel.Store.DangKy_update" />
+          <FunctionImportMapping FunctionImportName="HanhChinhNM_delete" FunctionName="SoDoToChucModel.Store.HanhChinhNM_delete" />
+          <FunctionImportMapping FunctionImportName="HanhChinhNM_insert" FunctionName="SoDoToChucModel.Store.HanhChinhNM_insert" />
+          <FunctionImportMapping FunctionImportName="HanhChinhNM_update" FunctionName="SoDoToChucModel.Store.HanhChinhNM_update" />
+          <FunctionImportMapping FunctionImportName="LoaiKH_insert_Excel" FunctionName="SoDoToChucModel.Store.LoaiKH_insert_Excel" />
+          <FunctionImportMapping FunctionImportName="LoaiKH_update_Excel" FunctionName="SoDoToChucModel.Store.LoaiKH_update_Excel" />
+          <FunctionImportMapping FunctionImportName="MaViTri_insert_Excel" FunctionName="SoDoToChucModel.Store.MaViTri_insert_Excel" />
+          <FunctionImportMapping FunctionImportName="MaViTri_update_Excel" FunctionName="SoDoToChucModel.Store.MaViTri_update_Excel" />
+          <FunctionImportMapping FunctionImportName="NhanSuCa_delete" FunctionName="SoDoToChucModel.Store.NhanSuCa_delete" />
+          <FunctionImportMapping FunctionImportName="NhanSuCa_insert" FunctionName="SoDoToChucModel.Store.NhanSuCa_insert" />
+          <FunctionImportMapping FunctionImportName="NhanSuCa_update" FunctionName="SoDoToChucModel.Store.NhanSuCa_update" />
+          <FunctionImportMapping FunctionImportName="NhanVien_delete" FunctionName="SoDoToChucModel.Store.NhanVien_delete" />
+          <FunctionImportMapping FunctionImportName="NhanVien_insert" FunctionName="SoDoToChucModel.Store.NhanVien_insert" />
+          <FunctionImportMapping FunctionImportName="NhanVien_insert_API" FunctionName="SoDoToChucModel.Store.NhanVien_insert_API" />
+          <FunctionImportMapping FunctionImportName="NhanVien_update" FunctionName="SoDoToChucModel.Store.NhanVien_update" />
+          <FunctionImportMapping FunctionImportName="NhanVien_update_API" FunctionName="SoDoToChucModel.Store.NhanVien_update_API" />
+          <FunctionImportMapping FunctionImportName="NhanVien_update_Excel" FunctionName="SoDoToChucModel.Store.NhanVien_update_Excel" />
+          <FunctionImportMapping FunctionImportName="NhanVien_update_TT" FunctionName="SoDoToChucModel.Store.NhanVien_update_TT" />
+          <FunctionImportMapping FunctionImportName="NhanVienAPI_select" FunctionName="SoDoToChucModel.Store.NhanVienAPI_select">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SoDoToChucModel.NhanVienAPI_select_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+                <ScalarProperty Name="DiaChi" ColumnName="DiaChi" />
+                <ScalarProperty Name="DienThoai" ColumnName="DienThoai" />
+                <ScalarProperty Name="NgayVaoLam" ColumnName="NgayVaoLam" />
+                <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+                <ScalarProperty Name="IDTinhTrangLV" ColumnName="IDTinhTrangLV" />
+                <ScalarProperty Name="IDViTri" ColumnName="IDViTri" />
+                <ScalarProperty Name="CMND" ColumnName="CMND" />
+                <ScalarProperty Name="IDPhanXuong" ColumnName="IDPhanXuong" />
+                <ScalarProperty Name="IDToLV" ColumnName="IDToLV" />
+                <ScalarProperty Name="IDCa" ColumnName="IDCa" />
+                <ScalarProperty Name="IDNhomLV" ColumnName="IDNhomLV" />
+                <ScalarProperty Name="MaViTri" ColumnName="MaViTri" />
+                <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+                <ScalarProperty Name="TT_BGD" ColumnName="TT_BGD" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+                <ScalarProperty Name="TenViTri" ColumnName="TenViTri" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="NhanVienPVSX_delete" FunctionName="SoDoToChucModel.Store.NhanVienPVSX_delete" />
+          <FunctionImportMapping FunctionImportName="NhanVienPVSX_insert" FunctionName="SoDoToChucModel.Store.NhanVienPVSX_insert" />
+          <FunctionImportMapping FunctionImportName="NhanVienPVSX_update" FunctionName="SoDoToChucModel.Store.NhanVienPVSX_update" />
+          <FunctionImportMapping FunctionImportName="Nhom_delete" FunctionName="SoDoToChucModel.Store.Nhom_delete" />
+          <FunctionImportMapping FunctionImportName="Nhom_insert" FunctionName="SoDoToChucModel.Store.Nhom_insert" />
+          <FunctionImportMapping FunctionImportName="Nhom_insert_Excel" FunctionName="SoDoToChucModel.Store.Nhom_insert_Excel" />
+          <FunctionImportMapping FunctionImportName="Nhom_update" FunctionName="SoDoToChucModel.Store.Nhom_update" />
+          <FunctionImportMapping FunctionImportName="Nhom_update_Excel" FunctionName="SoDoToChucModel.Store.Nhom_update_Excel" />
+          <FunctionImportMapping FunctionImportName="PhanXuong_delete" FunctionName="SoDoToChucModel.Store.PhanXuong_delete" />
+          <FunctionImportMapping FunctionImportName="PhanXuong_insert" FunctionName="SoDoToChucModel.Store.PhanXuong_insert" />
+          <FunctionImportMapping FunctionImportName="PhanXuong_insert_Excel" FunctionName="SoDoToChucModel.Store.PhanXuong_insert_Excel" />
+          <FunctionImportMapping FunctionImportName="PhanXuong_insert_name" FunctionName="SoDoToChucModel.Store.PhanXuong_insert_name" />
+          <FunctionImportMapping FunctionImportName="PhanXuong_update" FunctionName="SoDoToChucModel.Store.PhanXuong_update" />
+          <FunctionImportMapping FunctionImportName="PhanXuong_update_Excel" FunctionName="SoDoToChucModel.Store.PhanXuong_update_Excel" />
+          <FunctionImportMapping FunctionImportName="PhongBan_delete" FunctionName="SoDoToChucModel.Store.PhongBan_delete" />
+          <FunctionImportMapping FunctionImportName="PhongBan_insert" FunctionName="SoDoToChucModel.Store.PhongBan_insert" />
+          <FunctionImportMapping FunctionImportName="PhongBan_insert_API" FunctionName="SoDoToChucModel.Store.PhongBan_insert_API" />
+          <FunctionImportMapping FunctionImportName="PhongBan_insert_Excel" FunctionName="SoDoToChucModel.Store.PhongBan_insert_Excel" />
+          <FunctionImportMapping FunctionImportName="PhongBan_update" FunctionName="SoDoToChucModel.Store.PhongBan_update" />
+          <FunctionImportMapping FunctionImportName="PhongBan_update_Excel" FunctionName="SoDoToChucModel.Store.PhongBan_update_Excel" />
+          <FunctionImportMapping FunctionImportName="ToLV_delete" FunctionName="SoDoToChucModel.Store.ToLV_delete" />
+          <FunctionImportMapping FunctionImportName="ToLV_insert" FunctionName="SoDoToChucModel.Store.ToLV_insert" />
+          <FunctionImportMapping FunctionImportName="ToLV_update" FunctionName="SoDoToChucModel.Store.ToLV_update" />
+          <FunctionImportMapping FunctionImportName="ViTri_insert_API" FunctionName="SoDoToChucModel.Store.ViTri_insert_API" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

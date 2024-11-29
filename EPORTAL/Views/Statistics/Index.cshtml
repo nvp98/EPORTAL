@@ -1,0 +1,162 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.Models
+@using EPORTAL.ModelsView360;
+@model PagedList.IPagedList<StatisticsValidation>
+@using PagedList.Mvc
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<link href="~/Content/assets/css/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Thông tin cá nhân
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+
+                    <div class="card-header">
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th class="text-center">Tên BP/NM</th>
+                                            <th class="text-center">Đã khai báo</th>
+                                            <th class="text-center">Chưa khai báo</th>
+                                            <th class="text-center">Đã xác nhận</th>
+                                            <th class="text-center">Chưa xác nhận</th>
+                                            <th class="text-center">Tổng số nhân viên</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                EPORTALEntities db = new EPORTALEntities();
+                                                List<int> al = new List<int>();
+                                                var CBNV = db.NhanViens.Where(x => x.IDPhongBan == item.IDPhongBan && x.IDTinhTrangLV == 1).Count();
+                                                var NhanVien = db.NhanViens.Where(x => x.IDPhongBan == item.IDPhongBan && x.IDTinhTrangLV == 1).ToList();
+                                                var XN = db.ThongTinCaNhans.Where(x => x.NhanVien.IDPhongBan == item.IDPhongBan && x.XacNhan == true).Count();
+                                                var CXN = db.ThongTinCaNhans.Where(x => x.NhanVien.IDPhongBan == item.IDPhongBan && x.XacNhan == false).Count();
+                                                var TTCN = db.ThongTinCaNhans.Where(x => x.NhanVien.IDPhongBan == item.IDPhongBan).ToList();
+                                                foreach (var nv in NhanVien)
+                                                {
+                                                    foreach (var ttnv in TTCN)
+                                                    {
+                                                        if (nv.ID == ttnv.IDNhanVien)
+                                                        {
+                                                            al.Add((int)ttnv.IDNhanVien);
+                                                        }
+                                                    }
+
+                                                }
+                                                var Dakhaibao = al.Count();
+                                                var Chuakhaibao = (CBNV - Dakhaibao).ToString();
+                                                <tr>
+
+                                                    @if (CBNV != 0)
+                                                    {
+                                                        <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                        <td>
+                                                            @item.TenPhongBan
+
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <a class="icon_action1"> @Dakhaibao</a>
+
+                                                            <a title="Download Dakhaibao" class="fa fa-file-excel icon_action pull-right" id="@item.IDPhongBan" href="@Url.Action("ExportDeclared","Statistics", new { id = item.IDPhongBan })"></a>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <a class="icon_action1">@Chuakhaibao</a>
+                                                            <a title="Download Chuakhaibao" class="fa fa-file-excel icon_action pull-right" id="@item.IDPhongBan" href="@Url.Action("ExportNotdeclared","Statistics", new { id = item.IDPhongBan })"></a>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <a class="icon_action1">@XN</a>
+                                                            <a title="Download Daxacnhan" class="fa fa-file-excel icon_action pull-right" id="@item.IDPhongBan" href="@Url.Action("ExportConfirmed","Statistics", new { id = item.IDPhongBan })"></a>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <a class="icon_action1">@CXN</a>
+                                                            <a title="Download Daxacnhan" class="fa fa-file-excel icon_action pull-right" id="@item.IDPhongBan" href="@Url.Action("ExportNotConfirmed","Statistics", new { id = item.IDPhongBan })"></a>
+                                                        </td>
+                                                        <td class="text-center"> <a class="icon_action1">@CBNV</a></td>
+                                                    }
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item web_name">
+                        <span>Công ty cổ phần thép Hòa Phát Dung Quất</span>
+                    </div>
+
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hóa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+

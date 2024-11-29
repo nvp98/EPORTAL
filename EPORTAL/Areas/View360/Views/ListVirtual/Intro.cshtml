@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model EPORTAL.ModelsView360.VirtualValidation
+<div class="app-main__outer">
+    <div class="app-main__inner" style="background-image:url(/assets/images/bg1.png);background-size:cover;">
+        <div class="tab-content">
+            <div class="">
+                <div class="text-center m-5">
+                    <img src="~/assets/images/LOGO_mau.png" width="250" />
+                </div>
+                <div class="text-center m-5">
+                    <h2 class="font-weight-bold " style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; ">THAM QUAN THỰC TẾ NHÀ MÁY</h2>
+                    <h2 class="font-weight-bold" style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; ">CÔNG TY CỔ PHẦN THÉP HÒA PHÁT DUNG QUẤT</h2>
+                </div>
+                <div class="text-center m-5 row">
+                    <div class="row m-auto" style="max-width:600px;min-width:500px">
+                        <div class="col-6">
+                            <img src="~/assets/images/CHUOT.png" width="70" />
+                            <h6 class="font-weight-bold text-wrap" style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;">Nhấn giữ chuột trái <br> rồi kéo về phía cần xem</h6>
+                            <h6 class="font-weight-bold text-wrap " style="color: red; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; font-size:10px ">Hold down the left mouse <br> button and drag left/right</h6>
+                        </div>
+                        <div class="col-6">
+                            <img src="~/assets/images/DIADIEM.png" width="70" />
+                            <h6 class="font-weight-bold " style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;">Nhấn trỏ chuột vào các  <br> điểm hotspot để di chuyển</h6>
+                            <h6 class="font-weight-bold text-wrap " style="color: red; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; font-size:10px ">Move the cursor to the hightlight <br> hotspots and click</h6>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="text-center">
+                    <button style="background-color: #ffff; border: none; cursor:pointer" onclick="myFunction()">
+                        <img src="~/assets/images/THAMQUANNGAY.png" width="350" />
+                    </button>
+                </div>
+                <div class="text-right" style="width:85%">
+                    <img src="~/assets/images/tongdaivien.png" width="100" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item">
+                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
+                    </div>
+                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
+                        <ul class="d-flex justify-content-center">
+
+                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function myFunction() {
+         window.location.href = '@Url.Action("Details", "ListVirtual")/' + @Model.ID;
+    }
+</script>

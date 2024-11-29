@@ -1,0 +1,47 @@
+﻿
+@model EPORTAL.ModelsTagSign.TK_CardRegistrationInforValidation
+@using EPORTAL.ModelsView360;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@{
+    EPORTALEntities db = new EPORTALEntities();
+
+}
+@using (Html.BeginForm("Approve", "Approve", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDTKDKT)
+    @Html.HiddenFor(model => model.DKTID)
+    @Html.HiddenFor(model => model.NhanVienID)
+    <div class="modal-dialog" id="form" style="margin-top:5%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+                                @Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Note" } })
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+

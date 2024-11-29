@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="76a244446b3b4a2c824a0227379f002b" Name="Diagram1">
+        <EntityTypeShape EntityType="EPORTALModel.Album" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Approve" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.AuthenticationAPI" Width="1.5" PointX="7.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.AuthorizationContractor" Width="1.5" PointX="5.25" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.AuthorizationUSER" Width="1.5" PointX="5.25" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.AuthorizationVideo" Width="1.5" PointX="5.25" PointY="10.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Calender" Width="1.5" PointX="12.75" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.DangKy" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.KD_KyDuyet" Width="1.5" PointX="8.25" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.KD_LoaiKyDuyet" Width="1.5" PointX="6" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.KD_TinhTrangXL" Width="1.5" PointX="14.75" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.KD_TrinhKy" Width="1.5" PointX="13" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.KD_TrinhKyGH" Width="1.5" PointX="14.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NhanVien" Width="1.5" PointX="3" PointY="5.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Authority" Width="1.5" PointX="15.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_CardRegistrationInfor" Width="1.5" PointX="10.75" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Confirm" Width="1.5" PointX="15.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Contract" Width="1.5" PointX="15.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_ContractorGroup" Width="1.5" PointX="0.75" PointY="16.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_DetailCardRegistrationInfor" Width="1.5" PointX="13" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_DetailExtendcard" Width="1.5" PointX="10" PointY="12" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Extendcard" Width="1.5" PointX="7.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Gate" Width="1.5" PointX="16.75" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Partner" Width="1.5" PointX="16.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Permission" Width="1.5" PointX="17.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Position" Width="1.5" PointX="17.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Workingtime" Width="1.5" PointX="17.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Workplace" Width="1.5" PointX="7.75" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.PhongBan" Width="1.5" PointX="0.75" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Project" Width="1.5" PointX="9.75" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.ProjectsGroup" Width="1.5" PointX="11.75" PointY="17.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Quyen" Width="1.5" PointX="18.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Signingstatu" Width="1.5" PointX="18.75" PointY="12.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.ThongTinCaNhan" Width="1.5" PointX="5.25" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.TinhTrangLV" Width="1.5" PointX="0.75" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Video" Width="1.5" PointX="3" PointY="13.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTALModel.Vitri" Width="1.5" PointX="0.75" PointY="10.875" IsExpanded="true" />
+        <AssociationConnector Association="EPORTALModel.FK_AuthorizationContractors_NhanVien" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_AuthorizationUSER_NhanVien" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_AuthorizationVideo_NhanVien" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_AuthorizationVideo_Video" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_KD_KyDuyet_KD_LoaiKyDuyet" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_KD_KyDuyet_NhanVien1" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_KD_TrinhKy_NT_CardRegistrationInfor" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_NhanVien_PhongBan" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_NhanVien_TinhTrangLV" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_NhanVien_Vitri" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_ThongTinCaNhan_NhanVien" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor" ManuallyRouted="false" />
+        <AssociationConnector Association="EPORTALModel.FK_NT_DetailExtendcard_NT_Extendcard" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="EPORTALModel.Register_Gate" PointX="17.375" PointY="18.75" Width="1.5" />
+        <EntityTypeShape EntityType="EPORTALModel.Terminal" Width="1.5" PointX="0.75" PointY="19.75" />
+        <EntityTypeShape EntityType="EPORTALModel.AuthorizationVitual" Width="1.5" PointX="3.375" PointY="19.75" />
+        <EntityTypeShape EntityType="EPORTALModel.Virtual" Width="1.5" PointX="14.375" PointY="19.75" />
+        <EntityTypeShape EntityType="EPORTALModel.VirtualGroup" Width="1.5" PointX="19.375" PointY="15.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,86 @@
+﻿@model EPORTAL.ModelsDanhBaDoiTac.PictureValidation
+
+@using (Html.BeginForm("Create", "Picture", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên Hình Ảnh</label>
+                                @Html.EditorFor(model => model.TenHinhAnh, new { htmlAttributes = new { @class = "form-control", placeholder = "Tên hình ảnh", @id = "TenHinhAnh" } })
+                                @Html.ValidationMessageFor(model => model.TenHinhAnh, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1" for="inputLastName">Hình ảnh </label>
+                                <input type="file" id="NameFile" name="NameFile" class="form-control" />
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" id="btnSubmit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    function checkfile(sender) {
+        var validExts = new Array(".jpg", ".png", ".gif", ".bmp", ".tiff", ".jpeg", ".heic", ".raw", ".svg" );
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            alert("Vui lòng chọn file hình ảnh: " +
+                validExts.toString() + "");
+            $('#NameFile').val() = '';
+            return false;
+        }
+        else { return true; }
+    };
+
+    $("#btnSubmit").on('click', function () {
+        var file = $('#NameFile').val();
+        if (file.length == 0) {
+            alert('Vui lòng chọn file hình ảnh.');
+            return false;
+        } else {
+            var validExts = new Array(".jpg", ".png", ".gif", ".bmp", ".tiff", ".jpeg", ".heic", ".raw", ".svg");
+            var fileExt = file;
+            fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+            if (validExts.indexOf(fileExt) < 0) {
+                alert("Vui lòng chọn file hình ảnh: " +
+                    validExts.toString() + "");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    });
+</script>
+
+

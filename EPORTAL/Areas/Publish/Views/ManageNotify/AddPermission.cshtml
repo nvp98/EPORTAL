@@ -1,0 +1,100 @@
+﻿@model EPORTAL.ModelsDanhBaDoiTac.Notify_PartnerValidation
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle1"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Thông Báo</label>
+                                @Html.DropDownListFor(model => model.TBaoID, ViewBag.TBList as SelectList, new { @class = "form-control", @id = "TBaoID" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Đối Tác</label>
+                                @Html.DropDownListFor(model => model.IDDoiTac, ViewBag.DTList as SelectList, new { @id = "IDDoiTac", @class = "form-control" })
+                            </div>
+                        </div>
+
+
+                        @*<div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="small mb-1">Nhân Viên</label>
+                                    <script>
+                                        $(document).ready(function () {
+                                            $("#PBID").change(function () {
+                                                $.get("/ConfirmEStudy/GetNhanVien", { id: $("#PBID").val() }, function (data) {
+                                                    $("#NVID").empty();
+                                                    $.each(data, function (index, row) {
+                                                        $("#NVID").append("<option value ='" + row.ID + "'>" + row.MaNV + " - " + row.HoTen + "</option>")
+                                                    });
+
+                                                });
+
+                                            })
+                                        });
+
+                                    </script>
+                                    @Html.DropDownListFor(model => model.NVID, new SelectList(" "), "--Chọn nhân viên--", new { @class = "form-control", @id = "NVID" })
+                                    @Html.ValidationMessageFor(model => model.NVID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+
+
+                    </div>
+
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+
+    $("#IDDoiTac").chosen({
+        width: "100%"
+    });
+
+</script>
+
+<style>
+    .chosen-container-single .chosen-single {
+        color: #495057;
+        background: #fff;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.8;
+        text-transform: capitalize;
+    }
+
+        .chosen-container-single .chosen-single span {
+            text-transform: capitalize !important;
+            font-size: 16px !important;
+        }
+</style>

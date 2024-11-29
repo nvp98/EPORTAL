@@ -1,0 +1,294 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model PagedList.IPagedList<AccountNTValidation>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsPartner;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_NTEntities dbNT = new EPORTAL_NTEntities();
+    var quyenAdd = (int)ViewBag.Quyen;
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách Tài khoản nhà thầu
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-5">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (quyenAdd != 0)
+                            {
+                                <div class="col-md-7" style="display:flex;">
+                                    @using (Html.BeginForm("upLoadfile", "AccountNT", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <input type="file" name="FileExcel" class="form-control" value="@ViewBag.search">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-primary"><i class="fa fa-upload">&nbsp;</i> Import Excel</button>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div>
+                                          <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus"></i>&nbsp;Thêm mới </button>
+                                            <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","AccountNT")' style="margin-top:50px"></div>
+                                            &nbsp;
+                                            <button type="button" id="btn-re" class="btn btn-primary ml-2 pull-right"><i class="pe-7s-repeat">&nbsp;</i>&nbsp;Khóa tài khoản </button>
+                                            <div class="modal" id="myModalRe" role="dialog" data-url='@Url.Action("ResetListPass","AccountNT")' style="margin-top:50px"></div>
+                                    </div>
+                                    &nbsp;
+                                  
+                                </div>
+                            }
+
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            @if (quyenAdd != 0)
+                                            {
+                                                <th width="30px" class="text-center">Thao Tác</th>
+                                            }
+                                            <th class="text-center" width="120px">UserName</th>
+                                            <th class="text-center" width="120px">Tên Nhà thầu</th>
+                                            <th class="text-center" width="120px">Tình trạng</th>
+                                         
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                      @if (quyenAdd != 0) { 
+                                                         <td class="text-center">
+                                                            <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "AccountNT", new { id = item.ID })"
+                                                               onclick="return confirm('Bạn muốn xóa Thông tin  : @item.UserName')">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+
+                                                            <a id="btn-edit_@item.ID" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                            <div class="modal " id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "AccountNT", new { id = item.ID })'></div>
+                                                            <script type="text/javascript">
+                                                                    $('#btn-edit_@item.ID').click(function () {
+                                                                        var url = $('#myModaleEdit_@item.ID').data('url');
+                                                                        $.get(url, function (data) {
+                                                                            $("#myModaleEdit_@item.ID").html(data);
+                                                                            $("#ModalTitle").html("Chỉnh sửa thông tin");
+                                                                            $("#myModaleEdit_@item.ID").modal('show');
+                                                                        });
+                                                                    });
+                                                            </script>
+
+                                                            <a id="btn-reset_@item.ID" href="#" title="Reset password" class="btn-action"><i class="fa fa-key"></i> </a>
+                                                            <div class="modal fade" id="myModale_@item.ID" role="dialog" data-url='@Url.Action("Resetpass", "AccountNT", new { id = item.ID })'></div>
+                                                            <script type="text/javascript">
+                                                                $('#btn-reset_@item.ID').click(function () {
+                                                                    var url = $('#myModale_@item.ID').data('url');
+                                                                    $.get(url, function (data) {
+                                                                        $("#myModal").html(data);
+                                                                        $("#ModalTitle").html("Cập nhật mật khẩu");
+                                                                        $("#myModal").modal('show');
+                                                                    });
+                                                                });
+                                                            </script>
+
+                                                        </td>
+                                                      }
+                                                          
+                                    
+                                                    <td>
+                                                        @item.UserName
+                                                    </td>
+                                                    <td>
+                                                        @item.TenNhaThau
+                                                    </td>
+                                                    
+                                                        @if(item.TinhTrang == 1)
+                                                        {
+                                                            <td>Hoạt động</td>
+                                                        }
+                                                        else
+                                                        {
+                                                           <td>Đã Khóa</td>
+                                                        }
+                                                   
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "AccountNT", new { area = "Partner", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm thẻ tạm");
+            $("#myModal").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModalImport").html(data);
+            $("#ModalTitle").html("Thêm thẻ tạm nhà thầu");
+            $("#myModalImport").modal('show');
+        });
+    });
+
+    $('#btn-re').click(function () {
+        var url = $('#myModalRe').data('url');
+        $.get(url, function (data) {
+            $("#myModalRe").html(data);
+            $("#ModalTitle").html("Reset Pass List");
+            $("#myModalRe").modal('show');
+        });
+    });
+
+    $("#btn-search").on('click', function () {
+        var search = $('#txtsearch').val();
+        window.location.href = '@Url.Action("Index", "AccountNT")?search=' + search;
+    });
+    $('#btn-Export').click(function () {
+        window.location.href = '@Url.Action("DownloadExcel", "CardTemp")';
+    });
+
+
+    //$(document).ready(function () {
+    //    var dateNewFormat, onlyDate, today = new Date();
+
+    //    var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    //    dateLastDate = prevMonthLastDate.getFullYear() + '-';
+    //    if (prevMonthLastDate.getMonth() >= 9) {
+
+    //        dateLastDate += (prevMonthLastDate.getMonth() + 1);
+    //    }
+    //    else {
+    //        dateLastDate += '0' + (prevMonthLastDate.getMonth() + 1);
+    //    }
+
+    //    onlyLastDate = prevMonthLastDate.getDate();
+
+    //    if (onlyLastDate.toString().length == 2) {
+
+    //        dateLastDate += "-" + onlyLastDate;
+    //    }
+    //    else {
+    //        dateLastDate += '-0' + onlyLastDate;
+    //    }
+
+
+
+    //    dateNewFormat = today.getFullYear() + '-';
+    //    if (today.getMonth() >= 9) {
+
+    //        dateNewFormat += (today.getMonth() + 1);
+    //    }
+    //    else {
+    //        dateNewFormat += '0' + (today.getMonth() + 1);
+    //    }
+
+    //    onlyDate = today.getDate();
+    //    if (onlyDate.toString().length == 2) {
+
+    //        dateNewFormat += "-" + onlyDate;
+    //    }
+    //    else {
+    //        dateNewFormat += '-0' + onlyDate;
+    //    }
+    //    if ($('#begind').val() == '') {
+    //        $('#begind').val(dateLastDate);
+    //    }
+    //    if ($('#endd').val() == '') {
+    //        $('#endd').val(dateNewFormat);
+    //    }
+    //});
+</script>
+
+
+
+

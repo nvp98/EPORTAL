@@ -1,0 +1,490 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EPORTAL_NTModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="NT_CardTemp">
+    <Key>
+      <PropertyRef Name="IDThe" />
+    </Key>
+    <Property Name="IDThe" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="MaThe" Type="nvarchar" MaxLength="20" />
+    <Property Name="TenThe" Type="nvarchar" MaxLength="50" />
+    <Property Name="UserID" Type="nvarchar" MaxLength="20" />
+    <Property Name="EmployeeID" Type="nvarchar" MaxLength="20" />
+    <Property Name="IDCong" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_CarteTemporaire">
+    <Key>
+      <PropertyRef Name="IDTTT" />
+    </Key>
+    <Property Name="IDTTT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="NoiDung" Type="nvarchar" MaxLength="200" />
+    <Property Name="NguoiTaoID" Type="int" />
+    <Property Name="NgayTao" Type="date" />
+    <Property Name="TinhTrang" Type="int" />
+    <Property Name="NTID" Type="int" />
+    <Property Name="PhongBanID" Type="int" />
+    <Property Name="HangMuc" Type="nvarchar" MaxLength="200" />
+    <Property Name="ThoiHan" Type="date" />
+    <Property Name="GhiChu" Type="nvarchar" MaxLength="200" />
+    <Property Name="isNT" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_ContactEquipment">
+    <Key>
+      <PropertyRef Name="IDTBNT" />
+    </Key>
+    <Property Name="IDTBNT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="NameEquipment" Type="nvarchar" MaxLength="200" />
+    <Property Name="IndentifierContact" Type="nvarchar" MaxLength="50" />
+    <Property Name="BienSoXe" Type="nvarchar" MaxLength="50" />
+    <Property Name="IDContact" Type="int" />
+    <Property Name="Operator" Type="nvarchar" MaxLength="50" />
+    <Property Name="IDDepartment" Type="int" />
+    <Property Name="Cavet" Type="int" />
+    <Property Name="NgayHetHanDK" Type="date" />
+    <Property Name="SoNgayHetHanDK" Type="int" />
+    <Property Name="NgayHetHanKD" Type="date" />
+    <Property Name="SoNgayHetHanKD" Type="int" />
+    <Property Name="NgayHetHanBHX" Type="date" />
+    <Property Name="SoNgayHetHanBHX" Type="int" />
+    <Property Name="CCHV" Type="int" />
+    <Property Name="NgayHetHanTAT" Type="date" />
+    <Property Name="SoNgayHetHanTAT" Type="int" />
+    <Property Name="NgayHetHanVCHHChayNo" Type="date" />
+    <Property Name="SoNgayHetHanVCHHChayNo" Type="int" />
+    <Property Name="NgayHetHanCNKD" Type="date" />
+    <Property Name="SoNgayHetHanCNKD" Type="int" />
+    <Property Name="ChungChiPCCCCNCH" Type="nvarchar" MaxLength="50" />
+    <Property Name="ChungChiVCHHNHCN" Type="nvarchar" MaxLength="50" />
+    <Property Name="StartDate" Type="date" />
+    <Property Name="KhuVucThiCong" Type="nvarchar" MaxLength="50" />
+    <Property Name="NguoiNhap" Type="nvarchar" MaxLength="50" />
+    <Property Name="TinhTrang" Type="int" />
+    <Property Name="GhiChu" Type="nvarchar(max)" />
+    <Property Name="FileUpload" Type="nvarchar(max)" />
+    <Property Name="IDMDD" Type="int" />
+    <Property Name="SoKhung" Type="nvarchar" MaxLength="50" />
+    <Property Name="ThoiHanTheTu" Type="date" />
+    <Property Name="ThoiHanTheRVTX" Type="date" />
+  </EntityType>
+  <EntityType Name="NT_DetailCarteTemporaire">
+    <Key>
+      <PropertyRef Name="IDCTTTT" />
+    </Key>
+    <Property Name="IDCTTTT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="HoVaTen" Type="nvarchar" MaxLength="100" />
+    <Property Name="CCCD" Type="nvarchar" MaxLength="100" />
+    <Property Name="NgaySinh" Type="date" />
+    <Property Name="MucDich" Type="int" />
+    <Property Name="Sdt" Type="nvarchar" MaxLength="50" />
+    <Property Name="BienSo" Type="nvarchar" MaxLength="50" />
+    <Property Name="Cong" Type="int" />
+    <Property Name="GhiChu" Type="nvarchar" MaxLength="200" />
+    <Property Name="IDTTT" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_Handle">
+    <Key>
+      <PropertyRef Name="IDXL" />
+    </Key>
+    <Property Name="IDXL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDTTT" Type="int" />
+    <Property Name="IDCTTTT" Type="int" />
+    <Property Name="NguoiXuLy" Type="int" />
+    <Property Name="ThoiGianXuLy" Type="datetime" />
+    <Property Name="IDThe" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_HistoryBlackList">
+    <Key>
+      <PropertyRef Name="IDHis" />
+    </Key>
+    <Property Name="IDHis" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="NVVPID" Type="int" />
+    <Property Name="NgayUpdate" Type="datetime" />
+    <Property Name="IDNVUpdate" Type="int" />
+    <Property Name="StatusUpdate" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_HoatDongNV">
+    <Key>
+      <PropertyRef Name="IDHD" />
+    </Key>
+    <Property Name="IDHD" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDNVNT" Type="int" />
+    <Property Name="IDNT" Type="int" />
+    <Property Name="NgayCap" Type="date" />
+    <Property Name="HanSuDung" Type="date" />
+    <Property Name="IDKV" Type="nvarchar" MaxLength="50" />
+    <Property Name="IDCA" Type="int" />
+    <Property Name="GhiChu" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'EPORTAL_NT.dbo.NT_MaDinhDanh' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+  <EntityType Name="NT_MaDinhDanh">
+    <Key>
+      <PropertyRef Name="IDDD" />
+    </Key>
+    <Property Name="IDDD" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="MaDinhDanh" Type="nvarchar" MaxLength="50" />
+    <Property Name="TenMaDinhDanh" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="NT_NhanVienNT">
+    <Key>
+      <PropertyRef Name="IDNVNT" />
+    </Key>
+    <Property Name="IDNVNT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="HoTen" Type="nvarchar" MaxLength="150" />
+    <Property Name="CCCD" Type="nvarchar" MaxLength="50" />
+    <Property Name="DiaChi" Type="nvarchar" MaxLength="250" />
+    <Property Name="Sdt" Type="int" />
+    <Property Name="SoThe" Type="varchar" MaxLength="50" />
+    <Property Name="IDNT" Type="int" />
+    <Property Name="NgayCap" Type="date" />
+    <Property Name="HanSuDung" Type="date" />
+    <Property Name="TTLV" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_NhanVienVP">
+    <Key>
+      <PropertyRef Name="IDNVVP" />
+    </Key>
+    <Property Name="IDNVVP" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="HoTen" Type="nvarchar" MaxLength="150" />
+    <Property Name="CCCD" Type="nvarchar" MaxLength="50" />
+    <Property Name="CMND" Type="nvarchar" MaxLength="50" />
+    <Property Name="NgaySinh" Type="datetime" />
+    <Property Name="LyDoCam" Type="nvarchar" MaxLength="200" />
+    <Property Name="GhiChu" Type="nvarchar" MaxLength="250" />
+    <Property Name="CreateDay" Type="datetime" />
+    <Property Name="CreateIDNV" Type="int" />
+    <Property Name="TinhTrang" Type="int" />
+  </EntityType>
+  <EntityType Name="NT_Purpose">
+    <Key>
+      <PropertyRef Name="IDMD" />
+    </Key>
+    <Property Name="IDMD" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TenMD" Type="nvarchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="NT_TTHD">
+    <Key>
+      <PropertyRef Name="IDHD" />
+    </Key>
+    <Property Name="IDHD" Type="int" Nullable="false" />
+    <Property Name="TenHD" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="NT_UserTemp">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserName" Type="nvarchar" MaxLength="50" />
+    <Property Name="MatKhau" Type="nvarchar" MaxLength="200" />
+    <Property Name="IDNT" Type="int" />
+    <Property Name="TinhTrang" Type="int" />
+  </EntityType>
+  <Association Name="FK_NT_DetailCarteTemporaire_NT_CarteTemporaire">
+    <End Role="NT_CarteTemporaire" Type="Self.NT_CarteTemporaire" Multiplicity="0..1" />
+    <End Role="NT_DetailCarteTemporaire" Type="Self.NT_DetailCarteTemporaire" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NT_CarteTemporaire">
+        <PropertyRef Name="IDTTT" />
+      </Principal>
+      <Dependent Role="NT_DetailCarteTemporaire">
+        <PropertyRef Name="IDTTT" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Function Name="NT_CardTemp_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDThe" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_CardTemp_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="MaThe" Type="nvarchar" Mode="In" />
+    <Parameter Name="TenThe" Type="nvarchar" Mode="In" />
+    <Parameter Name="UserID" Type="nvarchar" Mode="In" />
+    <Parameter Name="EmployeeID" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDCong" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_CardTemp_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDThe" Type="int" Mode="In" />
+    <Parameter Name="MaThe" Type="nvarchar" Mode="In" />
+    <Parameter Name="TenThe" Type="nvarchar" Mode="In" />
+    <Parameter Name="UserID" Type="nvarchar" Mode="In" />
+    <Parameter Name="EmployeeID" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDCong" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_CarteTemporaire_Cancel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NT_CarteTemporaire_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_CarteTemporaire_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="NoiDung" Type="nvarchar" Mode="In" />
+    <Parameter Name="NguoiTaoID" Type="int" Mode="In" />
+    <Parameter Name="NgayTao" Type="date" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+    <Parameter Name="NTID" Type="int" Mode="In" />
+    <Parameter Name="PhongBanID" Type="int" Mode="In" />
+    <Parameter Name="HangMuc" Type="nvarchar" Mode="In" />
+    <Parameter Name="ThoiHan" Type="date" Mode="In" />
+    <Parameter Name="isNT" Type="int" Mode="In" />
+    <Parameter Name="IDTTT" Type="int" Mode="InOut" />
+  </Function>
+  <Function Name="NT_CarteTemporaire_Select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="NT_CarteTemporaire_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+    <Parameter Name="NoiDung" Type="nvarchar" Mode="In" />
+    <Parameter Name="NguoiTaoID" Type="int" Mode="In" />
+    <Parameter Name="NgayTao" Type="date" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+    <Parameter Name="NTID" Type="int" Mode="In" />
+    <Parameter Name="PhongBanID" Type="int" Mode="In" />
+    <Parameter Name="HangMuc" Type="nvarchar" Mode="In" />
+    <Parameter Name="ThoiHan" Type="date" Mode="In" />
+  </Function>
+  <Function Name="NT_CarteTemporaire_Update_XL" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_ContactEquipment_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTBNT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_ContactEquipment_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="NameEquipment" Type="nvarchar" Mode="In" />
+    <Parameter Name="IndentifierContact" Type="nvarchar" Mode="In" />
+    <Parameter Name="BienSoXe" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDContact" Type="int" Mode="In" />
+    <Parameter Name="Operator" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDDepartment" Type="int" Mode="In" />
+    <Parameter Name="Cavet" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanDK" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHethanDK" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanKD" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanKD" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanBHX" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanBHX" Type="int" Mode="In" />
+    <Parameter Name="CCHV" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanTAT" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanTAT" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanVCHHChayNo" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanVCHHChayNo" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanCNKD" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanCNKD" Type="int" Mode="In" />
+    <Parameter Name="ChungChiPCCCCNCH" Type="nvarchar" Mode="In" />
+    <Parameter Name="ChungChiVCHHCHCN" Type="nvarchar" Mode="In" />
+    <Parameter Name="StartDate" Type="date" Mode="In" />
+    <Parameter Name="IDKV" Type="nvarchar" Mode="In" />
+    <Parameter Name="NguoiNhap" Type="nvarchar" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="FileUpload" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="IDMDD" Type="int" Mode="In" />
+    <Parameter Name="SoKhung" Type="nvarchar" Mode="In" />
+    <Parameter Name="ThoiHanTheTu" Type="date" Mode="In" />
+    <Parameter Name="ThoiHanTheRVTX" Type="date" Mode="In" />
+  </Function>
+  <Function Name="NT_ContactEquipment_Select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="NT_ContactEquipment_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTBNT" Type="int" Mode="In" />
+    <Parameter Name="NameEquipment" Type="nvarchar" Mode="In" />
+    <Parameter Name="IndentifierContact" Type="nvarchar" Mode="In" />
+    <Parameter Name="BienSoXe" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDContact" Type="int" Mode="In" />
+    <Parameter Name="Operator" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDDepartment" Type="int" Mode="In" />
+    <Parameter Name="Cavet" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanDK" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHethanDK" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanKD" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanKD" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanBHX" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanBHX" Type="int" Mode="In" />
+    <Parameter Name="CCHV" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanTAT" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanTAT" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanVCHHChayNo" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanVCHHChayNo" Type="int" Mode="In" />
+    <Parameter Name="NgayHetHanCNKD" Type="date" Mode="In" />
+    <Parameter Name="SoNgayHetHanCNKD" Type="int" Mode="In" />
+    <Parameter Name="ChungChiPCCCCNCH" Type="nvarchar" Mode="In" />
+    <Parameter Name="ChungChiVCHHCHCN" Type="nvarchar" Mode="In" />
+    <Parameter Name="StartDate" Type="date" Mode="In" />
+    <Parameter Name="IDKV" Type="nvarchar" Mode="In" />
+    <Parameter Name="NguoiNhap" Type="nvarchar" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="FileUpload" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="IDMDD" Type="int" Mode="In" />
+    <Parameter Name="SoKhung" Type="nvarchar" Mode="In" />
+    <Parameter Name="ThoiHanTheTu" Type="date" Mode="In" />
+    <Parameter Name="ThoiHanTheRVTX" Type="date" Mode="In" />
+  </Function>
+  <Function Name="NT_DetailCarteTemporaire_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDCTTTT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_DetailCarteTemporaire_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="HoVaTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgaySinh" Type="date" Mode="In" />
+    <Parameter Name="MucDich" Type="int" Mode="In" />
+    <Parameter Name="Sdt" Type="nvarchar" Mode="In" />
+    <Parameter Name="BienSo" Type="nvarchar" Mode="In" />
+    <Parameter Name="Cong" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_DetailCarteTemporaire_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDCTTTT" Type="int" Mode="In" />
+    <Parameter Name="HoVaTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgaySinh" Type="date" Mode="In" />
+    <Parameter Name="MucDich" Type="int" Mode="In" />
+    <Parameter Name="Sdt" Type="nvarchar" Mode="In" />
+    <Parameter Name="BienSo" Type="nvarchar" Mode="In" />
+    <Parameter Name="Cong" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_Handle_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDTTT" Type="int" Mode="In" />
+    <Parameter Name="IDCTTTT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_Handle_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDXL" Type="int" Mode="In" />
+    <Parameter Name="NguoiXuLy" Type="int" Mode="In" />
+    <Parameter Name="ThoiGianXuLy" Type="date" Mode="In" />
+    <Parameter Name="IDThe" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_HistoryBlackList_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="NVVPID" Type="int" Mode="In" />
+    <Parameter Name="NgayUpdate" Type="datetime" Mode="In" />
+    <Parameter Name="IDNVUpdate" Type="int" Mode="In" />
+    <Parameter Name="StatusUpdate" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_HistoryBlackList_Select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="NT_HoatDongNV_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVNT" Type="int" Mode="In" />
+    <Parameter Name="IDNT" Type="int" Mode="In" />
+    <Parameter Name="NgayCap" Type="date" Mode="In" />
+    <Parameter Name="HanSuDung" Type="date" Mode="In" />
+    <Parameter Name="IDKV" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDCA" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienNT_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVNT" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienNT_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="DiaChi" Type="nvarchar" Mode="In" />
+    <Parameter Name="Sdt" Type="int" Mode="In" />
+    <Parameter Name="SoThe" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDNT" Type="int" Mode="In" />
+    <Parameter Name="NgayCap" Type="date" Mode="In" />
+    <Parameter Name="HanSuDung" Type="date" Mode="In" />
+    <Parameter Name="TTLV" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienNT_lock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVNT" Type="int" Mode="In" />
+    <Parameter Name="TTLV" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienNT_Select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienNT_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVNT" Type="int" Mode="In" />
+    <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="DiaChi" Type="nvarchar" Mode="In" />
+    <Parameter Name="Sdt" Type="int" Mode="In" />
+    <Parameter Name="SoThe" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDNT" Type="int" Mode="In" />
+    <Parameter Name="NgayCap" Type="date" Mode="In" />
+    <Parameter Name="HanSuDung" Type="date" Mode="In" />
+    <Parameter Name="TTLV" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienNT_updateday" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVNT" Type="int" Mode="In" />
+    <Parameter Name="NgayCap" Type="date" Mode="In" />
+    <Parameter Name="HanSuDung" Type="date" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienVP_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVVP" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienVP_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="CMND" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgaySinh" Type="datetime" Mode="In" />
+    <Parameter Name="LyDoCam" Type="nvarchar" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+    <Parameter Name="CreateDay" Type="datetime" Mode="In" />
+    <Parameter Name="CreateIDNV" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienVP_Select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienVP_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVVP" Type="int" Mode="In" />
+    <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgaySinh" Type="datetime" Mode="In" />
+    <Parameter Name="LyDoCam" Type="nvarchar" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="NT_NhanVienVP_updateLock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDNVVP" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_UserTemp_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_UserTemp_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="UserName" Type="nvarchar" Mode="In" />
+    <Parameter Name="MatKhau" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDNT" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_UserTemp_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="UserName" Type="nvarchar" Mode="In" />
+    <Parameter Name="MatKhau" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDNT" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NT_UserTemp_updatePass" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="MatKhau" Type="nvarchar" Mode="In" />
+  </Function>
+  <EntityContainer Name="EPORTAL_NTModelStoreContainer">
+    <EntitySet Name="NT_CardTemp" EntityType="Self.NT_CardTemp" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_CarteTemporaire" EntityType="Self.NT_CarteTemporaire" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_ContactEquipment" EntityType="Self.NT_ContactEquipment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_DetailCarteTemporaire" EntityType="Self.NT_DetailCarteTemporaire" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_Handle" EntityType="Self.NT_Handle" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_HistoryBlackList" EntityType="Self.NT_HistoryBlackList" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_HoatDongNV" EntityType="Self.NT_HoatDongNV" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_NhanVienNT" EntityType="Self.NT_NhanVienNT" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_NhanVienVP" EntityType="Self.NT_NhanVienVP" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_Purpose" EntityType="Self.NT_Purpose" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_TTHD" EntityType="Self.NT_TTHD" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_UserTemp" EntityType="Self.NT_UserTemp" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="NT_MaDinhDanh" EntityType="Self.NT_MaDinhDanh" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [NT_MaDinhDanh].[IDDD] AS [IDDD], 
+    [NT_MaDinhDanh].[MaDinhDanh] AS [MaDinhDanh], 
+    [NT_MaDinhDanh].[TenMaDinhDanh] AS [TenMaDinhDanh]
+    FROM [dbo].[NT_MaDinhDanh] AS [NT_MaDinhDanh]</DefiningQuery>
+    </EntitySet>
+    <AssociationSet Name="FK_NT_DetailCarteTemporaire_NT_CarteTemporaire" Association="Self.FK_NT_DetailCarteTemporaire_NT_CarteTemporaire">
+      <End Role="NT_CarteTemporaire" EntitySet="NT_CarteTemporaire" />
+      <End Role="NT_DetailCarteTemporaire" EntitySet="NT_DetailCarteTemporaire" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

@@ -1,0 +1,127 @@
+﻿
+@model SoDoToChuc.Models.AdminPB
+@using EPORTAL.ModelsOrganizational
+
+@using (Html.BeginForm("Create", "AdminPB", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Tên Phòng Ban</label>
+                                @Html.EditorFor(model => model.TenPhongBan, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TenPhongBan" } })
+                                @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Khối </label>
+
+                                @Html.DropDownListFor(model => model.NhomID, ViewBag.NhomList as SelectList, "--Chọn Khối--", new { @id = "NhomID", @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.V_TT, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL T/PDB</label>
+                                @Html.EditorFor(model => model.TPDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TPDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL QD/TPT</label>
+                                @Html.EditorFor(model => model.QDTPTDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "QDTPTDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL Phụ trách</label>
+                                @Html.EditorFor(model => model.PTDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "PTDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL T/P Kíp Ca</label>
+                                @Html.EditorFor(model => model.TPKipDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TPKipDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL KTV HC</label>
+                                @Html.EditorFor(model => model.KTVHCDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "KTVHCDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL KTV Ca</label>
+                                @Html.EditorFor(model => model.KTVCaDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "KTVCaDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL Tổ T/P HC</label>
+                                @Html.EditorFor(model => model.TTTPHCDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TTTPHCDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL Tổ T/P Ca</label>
+                                @Html.EditorFor(model => model.TTTPCaDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "TTTPCaDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL NV HC</label>
+                                @Html.EditorFor(model => model.NVHCDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NVHCDB", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">SL NV Ca</label>
+                                @Html.EditorFor(model => model.NVCaDB, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "NVCaDB", @text = "" } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1 font-weight-bold">Hình Ảnh</label>
+                                @*@Html.LabelFor(model => model.ImagePath, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                                <div class="col-md-10">
+                                    <input type="file" name="ImageFile" />
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+                        <input type="reset" value="Hủy" class="btn btn-danger button_cancel" data-dismiss="modal" />
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+<script>
+
+</script>

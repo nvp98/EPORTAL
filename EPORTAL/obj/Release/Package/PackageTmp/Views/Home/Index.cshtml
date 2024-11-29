@@ -1,0 +1,1277 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsPartner;
+@using EPORTAL.ModelsView360;
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_NTEntities db_nt = new EPORTAL_NTEntities();
+}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<div class="app-main__outer">
+    @*<div class="app-main__inner">
+        <div class="overview row" style="background-color: #f4f3ef;">
+            <div class="col-xl-3 col-md-6">
+                @{
+                    var count = db.NT_Partner.Where(x => x.CodeUnis != "").ToList().Count;
+                }
+                <div class="card">
+                    <div style="padding: 1.25rem; background-color: #1b4188 !important;" class="card-block">
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <h4 style="color: #fe9365; font-weight: 600; color:white;" class="text-c-yellow f-w-600">Nhà thầu</h4>
+                                <h6 style="font-weight: 600; color: white;" class="text-muted m-b-0">Số lượng: @count </h6>
+                            </div>
+                            <div class="col-4 text-right">
+                                <b><i style="font-size: 3rem; background-color: white;" class="pe-7s-culture icon-gradient bg-grow-early"></i></b>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-c-yellow">
+                        <div class="row align-items-center">
+                            <div style="font-weight: 600;" class="col-12 pull-right">
+                                <a class="small text-white stretched-link pull-right" href="@Url.Action("Index", "ListPartner", new { area = "Partner" })">
+                                    <span style="color:black;"> Xem chi tiết </span>
+                                    <i style="color: black;" class="fa fa-angle-double-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                @{
+                    var count1 = db_nt.NT_NhanVienNT.Where(x => x.TTLV == 1).ToList().Count;
+                    var count5 = db_nt.NT_NhanVienNT.Where(x => x.TTLV == 3).ToList().Count;
+                }
+                <div class="card">
+                    <div style="padding: 1.25rem; background-color: #00BCD4 !important;" class="card-block">
+                        <div class="row align-items-center">
+                            <div class="col-10">
+                                <h4 style="color: #0ac282; font-weight: 600; color:white;" class="text-c-yellow f-w-600">Nhân viên nhà thầu</h4>
+                                <div style="display:flex;">
+                                    <h6 style="font-weight: 600; color: white;" class="text-muted m-b-0">Hoạt động: @count1</h6>
+                                    &nbsp;
+                                    &nbsp;
+                                    <h6 style="font-weight: 600; color: white;" class="text-muted m-b-0">Tạm dừng: @count5</h6>
+                                </div>
+
+                            </div>
+                            <div class="col-2 text-right">
+                                <i style="font-size: 3rem; background-color: white; " class="pe-7s-notebook icon-gradient bg-grow-early"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-c-yellow">
+                        <div class="row align-items-center">
+                            <div class="col-12">
+                                <a class="small text-white stretched-link pull-right" href="@Url.Action("Index", "ContractorStaff", new { area = "Partner" })">
+                                    <span style="color:black;"> Xem chi tiết </span>
+                                    <i style="color:black;" class="fa fa-angle-double-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6" style="width">
+                @{
+                    DateTime Now = DateTime.Now;
+                    var startDay = new DateTime(Now.Year, Now.Month, 1);
+                    var endDay = startDay.AddMonths(1).AddDays(-1);
+                    var IDDS = db.NT_CardRegistrationInfor.Where(x => x.DayUpload >= startDay && x.DayUpload <= endDay).ToList().Count;
+                }
+                <div class="card">
+                    <div style="padding: 1.25rem; background-color: #8BC34A !important;" class="card-block">
+                        <div class="row align-items-center">
+                            <div class="col-10">
+                                <h4 style="color: #0ac282; font-weight: 600; color:white;" class="text-c-yellow f-w-600">Đăng ký học ATLĐ</h4>
+                                <h6 style="font-weight: 600; color: white;" class="text-muted m-b-0">Số lượng: @IDDS  &nbsp; <i class="fa fa-arrows-h" aria-hidden="true"></i> &nbsp; Tháng: @Now.Month</h6>
+                            </div>
+                            <div class="col-2 text-right">
+                                <i style="font-size: 3rem; background-color: white; " class="pe-7s-note2 icon-gradient bg-grow-early"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-c-yellow">
+                        <div class="row align-items-center">
+                            <div class="col-12">
+                                <a class="small text-white stretched-link pull-right" href="@Url.Action("Index", "ListCardRegisInfor", new { area = "TagSign" })">
+                                    <span style="color:black;"> Xem chi tiết </span>
+                                    <i style="color:black;" class="fa fa-angle-double-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                @{
+                    List<int> Number = new List<int>();
+                    DateTime day = DateTime.Now;
+                    var begin = new DateTime(day.Year, day.Month, 1);
+                    var end = startDay.AddMonths(1).AddDays(-1);
+                    var IDGH = db.NT_Extendcard.Where(x => x.NgayTrinhKy >= startDay && x.NgayTrinhKy <= endDay).ToList().Count();
+                }
+                <div class="card">
+                    <div style="padding: 1.25rem; background-color: #FF9800 !important;" class="card-block">
+                        <div class="row align-items-center">
+                            <div class="col-10">
+                                <h4 style="color: #0ac282; font-weight: 600; color:white;" class="text-c-yellow f-w-600">Đăng ký gia hạn thẻ</h4>
+                                <h6 style="font-weight: 600; color: white;" class="text-muted m-b-0">Số lượng: @IDGH &nbsp; <i class="fa fa-arrows-h" aria-hidden="true"></i>  &nbsp; Tháng : @day.Month</h6>
+                            </div>
+                            <div class="col-2 text-right">
+                                <i style="font-size: 3rem; background-color: white; " class="pe-7s-users icon-gradient bg-grow-early"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-c-yellow">
+                        <div class="row align-items-center">
+                            <div class="col-12">
+                                <a class="small text-white stretched-link pull-right" href="@Url.Action("Index", "ListExtendcard", new { area = "Partner" })">
+                                    <span style="color:black;"> Xem chi tiết </span>
+                                    <i style="color:black;" class="fa fa-angle-double-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div style="display:flex;">
+        <div style="flex-direction:row; width: 50%;">
+            <div class="card-body">
+                <div class="col-md-12" style=" margin-right: -12px;">
+                    <div class="card mb-4" style="padding: 10px; border-radius: 10px;">
+                        <div style="height: 5px; background-color: #1c98d1; border-radius: 10px;">
+                        </div>
+                        <img id="gif-loading" />
+                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                            <h6><b>Tình hình xử lý danh sách học ATLĐ</b></h6>
+                        </div>
+                        <div>
+                            <div class="card-body" style="width:100%;">
+                                <div id="container1" style="width:100%;">
+                                </div>
+                            </div>
+                            <div class="card-body" style="width: 100%; text-align: center; margin-top:10%; display:flex;">
+                                <div style="width: 100%;">
+                                    <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                    @{
+                                        var Chuaxuly = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2).Count();
+
+                                        <h5 style="color: #1c98d1;">@Chuaxuly</h5>
+                                    }
+                                    <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                </div>
+                                <hr />
+                                <div style="width:100%;">
+                                    <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                    @{
+                                        var Daxuly = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2).Count();
+                                        <h5 style="color: #ED561B;">@Daxuly</h5>
+                                    }
+                                    <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                        Highcharts.chart('container1', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie',
+                                color: "#f00"
+                            }, credits: {
+                                enabled: false
+                            },
+                            title: {
+                                text: ''
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            accessibility: {
+                                point: {
+                                    valueSuffix: '%'
+                                }
+                            },
+                            exporting: {
+                                enabled: false
+                            },
+                            plotOptions: {
+                                pie: {
+                                    colors: [
+                                        '#1c98d1',
+                                        '#ED561B'
+                                    ],
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: 'Đã tiếp nhận',
+                                    y: data.Chuaxuly
+                                }, {
+                                    name: 'Đã xử lý',
+                                    y: data.Daxuly
+                                }]
+                            }]
+                        });
+                    });
+                });
+
+            </script>
+
+        </div>
+
+        <div style="flex-direction:row; width: 50%;">
+            <div class="card-body">
+                <div class="col-md-12" style=" margin-right: -12px;">
+                    <div class="card mb-4" style="padding: 10px; border-radius: 10px;">
+                        <div style="height: 5px; background-color: #1c98d1; border-radius: 10px;">
+                        </div>
+                        <img id="gif-loading" />
+
+                        <div class="card-header" style="background: #fdfdfd;width:100%;">
+                            <button class="w3-button" style="border: darkblue;" onclick="plusDivs(-1)">&#10094;</button>
+                            <div style="padding: 0 17%;">
+                                <h6><b>Tình hình xử lý danh sách học ATLĐ theo tháng</b></h6>
+                            </div>
+                            <button class="w3-button" style="border: darkblue;" onclick="plusDivs(1)"> &#10095;</button>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="w3-content" style="max-width:800px;">
+                                @{
+
+                                    DateTime Nowday = DateTime.Now;
+                                    var StartDay = new DateTime(Now.Year, Now.Month, 1);
+                                    var EndDay = startDay.AddMonths(1).AddDays(-1);
+
+                                    <div class="mySlides">
+                                        <div class="card-body" style="width: 50%; text-align: center; border-right: double;">
+                                            <div class="card-body">
+                                                <div class="col-md-12" style=" margin-right: -12px;">
+                                                    <div class="card mb-4" style="border-radius: 10px;">
+                                                        <img id="gif-loading" />
+                                                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                                                            <h6><b> THÁNG @Nowday.AddMonths(-5).ToString("MM") - @Nowday.ToString("yyyy")</b></h6>
+                                                        </div>
+                                                        <div>
+                                                            <div class="card-body" style="width:100%;">
+                                                                <div id="containert1" style="width:100%;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body" style="text-align: center;display:flex;">
+                                                                @{
+
+                                                                    DateTime Thang1 = DateTime.Now.AddMonths(-5);
+                                                                    var Start1 = new DateTime(Thang1.Year, Thang1.Month, 1);
+                                                                    var End1 = Start1.AddMonths(1).AddDays(-1);
+                                                                    <div style="width: 50%;">
+                                                                        <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                                                        @{
+                                                                            var Chuaxuly1 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2 && x.DayUpload >= Start1 && x.DayUpload <= End1).Count();
+                                                                            <h5 style="color: #1c98d1;">@Chuaxuly1</h5>
+                                                                        }
+                                                                        <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                    <hr />
+                                                                    <div style="width:50%;">
+                                                                        <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                                                        @{
+                                                                            var Daxuly1 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2 && x.DayUpload >= Start1 && x.DayUpload <= End1).Count();
+                                                                            <h5 style="color: #ED561B;">@Daxuly1</h5>
+                                                                        }
+                                                                        <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                                                        Highcharts.chart('containert1', {
+                                                            chart: {
+                                                                plotBackgroundColor: null,
+                                                                plotBorderWidth: null,
+                                                                plotShadow: false,
+                                                                type: 'pie'
+                                                            }, credits: {
+                                                                enabled: false
+                                                            },
+                                                            title: {
+                                                                text: ''
+                                                            },
+                                                            tooltip: {
+                                                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                            },
+                                                            exporting: {
+                                                                enabled: false
+                                                            },
+                                                            accessibility: {
+                                                                point: {
+                                                                    valueSuffix: '%'
+                                                                }
+                                                            },
+                                                            plotOptions: {
+                                                                pie: {
+                                                                    colors: [
+                                                                        '#1c98d1',
+                                                                        '#ED561B'
+                                                                    ],
+                                                                    allowPointSelect: true,
+                                                                    cursor: 'pointer',
+                                                                    dataLabels: {
+                                                                        enabled: false
+                                                                    },
+                                                                    showInLegend: true
+                                                                }
+                                                            },
+                                                            series: [{
+                                                                name: 'Brands',
+                                                                colorByPoint: true,
+                                                                data: [{
+                                                                    name: 'Đã tiếp nhận',
+                                                                    y: data.Chuaxuly1
+                                                                }, {
+                                                                    name: 'Đã xử lý',
+                                                                    y: data.Daxuly1
+
+                                                                }]
+                                                            }]
+                                                        });
+                                                    });
+                                                });
+
+                                            </script>
+                                        </div>
+
+                                        <div class="card-body" style="width: 50%; text-align: center;">
+                                            <div class="card-body">
+                                                <div class="col-md-12" style=" margin-right: -12px;">
+                                                    <div class="card mb-4" style="border-radius: 10px;">
+                                                        <img id="gif-loading" />
+                                                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                                                            <h6><b>THÁNG @Nowday.AddMonths(-4).ToString("MM") - @Nowday.ToString("yyyy")</b></h6>
+                                                        </div>
+                                                        <div>
+                                                            <div class="card-body" style="width:100%;">
+                                                                <div id="containert2" style="width:100%;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body" style="text-align: center;display:flex;">
+                                                                @{
+
+                                                                    DateTime Thang2 = DateTime.Now.AddMonths(-4);
+                                                                    var Start2 = new DateTime(Thang2.Year, Thang2.Month, 1);
+                                                                    var End2 = Start2.AddMonths(1).AddDays(-1);
+
+                                                                    <div style="width: 50%;">
+                                                                        <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                                                        @{
+                                                                            var Chuaxuly2 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2 && x.DayUpload >= Start2 && x.DayUpload <= End2).Count();
+
+                                                                            <h5 style="color: #1c98d1;">@Chuaxuly2</h5>
+                                                                        }
+                                                                        <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                    <hr />
+                                                                    <div style="width:50%;">
+                                                                        <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                                                        @{
+                                                                            var Daxuly2 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2 && x.DayUpload >= Start2 && x.DayUpload <= End2).Count();
+                                                                            <h5 style="color: #ED561B;">@Daxuly2</h5>
+                                                                        }
+                                                                        <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                                                        Highcharts.chart('containert2', {
+                                                            chart: {
+                                                                plotBackgroundColor: null,
+                                                                plotBorderWidth: null,
+                                                                plotShadow: false,
+                                                                type: 'pie'
+                                                            }, credits: {
+                                                                enabled: false
+                                                            },
+                                                            title: {
+                                                                text: ''
+                                                            },
+                                                            tooltip: {
+                                                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                            },
+                                                            exporting: {
+                                                                enabled: false
+                                                            },
+                                                            accessibility: {
+                                                                point: {
+                                                                    valueSuffix: '%'
+                                                                }
+                                                            },
+                                                            plotOptions: {
+                                                                pie: {
+                                                                    colors: [
+                                                                        '#1c98d1',
+                                                                        '#ED561B'
+                                                                    ],
+                                                                    allowPointSelect: true,
+                                                                    cursor: 'pointer',
+                                                                    dataLabels: {
+                                                                        enabled: false
+                                                                    },
+                                                                    showInLegend: true
+                                                                }
+                                                            },
+                                                            series: [{
+                                                                name: 'Brands',
+                                                                colorByPoint: true,
+                                                                data: [{
+                                                                    name: 'Đã tiếp nhận',
+                                                                    y: data.Chuaxuly2
+                                                                }, {
+                                                                    name: 'Đã xử lý',
+                                                                    y: data.Daxuly2
+
+                                                                }]
+                                                            }]
+                                                        });
+                                                    });
+                                                });
+
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="mySlides">
+                                        <div class="card-body" style="width: 50%; text-align: center; border-right: double;">
+                                            <div class="card-body">
+                                                <div class="col-md-12" style=" margin-right: -12px;">
+                                                    <div class="card mb-4" style="border-radius: 10px;">
+                                                        <img id="gif-loading" />
+                                                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                                                            <h6><b>THÁNG @Nowday.AddMonths(-3).ToString("MM") - @Nowday.ToString("yyyy")</b></h6>
+                                                        </div>
+                                                        <div>
+                                                            <div class="card-body" style="width:100%;">
+                                                                <div id="containert3" style="width:100%;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body" style="text-align: center;display:flex;">
+                                                                @{
+
+                                                                    DateTime Thang3 = DateTime.Now.AddMonths(-3);
+                                                                    var Start3 = new DateTime(Thang3.Year, Thang3.Month, 1);
+                                                                    var End3 = Start3.AddMonths(1).AddDays(-1);
+
+                                                                    <div style="width: 50%;">
+                                                                        <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                                                        @{
+                                                                            var Chuaxuly3 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2 && x.DayUpload >= Start3 && x.DayUpload <= End3).Count();
+
+                                                                            <h5 style="color: #1c98d1;">@Chuaxuly3</h5>
+                                                                        }
+                                                                        <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                    <hr />
+                                                                    <div style="width:50%;">
+                                                                        <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                                                        @{
+                                                                            var Daxuly3 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2 && x.DayUpload >= Start3 && x.DayUpload <= End3).Count();
+                                                                            <h5 style="color: #ED561B;">@Daxuly3</h5>
+                                                                        }
+                                                                        <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                                                        Highcharts.chart('containert3', {
+                                                            chart: {
+                                                                plotBackgroundColor: null,
+                                                                plotBorderWidth: null,
+                                                                plotShadow: false,
+                                                                type: 'pie'
+                                                            }, credits: {
+                                                                enabled: false
+                                                            },
+                                                            title: {
+                                                                text: ''
+                                                            },
+                                                            tooltip: {
+                                                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                            },
+                                                            exporting: {
+                                                                enabled: false
+                                                            },
+                                                            accessibility: {
+                                                                point: {
+                                                                    valueSuffix: '%'
+                                                                }
+                                                            },
+                                                            plotOptions: {
+                                                                pie: {
+                                                                    colors: [
+                                                                        '#1c98d1',
+                                                                        '#ED561B'
+                                                                    ],
+                                                                    allowPointSelect: true,
+                                                                    cursor: 'pointer',
+                                                                    dataLabels: {
+                                                                        enabled: false
+                                                                    },
+                                                                    showInLegend: true
+                                                                }
+                                                            },
+                                                            series: [{
+                                                                name: 'Brands',
+                                                                colorByPoint: true,
+                                                                data: [{
+                                                                    name: 'Đã tiếp nhận',
+                                                                    y: data.Chuaxuly3
+                                                                }, {
+                                                                    name: 'Đã xử lý',
+                                                                    y: data.Daxuly3
+
+                                                                }]
+                                                            }]
+                                                        });
+                                                    });
+                                                });
+
+                                            </script>
+                                        </div>
+
+                                        <div class="card-body" style="width: 50%; text-align: center;">
+                                            <div class="card-body">
+                                                <div class="col-md-12" style=" margin-right: -12px;">
+                                                    <div class="card mb-4" style="border-radius: 10px;">
+                                                        <img id="gif-loading" />
+                                                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                                                            <h6><b>THÁNG @Nowday.AddMonths(-2).ToString("MM") - @Nowday.ToString("yyyy")</b></h6>
+                                                        </div>
+                                                        <div>
+                                                            <div class="card-body" style="width:100%;">
+                                                                <div id="containert4" style="width:100%;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body" style="text-align: center;display:flex;">
+                                                                @{
+
+                                                                    DateTime Thang4 = DateTime.Now.AddMonths(-2);
+                                                                    var Start4 = new DateTime(Thang4.Year, Thang4.Month, 1);
+                                                                    var End4 = Start4.AddMonths(1).AddDays(-1);
+
+                                                                    <div style="width: 50%;">
+                                                                        <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                                                        @{
+                                                                            var Chuaxuly4 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2 && x.DayUpload >= Start4 && x.DayUpload <= End4).Count();
+
+                                                                            <h5 style="color: #1c98d1;">@Chuaxuly4</h5>
+                                                                        }
+                                                                        <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                    <hr />
+                                                                    <div style="width:50%;">
+                                                                        <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                                                        @{
+                                                                            var Daxuly4 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2 && x.DayUpload >= Start4 && x.DayUpload <= End4).Count();
+                                                                            <h5 style="color: #ED561B;">@Daxuly4</h5>
+                                                                        }
+                                                                        <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                                                        Highcharts.chart('containert4', {
+                                                            chart: {
+                                                                plotBackgroundColor: null,
+                                                                plotBorderWidth: null,
+                                                                plotShadow: false,
+                                                                type: 'pie'
+                                                            }, credits: {
+                                                                enabled: false
+                                                            },
+                                                            title: {
+                                                                text: ''
+                                                            },
+                                                            tooltip: {
+                                                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                            },
+                                                            exporting: {
+                                                                enabled: false
+                                                            },
+                                                            accessibility: {
+                                                                point: {
+                                                                    valueSuffix: '%'
+                                                                }
+                                                            },
+                                                            plotOptions: {
+                                                                pie: {
+                                                                    colors: [
+                                                                        '#1c98d1',
+                                                                        '#ED561B'
+                                                                    ],
+                                                                    allowPointSelect: true,
+                                                                    cursor: 'pointer',
+                                                                    dataLabels: {
+                                                                        enabled: false
+                                                                    },
+                                                                    showInLegend: true
+                                                                }
+                                                            },
+                                                            series: [{
+                                                                name: 'Brands',
+                                                                colorByPoint: true,
+                                                                data: [{
+                                                                    name: 'Đã tiếp nhận',
+                                                                    y: data.Chuaxuly4
+                                                                }, {
+                                                                    name: 'Đã xử lý',
+                                                                    y: data.Daxuly4
+
+                                                                }]
+                                                            }]
+                                                        });
+                                                    });
+                                                });
+
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="mySlides">
+                                        <div class="card-body" style="width: 50%; text-align: center; border-right: double;">
+                                            <div class="card-body">
+                                                <div class="col-md-12" style=" margin-right: -12px;">
+                                                    <div class="card mb-4" style="border-radius: 10px;">
+                                                        <img id="gif-loading" />
+                                                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                                                            <h6><b>THÁNG @Nowday.AddMonths(-1).ToString("MM") - @Nowday.ToString("yyyy")</b></h6>
+                                                        </div>
+                                                        <div>
+                                                            <div class="card-body" style="width:100%;">
+                                                                <div id="containert5" style="width:100%;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body" style="text-align: center;display:flex;">
+                                                                @{
+
+                                                                    DateTime Thang5 = DateTime.Now.AddMonths(-1);
+                                                                    var Start5 = new DateTime(Thang5.Year, Thang5.Month, 1);
+                                                                    var End5 = Start5.AddMonths(1).AddDays(-1);
+
+                                                                    <div style="width: 50%;">
+                                                                        <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                                                        @{
+                                                                            var Chuaxuly5 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2 && x.DayUpload >= Start5 && x.DayUpload <= End5).Count();
+
+                                                                            <h5 style="color: #1c98d1;">@Chuaxuly5</h5>
+                                                                        }
+                                                                        <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                    <hr />
+                                                                    <div style="width:50%;">
+                                                                        <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                                                        @{
+                                                                            var Daxuly5 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2 && x.DayUpload >= Start5 && x.DayUpload <= End5).Count();
+                                                                            <h5 style="color: #ED561B;">@Daxuly5</h5>
+                                                                        }
+                                                                        <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                                                        Highcharts.chart('containert5', {
+                                                            chart: {
+                                                                plotBackgroundColor: null,
+                                                                plotBorderWidth: null,
+                                                                plotShadow: false,
+                                                                type: 'pie'
+                                                            }, credits: {
+                                                                enabled: false
+                                                            },
+                                                            title: {
+                                                                text: ''
+                                                            },
+                                                            tooltip: {
+                                                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                            },
+                                                            exporting: {
+                                                                enabled: false
+                                                            },
+                                                            accessibility: {
+                                                                point: {
+                                                                    valueSuffix: '%'
+                                                                }
+                                                            },
+                                                            plotOptions: {
+                                                                pie: {
+                                                                    colors: [
+                                                                        '#1c98d1',
+                                                                        '#ED561B'
+                                                                    ],
+                                                                    allowPointSelect: true,
+                                                                    cursor: 'pointer',
+                                                                    dataLabels: {
+                                                                        enabled: false
+                                                                    },
+                                                                    showInLegend: true
+                                                                }
+                                                            },
+                                                            series: [{
+                                                                name: 'Brands',
+                                                                colorByPoint: true,
+                                                                data: [{
+                                                                    name: 'Đã tiếp nhận',
+                                                                    y: data.Chuaxuly5
+                                                                }, {
+                                                                    name: 'Đã xử lý',
+                                                                    y: data.Daxuly5
+
+                                                                }]
+                                                            }]
+                                                        });
+                                                    });
+                                                });
+
+                                            </script>
+                                        </div>
+
+                                        <div class="card-body" style="width: 50%; text-align: center;">
+                                            <div class="card-body">
+                                                <div class="col-md-12" style=" margin-right: -12px;">
+                                                    <div class="card mb-4" style="border-radius: 10px;">
+                                                        <img id="gif-loading" />
+                                                        <div class="card-header" style="background: #fdfdfd; padding-left:30%; ">
+                                                            <h6><b>THÁNG @Nowday.ToString("MM") - @Nowday.ToString("yyyy")</b></h6>
+                                                        </div>
+                                                        <div>
+                                                            <div class="card-body" style="width:100%;">
+                                                                <div id="containert6" style="width:100%;">
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body" style="text-align: center;display:flex;">
+                                                                @{
+
+                                                                    DateTime Thang6 = DateTime.Now;
+                                                                    var Start6 = new DateTime(Thang6.Year, Thang6.Month, 1);
+                                                                    var End6 = Start6.AddMonths(1).AddDays(-1);
+
+                                                                    <div style="width: 50%;">
+                                                                        <h6 style="color: #1c98d1;"><b>Đã tiếp nhận</b></h6>
+                                                                        @{
+                                                                            var Daxuly6 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK != 2 && x.DayUpload >= Start6 && x.DayUpload <= End6).Count();
+
+                                                                            <h5 style="color: #1c98d1;">@Daxuly6</h5>
+                                                                        }
+                                                                        <h6 style="color: #1c98d1;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                    <hr />
+                                                                    <div style="width:50%;">
+                                                                        <h6 style="color: #ED561B;"><b>Đã xử lý</b></h6>
+                                                                        @{
+                                                                            var Chuaxuly6 = db.NT_CardRegistrationInfor.Where(x => x.IDTTTK == 2 && x.DayUpload >= Start6 && x.DayUpload <= End6).Count();
+                                                                            <h5 style="color: #ED561B;">@Chuaxuly6</h5>
+                                                                        }
+                                                                        <h6 style="color: #ED561B;">Danh sách đăng ký</h6>
+                                                                    </div>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $.getJSON("/Home/GetDataATLD", function (data) {
+
+                                                        Highcharts.chart('containert6', {
+                                                            chart: {
+                                                                plotBackgroundColor: null,
+                                                                plotBorderWidth: null,
+                                                                plotShadow: false,
+                                                                type: 'pie'
+                                                            }, credits: {
+                                                                enabled: false
+                                                            },
+                                                            title: {
+                                                                text: ''
+                                                            },
+                                                            tooltip: {
+                                                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                            },
+                                                            exporting: {
+                                                                enabled: false
+                                                            },
+                                                            accessibility: {
+                                                                point: {
+                                                                    valueSuffix: '%'
+                                                                }
+                                                            },
+                                                            plotOptions: {
+                                                                pie: {
+                                                                    colors: [
+                                                                        '#1c98d1',
+                                                                        '#ED561B'
+                                                                    ],
+                                                                    allowPointSelect: true,
+                                                                    cursor: 'pointer',
+                                                                    dataLabels: {
+                                                                        enabled: false
+                                                                    },
+                                                                    showInLegend: true
+                                                                }
+                                                            },
+                                                            series: [{
+                                                                name: 'Brands',
+                                                                colorByPoint: true,
+                                                                data: [{
+                                                                    name: 'Đã tiếp nhận',
+                                                                    y: data.Chuaxuly6
+                                                                }, {
+                                                                    name: 'Đã xử lý',
+                                                                    y: data.Daxuly6
+
+                                                                }]
+                                                            }]
+                                                        });
+                                                    });
+                                                });
+
+                                            </script>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+
+                var myIndex = 0;
+                carousel();
+
+                function carousel() {
+                    var i;
+                    var x = document.getElementsByClassName("mySlides");
+                    for (i = 0; i < x.length; i++) {
+                        x[i].style.display = "none";
+                    }
+                    myIndex++;
+                    if (myIndex > x.length) { myIndex = 1 }
+                    x[myIndex - 1].style.display = "flex";
+                    setTimeout(carousel, 3000); // Change image every 2 seconds
+                }
+
+
+                var Nowday = @DateTime.Now.ToString("MM");
+                if ((Nowday % 2) == 0) {
+                    var show = ((Nowday / 4));
+                }
+                else {
+                    var show = ((Nowday / 4) + 0.5);
+                }
+                var slideIndex = show;
+                showDivs(slideIndex);
+             /*   setTimeout(slideIndex, 2000);*/
+
+                function plusDivs(n) {
+                    showDivs(slideIndex += n);
+                }
+
+                function currentDiv(n) {
+                    showDivs(slideIndex = n);
+                }
+
+                function showDivs(n) {
+                    var i;
+                    var x = document.getElementsByClassName("mySlides");
+                    var dots = document.getElementsByClassName("demo");
+                    if (n > x.length) { slideIndex = 1 }
+                    if (n < 1) { slideIndex = x.length }
+                    for (i = 0; i < x.length; i++) {
+                        x[i].style.display = "none";
+                    }
+
+                    for (i = 0; i < dots.length; i++) {
+                        dots[i].className = dots[i].className.replace(" w3-red", "");
+                    }
+                    x[slideIndex - 1].style.display = "flex";
+                   /* dots[slideIndex - 1].className += " w3-red";*/
+
+                }
+            </script>
+
+        </div>
+    </div>*@
+
+
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            /* border: 1px solid #ccc;*/
+            background-color: #f1f1f1;
+        }
+
+            /* Style the buttons inside the tab */
+            .tab button {
+                background-color: inherit;
+                float: left;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                padding: 14px 16px;
+                transition: 0.3s;
+                font-size: 17px;
+            }
+
+                /* Change background color of buttons on hover */
+                .tab button:hover {
+                    background-color: #247cd0;
+                    color: white;
+                }
+
+                /* Create an active/current tablink class */
+                .tab button.active {
+                    background-color: #247cd0;
+                    color: white;
+                }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            /*  padding: 6px 12px;*/
+            /*  border: 1px solid #ccc;*/
+            border-top: none;
+        }
+
+        /* Style the close button */
+        .topright {
+            float: right;
+            cursor: pointer;
+            font-size: 28px;
+        }
+
+            .topright:hover {
+                color: red;
+            }
+    </style>
+    <div style="padding:1%;">
+
+        <div class="tab" style="background: #fdfdfd;">
+            <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen"><h6><b>NHÂN VIÊN NT ĐANG HOẠT ĐỘNG</b></h6></button>
+            <button class="tablinks" style="margin-left: 5px" onclick="openCity(event, 'Paris')"><h6><b>NHÂN VIÊN NT TẠM KHÓA THẺ</b></h6></button>
+        </div>
+        <div style="height: 3px; background-color: #247cd0;">
+        </div>
+        <div id="London" class="tabcontent">
+            <div style=" display: flex; flex-direction:row; width: 100%;">
+                <div class="card-body">
+                    <div class="col-md-12" style=" margin-right: -12px;padding:0px;">
+                        <div class="card">
+                            <img id="gif-loading" />
+                            <div class="card-header" id="1" style="background: #fdfdfd; ">
+                                <i class="fas fa-chart-bar mr-1"></i> Số lượng nhân viên đang hoạt động của Nhà thầu
+                            </div>
+                            <div class="card-body" id="2">
+                                <div id="containerlv" style="width:100%;height:2000px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    $(document).ready(function () {
+                        $.getJSON("/Home/GetDataNVNT", function (data) {
+
+                            var Names = []
+                            var Counts = []
+                            for (var i = 0; i < data.TenNhaThaulv.length; i++) {
+                                Names.push(data.TenNhaThaulv[(data.TenNhaThaulv.length - 1) - i]);
+                            }
+                            for (var i = 0; i < data.Countlv.length; i++) {
+
+                                Counts.push(data.Countlv[i])
+                            }
+                            Highcharts.chart('containerlv', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                exporting: {
+                                    enabled: false
+                                },
+                                subtitle: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: Names,
+                                    title: {
+                                        text: null
+                                    }
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: 'Số lượng nhân viên',
+                                        align: 'high'
+                                    },
+                                    labels: {
+                                        overflow: 'justify'
+                                    }
+                                },
+                                tooltip: {
+                                    valueSuffix: 'Người'
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        dataLabels: {
+                                            enabled: true
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    layout: 'vertical',
+                                    align: 'right',
+                                    verticalAlign: 'top',
+                                    x: -40,
+                                    y: 80,
+                                    floating: true,
+                                    borderWidth: 1,
+                                    backgroundColor:
+                                        Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+                                    shadow: true
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                series: [{
+                                    name: 'Nhân viên đang hoạt động',
+                                    data: Counts
+                                }]
+                            });
+
+                        });
+                    });
+
+                </script>
+
+            </div>
+        </div>
+
+        <div id="Paris" class="tabcontent">
+            <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+            <div style=" display: flex; flex-direction:row; width: 100%;">
+                <div class="card-body">
+                    <div class="col-md-12" style=" margin-right: -12px; padding: 0px;">
+                        <div class="card" style="margin-bottom:0px;">
+                            <img id="gif-loading" />
+                            <div class="card-header" id="1" style="background: #fdfdfd; ">
+                                <i class="fas fa-chart-bar mr-1"></i> Số lượng nhân viên tạm khóa thẻ của Nhà thầu
+                            </div>
+                            <div class="card-body" id="2">
+                                <div id="containernv" style="width: 100%; height: 2000px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    $(document).ready(function () {
+                        $.getJSON("/Home/GetDataNVNT", function (data) {
+
+                            var Name = []
+                            var Count = []
+                            for (var i = 0; i < data.TenNhaThaunv.length; i++) {
+                                Name.push(data.TenNhaThaunv[(data.TenNhaThaunv.length - 1) - i]);
+                            }
+                            for (var i = 0; i < data.Countnv.length; i++) {
+
+                                Count.push(data.Countnv[i])
+                            }
+                            Highcharts.chart('containernv', {
+                                chart: {
+                                    type: 'bar'
+                                },
+                                title: {
+                                    text: ''
+                                },
+                                exporting: {
+                                    enabled: false
+                                },
+                                subtitle: {
+                                    text: ''
+                                },
+                                xAxis: {
+                                    categories: Name,
+                                    title: {
+                                        text: null
+                                    }
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: 'Số lượng nhân viên',
+                                        align: 'high'
+                                    },
+                                    labels: {
+                                        overflow: 'justify'
+                                    }
+                                },
+                                tooltip: {
+                                    valueSuffix: ' Người'
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        dataLabels: {
+                                            enabled: true
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    layout: 'vertical',
+                                    align: 'right',
+                                    verticalAlign: 'top',
+                                    x: -40,
+                                    y: 80,
+                                    floating: true,
+                                    borderWidth: 1,
+                                    backgroundColor:
+                                        Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+                                    shadow: true
+                                },
+                                credits: {
+                                    enabled: false
+                                },
+                                series: [{
+                                    name: 'Nhân viên tạm khóa thẻ',
+                                    data: Count
+                                }]
+                            });
+
+                        });
+                    });
+
+                </script>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCity(evt, cityName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(cityName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+    </script>
+
+    <div id="layoutAuthentication_footer" style="width:100%">
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted"> Copyright &copy; Ban Công nghệ thông tin @DateTime.Now.Year</div>
+                    <div>
+                        <a href="https://www.hoaphat.com.vn/">Công ty CP Thép Hòa Phát Dung Quất</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>

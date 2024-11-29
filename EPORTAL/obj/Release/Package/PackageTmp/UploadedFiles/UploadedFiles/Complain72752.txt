@@ -1,0 +1,10 @@
+-stt
+-id đối tác
+-Mã đối tác
+-Id khiếu nại
+-IDPhanhoi
+-Nội Dung phản hồi
+-file đính kèms
+-Ngày Phản Hồi
+-IDNguoiPH
+-TenNguoiPhanHoi

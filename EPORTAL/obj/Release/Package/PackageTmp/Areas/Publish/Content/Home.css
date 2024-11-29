@@ -1,0 +1,338 @@
+﻿body {
+}
+.header-top {
+    padding: 10px 0px;
+    width: 100%;
+    float: left;
+    background: linear-gradient(133deg,#ed1b23,#2e3091,#253494) !important;
+}
+
+.header-top a.logo img.logo-header {
+   height:50px;
+    float: left;
+    padding-right:10px
+}
+    .header-top a.logo h1{color:#fff;font-size:18px}
+    .header-top a:hover{text-decoration:none}
+    #menu-top {
+        float: right;
+        padding: 0px;
+        margin: 0px;
+        list-style: none;
+        text-align: right;
+    }
+
+#menu-top > li {
+    text-align: right;
+    float: left;
+    position: relative;
+    padding: 5px 17px;
+}
+
+#menu-top > li > a {
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    position: relative;
+    float: left;
+    font-size: 14px;
+    text-decoration: none
+}
+    #menu-top > li a.page {
+        border-radius: 8px 8px 8px 0;
+        border: 2px solid rgba(0,0,0,0);
+        background-color: #fff;
+        color: #281ba4;
+        margin: 0 0 0 30px;
+        padding: 5px 25px;
+        font-weight: 700;
+    }
+    #menu-top > li a {
+        border: 2px solid rgba(0,0,0,0);
+      /*  margin: 0 0 0 30px;*/
+        padding: 5px 25px;
+        font-weight: 700;
+    }
+    #menu-top > li a:hover {
+        border-radius: 8px 8px 8px 0;
+        border: 2px solid rgba(0,0,0,0);
+        background-color: #fff;
+        color: #281ba4;
+      /*  margin: 0 0 0 30px;*/
+        padding: 5px 25px;
+        font-weight: 700;
+    }
+.section-bg{float:left;width:100%}
+.widget-content {
+    padding: 1rem;
+    flex-direction: row;
+    align-items: center;
+}
+.card {
+    box-shadow: 0 0.46875rem 2.1875rem rgb(4 9 20 / 3%), 0 0.9375rem 1.40625rem rgb(4 9 20 / 3%), 0 0.25rem 0.53125rem rgb(4 9 20 / 5%), 0 0.125rem 0.1875rem rgb(4 9 20 / 3%);
+    border-width: 0;
+    transition: all .2s;
+}
+.bg-midnight-bloom {
+    
+    background-image: linear-gradient( -20deg, #2b5876 0%, #4e4376 100%) !important;
+}
+.widget-content .widget-content-wrapper {
+    display: flex;
+    flex: 1;
+    position: relative;
+    align-items: center;
+}
+.text-white {
+    color: #fff !important;
+}
+.bg-arielle-smile {
+    padding:10px 0px;
+    background-image: radial-gradient(circle 248px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%) !important;
+}
+.bg-grow-early {
+    
+    background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%) !important;
+}
+.widget-content .widget-content-right {
+    margin-left: auto;
+}
+.card-count {
+    position: relative;
+    box-shadow: 0 0.46875rem 2.1875rem rgb(4 9 20 / 3%), 0 0.9375rem 1.40625rem rgb(4 9 20 / 3%), 0 0.25rem 0.53125rem rgb(4 9 20 / 5%), 0 0.125rem 0.1875rem rgb(4 9 20 / 3%);
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(26,54,126,0.125);
+}
+.marginTB{margin:10px 0px;
+background: #f1f7fd;
+padding: 70px 0 60px;
+}
+.counts {
+    margin:30px 0px;
+    padding: 20px 0 20px;
+}
+    .counts .count-box {
+        padding: 15px 10px 5px 10px;
+        width: 100%;
+        position: relative;
+        text-align: center;
+        background: #f1f7fd;
+    }
+
+    .counts .count-box i {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 20px;
+        background: #1977cc;
+        color: #fff;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+    }
+
+    .counts .count-box span {
+        font-size: 32px;
+        display: block;
+        font-weight: 600;
+        color: #082744;
+    }
+
+    .counts .count-box p {
+        padding: 0;
+        margin: 0;
+        font-family: "Raleway", sans-serif;
+        font-size: 14px;
+    }
+.highcharts-figure, .highcharts-data-table table {
+    min-width: 310px;
+    max-width: 100%;
+    margin: 1em auto;
+}
+
+#chart_company {
+    height: 400px;
+}
+
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #EBEBEB;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+.footer-center {
+    padding: 20px 0px 20px 0px;
+    width: 100%;
+    float: left;
+    /*background: linear-gradient( 180deg, #0579DA 0%, #00579F 44.27%);*/
+}
+h1.title-footer {
+    width: 100%;
+    float: left;
+    text-transform: uppercase;
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+}
+.tru-so span {
+    color: #000;
+    font-size: 14px;
+    line-height: 1.2;
+    float: left;
+    width: 100%;
+}
+.border-bound {
+    border: 1px solid rgba(38,56,150,.1411764705882353);
+    border-radius: 10px;
+    padding: 24px;
+    display: block;
+    background-color: #fff;
+    
+}
+.footer-botton {
+    padding: 18px;
+    background-color: #002a5e;
+    color: #878787;
+    font-size: 13px;
+    text-align: center;
+    height: 60px;
+    float: left;
+    width: 100%
+}
+.section-title {
+    text-align: center;
+    margin-bottom: 25px;
+}
+    .section-title .title {
+        font-size: 27px;
+        line-height: 42px;
+        margin-bottom: 18px;
+        font-weight: 600;
+        color: #003164;
+        text-transform: uppercase;
+    }
+    .section-title .separator {
+        display: inline-block;
+        position: relative;
+        width: 200px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+        .section-title .separator:before {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 60px;
+            height: 5px;
+            content: '';
+            background-color: #fbba42;
+            border-radius: 5px;
+        }
+        .section-title .separator span {
+            position: relative;
+            top: -7px;
+            width: 12px;
+            height: 12px;
+            background-color: #fff;
+            border: 2px solid #fbba42;
+            border-radius: 50%;
+            display: inline-block;
+        }
+            .section-title .separator span:nth-child(2) {
+                background-color: #fbba42;
+            }
+        .section-title .separator:after {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 60px;
+            height: 5px;
+            content: '';
+            background-color: #fbba42;
+            border-radius: 5px;
+        }
+.breadcrumbs ol {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+}
+.d-flex {
+    display: -ms-flexbox !important;
+    display: flex !important;
+}
+.body-content{float:left;width:100%;}
+.mr-3, .mx-3 {
+    margin-right: 1rem !important;
+}
+table.mt-5 tbody tr td a{color:red}
+label.label-margin {margin:5px 0px;font-weight:500;
+}
+span.red{color:red;}
+.margin_TB {margin: 5px 0px}
+.btn-xacnhan {
+    background-color: #171a88 !important;
+    border-color: #171a88 !important;
+    color:#fff
+}
+    .btn-xacnhan:hover {
+        color: #fff;
+        background-color: #1e2f97 !important;
+        border-color: #1e2f97 !important;
+    }
+    .form-group-kb {
+        float: left;
+        width: 100%;
+        padding: 0px 15px 50px 15px;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        margin: 0px 0px 50px 0px
+    }
+.bg_conten {
+    background-color: #05418a;color:#fff;padding:15px;border-radius:5px; text-align:center
+}
+.btn-vanban {
+    background-color: #171a88;
+    border-color: #171a88;color:#fff;
+}
+    .btn-vanban:hover {
+        background-color: #171a88;
+        border-color: #171a88;
+        color: #fff;
+    }

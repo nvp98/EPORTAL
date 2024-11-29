@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="EPORTAL_DOCUMENTModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="VB_DetailDocument">
+          <Key>
+            <PropertyRef Name="IDCTVB" />
+          </Key>
+          <Property Name="IDCTVB" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDVB" Type="int" />
+          <Property Name="SoVB" Type="nvarchar" MaxLength="150" />
+          <Property Name="NoiDungVB" Type="nvarchar" MaxLength="500" />
+          <Property Name="NgayVB" Type="date" />
+          <Property Name="NgayBĐ" Type="date" />
+          <Property Name="NgayKT" Type="date" />
+          <Property Name="TenFile" Type="nvarchar" MaxLength="150" />
+          <Property Name="Status" Type="int" />
+        </EntityType>
+        <EntityType Name="VB_Document">
+          <Key>
+            <PropertyRef Name="IDVB" />
+          </Key>
+          <Property Name="IDVB" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenVB" Type="nvarchar" MaxLength="150" />
+          <Property Name="NgayCapNhat" Type="date" />
+          <Property Name="NhanVienID" Type="int" />
+          <Property Name="IDPage" Type="int" />
+          <Property Name="IDLoai" Type="int" />
+        </EntityType>
+        <EntityContainer Name="EPORTAL_DOCUMENTModelStoreContainer">
+          <EntitySet Name="VB_DetailDocument" EntityType="Self.VB_DetailDocument" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VB_Document" EntityType="Self.VB_Document" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EPORTAL_DOCUMENTModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="VB_DetailDocument">
+          <Key>
+            <PropertyRef Name="IDCTVB" />
+          </Key>
+          <Property Name="IDCTVB" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDVB" Type="Int32" />
+          <Property Name="SoVB" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="NoiDungVB" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="NgayVB" Type="DateTime" Precision="0" />
+          <Property Name="NgayBĐ" Type="DateTime" Precision="0" />
+          <Property Name="NgayKT" Type="DateTime" Precision="0" />
+          <Property Name="TenFile" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" />
+        </EntityType>
+        <EntityType Name="VB_Document">
+          <Key>
+            <PropertyRef Name="IDVB" />
+          </Key>
+          <Property Name="IDVB" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenVB" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="NgayCapNhat" Type="DateTime" Precision="0" />
+          <Property Name="NhanVienID" Type="Int32" />
+          <Property Name="IDPage" Type="Int32" />
+          <Property Name="IDLoai" Type="Int32" />
+        </EntityType>
+        <EntityContainer Name="EPORTAL_DOCUMENTEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="VB_DetailDocument" EntityType="Self.VB_DetailDocument" />
+          <EntitySet Name="VB_Document" EntityType="Self.VB_Document" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EPORTAL_DOCUMENTModelStoreContainer" CdmEntityContainer="EPORTAL_DOCUMENTEntities">
+          <EntitySetMapping Name="VB_DetailDocument">
+            <EntityTypeMapping TypeName="EPORTAL_DOCUMENTModel.VB_DetailDocument">
+              <MappingFragment StoreEntitySet="VB_DetailDocument">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IDCTVB" ColumnName="IDCTVB" />
+                <ScalarProperty Name="IDVB" ColumnName="IDVB" />
+                <ScalarProperty Name="SoVB" ColumnName="SoVB" />
+                <ScalarProperty Name="NoiDungVB" ColumnName="NoiDungVB" />
+                <ScalarProperty Name="NgayVB" ColumnName="NgayVB" />
+                <ScalarProperty Name="NgayBĐ" ColumnName="NgayBĐ" />
+                <ScalarProperty Name="NgayKT" ColumnName="NgayKT" />
+                <ScalarProperty Name="TenFile" ColumnName="TenFile" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VB_Document">
+            <EntityTypeMapping TypeName="EPORTAL_DOCUMENTModel.VB_Document">
+              <MappingFragment StoreEntitySet="VB_Document">
+                <ScalarProperty Name="IDVB" ColumnName="IDVB" />
+                <ScalarProperty Name="TenVB" ColumnName="TenVB" />
+                <ScalarProperty Name="NgayCapNhat" ColumnName="NgayCapNhat" />
+                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+                <ScalarProperty Name="IDPage" ColumnName="IDPage" />
+                <ScalarProperty Name="IDLoai" ColumnName="IDLoai" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="EPORTAL_UNISModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="LogUNIS">
+          <Key>
+            <PropertyRef Name="MaThe" />
+            <PropertyRef Name="Ngay" />
+            <PropertyRef Name="Gio" />
+          </Key>
+          <Property Name="MaThe" Type="varchar" MaxLength="14" Nullable="false" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
+          <Property Name="MaNT" Type="varchar" MaxLength="8" />
+          <Property Name="TenNT" Type="nvarchar" MaxLength="30" />
+          <Property Name="Ngay" Type="nvarchar" MaxLength="8" Nullable="false" />
+          <Property Name="Gio" Type="nvarchar" MaxLength="6" Nullable="false" />
+          <Property Name="MQT" Type="nvarchar" MaxLength="30" />
+          <Property Name="CCCD" Type="varchar" MaxLength="14" />
+          <Property Name="isNT" Type="int" />
+        </EntityType>
+        <Function Name="LogUNIS_Check" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="CCCD" Type="varchar" Mode="In" />
+          <Parameter Name="Ngay_HT" Type="nvarchar" Mode="In" />
+          <Parameter Name="Ngay_QK" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="LogUNIS_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaThe" Type="nvarchar" Mode="In" />
+          <Parameter Name="HoTen" Type="nvarchar" Mode="In" />
+          <Parameter Name="MaNT" Type="varchar" Mode="In" />
+          <Parameter Name="TenNT" Type="nvarchar" Mode="In" />
+          <Parameter Name="Ngay" Type="nvarchar" Mode="In" />
+          <Parameter Name="Gio" Type="nvarchar" Mode="In" />
+          <Parameter Name="MQT" Type="nvarchar" Mode="In" />
+          <Parameter Name="CCCD" Type="varchar" Mode="In" />
+          <Parameter Name="isNT" Type="int" Mode="In" />
+        </Function>
+        <Function Name="LogUNIS_Query" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="begind" Type="nvarchar" Mode="In" />
+          <Parameter Name="endd" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="LogUNIS_Select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaThe" Type="varchar" Mode="In" />
+          <Parameter Name="Ngay" Type="nvarchar" Mode="In" />
+          <Parameter Name="Gio" Type="nvarchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="EPORTAL_UNISModelStoreContainer">
+          <EntitySet Name="LogUNIS" EntityType="Self.LogUNIS" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EPORTAL_UNISModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="EPORTAL_UNISEntities" annotation:LazyLoadingEnabled="true" >
+          <FunctionImport Name="LogUNIS_insert">
+            <Parameter Name="MaThe" Mode="In" Type="String" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="MaNT" Mode="In" Type="String" />
+            <Parameter Name="TenNT" Mode="In" Type="String" />
+            <Parameter Name="Ngay" Mode="In" Type="String" />
+            <Parameter Name="Gio" Mode="In" Type="String" />
+            <Parameter Name="MQT" Mode="In" Type="String" />
+            <Parameter Name="CCCD" Mode="In" Type="String" />
+            <Parameter Name="isNT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="LogUNIS_Select" ReturnType="Collection(EPORTAL_UNISModel.LogUNIS_Select_Result)">
+            <Parameter Name="MaThe" Mode="In" Type="String" />
+            <Parameter Name="Ngay" Mode="In" Type="String" />
+            <Parameter Name="Gio" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="LogUNIS" EntityType="EPORTAL_UNISModel.LogUNIS" />
+          <FunctionImport Name="LogUNIS_Query" ReturnType="Collection(EPORTAL_UNISModel.LogUNIS_Query_Result)">
+            <Parameter Name="begind" Mode="In" Type="String" />
+            <Parameter Name="endd" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="LogUNIS_Check" ReturnType="Collection(EPORTAL_UNISModel.LogUNIS_Check_Result)">
+            <Parameter Name="CCCD" Mode="In" Type="String" />
+            <Parameter Name="Ngay_HT" Mode="In" Type="String" />
+            <Parameter Name="Ngay_QK" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="LogUNIS_Select_Result">
+          <Property Type="String" Name="MaThe" Nullable="true" MaxLength="14" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="MaNT" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="TenNT" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="Ngay" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="Gio" Nullable="true" MaxLength="6" />
+          <Property Type="String" Name="MQT" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="CCCD" Nullable="true" MaxLength="14" />
+          <Property Type="Int32" Name="isNT" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="LogUNIS">
+          <Key>
+            <PropertyRef Name="MaThe" />
+            <PropertyRef Name="Ngay" />
+            <PropertyRef Name="Gio" />
+          </Key>
+          <Property Name="MaThe" Type="String" Nullable="false" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MaNT" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="TenNT" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Ngay" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="true" />
+          <Property Name="Gio" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="true" />
+          <Property Name="MQT" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CCCD" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="isNT" Type="Int32" />
+        </EntityType>
+        <ComplexType Name="LogUNIS_Query_Result">
+          <Property Type="String" Name="MaThe" Nullable="false" MaxLength="14" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="MaNT" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="TenNT" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="Ngay" Nullable="false" MaxLength="8" />
+          <Property Type="String" Name="Gio" Nullable="false" MaxLength="6" />
+          <Property Type="String" Name="MQT" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="CCCD" Nullable="true" MaxLength="14" />
+          <Property Type="Int32" Name="isNT" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="LogUNIS_Check_Result">
+          <Property Type="String" Name="MaThe" Nullable="false" MaxLength="14" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="MaNT" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="TenNT" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="Ngay" Nullable="false" MaxLength="8" />
+          <Property Type="String" Name="Gio" Nullable="false" MaxLength="6" />
+          <Property Type="String" Name="MQT" Nullable="true" MaxLength="30" />
+          <Property Type="String" Name="CCCD" Nullable="true" MaxLength="14" />
+          <Property Type="Int32" Name="isNT" Nullable="true" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EPORTAL_UNISModelStoreContainer" CdmEntityContainer="EPORTAL_UNISEntities" >
+          <FunctionImportMapping FunctionImportName="LogUNIS_insert" FunctionName="EPORTAL_UNISModel.Store.LogUNIS_insert" />
+          <FunctionImportMapping FunctionImportName="LogUNIS_Select" FunctionName="EPORTAL_UNISModel.Store.LogUNIS_Select">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_UNISModel.LogUNIS_Select_Result">
+                <ScalarProperty Name="MaThe" ColumnName="MaThe" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="MaNT" ColumnName="MaNT" />
+                <ScalarProperty Name="TenNT" ColumnName="TenNT" />
+                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
+                <ScalarProperty Name="Gio" ColumnName="Gio" />
+                <ScalarProperty Name="MQT" ColumnName="MQT" />
+                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+                <ScalarProperty Name="isNT" ColumnName="isNT" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="LogUNIS">
+            <EntityTypeMapping TypeName="EPORTAL_UNISModel.LogUNIS">
+              <MappingFragment StoreEntitySet="LogUNIS">
+                <ScalarProperty Name="isNT" ColumnName="isNT" />
+                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+                <ScalarProperty Name="MQT" ColumnName="MQT" />
+                <ScalarProperty Name="Gio" ColumnName="Gio" />
+                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
+                <ScalarProperty Name="TenNT" ColumnName="TenNT" />
+                <ScalarProperty Name="MaNT" ColumnName="MaNT" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="MaThe" ColumnName="MaThe" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="LogUNIS_Query" FunctionName="EPORTAL_UNISModel.Store.LogUNIS_Query">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_UNISModel.LogUNIS_Query_Result">
+                <ScalarProperty Name="MaThe" ColumnName="MaThe" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="MaNT" ColumnName="MaNT" />
+                <ScalarProperty Name="TenNT" ColumnName="TenNT" />
+                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
+                <ScalarProperty Name="Gio" ColumnName="Gio" />
+                <ScalarProperty Name="MQT" ColumnName="MQT" />
+                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+                <ScalarProperty Name="isNT" ColumnName="isNT" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="LogUNIS_Check" FunctionName="EPORTAL_UNISModel.Store.LogUNIS_Check">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_UNISModel.LogUNIS_Check_Result">
+                <ScalarProperty Name="MaThe" ColumnName="MaThe" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="MaNT" ColumnName="MaNT" />
+                <ScalarProperty Name="TenNT" ColumnName="TenNT" />
+                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
+                <ScalarProperty Name="Gio" ColumnName="Gio" />
+                <ScalarProperty Name="MQT" ColumnName="MQT" />
+                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+                <ScalarProperty Name="isNT" ColumnName="isNT" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

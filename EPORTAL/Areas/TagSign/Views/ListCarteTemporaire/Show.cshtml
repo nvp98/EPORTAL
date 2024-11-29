@@ -1,0 +1,264 @@
+﻿
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsTagSign
+@model PagedList.IPagedList<HandleModel>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsPartner;
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_NTEntities dbNT = new EPORTAL_NTEntities();
+    var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Các cấp xử lý cấp thẻ tạm thời 
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+
+                  
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th class="text-center" width="70px">Người xử lý</th>
+
+                                            <th class="text-center" width="200px">chức danh</th>
+                                            <th class="text-center" width="200px">Bộ phận</th>
+                                            <th class="text-center" width="200px">Ngày xử lý</th>
+                                            <th class="text-center" width="200px">Cấp xử lý</th>
+
+                                            <th class="text-center" width="100px">Tình trạng</th>
+                                            <th class="text-center" width="100px">Ghi chú</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+                                                                                <tr>
+                                                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                                                    @{
+                                                                                        var nhanvien = (from nv in db.NhanViens.ToList()
+                                                                                                        join cv in db.Vitris.ToList() on nv.IDViTri equals cv.IDViTri
+                                                                                                        join bp in db.PhongBans.ToList() on nv.IDPhongBan equals bp.IDPhongBan
+                                                                                                        where nv.ID == item.IDNguoiXuLy
+                                                                                                        select new NhanVienModel()
+                                                                                                        {
+                                                                                                            ID = nv.ID,
+                                                                                                            TenBP = bp.TenPhongBan,
+                                                                                                            TenNV = nv.HoTen,
+                                                                                                            TenVT = cv.TenViTri,
+
+                                                                                                        }).FirstOrDefault();
+
+
+                                                                                    }
+                                                                                    @if (nhanvien == null)
+                                                                                    {
+
+
+                                                                                        <td class="text-center">
+                                                                                            Nhóm VP1C
+                                                                                        </td>
+
+
+                                                                                        <td class="text-center">
+                                                                                            Nhóm VP1C
+                                                                                        </td>
+
+
+                                                                                        <td class="text-center">
+
+                                                                                            Văn phòng 1 cửa
+                                                                                        </td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td class="text-center">
+                                                                                            @nhanvien.TenNV
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            @nhanvien.TenVT
+                                                                                        </td>
+                                                                                        <td class="text-center">
+
+                                                                                            @nhanvien.TenBP
+                                                                                        </td>
+                                                                                    }                                                                                  
+
+                                                                                    <td class="text-center">
+                                                                                        @if (item.NgayXL == DateTime.Parse("0001/01/01"))
+                                                                                        {
+                                                                                            <span></span>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+
+                                                                                            @item.NgayXL.ToString("dd-MM-yyyy")
+                                                                                        }
+                                                                                    </td>
+                                                                                    @{
+                                                                                        string capXL;
+                                                                                        if (item.isNT == 0)
+                                                                                        {
+
+                                                                                            capXL = (item.IDCXL == 1) ? "Trưởng phó BP/NM" : "Văn phòng 1 cửa";
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            capXL = (item.IDCXL == 1) ? "Kỹ thuật viên" : ((item.IDCXL == 2) ? "Trưởng phó BP/NM" : "Văn phòng 1 cửa");
+                                                                                        }
+                                                                                    }
+                                                                                    <td class="text-center">
+                                                                                        @capXL
+                                                                                    </td>
+                                                                                    @{
+                                                                                        string a = (item.TinhTrang == null) ? "Chưa xử lý" : ((item.TinhTrang == 0) ? "Đã hủy" : "Đã xử lý");
+                                                                                    }
+                                                                                    <td class="text-center"> @a </td>
+                                                                                    <td>@item.GhiChu</td>
+                                                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index", "ListCardRegisInfor", new { area = "TagSign", page }))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm tiêu đề");
+            $("#myModal").modal('show');
+        });
+    });
+     $("#btn-search").on('click', function () {
+         var search = $('#txtsearch').val();
+         var begind = Date.parse($('#begind').val());
+         var endd = Date.parse($('#endd').val());
+         window.location.href = '@Url.Action("Index", "ListCardRegisInfor")?search=' + search + '&begind=' + $('#begind').val() + '&endd=' + $('#endd').val();
+     });
+    $(document).ready(function () {
+        var dateNewFormat, onlyDate, today = new Date();
+
+        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        dateLastDate = prevMonthLastDate.getFullYear() + '-';
+        if (prevMonthLastDate.getMonth() >= 9) {
+
+            dateLastDate += (prevMonthLastDate.getMonth() + 1);
+        }
+        else {
+            dateLastDate += '0' + (prevMonthLastDate.getMonth() + 1);
+        }
+
+        onlyLastDate = prevMonthLastDate.getDate();
+
+        if (onlyLastDate.toString().length == 2) {
+
+            dateLastDate += "-" + onlyLastDate;
+        }
+        else {
+            dateLastDate += '-0' + onlyLastDate;
+        }
+
+
+
+        dateNewFormat = today.getFullYear() + '-';
+        if (today.getMonth() >= 9) {
+
+            dateNewFormat += (today.getMonth() + 1);
+        }
+        else {
+            dateNewFormat += '0' + (today.getMonth() + 1);
+        }
+
+        onlyDate = today.getDate();
+        if (onlyDate.toString().length == 2) {
+
+            dateNewFormat += "-" + onlyDate;
+        }
+        else {
+            dateNewFormat += '-0' + onlyDate;
+        }
+        if ($('#begind').val() == '') {
+            $('#begind').val(dateLastDate);
+        }
+        if ($('#endd').val() == '') {
+            $('#endd').val(dateNewFormat);
+        }
+    });
+</script>
+
+
+
+
+

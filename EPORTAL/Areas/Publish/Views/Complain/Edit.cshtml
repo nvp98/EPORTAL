@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Publish/Views/Shared/_InternalLayout2.cshtml";
+}
+<link href="~/Content/assets/css/PagedList.css" rel="stylesheet" />
+@model EPORTAL.ModelsDanhBaDoiTac.ComplainValidation
+
+<script src="//cdn.ckeditor.com/4.19.0/full/ckeditor.js"></script>
+@using (Html.BeginForm("Edit", "Complain", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDKhieuNai)
+    <div class="d_content s_main-content" style="margin-top:4px">
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="modal-content">
+                        <div class="modal-body">
+
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <fieldset id="SubmitForm">
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="small mb-1">Mã Khiếu Nại</label>
+                                            @Html.TextBox("MaKhieuNai", null, new { @class = "form-control", @readonly = "true" })
+                                            @Html.ValidationMessageFor(model => model.MaKhieuNai, "", new { @class = "text-danger" })
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="small mb-1">Tiêu Đề Khiếu Nại</label>
+                                            @Html.EditorFor(model => model.TieuDeKN, new { htmlAttributes = new { @class = "form-control", placeholder = "Tiêu Đề Khiếu Nại", @id = "TieuDeKN" } })
+                                            @Html.ValidationMessageFor(model => model.TieuDeKN, "", new { @class = "text-danger" })
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="small mb-1">Người Khiếu Nại</label>
+                                            @Html.TextBox("NguoiKN", null, new { @class = "form-control", @readonly = "true" })
+                                            @Html.ValidationMessageFor(model => model.NguoiKN, "", new { @class = "text-danger" })
+
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="small mb-1">Trình trạng</label>
+                                            @Html.DropDownListFor(model => model.IDTTKN, ViewBag.TTKNList as SelectList, new { @class = "form-control", @id = "IDTTKN" })
+
+                                        </div>
+                                    </div>
+                                    @*<div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="small mb-1">ID Đối Tác</label>
+                                                @Html.EditorFor(model => model.IDDoiTac, new { htmlAttributes = new { @class = "form-control", placeholder = "ID Đối Tác", @id = "IDDoiTac" } })
+                                                @Html.ValidationMessageFor(model => model.IDDoiTac, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>*@
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="small mb-1">Nội Dung Khiếu Nại</label>
+                                            @Html.TextArea("NoiDungKN", null, new { @class = "form-control", @id = "NoiDungKN" })
+                                            @Html.ValidationMessageFor(model => model.NoiDungKN, "", new { @class = "text-danger" })
+                                        </div>
+                                        <script>
+                                            CKEDITOR.replace("NoiDungKN");
+                                        </script>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="btn-margin-top text-center">
+                                    <input type="submit" value="Cập Nhật" class="btn btn-success button_submit" />
+
+                                </div>
+                            </fieldset>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+<style>
+    .modal-body {
+        min-height: 752px
+    }
+</style>

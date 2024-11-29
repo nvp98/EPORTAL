@@ -1,0 +1,46 @@
+﻿@model EPORTAL.Models.AuthorizationTVValidation
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+@using (Html.BeginForm("AddPermission", "DocumentLibrary", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhân viên</label>
+                                @Html.DropDownList("Selected", null, "", new { id = "multiSelectDropDown", @class = "form-control", @style = "width:100%", multiple = "multiple" })
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            $("#multiSelectDropDown").chosen({
+                width: "100%"
+            });
+        });
+    </script>
+}
+
+
+

@@ -1,0 +1,579 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.ModelsPartner
+@using EPORTAL.ModelsView360
+@model PagedList.IPagedList<VehicleManagementValidation>
+@using PagedList.Mvc
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTAL_NTEntities db = new EPORTAL_NTEntities();
+    EPORTALEntities db1 = new EPORTALEntities();
+    var quyenAdd = (int)ViewBag.Quyen;
+}
+<style type="text/css">
+    a:hover {
+        cursor: pointer;
+    }
+
+    .table-responsive {
+        height: 650px;
+    }
+
+    thead {
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+</style>
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title" style="margin:0px;">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early fa-solid fa-bus"></i>
+                    </div>
+                    <div>
+                        Quản lý phương tiện
+                        <div class="page-title-subheading">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-8 col-lg-8">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
+                                    </div>
+                                    <div class="col-md-3">
+                                        @Html.DropDownList("PBList", null, "Chọn BP/NM", new { id = "IDPhongBan", @class = "form-control", })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.DropDownList("NTList", null, "Chọn nhà thầu", new { id = "ID_NT", @class = "form-control", })
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (quyenAdd != 0)
+                            {
+                                <div class="col-md-4">
+                                    <button type="button" id="btn-add" class="btn btn-primary" style="margin-left: 10px;float: right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới</button>
+                                    <div class="modal" id="myModal_Add" role="dialog" data-url='@Url.Action("Create_New","VehicleManagement",new {area="Management"})' style="margin-top:50px"></div>
+                                    &nbsp;
+                                    <button type="button" id="btn-Import" class="btn btn-success" style="margin-left: 10px; float: right"><i class="fa fa-file">&nbsp;</i>&nbsp; Import Excel</button>
+                                    <div class="modal" id="myModalImport" role="dialog" data-url='@Url.Action("ImportExcel","VehicleManagement")' style="margin-top:50px"></div>
+                                    &nbsp;
+                                    <button type="button" id="btn-Export" class="btn btn-primary m-l-auto" style="margin-left:10px;float:right"><i class="fa fa-download">&nbsp;</i>&nbsp;Download</button>
+                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("ExportToExcel","VehicleManagement")' style="margin-top:50px"></div>
+                                    &nbsp;
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive" style="padding: 0px">
+                            <div class="table-responsive" style="width: 81vw; overflow-x: auto;height: 600px;">
+                                <table class="table table-bordered table-hover" id="table" style="width:350vw;" cellpadding="0">
+                                    <thead class="thead-light" style="position: sticky;">
+                                        <tr>
+                                            <th width="30px" class="text-center" style="vertical-align: middle;">STT</th>
+                                            @if (quyenAdd != 0)
+                                            {
+                                                <th class="text-center" style="vertical-align: middle;">Thao Tác</th>
+                                            }
+
+                                            <th class="text-center" style="vertical-align: middle; position: sticky;left:0;">Tên thiết bị - Mã định danh - Biển số</th>
+                                            <th class="text-center" style="vertical-align:middle;">Nhà thầu</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="200px">Người vận hành</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="300px">Bộ phận QLTT</th>
+                                            <th class="text-center" style="vertical-align:middle;">Cavet</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="300px">Số Khung</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="250px">Thời hạn thẻ từ</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Thời hạn thẻ ra vào thường xuyên</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày hết hạn đăng kiểm</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Số ngày còn lại hết đăng kiểm</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày hết hạn KĐ </th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Số ngày còn lại hết KĐ</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày hết hạn BHX.HH</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Số ngày còn lại hết BHX.HH</th>
+                                            <th class="text-center" style="vertical-align:middle;">CCVH</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày hết hạn thẻ AT-3</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Số ngày còn lại hết hạn thẻ AT-3</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày hết hạn giấy phép VCHH cháy nổ</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Số ngày còn lại hết hạn giấy phép VCHH cháy nổ</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày hết hạn chứng chỉ VCHHNH, CN</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Số ngày còn lại hết hạn chứng chỉ VCHHNH, CN</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Chứng chỉ PCCC-CNCH</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="130px">Ngày kiểm tra</th>
+                                            <th class="text-center" style="vertical-align:middle;">Khu vực thi công</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="200px">Người nhập hồ sơ</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="200px">Tình trạng</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Cấp mới</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Gia hạn</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Mất thẻ làm lại</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Cập nhật thêm thông tin</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Bảo lãnh</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Ngày nhập/chỉnh sửa</th>
+                                            <th class="text-center" style="vertical-align:middle;">Ghi chú</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Nhập file hồ sơ</th>
+                                            <th class="text-center" style="vertical-align:middle;" width="150px">Nhập file thẻ từ phương tiện</th>
+                                        </tr>
+                                        <tr>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int pageno = (int)Model.PageNumber;
+                                            int itemperpage = (int)Model.PageSize;
+                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                        }
+                                        @{
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center" style="background-color: #f8f9fa;">@RowNo@{RowNo++;}</td>
+                                                      @if (quyenAdd != 0)
+                                                      { 
+                                                           <td class="text-center" style="background-color: #f8f9fa;">
+                                                            <a class="fa fa-trash" title="Xóa" href="@Url.Action("Delete", "VehicleManagement", new { id = item.IDTBNT })"
+                                                               onclick="return confirm('Bạn muốn xóa Thông báo: @item.NameEquipment')">
+                                                            </a>
+                                                            <a id="btn-edit_@item.IDTBNT" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                            <div class="modal " id="myModaleEdit_@item.IDTBNT" role="dialog" data-url='@Url.Action("Edit", "VehicleManagement", new { id = item.IDTBNT })'></div>
+                                                            <script type="text/javascript">
+                                                                $('#btn-edit_@item.IDTBNT').click(function () {
+                                                                    var url = $('#myModaleEdit_@item.IDTBNT').data('url');
+                                                                    $.get(url, function (data) {
+                                                                        $("#myModal").html(data);
+                                                                        $("#ModalTitle").html("Cập nhật thông tin");
+                                                                        $("#myModal").modal('show');
+                                                                    });
+                                                                });
+                                                            </script>
+                                                        </td>
+                                                      }
+
+                                                    <td style="position: sticky; left: 0; background-color: #f8f9fa;display: flex;">
+                                                        <div>
+                                                            @item.NameEquipment  &nbsp;
+                                                        </div>
+                                                        <div>
+                                                            -   &nbsp;@item.MaDinhDanh@item.IndentifierContact  &nbsp;
+                                                        </div>
+                                                        <div>
+                                                            -  &nbsp;@if (item.BienSoXe == "" || item.BienSoXe == null)
+                                                            {
+
+
+                                                                <samp>Không có</samp>
+                                                            }
+                                                            else
+                                                            {
+                                                                @item.BienSoXe
+                                                            }
+                                                        </div>
+
+                                                    </td>
+                                                    <td>@item.TenNhaThau</td>
+                                                    <td>@item.Operator</td>
+                                                    <td>@item.TenPhongBan</td>
+                                                    @if (item.Cavet == 0)
+                                                    {
+                                                        <td>Có</td>
+                                                    }
+                                                    else if (item.Cavet == 1)
+                                                    {
+                                                        <td>Không</td>
+                                                    }
+                                                    @if (item.SoKhung == "" || item.SoKhung == null)
+                                                    {
+
+
+                                                        <td>Không có</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.SoKhung</td>
+                                                    }
+                                                    @if (item.ThoiHanTheTu.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+                                                        <td style="background-color:red;color:white;">Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        DateTime Check_Day = DateTime.Now;
+                                                        DateTime ThoiHan = (DateTime)item.ThoiHanTheTu.AddDays(-7);
+                                                        if (item.ThoiHanTheTu < Check_Day)
+                                                        {
+                                                            <td style="background-color: red; color: white; ">@item.ThoiHanTheTu.ToString("dd-MM-yyyy") &nbsp; (Hết hạn)</td>
+                                                        }
+                                                        else if (ThoiHan <= Check_Day)
+                                                        {
+                                                            <td style="background-color: red; color: white; ">@item.ThoiHanTheTu.ToString("dd-MM-yyyy") &nbsp; (Sắp hết hạn)</td>
+                                                        }
+                                                        else if (ThoiHan >= Check_Day)
+                                                        {
+                                                            <td>@item.ThoiHanTheTu.ToString("dd-MM-yyyy")</td>
+                                                        }
+
+                                                    }
+                                                    @if (item.ThoiHanTheRVTX.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <td>@item.ThoiHanTheRVTX.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanDK.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayHetHanDK.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanDK <= DateTime.Now)
+                                                    {
+                                                        <td>Hết hiệu lực</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td> @(string.Format("{0}", Math.Round(Math.Abs(((Convert.ToDateTime(@item.NgayHetHanDK) - DateTime.Now).TotalDays))).ToString()))</td>
+                                                    }
+
+
+                                                    @if (item.NgayHetHanKD.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayHetHanKD.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanKD <= DateTime.Now)
+                                                    {
+                                                        <td>Hết hiệu lực</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@(string.Format("{0}", Math.Round(Math.Abs(((Convert.ToDateTime(@item.NgayHetHanKD) - DateTime.Now).TotalDays))).ToString()))</td>
+                                                    }
+
+
+                                                    @if (item.NgayHetHanBHX.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayHetHanBHX.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanBHX <= DateTime.Now)
+                                                    {
+                                                        <td>Hết hiệu lực</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@(string.Format("{0}", Math.Round(Math.Abs(((Convert.ToDateTime(@item.NgayHetHanBHX) - DateTime.Now).TotalDays))).ToString()))</td>
+                                                    }
+
+                                                    @if (item.CCHV == 0)
+                                                    {
+                                                        <td>Có</td>
+                                                    }
+                                                    else if (item.CCHV == 1)
+                                                    {
+                                                        <td>Không</td>
+                                                    }
+                                                    @if (item.NgayHetHanTAT.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayHetHanTAT.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanTAT <= DateTime.Now)
+                                                    {
+                                                        <td>Hết hiệu lực</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@(string.Format("{0}", Math.Round(Math.Abs(((Convert.ToDateTime(@item.NgayHetHanTAT) - DateTime.Now).TotalDays))).ToString()))</td>
+                                                    }
+
+                                                    @if (item.NgayHetHanVCHHChayNo.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayHetHanVCHHChayNo.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanVCHHChayNo <= DateTime.Now)
+                                                    {
+                                                        <td>Hết hiệu lực</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@(string.Format("{0}", Math.Round(Math.Abs(((Convert.ToDateTime(@item.NgayHetHanVCHHChayNo) - DateTime.Now).TotalDays))).ToString()))</td>
+                                                    }
+
+                                                    @if (item.NgayHetHanCNKD.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayHetHanCNKD.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    @if (item.NgayHetHanCNKD <= DateTime.Now)
+                                                    {
+                                                        <td>Hết hiệu lực</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@(string.Format("{0}", Math.Round(Math.Abs(((Convert.ToDateTime(@item.NgayHetHanCNKD) - DateTime.Now).TotalDays))).ToString()))</td>
+                                                    }
+
+                                                    <td>@item.ChungChiPCCCCNCH</td>
+                                                    @*<td>@item.ChungChiVCHHNHCN</td>*@
+                                                    <td>@item.StartDate.ToString("dd-MM-yyyy")</td>
+                                                    <td>@item.IDKV</td>
+                                                    <td>@item.NguoiNhap</td>
+                                                    @if (item.TinhTrang == 0)
+                                                    {
+                                                        <td>Đang hoạt động</td>
+                                                    }
+                                                    else if (item.TinhTrang == 1)
+                                                    {
+                                                        <td>Không còn hoạt động</td>
+                                                    }
+                                                    @if(item.CapMoi == "0" || item.CapMoi == "X" || item.CapMoi == "x")
+                                                    { 
+                                                       <td>
+                                                           <samp>X</samp>
+                                                       </td>
+                                                    }
+                                                    else{
+                                                        <td>
+                                                          
+                                                       </td>
+                                                    }
+                                            
+                                                    @if(item.GiaHan == "0" || item.GiaHan == "X" || item.GiaHan == "x")
+                                                    { 
+                                                       <td>
+                                                           <samp>X</samp>
+                                                       </td>
+                                                    }
+                                                    else{
+                                                        <td>
+                                                          
+                                                       </td>
+                                                    }
+                                                    @if(item.MatThe == "0" || item.MatThe == "X" || item.MatThe == "x")
+                                                    {
+                                                       <td>
+                                                           <samp>X</samp>
+                                                       </td>
+                                                    }
+                                                    else{
+                                                        <td>
+                                                          
+                                                       </td>
+                                                    }
+                                                    @if(item.CapNhatThongTin == "0" || item.CapNhatThongTin == "X" || item.CapNhatThongTin == "x")
+                                                    { 
+                                                       <td>
+                                                           <samp>X</samp>
+                                                       </td>
+                                                    }
+                                                    else{
+                                                        <td>
+                                                          
+                                                       </td>
+                                                    }
+                                                   @if(item.BaoLanh == "0" || item.BaoLanh == "X" || item.BaoLanh == "x")
+                                                   {
+                                                       <td>
+                                                           <samp>X</samp>
+                                                       </td>
+                                                    }
+                                                   else{
+                                                        <td>
+                                                          
+                                                       </td>
+                                                    }
+                                                    @if (item.NgayChinhSua.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                    {
+
+
+                                                        <td>Trống</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.NgayChinhSua.ToString("dd-MM-yyyy")</td>
+                                                    }
+                                                    <td>@item.GhiChu</td>
+                                                    @if (item.FileUpload == null)
+                                                    {
+                                                        <td class="text-center">
+                                                            <a id="btn-Import_@item.IDTBNT" href="#" title="Chỉnh sửa" class="btn-action"><i style="font-size:10px;" class="fa fa-upload"> Upload File </i> </a>
+                                                            <div class="modal " id="myModaleImport_@item.IDTBNT" role="dialog" data-url='@Url.Action("Update_File", "VehicleManagement", new { id = item.IDTBNT, idl = 1 })'></div>
+                                                            <script type="text/javascript">
+                                                                $('#btn-Import_@item.IDTBNT').click(function () {
+                                                                var url = $('#myModaleImport_@item.IDTBNT').data('url');
+                                                                $.get(url, function (data) {
+                                                                    $("#myModal").html(data);
+                                                                    $("#ModalTitle").html("Cập nhật File");
+                                                                    $("#myModal").modal('show');
+                                                                });
+                                                            });
+                                                            </script>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="text-center">
+                                                            <i class="fa-solid fa-eye mr-2"></i><a class="text-download" target="_blank" href="@Url.Content("/UploadedFiles/FileContractEquiment/" + System.IO.Path.GetFileName(item.FileUpload))">Xem file</a>
+                                                        </td>
+                                                    }
+
+                                                    @if (item.FileTheTu == null)
+                                                    {
+                                                        <td class="text-center">
+                                                            <a id="btn-import_@item.IDTBNT" href="#" title="Chỉnh sửa" class="btn-action"><i style="font-size:10px;" class="fa fa-upload"> Upload File </i> </a>
+                                                            <div class="modal " id="myModaleimport_@item.IDTBNT" role="dialog" data-url='@Url.Action("Update_File", "VehicleManagement", new { id = item.IDTBNT, idl = 2 })'></div>
+                                                            <script type="text/javascript">
+                                                                $('#btn-import_@item.IDTBNT').click(function () {
+                                                                var url = $('#myModaleimport_@item.IDTBNT').data('url');
+                                                                $.get(url, function (data) {
+                                                                    $("#myModal").html(data);
+                                                                    $("#ModalTitle").html("Cập nhật File");
+                                                                    $("#myModal").modal('show');
+                                                                });
+                                                            });
+                                                            </script>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="text-center">
+                                                            <i class="fa-solid fa-eye mr-2"></i><a class="text-download" target="_blank" href="@Url.Content("/UploadedFiles/FileContractEquiment/" + System.IO.Path.GetFileName(item.FileTheTu))">Xem file</a>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <div class="pager">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", "VehicleManagement", new { area = "Management", page }))
+                                <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#btn-add').click(function () {
+        var url = $('#myModal_Add').data('url');
+        $.get(url, function (data) {
+            $("#myModal_Add").html(data);
+            $("#ModalTitle").html("Thêm mới");
+            $("#myModal_Add").modal('show');
+        });
+    });
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModalImport").html(data);
+            $("#ModalTitle").html("Import phương tiện");
+            $("#myModalImport").modal('show');
+        });
+    })
+        $("#btn-search").on('click', function () {
+            var search = $('#txtsearch').val();
+            var IDPhongBan = $('#IDPhongBan').val();
+            var ID_NT = $('#ID_NT').val();
+            window.location.href = '@Url.Action("Index", "VehicleManagement")?search=' + search + '&IDPhongBan=' + IDPhongBan + '&ID_NT=' + ID_NT;
+        });
+      $('#btn-Export').click(function () {
+        window.location.href = '@Url.Action("ExportToExcel", "VehicleManagement")';
+      });
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    }); $("#ID_NT").chosen({
+        width: "100%"
+    });
+</script>
+<style>
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+</style>

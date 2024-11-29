@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using EPORTAL.Models
+@model PagedList.IPagedList<ApprovalClassification>
+@using PagedList.Mvc
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh mục xử lý
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-header">
+
+                        <div class="m-l-auto">
+
+
+                            <button type="button" id="btn-add" class="btn btn-primary m-l-auto"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+
+
+
+                            <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","ApprovalClassification")' style="margin-top:50px"></div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead class="thead-light">
+                                    <tr>
+
+                                        <th class="text-center" width="60px">STT</th>
+                                       
+                                        <th class="text-center" width="">Tên Loại Ký Duyệt</th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int pageno = (int)Model.PageNumber;
+                                        int itemperpage = (int)Model.PageSize;
+                                        int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                    }
+                                    @foreach (var item in Model)
+                                    {
+                                    <tr>
+
+                                        <td class="text-center">@RowNo@{RowNo++;}</td>
+
+
+
+
+
+                                        <!--<td class="text-center">-->
+
+
+                                            @*<a id="btn-edit_@item.id" title="Sửa" class="fa fa-edit hidden"></a>*@
+                                            <!--<div class="modal fade " id="myModale_@item.id" role="dialog" data-url='@Url.Action("Edit","ApprovalClassification", new { id = item.id })'></div>
+                                            <script type="text/javascript">
+                                                            $("#btn-edit_@item.id").click(function () {
+                                                                var url = $('#myModale_@item.id').data('url');
+                                                                $.get(url, function (data) {
+                                                                    $("#myModal").html(data);
+                                                                    $("#ModalTitle").html("Cập nhật loại ký duyệt");
+                                                                    $("#myModal").modal('show');
+                                                                });
+                                                            });
+                                            </script>-->
+
+                                            @*<a class="fa fa-trash" title="Xóa" href="@Url.Action("Delete", "ApprovalClassification", new { id = item.id })"
+                                               onclick="return confirm('Bạn muốn xóa Thông tin Loai Ky Duyệt: @item.tenloaikyduyet')">
+                                            </a>*@
+
+                                        <!--</td>-->
+                                        <td class="">@item.tenloaikyduyet</td>
+
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="pager d-flex">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", "ApprovalClassification", new { page }))
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        console.log(url);
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm mới danh mục xử lý");
+            $("#myModal").modal('show');
+        });
+    });
+
+
+
+</script>
+<style>
+    .d-flex {
+        display: flex !important;
+        flex-direction: row-reverse;
+    }
+</style>

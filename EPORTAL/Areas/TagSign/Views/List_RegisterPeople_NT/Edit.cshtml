@@ -1,0 +1,458 @@
+﻿
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+
+@{
+    ViewBag.Title = "Form";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@using EPORTAL.ModelsTagSign
+@model EPORTAL.ModelsTagSign.List_RegisterPeopleValidation
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    var DKTN_ID = ViewData["id"];
+    var bmid = Convert.ToInt32(DKTN_ID);
+    var ctid = db_dk.RegisterPeoples.Where(x => x.ID_DKTN == bmid).SingleOrDefault();
+    var nt = db.NT_Partner.Where(x => x.ID == ctid.NhaThau_ID).FirstOrDefault();
+    var pb = db.PhongBans.Where(x => x.IDPhongBan == ctid.BPQL_ID).FirstOrDefault();
+
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+@using (Html.BeginForm("Edit", "List_RegisterPeople_NT", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ID_DKTN)
+    <div class="app-main__outer">
+        <div class="app-main__inner" style="display:block;padding:0px;">
+
+            <div class="tab-content">
+                <div class="row" style="padding-left: 25px;">
+                    <div class="card">
+                        <div style="margin-top: 1%; text-align:center;">
+                            <h3>
+                                <b>
+                                    ĐƠN ĐỀ NGHỊ CẤP THẺ DÀI NGÀY - DÀNH CHO NGƯỜI
+
+                                </b>
+                            </h3>
+                        </div>
+                        <div style=" margin: 1% 0% 1% 3%;">
+                            <h6 style="margin-bottom: 1%;">
+                                Kính gửi: -Công ty Cổ phần Thép Hòa Phát Dung Quất.
+                            </h6>
+                            <h6 style="margin-bottom: 1%;">
+                                Căn cứ theo hợp đồng số: @ctid.HopDong giữa Nhà thầu: @nt.FullName và Hòa Phát Dung Quất
+                            </h6>
+                            <h6 style="margin-bottom: 1%;">
+                                Nhà thầu đang thực hiện gói thầu...................................... thời hạn gói thầu từ ngày................. đến ngày.....................do BP: @pb.TenPhongBan quản lý.
+                            </h6>
+                            <h6 style="margin-bottom: 1%;">
+                                Vì lý do..............................................Để đáp ứng yêu cầu công việc của Nhà thầu,  kính đề nghị đổi/gia hạn/điều chỉnh thông tin thẻ cho những CBNV có tên sau:
+                            </h6>
+                        </div>
+                        <div class="card-body">
+
+                            <div style="width: 80vw; overflow-x: auto; height: 30vw;">
+                                <table class="table table-bordered table-hover" id="table" style="width:150vw" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th width="30px" rowspan="2" style="vertical-align:middle">TT</th>
+
+                                            <th class="text-center" rowspan="2" width="300px" style="vertical-align:middle">Họ tên</th>
+                                            <th class="text-center" rowspan="2" width="130px" style="vertical-align:middle">Ngày sinh</th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">CMND/CCCD</th>
+                                            <th class="text-center" rowspan="2" width="250px" style="vertical-align:middle">Hộ khẩu thường trú</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Chức vụ</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Số điện thoại</th>
+                                            <th class="text-center" colspan="3" width="200px" style="vertical-align:middle">Thông tin nhà thầu phụ <br /> ( Nếu thuộc NTP )</th>
+                                            <th class="text-center" colspan="5" width="200px" style="vertical-align:middle">
+                                                Đánh dấu "X" vào
+                                                những ô cần chọn
+                                            </th>
+                                            <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Thời hạn thẻ</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Khu vực làm việc</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Cổng đăng ký ra/vào</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Nhóm NT</th>
+                                            <th class="text-center" rowspan="2" width="100px" style="vertical-align:middle">Thao tác</th>
+                                        </tr>
+                                        <tr style="background-color: #f8f9fa;">
+
+                                            <th width="250px" class="text-center">Tên NTP</th>
+                                            <th width="250px" class="text-center">Họ tên quản lý</th>
+                                            <th width="100px" class="text-center">SĐT quản lý</th>
+
+
+                                            <th width="70px" class="text-center">Cấp mới</th>
+                                            <th width="70px" class="text-center">Gia hạn</th>
+                                            <th width="70px" class="text-center">Bổ sung cổng</th>
+                                            <th width="70px" class="text-center">Cấp lại</th>
+                                            <th width="70px" class="text-center">Chuyển đổi NT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int b = 0;
+                                        }
+                                        @{
+                                            var ID_DKTN = Convert.ToInt32(DKTN_ID);
+                                            var Models = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == ID_DKTN).ToList();
+                                            foreach (var item in Models)
+                                            {
+                                                b++;
+                                                <tr>
+                                                    <td class="text-center">@b</td>
+
+                                                    <td swidth="300px">@item.HoVaTen</td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            DateTime ngaysinh = DateTime.Parse(item.NgaySinh.ToString());
+                                                        }
+                                                        @ngaysinh.ToString("dd/MM/yyyy")
+                                                    </td>
+                                                    <td>@item.CCCD</td>
+                                                    <td>@item.HoKhau</td>
+                                                    <td>
+                                                        @{
+                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
+                                                        }
+                                                        @IDCV.TenCV.ToString()
+                                                    </td>
+                                                    <td>
+                                                        @item.SoDienThoai
+                                                    </td>
+                                                    <td>
+                                                        @item.Ten_NTP
+                                                    </td>
+                                                    <td>
+                                                        @item.HoTen_QuanLy
+                                                    </td>
+                                                    <td>
+                                                        @item.SoDienThoai_QuanLy
+                                                    </td>
+                                                    @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+
+                                                    @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    <td class="text-center" width="180px">
+                                                        @{
+                                                            DateTime thoihan = DateTime.Parse(item.ThoiHanThe.ToString());
+                                                        }
+                                                        @thoihan.ToString("dd/MM/yyyy")
+                                                    </td>
+                                                    @{
+                                                        string ListKhuVuc = "";
+                                                        string[] arrList = item.KhuVucLamViec.Split(',');
+                                                        foreach (var ar in arrList)
+                                                        {
+                                                            if (ar != "")
+                                                            {
+                                                                int IDKV = Convert.ToInt32(ar);
+                                                                var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                                                ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
+                                                            }
+
+                                                        }
+                                                    }
+                                                    <td>
+                                                        @ListKhuVuc
+                                                    </td>
+
+                                                    @{
+                                                        string List = "";
+                                                        string[] arrListStr = item.CongLamViec.Split(',');
+                                                        foreach (var ar in arrListStr)
+                                                        {
+                                                            int IDGate = Convert.ToInt32(ar);
+                                                            var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                                            List = String.Concat(Cong.Gate + " , " + List);
+                                                        }
+                                                    }
+                                                    <td>
+                                                        @List
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
+                                                        }
+                                                        @IDCong.NameContractorGroup
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "Detail_List_RegisterPeople_NT", new { id = item.ID_CT_DKTN , iddkt = ID_DKTN})"
+                                                           onclick="return confirm('Bạn muốn xóa Thông tin  : @item.HoVaTen')">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                        <a id="btn-editdsct_@item.ID_CT_DKTN" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
+                                                        <div class="modal" id="myModaleEditDS_@item.ID_CT_DKTN" role="dialog" data-url='@Url.Action("Edit","Detail_List_RegisterPeople_NT", new { id = item.ID_CT_DKTN })'></div>
+                                                        <script type="text/javascript">
+                                                                        $('#btn-editdsct_@item.ID_CT_DKTN').click(function () {
+                                                                            var url = $('#myModaleEditDS_@item.ID_CT_DKTN').data('url');
+                                                                            $.get(url, function (data) {
+                                                                                $("#myModaleEditDS_@item.ID_CT_DKTN").html(data);
+                                                                                $("#ModalTitle").html("Cập nhật Thông Tin");
+                                                                                $("#myModaleEditDS_@item.ID_CT_DKTN").modal('show');
+                                                                            });
+                                                                        });
+                                                        </script>
+
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                    <tr id="vt">
+                                        <th colspan="18" class="font-weight-bold font-size-lg">
+                                            <button id="add-vt" type="button" class="btn btn-light border border-white"><i class="fas fa-plus"></i></button>
+
+                                        </th>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <div class="col-md-12 col-lg-12" style="text-align: end;">
+                                <button type="submit" value="@DKTN_ID" name="XacNhan" class="btn btn-primary " style="margin-top: 1%;">&nbsp; Xác nhận </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+}
+<script>
+     $(document).ready(function () {
+            var i = 2;
+            $("#add-vt").click(function () {
+                var renderList = $(`<tr>
+                                                                        <td class='text-center delItem' > <i class="fa fa-trash" aria-hidden="true"></i> </td>
+                                                                        <td >
+                                                                            <textarea class='form-control' cols='20' id='HoTen_${i}' name='HoTen_${i}' placeholder='Họ và tên' rows='1'></textarea>
+                                                                            <span id="Errorfullname_${i}" style="color: red; text-transform: none; font-weight: normal "></span>
+                                                                        </td>
+
+                                                                         <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field BirthDay must be a number.' id='NgaySinh_${i}'  name='NgaySinh_${i}' placeholder='' type='date' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='BirthDay' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field CCCD must be a number.' id='CCCD_${i}'  name='CCCD_${i}' placeholder='CCCD' type='text' value=''>
+                                                                           <span class='field-validation-valid text-danger' data-valmsg-for='CCCD' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoKhau_${i}'  name='HoKhau_${i}' placeholder='Hộ khẩu thường trú' type='text' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                       <td style=''>
+                                                                            <select class="form-control marginTB5 SelectCV" name="ChucVu_${i}" id="ChucVu_${i}">
+                                                                              <option value ='null'>-Chức Vụ-</option>
+                                                                              @foreach (var item in ViewBag.IDCV)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_${i}'  name='SoDienThoai_${i}' placeholder='Số điện thoại' type='number' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                          <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='Ten_NTP_${i}'  name='Ten_NTP_${i}' placeholder='Tên Nhà thầu phụ' type='text' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                              <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoTen_QuanLy_${i}'  name='HoTen_QuanLy_${i}' placeholder='Họ tên Quản lý' type='text' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+                                                                          <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_QuanLy_${i}'  name='SoDienThoai_QuanLy_${i}' placeholder='Số điện thoại' type='number' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
+                                                                        </td>
+
+
+                                                                          <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='CapMoi_${i}'  name='CapMoi_${i}' placeholder='' type='radio' value='1'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='GiaHan_${i}'  name='GiaHan_${i}' placeholder='' type='radio' value='2'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='BoSungCong_${i}'  name='BoSungCong_${i}' placeholder='' type='radio' value='3'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='CapLai_${i}'  name='CapLai_${i}' placeholder='' type='radio' value='4'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='ChuyenNT_${i}'  name='ChuyenNT_${i}' placeholder='' type='radio' value='5'>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                        <td style=''>
+                                                                            <input class='form-control' data-val='true' data-val-number='The field CreateDate must be a number.' id='ThoiHanThe_${i}'  name='ThoiHanThe_${i}' placeholder='' type='date' value=''>
+                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='CreateDate' data-valmsg-replace='true'></span>
+                                                                        </td>
+                                                                         <td style=''>
+                                                                            <select class="form-control marginTB5 SelectKV" name="KhuVucLamViec_${i}" id="KhuVucLamViec_${i}" multiple="multiple">
+                                                                              <option value ='null'>-Khu vực-</option>
+                                                                              @foreach (var item in ViewBag.IDKV)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                         <td style=''>
+                                                                            <select class="form-control marginTB5 SelectCong" name="Cong_${i}" id="Cong_${i}" multiple="multiple">
+                                                                              <option value ='null'>-Cổng-</option>
+                                                                              @foreach (var item in ViewBag.IDGate)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+
+                                                                         <td style=''>
+                                                                            <select class="form-control marginTB5 SelectNhom" name="NhomNT_${i}" id="NhomNT_${i}">
+                                                                              <option value ='null'>-Nhóm-</option>
+                                                                              @foreach (var item in ViewBag.IDGroup)
+                                                                                {
+                                                                                  <option value='@item.Value'>@item.Text</option>
+                                                                                }
+                                                                            </select>
+                                                                        </td>
+                                                                    </tr>`);
+                i++;
+                $("#vt").before(renderList);
+                $(".SelectCong").chosen({
+                    width: "100%",
+                });
+                $("#table .chosen-search-input").val("Chọn cổng");
+                $(".SelectKV").chosen({
+                    width: "100%",
+                });
+                $("#table .chosen-search-input").val("Chọn khu vực");
+            });
+
+         $("#IDNT").change(function () {
+             const params = new URLSearchParams(window.location.search);
+             $.get("/ListCardRegisInforNT/GetHD", { IDNT: $("#IDNT").val() }, function (data) {
+                 console.log(data)
+                 if (data[0] != null) {
+                     $("#IDHD").empty();
+                     $("#IDHD").append("<option value ='" + null + "'>" + "--Chọn hợp đồng--" + "</option>")
+                     $.each(data, function (index, row) {
+                         console.log(row)
+                         $("#IDHD").append("<option value ='" + row.IDContract + "'>" + row.Somecontracts + "</option>")
+                     });
+                 }
+                 else {
+                     $("#IDHD").empty();
+                     $("#IDHD").append("<option value ='" + 0 + "'>" + "--Không hợp đồng--" + "</option>")
+                 }
+             });
+         });
+     });
+
+    $("#table").on("click", ".delItem", function () {
+        $(this).closest("tr").remove();
+    });
+
+
+
+</script>
+<script type="text/javascript">
+    $("#IDNT").chosen({
+        width: "100%"
+    });
+    $("#IDLTK").chosen({
+        width: "100%"
+    });
+
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $('#btn-add-ds').click(function () {
+        var url = $('#myModal_add').data('url');
+        $.get(url, function (data) {
+            $("#myModal_add").html(data);
+            $("#ModalTitle").html("Thêm Dự án");
+            $("#myModal_add").modal('show');
+        });
+    });
+    $('#btn-Download').click(function () {
+        var url = $('#myModal_Download').data('url');
+        $.get(url, function (data) {
+            $("#myModal_Download").html(data);
+        });
+    });
+</script>
+
+
+

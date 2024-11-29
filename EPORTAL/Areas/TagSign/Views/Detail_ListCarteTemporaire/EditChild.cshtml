@@ -1,0 +1,278 @@
+﻿
+@model  EPORTAL.ModelsTagSign.NT_DetailCarteTemporaireValidation
+@using EPORTAL.ModelsView360;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<div>
+    <div class="tab" style="background: #fdfdfd;">
+        <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen"><h6><b>NHÂN VIÊN NT ĐANG LÀM VIỆC</b></h6></button>
+        <button class="tablinks" style="margin-left: 5px" onclick="openCity(event, 'Paris')"><h6><b>NHÂN VIÊN NHÀ NT ĐÃ NGHỈ VIỆC</b></h6></button>
+    </div>
+</div>
+@using (Html.BeginForm("EditChild", "Detail_ListCarteTemporaire", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.TextBox("TTTID", ViewData["id"], new { @type = "hidden" })
+
+    <div class="modal-dialog modal-lg" id="form" style="margin-top: 7%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                @{
+                    EPORTALEntities db = new EPORTALEntities();
+                    /* var IDDS = (int)ViewBag.ID;
+                     var ID = db.NT_Extendcard.Where(x => x.IDGH == IDDS).FirstOrDefault();*/
+                    /*if (ID.Namefile == "1")
+                    {*/
+                    <fieldset id="SubmitForm">
+                                        <div class="row">
+                                            @Html.HiddenFor(x => x.IDCTTTT) @Html.HiddenFor(x => x.IDTTT)
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Họ và tên &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+
+                                                        @Html.TextBox("HoVaTen", Model.HoVaTen, new { @id = "HoVaTen", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.HoVaTen, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">CCCD &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextBox("CCCD", Model.CCCD, new { @id = "CCCD", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.CCCD, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Loại phương tiện &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.DropDownListFor(model => model.LoaiPTID, ViewBag.loaipt as SelectList, "----- Chọn loại phuong tiện ký nháy -----", new { @id = "LoaiPTID", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.LoaiPTID, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Chức vụ &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextBox("ChucVu", Model.ChucVu, new { @id = "ChucVu", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.ChucVu, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                @{
+                                                    string a = Model.NgaySinh.ToString("yyyy-MM-dd");
+                                                }
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Ngày sinh &nbsp; &nbsp;: </span>
+                                                    </div>
+
+                                                    <div class="col-md-8 form-group" style="text-align:left;">
+                                                        @Html.EditorFor(m => m.NgaySinh, new { htmlAttributes = new { @class = "form-control", placeholder = "Chọn ngày", @id = "NgaySinh", @type = "date", @Value = a } })
+                                                        @Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">SĐT &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextBox("Sdt", Model.Sdt, new { @id = "Sdt", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.Sdt, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Biển số &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextBox("BienSo", Model.BienSo, new { @id = "ChucVu", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.BienSo, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Cổng : </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.DropDownListFor(model => model.Cong, ViewBag.IDGate as SelectList, "----- Chọn cổng -----", new { @id = "BPQL", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.Cong, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Số phiếu đăng ký VTTS &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextBox("SoPhieuDKVTTS", Model.SoPhieuDKVTTS, new { @id = "SoPhieuDKVTTS", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.SoPhieuDKVTTS, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">VTTS chưa đăng ký &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextBox("SoLanRaVao", Model.SoLanRaVao, new { @id = "SoLanRaVao", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.SoLanRaVao, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">VT theo phạm vi cung cấp của hợp đồng CĐT&nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextArea("VTTSChuaDK", Model.VTTSChuaDK, new { @type = "textarea", @id = "VTTSChuaDK", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.VTTSChuaDK, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Số lần đăng ký ra vào &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextArea("VTTheoPVCC", Model.VTTheoPVCC, new { @type = "textarea", @id = "VTTheoPVCC", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.VTTheoPVCC, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group" style="display:flex;width:100%;">
+                                                    <div class="col-md-4" style="padding-top:1%;">
+                                                        <span class="small mb-2" style="font-size:15px;">Ghi chú &nbsp; &nbsp;: </span>
+                                                    </div>
+                                                    <div class="col-md-8" style="text-align:left;">
+                                                        @Html.TextArea("GhiChu", Model.GhiChu, new { @type = "textarea", @id = "GhiChu", @class = "form-control" })
+                                                        @Html.ValidationMessageFor(model => model.GhiChu, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                        <div class="btn-margin-top text-center">
+
+                            <input type="submit" value="Sửa" class="btn btn-success pull-right" />
+                        </div>
+
+                    </fieldset>
+                    @*   }
+                        else
+                        {
+                            <fieldset id="SubmitForm">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="display:flex;width:100%;">
+                                            <div class="col-md-4" style="padding-top:1%;">
+                                                <span class="small mb-2" style="font-size:15px;">Bộ phận QL : </span>
+                                            </div>
+                                            <div class="col-md-8" style="text-align:left;">
+                                                @Html.DropDownListFor(model => model.idktv, ViewBag.TPBPList as SelectList, "----- Chọn Tr/P BP/NM -----", new { @id = "TPBP", @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.idktv, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="display:flex;width:100%;">
+                                            <div class="col-md-4" style="padding-top:1%;">
+                                                <span class="small mb-2" style="font-size:15px;">TP P. HCĐN : </span>
+                                            </div>
+                                            <div class="col-md-8" style="text-align:left;">
+                                                @Html.DropDownListFor(model => model.idbpql, ViewBag.TPHCDNList as SelectList, "----- Chọn Tr/P P. HCĐN-----", new { @id = "PHCDN", @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.idbpql, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="display:flex;width:100%;">
+                                            <div class="col-md-4" style="padding-top:1%;">
+                                                <span class="small mb-2" style="font-size:15px;">VP1C : </span>
+                                            </div>
+                                            <div class="col-md-8" style="text-align:left;">
+                                                @Html.DropDownListFor(model => model.idvp1c, ViewBag.VP1CList as SelectList, "----- Chọn CBNV VP1C -----", new { @id = "VP1CNN", @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.idvp1c, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="btn-margin-top text-center">
+
+                                    <input type="submit" value="Trình ký" class="btn btn-success pull-right" />
+                                </div>
+
+                            </fieldset>
+                        }*@
+                }
+
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<script>
+    $(document).ready(function () {
+        $("#bnt-hide").click(function () {
+            $("p").hide();
+        });
+</script>
+<script type="text/javascript">
+
+    $("#LoaiPTID").chosen({
+        width: "100%"
+    });
+    $("#BPQL").chosen({
+        width: "100%"
+    });
+    $("#VP1C").chosen({
+        width: "100%"
+    });
+    $("#TPBP").chosen({
+        width: "100%"
+    });
+    $("#PHCDN").chosen({
+        width: "100%"
+    });
+    $("#VP1CNN").chosen({
+        width: "100%"
+    });
+
+</script>
+
+
+
+
+

@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model EPORTAL.ModelsView360.ProjectValidation
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="tab-content">
+            <div class="card">
+
+                <div style="padding:10px 20px;float:left;width:100%">
+                    <div style="display: flex;">
+                        <div>
+                            <img style="width: 40%;padding-top:6.5%" src="/Images/360.png">
+                        </div>
+                        <div class="page-title-actions" style="margin-left:-4%;">
+                            <b>@Model.Title</b>
+                        </div>
+                    </div>
+
+                    <iframe class="ku-embed" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="@Model.URL" width="100%" height="800px"></iframe>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item">
+                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
+                    </div>
+                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
+                        <ul class="d-flex justify-content-center">
+
+                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

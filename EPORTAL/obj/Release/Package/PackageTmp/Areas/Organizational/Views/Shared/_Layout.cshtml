@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Sơ Đồ Tổ Chức</title>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="~/Areas/Organizational/Content/styles.css" rel="stylesheet" />
+    <link href="~/Areas/Organizational/Content/style_KPVSX.css" rel="stylesheet" />
+    <link href="~/Areas/Organizational/Content/responsive.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+
+    @*<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- chart -->
+    @*<script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>*@
+    <script src="~/Areas/Organizational/Content/highcharts.js"></script>
+    <link href="~/Areas/Organizational/Content/highcharts.css" rel="stylesheet" />
+    <script src="~/Areas/Organizational/Content/highchartExporting.js"></script>
+    @*@Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")*@
+
+</head>
+
+<body>
+
+    @using SoDoToChuc.Models
+    @using EPORTAL.ModelsOrganizational
+    @{
+        SoDoToChucEntities db_context = new SoDoToChucEntities();
+    }
+    @if (!User.Identity.IsAuthenticated)
+    {
+        Response.Redirect("~/Login");
+    }
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-white" style="max-width: 1950px; margin: auto;" id="navtop">
+
+        <!-- Navbar Logo-->
+        <a href="@Url.Action("index","HomeSDTC")"><img src="~/Areas/Organizational/Content/assets/img/logo.png" alt="Logo" class="float-left" style="" id="logo"></a>
+
+        <div class="container-fluid wrapp_contai">
+            <div class="row" style="width: 100%;margin-right: 80px; text-align:center">
+                <div class="col offset-md-8 info topI" style="align-self:center ;text-align:center;"><a href="#">Giới thiệu</a></div>
+                <div class="col-flex info topI menuTopI"><a href="@Url.Action("index","Home",new {area=""})">Cổng thông tin</a></div>
+                <div class="col-flex info topI" style="max-width:150px;"><a href="@Url.Action("Index", "ListProject", new {area="View360"})">360 Virtual Tour </a></div>
+                <!-- Sidebar Toggle-->
+                <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 col" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+
+            </div>
+        </div>
+        <!-- Navbar
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="#!">Settings</a></li>
+                    <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item" href="#!">Logout</a></li>
+                </ul>
+            </li>
+        </ul> -->
+    </nav>
+
+    <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel" style="margin-top:100px;">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleSlidesOnly" data-slide-to="0" class="active"><p style="position: absolute; top: -45px; right: -3px; display: none"><span>1</span><span>/</span><span>2</span></p></li>
+            <li data-target="#carouselExampleSlidesOnly" data-slide-to="1"><p style="position: absolute; top: -45px; right: -3px;display:none "><span>2</span><span>/</span><span>2</span></p></li>
+            @*<li data-target="#carouselExampleSlidesOnly" data-slide-to="2">3</li>
+                <li data-target="#carouselExampleSlidesOnly" data-slide-to="3">4</li>*@
+        </ol>
+        <div class="carousel-inner h500">
+            <div class="carousel-item active banner">
+                <img class="d-block w-100" src="~/Areas/Organizational/Content/assets/img/IMG HPDQ 1.png" alt="First slide">
+            </div>
+            <div class="carousel-item banner">
+                <img class="d-block w-100" src="~/Areas/Organizational/Content/assets/img/banner-trang-gioi-thieu.jpg" alt="Second slide">
+            </div>
+            @*<div class="carousel-item banner">
+                    <img class="d-block w-100" src="~/Content/assets/img/IMG HPDQ 1.png" alt="Third slide">
+                </div>
+                <div class="carousel-item banner">
+                    <img class="d-block w-100" src="~/Content/assets/img/banner-trang-gioi-thieu.jpg" alt="Third slide">
+                </div>*@
+        </div>
+    </div>
+    <div class="overlay">
+        <img src="~/Areas/Organizational/Content/assets/img/overlay1.png" class="" />
+    </div>
+
+    @*<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel" style="margin-top:100px;">
+            <div class="carousel-inner">
+                <div class="carousel-item active banner">
+                    <img src="~/Content/assets/img/IMG HPDQ 1.png" class="d-block " alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="~/Content/assets/img/IMG HPDQ 1.png" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="~/Content/assets/img/IMG HPDQ 1.png" class="d-block w-100" alt="...">
+                </div>
+            </div>
+        </div>*@
+
+<div class="">
+    <div id="layoutSidenav" style="background-color: #e5e5e5;">
+        @*menu*@
+        <div id="layoutSidenav_nav" style="position: relative;background-color: #ffffff;height: auto;z-index:3;">
+            <nav class="sb-sidenav accordion sb-sidenav-white" id="sidenavAccordion" style="width: 20rem;">
+                <div class="sb-sidenav-menu" style="background-color: #ffffff;border-radius: 8px;">
+                    <div class="nav">
+                        <a class="nav-link collapsed " href="#" data-bs-toggle="collapse" style="color: #05418A; font-weight: bold; background-color: #ffffff; color: #05418A; font-weight: bold;"
+                           data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-project-diagram"></i></div>
+                            Sơ đồ tổng quan
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav ">
+                                <a class="nav-link" href="@Url.Action("index","HomeSDTC")">Hòa Phát Dung Quất</a>
+                            </nav>
+                        </div>
+
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" style="color: #05418A; font-weight: bold; background-color: #ffffff; color: #05418A; font-weight: bold;"
+                           data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+                            <div class="sb-nav-link-icon"><i class="fas fa-sitemap"></i></div>
+                            Sơ đồ chi tiết
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                                <a class="nav-link collapsed menuTab" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
+                                    <i class="fas fa-columns" style="margin-right: 10px;"></i>
+                                    @*<img src="~/Content/assets/img/KhoiPVSX 1.png"/>*@
+                                    Khối Phục Vụ Sản Xuất
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse @(String.Equals(Session["nav"],"KPVSX") ? "show" : "")" id="pagesCollapseAuth" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        @{
+                                            var result = db_context.PhongBans.Where(x => x.NhomID == 1);
+                                            foreach (var item in result)
+                                            {
+                                                <a class="nav-link  @(String.Equals(Session["idpb"],item.IDPhongBan) ? "boldwe" : "navLink")" href="@Url.Action("index","KPVSX",new { id = item.IDPhongBan })"><img src="~/Areas/Organizational/Content/assets/img/icon2.png" /> @item.TenPhongBan </a>@*<span style="display: @(String.Equals(Session["idpb"],item.IDPhongBan) ? "block" : "none") " class="spanI"></span>*@
+                                            }
+                                        }
+                                    </nav>
+                                </div>
+                                <a class="nav-link collapsed menuTab" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
+                                    <!-- <i class="fas fa-columns" style="margin-right: 10px;"></i> -->
+                                    <i class="fa fa-cog" style="margin-right: 10px;"></i>
+                                    Khối Sản Xuất
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse @(String.Equals(Session["nav"],"KSX") ? "show" : "")" id="pagesCollapseError" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        @{
+                                            var res = db_context.PhongBans.Where(x => x.NhomID == 2);
+                                            foreach (var item in res)
+                                            {
+                                                <a class="nav-link @(String.Equals(Session["idpb"],item.IDPhongBan) ? "boldwe" : "navLink")" href="@Url.Action("index","NMNL",new { id = item.IDPhongBan })"><img src="~/Areas/Organizational/Content/assets/img/icon2.png" /> @item.TenPhongBan  </a> @*<span style="display: @(String.Equals(Session["idpb"],item.IDPhongBan) ? "block" : "none") " class="spanI"></span>*@
+                                            }
+                                        }
+                                    </nav>
+                                </div>
+                                <a class="nav-link collapsed menuTab" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseE" aria-expanded="false" aria-controls="pagesCollapseE">
+                                    <!-- <i class="fas fa-columns" style="margin-right: 10px;"></i> -->
+                                    <i class="far fa-handshake" aria-hidden="true" style="margin-right: 10px;"></i>
+                                    Công Ty Con
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseE" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="#"><img src="~/Areas/Organizational/Content/assets/img/icon2.png" /> Cảng tổng hợp</a>
+                                    </nav>
+                                </div>
+
+                                <a class="nav-link collapsed menuTab" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseB" aria-expanded="false" aria-controls="pagesCollapseE">
+                                    <!-- <i class="fas fa-columns" style="margin-right: 10px;"></i> -->
+                                    <i class="far fa-handshake" aria-hidden="true" style="margin-right: 10px;"></i>
+                                    Ban Dự Án
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                @*<div class="collapse" id="pagesCollapseB" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                        <nav class="sb-sidenav-menu-nested nav">
+                                            <a class="nav-link" href="#"><img src="~/Content/assets/img/icon2.png" /> BDA NM.LT</a>
+                                        </nav>
+                                    </div>*@
+                                <div class="collapse @(String.Equals(Session["nav"],"BDA") ? "show" : "")" id="pagesCollapseB" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        @{
+                                            var re = db_context.PhongBans.Where(x => x.NhomID == 4);
+                                            foreach (var item in re)
+                                            {
+                                                <a class="nav-link @(String.Equals(Session["idpb"],item.IDPhongBan) ? "boldwe" : "navLink")" href="@Url.Action("index","BDA",new { id = item.IDPhongBan })"><img src="~/Areas/Organizational/Content/assets/img/icon2.png" /> @item.TenPhongBan  </a> @*<span style="display: @(String.Equals(Session["idpb"],item.IDPhongBan) ? "block" : "none") " class="spanI"></span>*@
+                                            }
+                                        }
+                                    </nav>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div id="layoutSidenav_content" style="min-height: 1700px;padding-left: 0;">
+            <main class="main">
+                @RenderBody()
+
+            </main>
+        </div>
+
+    </div>
+    <footer class="row " style="min-height: 60px; background-color: #0097D0;margin: 0;">
+        <div class="col-xl-11 align-self-center d-flex " style="margin: auto;">
+            <div class="footer_item">
+                <span style="color:rgba(255, 255, 255, 0.6);font-size:16px">SƠ ĐỒ TỔ CHỨC</span>
+            </div>
+            <div class="footer_content" style="">
+                <h6 style="color: #fff;">Công ty cổ phần thép Hòa Phát Dung Quất</h6>
+
+            </div>
+            <div class="footer_item_copy d-flex">
+                <span class="copyright">Copyright</span>
+                <ul class="copyright_ul">
+                    <li>Ban công nghệ thông tin</li>
+                    <li>Hóa Phát Dung Quất</li>
+                </ul>
+            </div>
+            <hr style="background-color: #fff;">
+
+        </div>
+    </footer>
+    
+</div>
+    <script>
+        $(document).ready(function () {
+            /* $('.carousel-item').fadeOut("slow")*/
+            //if (window.matchMedia('(max-width: 1500px)').matches) {
+            //    $('body').addClass("sb-sidenav-toggled")
+            //}
+            //if (window.matchMedia('(max-width: 1500px)').matches) {
+            //    $('body').addClass("sb-sidenav-toggled")
+            //}
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() > 200) {
+                    $("#navtop").animate({ height: "80px" }, {
+                        queue: false,
+                        duration: 1000
+                    })
+                    $("#logo").animate({ "max-width": "200px" }, {
+                        queue: false,
+                        duration: 1000
+                    })
+                }
+                else {
+                    $("#navtop").animate({ height: "120px" }, {
+                        queue: false,
+                        duration: 1000
+                    })
+                    $("#logo").animate({ "max-width": "250px" }, {
+                        queue: false,
+                        duration: 1000
+                    })
+                }
+            })
+
+        })
+    </script>
+
+    @*<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>*@
+    <script src="~/Areas/Organizational/Content/assets/scripts/script.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

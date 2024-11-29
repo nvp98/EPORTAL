@@ -1,0 +1,172 @@
+﻿@model EPORTAL.ModelsView360.ProjectValidation
+
+@using (Html.BeginForm("Edit", "Projects", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ID)
+    <div class="modal-dialog" id="form">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên dự án</label>
+                                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Title", @text = "",@required = true } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhóm dự án</label>
+
+                                @Html.DropDownListFor(model => model.IDGroup, ViewBag.PGList as SelectList, "--Chọn Nhóm dự án--", new { @id = "IDGroup", @class = "form-control", @required = true })
+                                @*@Html.ValidationMessageFor(model => model.V_TT, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày thực hiện</label>
+                                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Date", @type = "date", @Value = ViewBag.Date, @required = true } })
+                                @*@Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Bộ Phận Yêu cầu</label>
+
+                                @Html.DropDownListFor(model => model.IDPhongBan, ViewBag.PBList as SelectList, "--Chọn Phòng Ban--", new { @id = "IDPhongBan", @class = "form-control" })
+                                @*@Html.ValidationMessageFor(model => model.V_TT, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Link truy cập</label>
+
+                                @Html.EditorFor(model => model.URL, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "URL", @required = true } })
+                                @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+
+                                @Html.EditorFor(model => model.Note, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Note" } })
+                                @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">
+                                    Hình Ảnh (Kích thước yêu cầu 20x20) &nbsp;
+                                    @if (Model.Images != null && Model.Images.Length > 0)
+                                    {
+                                        <a class="" target="_blank" href="@Url.Content("~/Images/" + System.IO.Path.GetFileName(Model.Images))"><b>Xem hình cũ</b> <i class="fa-solid fa-eye"></i></a>
+                                    }
+                                </label>
+                                <input type="file" name="ImageFile" />
+
+                                @Html.HiddenFor(model => model.Images)
+                                @*<div class="col-md-10">
+
+        </div>*@
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-12">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <fieldset id="SubmitForm">
+
+                                <div class="form-group">
+                                    <label class="small mb-1" for="inputLastName">
+                                        Tải lên File &nbsp;
+                                        @if (Model.FilePDF != null && Model.FilePDF.Length > 0)
+                                        {
+                                            <a class="" target="_blank" href="@Url.Content("~/UploadedFiles/" + System.IO.Path.GetFileName(Model.FilePDF))"><b>Xem File cũ</b> <i class="fa-solid fa-eye"></i></a>
+                                        }
+                                    </label>
+                                    <div >
+                                        <input type="file" id="FileUpload" name="FileUpload" onchange="checkfile(this);" />
+                                    </div>
+                                </div>
+                                @Html.HiddenFor(model => model.FilePDF)
+                                @*@Html.EditorFor(model => model.FilePDF, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "FilePDF", @readonly = "true" } })*@
+                            </fieldset>
+                        </div>
+                        @*Upload PDF*@
+                        <!--<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 id="ModalTitle"></h5>
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+        </div>
+        <div class="modal-body">-->
+                        @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+                        <!--<fieldset id="SubmitForm">
+                    <div class="form-group">
+                        <label class="small mb-1" for="inputLastName">Tải lên Danh Sách Dữ Liệu TagName</label>
+                        <input type="file" id="FileUpload" name="FileUpload" class="form-control" onchange="checkfile(this);" />
+                    </div>
+
+                    <div class="form-group">
+        <input type="submit" value="Import" id="btnSubmit" class="btn btn-primary" />
+    </div>
+                    <div class="btn-margin-top text-center">
+        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>-->
+
+
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+
+}
+<script type="text/javascript">
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+    $("#IDGroup").chosen({
+        width: "100%"
+    });
+    //$("#ChucVuID").chosen({
+    //    width: "100%"
+    //});
+    //$("#IDNhom").chosen({
+    //    width: "100%"
+    //});
+    function checkfile(sender) {
+        var validExts = new Array(".pdf");
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            alert("Vui lòng chọn file Excel: " +
+                validExts.toString() + "");
+            $('#FileUpload').val() = '';
+            return false;
+        }
+        else { return true; }
+    };
+</script>
+
+
+

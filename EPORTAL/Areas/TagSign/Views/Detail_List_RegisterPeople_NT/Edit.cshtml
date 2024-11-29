@@ -1,0 +1,217 @@
+﻿
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+@model EPORTAL.ModelsTagSign.List_Detail_RegisterPeopleValidation
+@using EPORTAL.ModelsView360;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@{
+    EPORTALEntities db = new EPORTALEntities();
+
+}
+@using (Html.BeginForm("Edit", "Detail_List_RegisterPeople_NT", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ID_CT_DKTN)
+    @Html.HiddenFor(model => model.DKTN_ID)
+    <div class="modal-dialog" id="form" style="margin: 1% 0% 0% 15%; max-width: max-content;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Họ và tên</label>
+                                @Html.EditorFor(model => model.HoVaTen, new { htmlAttributes = new { @class = "form-control", placeholder = "FullName ", @id = "FullName" } })
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">CCCD</label>
+                                @Html.EditorFor(model => model.CCCD, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Title", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Ngày sinh</label>
+                                @Html.EditorFor(model => model.NgaySinh, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "BirthDay", @type = "date", @Value = ViewBag.NgaySinh } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Hộ khẩu</label>
+                                @Html.EditorFor(model => model.HoKhau, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Title", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Chức vụ</label>
+                                @Html.DropDownListFor(model => model.CV_ID, ViewBag.IDCV as SelectList, new { @id = "IDCV", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Số điện thoại</label>
+                                @Html.EditorFor(model => model.SoDienThoai, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "SoDienThoai", @text = "" } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small mb-1">Tên NTP</label>
+                                @Html.EditorFor(model => model.Ten_NTP, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "Ten_NTP", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small mb-1">Họ tên quản lý</label>
+                                @Html.EditorFor(model => model.HoTen_QuanLy, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "HoTen_QuanLy", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small mb-1">SĐT quản lý</label>
+                                @Html.EditorFor(model => model.SoDienThoai_QuanLy, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "SoDienThoai_QuanLy", @text = "" } })
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="small mb-1">Cấp mới</label>
+                                @Html.EditorFor(model => model.CapMoi, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "DoiThe", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="small mb-1">Gia hạn </label>
+                                @Html.EditorFor(model => model.GiaHan, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GiaHanThe", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="small mb-1">Bổ sung cổng</label>
+                                @Html.EditorFor(model => model.BoSungCong, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "BoSungDt", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="small mb-1">Cấp lại</label>
+                                @Html.EditorFor(model => model.CapLai, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GiaHanThe", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="small mb-1">Chuyển đổi NT</label>
+                                @Html.EditorFor(model => model.ChuyenNT, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GiaHanThe", @text = "" } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Thời hạn thẻ</label>
+                                @Html.EditorFor(model => model.ThoiHanThe, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ThoiHanThe", @type = "date", @Value = ViewBag.ThoiHanThe } })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhóm nhà thầu</label>
+                                @Html.DropDownListFor(model => model.NhomNT, ViewBag.IDGroup as SelectList, new { @id = "IDGroup", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Khu vực làm việc</label>
+                                @Html.DropDownList("SelectedKV", null, "", new { id = "SelectedKV", @class = "form-control", style = "width:100%", multiple = "multiple", placeholder = "Chọn khu vực" })
+                            </div>
+
+                        </div>
+                        @{
+                            string[] arrList = Model.KhuVucLamViec.Split(',');
+                        }
+                        @foreach (var item in arrList)
+                        {
+                            <div class="col-md-12 font-weight-bold float-left text-left">
+
+                                @{
+                                    var IDKV = Convert.ToInt32(item);
+                                    var Name = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                    @Name.TenKV
+                                }
+                            </div>
+                        }
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Cổng</label>
+                                @Html.DropDownList("Selected", null, "", new { id = "Selected", @class = "form-control", style = "width:100%", multiple = "multiple", placeholder = "Chọn cổng" })
+                            </div>
+
+                        </div>
+                        @{
+                            string[] arrListStr = Model.CongLamViec.Split(',');
+                        }
+                        @foreach (var item in arrListStr)
+                        {
+                            <div class="col-md-12 font-weight-bold float-left text-left">
+
+                                @{
+                                    var IDGate = Convert.ToInt32(item);
+                                    var Name = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                    @Name.Gate
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<script type="text/javascript">
+    $("#NhomNT").chosen({
+        width: "100%"
+    });
+    $("#IDCA").chosen({
+        width: "100%"
+    });
+    $(function () {
+        $("#Selected").chosen({
+            width: "100%"
+        });
+    });
+    $("#Selected").val("Chọn cổng");
+    $(function () {
+        $("#SelectedKV").chosen({
+            width: "100%"
+        });
+    });
+    $("#SelectedKV").val("Chọn khu vực");
+</script>
+
+
+

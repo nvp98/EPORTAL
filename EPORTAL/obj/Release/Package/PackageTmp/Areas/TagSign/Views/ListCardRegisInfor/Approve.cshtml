@@ -1,0 +1,80 @@
+﻿@model EPORTAL.ModelsTagSign.SigersValidation
+@using EPORTAL.ModelsView360;
+
+@using (Html.BeginForm("Approve", "ListCardRegisInfor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.idds)
+    <div class="modal-dialog" id="form" style="margin-top:5%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <fieldset id="SubmitForm">
+                    @{
+                        EPORTALEntities db = new EPORTALEntities();
+                        var IDDS = (int)ViewBag.IDDS;
+                        var CheckID = db.NT_CardRegistrationInfor.Where(x => x.IDDS == IDDS).FirstOrDefault();
+
+                        if (CheckID.Namefile == "1")
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="small mb-1">Tình trạng phê duyệt</label>
+                                        @Html.DropDownListFor(model => model.tkvp1c, ViewBag.VP1CList as SelectList, new { @id = "tkvp1c", @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.tkvp1c, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="small mb-1">Ngày dự kiến học</label>
+                                        @Html.TextBox("NgayKyVP1C", null, new { @id = "NgayKyVP1C", @type = "datetime-local", @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ngaykyvp1c, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="small mb-1">Ghi chú</label>
+                                        @Html.EditorFor(model => model.ghichuvp1c, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ghichuvp1c" } })
+                                        @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="small mb-1">Tình trạng phê duyệt</label>
+                                        @Html.DropDownListFor(model => model.tkvp1c, ViewBag.VP1CList as SelectList, new { @id = "tkvp1c", @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.tkvp1c, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="small mb-1">Ghi chú</label>
+                                        @Html.EditorFor(model => model.ghichuvp1c, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ghichuvp1c" } })
+                                        @*@Html.ValidationMessageFor(model => model.V_BKS, "", new { @class = "text-danger" })*@
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <div class="btn-margin-top text-center">
+
+                        <input type="submit" value="Xác nhận" class="btn btn-success button_submit" />
+
+                    </div>
+
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+}
+

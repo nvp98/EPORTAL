@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Publish/Views/Shared/_Layout.cshtml";
+}
+
+@using EPORTAL.ModelsDanhBaDoiTac
+@model PagedList.IPagedList<ComplainValidation>
+@using PagedList.Mvc
+<link href="~/Areas/Publish/Content/assets/css/PagedList.css" rel="stylesheet" />
+
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Quản Lý Khiếu Nại
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-header">
+
+                        <div class="m-l-auto">
+
+
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+
+
+                        <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th width="30px" class="text-center">STT</th>
+                                    <th width="" class="text-center">Mã Khiếu Nại</th>
+                                    <th width="" class="text-center">Tiêu Đề Khiếu Nại</th>
+                                    <th width="" class="text-center">Nội Dung Khiếu Nại</th>
+                                    <th width="" class="text-center">File Đính Kèm</th>
+                                    <th width="" class="text-center">Người Khiếu Nại</th>
+                                    @* <th width="" class="text-center">ID Đối Tác</th>*@
+                                    <th width="" class="text-center">Ngày Khiếu Nại</th>
+
+                                    @*<th width="" class="text-center">TTKNID</th>*@
+                                    <th width="80px" class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int pageno = (int)Model.PageNumber;
+                                    int itemperpage = (int)Model.PageSize;
+                                    int RowNo = ((pageno - 1) * itemperpage) + 1;
+                                }
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">@RowNo@{RowNo++;}</td>
+                                        <td class="text-center">@item.MaKhieuNai</td>
+                                        <td class="text-center">@item.TieuDeKN</td>
+                                        <td class="text-center">@Html.Raw(item.NoiDungKN)</td>
+
+
+
+                                        @*<td class="text-center">@item.ImageLogo</td>*@
+                                        @*<td class="text-center">
+                                                <img src="@Url.Content("~/UploadedFiles/Logo/" + System.IO.Path.GetFileName(item.ImageLogo))" alt="" width="100%"/>
+                                            </td>*@
+
+                                        <td class="text-center">
+                                            <a href="@item.FileDinhKem" target="_blank"><i class="fa fa-download mr-3"></i>Tải về</a>
+                                        </td>
+
+                                        <td class="text-center">@item.NguoiKN</td>
+                                        @* <td class="text-center">@item.IDDoiTac</td>*@
+                                        <td class="text-center">@item.NgayKN.ToString("dd-MM-yyyy")</td>
+
+                                        @*<td class="text-center">@item.TTKNID</td>*@
+
+
+                                        <td class="text-center">
+
+                                            <a style="color:#0097D0" href="@Url.Action("ComplainTo", "ManageComplain", new { id = item.IDKhieuNai })" class="btn-action" title="Phản Hồi"><i class="fa fa-comments" aria-hidden="true"></i></a>
+
+
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="pager">
+                            @Html.PagedListPager(Model, page => Url.Action("Index", "ManageComplain", new { area = "Publish", page }))
+                            <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm Khiếu Nại");
+            $("#myModal").modal('show');
+        });
+    });
+
+
+
+
+
+</script>
+
+
+
