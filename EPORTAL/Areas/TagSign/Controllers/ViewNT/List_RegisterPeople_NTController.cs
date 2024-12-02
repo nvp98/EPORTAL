@@ -98,7 +98,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 res = res.Where(x => x.NgayTrinhKy >= begind && x.NgayTrinhKy <= endd).ToList();
             }
 
-            if (search != "")
+            if (search != "" && search != null)
             {
                 var ID_NT = db.NT_Partner.Where(x=>x.FullName.Contains(search)).FirstOrDefault();   
                 res = res.Where(x => x.NhaThau_ID == ID_NT.ID).ToList();
