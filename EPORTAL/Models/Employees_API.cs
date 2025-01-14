@@ -9,8 +9,8 @@ namespace EPORTAL.Models
     {
         public string result { get; set; }
         public string content { get; set; }
-        public data[] Employees { get; set; }
-        public class data
+        public List<Employee> data { get; set; }
+        public class Employee
         {
             public string manv { get; set; }
             public string hoten { get; set; }

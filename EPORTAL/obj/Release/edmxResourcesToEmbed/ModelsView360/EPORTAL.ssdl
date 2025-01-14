@@ -356,6 +356,7 @@
     </Key>
     <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TenPhongBan" Type="nvarchar" MaxLength="50" />
+    <Property Name="status" Type="int" />
   </EntityType>
   <EntityType Name="Projects">
     <Key>

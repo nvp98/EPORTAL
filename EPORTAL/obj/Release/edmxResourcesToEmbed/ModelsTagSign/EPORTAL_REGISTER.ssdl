@@ -1,16 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="EPORTAL_REGISTERModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-  <EntityType Name="CollectMoney">
-    <Key>
-      <PropertyRef Name="ID_PT" />
-    </Key>
-    <Property Name="ID_PT" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="DKTN_ID" Type="int" />
-    <Property Name="NgayThu" Type="date" />
-    <Property Name="SoPhieuThu" Type="nvarchar" MaxLength="50" />
-    <Property Name="TongSoThe" Type="int" />
-    <Property Name="TongSoTien" Type="nvarchar(max)" />
-  </EntityType>
   <EntityType Name="Detail_RegisterPeople">
     <Key>
       <PropertyRef Name="ID_CT_DKTN" />
@@ -37,6 +26,8 @@
     <Property Name="NhomNT" Type="int" />
     <Property Name="GhiChu" Type="nvarchar(max)" />
     <Property Name="Price" Type="nvarchar(max)" />
+    <Property Name="DienThoaiThongMinh" Type="int" />
+    <Property Name="GhiChuHPDQ" Type="nvarchar(max)" />
   </EntityType>
   <EntityType Name="DK_CardExtend">
     <Key>
@@ -208,6 +199,8 @@
     <Parameter Name="CongLamViec" Type="nvarchar(max)" Mode="In" />
     <Parameter Name="NhomNT" Type="int" Mode="In" />
     <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="DienThoaiThongMinh" Type="int" Mode="In" />
+    <Parameter Name="GhiChuHPDQ" Type="nvarchar(max)" Mode="In" />
   </Function>
   <Function Name="Detail_RegisterPeople_Price" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="ID_CT_DKTN" Type="int" Mode="In" />
@@ -234,6 +227,8 @@
     <Parameter Name="CongLamViec" Type="nvarchar(max)" Mode="In" />
     <Parameter Name="NhomNT" Type="int" Mode="In" />
     <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="DienThoaiThongMinh" Type="int" Mode="In" />
+    <Parameter Name="GhiChuHPDQ" Type="nvarchar(max)" Mode="In" />
   </Function>
   <Function Name="DK_CardExtend_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="IDGHT" Type="int" Mode="In" />
@@ -475,11 +470,7 @@
     <Parameter Name="NgayDuyet" Type="date" Mode="In" />
     <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
   </Function>
-  <Function Name="TK_CarteTemp_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="id" Type="int" Mode="In" />
-  </Function>
   <EntityContainer Name="EPORTAL_REGISTERModelStoreContainer">
-    <EntitySet Name="CollectMoney" EntityType="Self.CollectMoney" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Detail_RegisterPeople" EntityType="Self.Detail_RegisterPeople" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DK_CardExtend" EntityType="Self.DK_CardExtend" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DK_CardRegistrationInfor" EntityType="Self.DK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />

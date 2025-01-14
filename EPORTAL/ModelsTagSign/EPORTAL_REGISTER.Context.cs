@@ -47,8 +47,6 @@ public partial class EPORTAL_REGISTEREntities : DbContext
 
     public virtual DbSet<TK_CardRegistrationInfor> TK_CardRegistrationInfor { get; set; }
 
-    public virtual DbSet<CollectMoney> CollectMoneys { get; set; }
-
     public virtual DbSet<Detail_RegisterPeople> Detail_RegisterPeople { get; set; }
 
     public virtual DbSet<Flow> Flows { get; set; }
@@ -941,7 +939,7 @@ public partial class EPORTAL_REGISTEREntities : DbContext
     }
 
 
-    public virtual int Detail_RegisterPeople_Insert(Nullable<int> dKTN_ID, string hoVaTen, Nullable<System.DateTime> ngaySinh, string cCCD, string hoKhau, Nullable<int> cV_ID, string soDienThoai, string ten_NTP, string hoTen_QuanLy, string soDienThoai_QuanLy, string capMoi, string giaHan, string boSungCong, string capLai, string chuyenNT, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string congLamViec, Nullable<int> nhomNT, string ghiChu)
+    public virtual int Detail_RegisterPeople_Insert(Nullable<int> dKTN_ID, string hoVaTen, Nullable<System.DateTime> ngaySinh, string cCCD, string hoKhau, Nullable<int> cV_ID, string soDienThoai, string ten_NTP, string hoTen_QuanLy, string soDienThoai_QuanLy, string capMoi, string giaHan, string boSungCong, string capLai, string chuyenNT, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string congLamViec, Nullable<int> nhomNT, string ghiChu, Nullable<int> dienThoaiThongMinh, string ghiChuHPDQ)
     {
 
         var dKTN_IDParameter = dKTN_ID.HasValue ?
@@ -1044,7 +1042,17 @@ public partial class EPORTAL_REGISTEREntities : DbContext
             new ObjectParameter("GhiChu", typeof(string));
 
 
-        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Detail_RegisterPeople_Insert", dKTN_IDParameter, hoVaTenParameter, ngaySinhParameter, cCCDParameter, hoKhauParameter, cV_IDParameter, soDienThoaiParameter, ten_NTPParameter, hoTen_QuanLyParameter, soDienThoai_QuanLyParameter, capMoiParameter, giaHanParameter, boSungCongParameter, capLaiParameter, chuyenNTParameter, thoiHanTheParameter, khuVucLamViecParameter, congLamViecParameter, nhomNTParameter, ghiChuParameter);
+        var dienThoaiThongMinhParameter = dienThoaiThongMinh.HasValue ?
+            new ObjectParameter("DienThoaiThongMinh", dienThoaiThongMinh) :
+            new ObjectParameter("DienThoaiThongMinh", typeof(int));
+
+
+        var ghiChuHPDQParameter = ghiChuHPDQ != null ?
+            new ObjectParameter("GhiChuHPDQ", ghiChuHPDQ) :
+            new ObjectParameter("GhiChuHPDQ", typeof(string));
+
+
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Detail_RegisterPeople_Insert", dKTN_IDParameter, hoVaTenParameter, ngaySinhParameter, cCCDParameter, hoKhauParameter, cV_IDParameter, soDienThoaiParameter, ten_NTPParameter, hoTen_QuanLyParameter, soDienThoai_QuanLyParameter, capMoiParameter, giaHanParameter, boSungCongParameter, capLaiParameter, chuyenNTParameter, thoiHanTheParameter, khuVucLamViecParameter, congLamViecParameter, nhomNTParameter, ghiChuParameter, dienThoaiThongMinhParameter, ghiChuHPDQParameter);
     }
 
 
@@ -1065,7 +1073,7 @@ public partial class EPORTAL_REGISTEREntities : DbContext
     }
 
 
-    public virtual int Detail_RegisterPeople_Update(Nullable<int> iD_CT_DKTN, string hoVaTen, Nullable<System.DateTime> ngaySinh, string cCCD, string hoKhau, Nullable<int> cV_ID, string soDienThoai, string ten_NTP, string hoTen_QuanLy, string soDienThoai_QuanLy, string capMoi, string giaHan, string boSungCong, string capLai, string chuyenNT, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string congLamViec, Nullable<int> nhomNT, string ghiChu)
+    public virtual int Detail_RegisterPeople_Update(Nullable<int> iD_CT_DKTN, string hoVaTen, Nullable<System.DateTime> ngaySinh, string cCCD, string hoKhau, Nullable<int> cV_ID, string soDienThoai, string ten_NTP, string hoTen_QuanLy, string soDienThoai_QuanLy, string capMoi, string giaHan, string boSungCong, string capLai, string chuyenNT, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string congLamViec, Nullable<int> nhomNT, string ghiChu, Nullable<int> dienThoaiThongMinh, string ghiChuHPDQ)
     {
 
         var iD_CT_DKTNParameter = iD_CT_DKTN.HasValue ?
@@ -1168,7 +1176,17 @@ public partial class EPORTAL_REGISTEREntities : DbContext
             new ObjectParameter("GhiChu", typeof(string));
 
 
-        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Detail_RegisterPeople_Update", iD_CT_DKTNParameter, hoVaTenParameter, ngaySinhParameter, cCCDParameter, hoKhauParameter, cV_IDParameter, soDienThoaiParameter, ten_NTPParameter, hoTen_QuanLyParameter, soDienThoai_QuanLyParameter, capMoiParameter, giaHanParameter, boSungCongParameter, capLaiParameter, chuyenNTParameter, thoiHanTheParameter, khuVucLamViecParameter, congLamViecParameter, nhomNTParameter, ghiChuParameter);
+        var dienThoaiThongMinhParameter = dienThoaiThongMinh.HasValue ?
+            new ObjectParameter("DienThoaiThongMinh", dienThoaiThongMinh) :
+            new ObjectParameter("DienThoaiThongMinh", typeof(int));
+
+
+        var ghiChuHPDQParameter = ghiChuHPDQ != null ?
+            new ObjectParameter("GhiChuHPDQ", ghiChuHPDQ) :
+            new ObjectParameter("GhiChuHPDQ", typeof(string));
+
+
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Detail_RegisterPeople_Update", iD_CT_DKTNParameter, hoVaTenParameter, ngaySinhParameter, cCCDParameter, hoKhauParameter, cV_IDParameter, soDienThoaiParameter, ten_NTPParameter, hoTen_QuanLyParameter, soDienThoai_QuanLyParameter, capMoiParameter, giaHanParameter, boSungCongParameter, capLaiParameter, chuyenNTParameter, thoiHanTheParameter, khuVucLamViecParameter, congLamViecParameter, nhomNTParameter, ghiChuParameter, dienThoaiThongMinhParameter, ghiChuHPDQParameter);
     }
 
 

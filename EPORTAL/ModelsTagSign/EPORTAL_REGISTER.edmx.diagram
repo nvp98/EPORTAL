@@ -11,8 +11,7 @@
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.DK_DetailCardExtend" Width="1.5" PointX="5.375" PointY="4.75" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.TK_CardExtend" Width="1.5" PointX="0.75" PointY="6.75" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.TK_CardRegistrationInfor" Width="1.5" PointX="2.75" PointY="6.75" />
-        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.CollectMoney" Width="1.5" PointX="7.375" PointY="0.75" />
-        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.Detail_RegisterPeople" Width="1.5" PointX="7.375" PointY="3.75" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.Detail_RegisterPeople" Width="1.5" PointX="7.625" PointY="2.25" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.Flow" Width="1.5" PointX="9.375" PointY="0.75" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.RegisterPeople" Width="1.5" PointX="9.375" PointY="3.75" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.SignerType" Width="1.5" PointX="7.5" PointY="9.25" />

@@ -1,5 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="EPORTAL_REGISTERModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Detail_RegisterPeople">
+    <Key>
+      <PropertyRef Name="ID_CT_DKTN" />
+    </Key>
+    <Property Name="ID_CT_DKTN" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DKTN_ID" Type="int" />
+    <Property Name="HoVaTen" Type="nvarchar" MaxLength="150" />
+    <Property Name="NgaySinh" Type="date" />
+    <Property Name="CCCD" Type="nvarchar" MaxLength="50" />
+    <Property Name="HoKhau" Type="nvarchar(max)" />
+    <Property Name="CV_ID" Type="int" />
+    <Property Name="SoDienThoai" Type="nvarchar" MaxLength="50" />
+    <Property Name="Ten_NTP" Type="nvarchar" MaxLength="500" />
+    <Property Name="HoTen_QuanLy" Type="nvarchar" MaxLength="500" />
+    <Property Name="SoDienThoai_QuanLy" Type="nvarchar" MaxLength="50" />
+    <Property Name="CapMoi" Type="nvarchar" MaxLength="50" />
+    <Property Name="GiaHan" Type="nvarchar" MaxLength="50" />
+    <Property Name="BoSungCong" Type="nvarchar" MaxLength="50" />
+    <Property Name="CapLai" Type="nvarchar" MaxLength="50" />
+    <Property Name="ChuyenNT" Type="nvarchar" MaxLength="50" />
+    <Property Name="ThoiHanThe" Type="date" />
+    <Property Name="KhuVucLamViec" Type="nvarchar(max)" />
+    <Property Name="CongLamViec" Type="nvarchar(max)" />
+    <Property Name="NhomNT" Type="int" />
+    <Property Name="GhiChu" Type="nvarchar(max)" />
+    <Property Name="Price" Type="nvarchar(max)" />
+    <Property Name="DienThoaiThongMinh" Type="int" />
+    <Property Name="GhiChuHPDQ" Type="nvarchar(max)" />
+  </EntityType>
   <EntityType Name="DK_CardExtend">
     <Key>
       <PropertyRef Name="IDGHT" />
@@ -78,6 +107,50 @@
     <Property Name="GhiChu" Type="nvarchar(max)" />
     <Property Name="IDDKT" Type="int" />
   </EntityType>
+  <EntityType Name="Flow">
+    <Key>
+      <PropertyRef Name="ID_XL" />
+    </Key>
+    <Property Name="ID_XL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TenXuLy" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="RegisterPeople">
+    <Key>
+      <PropertyRef Name="ID_DKTN" />
+    </Key>
+    <Property Name="ID_DKTN" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="NoiDung" Type="nvarchar(max)" />
+    <Property Name="BPQL_ID" Type="int" />
+    <Property Name="NhanVienNT_ID" Type="int" />
+    <Property Name="NhaThau_ID" Type="int" />
+    <Property Name="HopDong" Type="nvarchar" MaxLength="150" />
+    <Property Name="NgayTrinhKy" Type="date" />
+    <Property Name="File_CCAT" Type="nvarchar(max)" />
+    <Property Name="File_IMG" Type="nvarchar(max)" />
+    <Property Name="TrinhKy_ID" Type="int" />
+    <Property Name="TinhTrang_ID" Type="int" />
+    <Property Name="LoaiNT_ID" Type="int" />
+  </EntityType>
+  <EntityType Name="SignerType">
+    <Key>
+      <PropertyRef Name="ID_LTK" />
+    </Key>
+    <Property Name="ID_LTK" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TenLoai" Type="nvarchar" MaxLength="150" />
+  </EntityType>
+  <EntityType Name="SignOff_Flow">
+    <Key>
+      <PropertyRef Name="ID_TK_TN" />
+    </Key>
+    <Property Name="ID_TK_TN" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DKTN_ID" Type="int" />
+    <Property Name="CapDuyet" Type="int" />
+    <Property Name="LuongXuLy" Type="int" />
+    <Property Name="NhanVienID" Type="int" />
+    <Property Name="NgayDuyet" Type="datetime" />
+    <Property Name="TinhTrangID" Type="int" />
+    <Property Name="GhiChu" Type="nvarchar(max)" />
+  </EntityType>
   <EntityType Name="TK_CardExtend">
     <Key>
       <PropertyRef Name="IDTKGHT" />
@@ -102,6 +175,61 @@
     <Property Name="NgayDuyet" Type="date" />
     <Property Name="GhiChu" Type="nvarchar(max)" />
   </EntityType>
+  <Function Name="Detail_RegisterPeople_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_CT_DKTN" Type="int" Mode="In" />
+  </Function>
+  <Function Name="Detail_RegisterPeople_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="DKTN_ID" Type="int" Mode="In" />
+    <Parameter Name="HoVaTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgaySinh" Type="date" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="HoKhau" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="CV_ID" Type="int" Mode="In" />
+    <Parameter Name="SoDienThoai" Type="nvarchar" Mode="In" />
+    <Parameter Name="Ten_NTP" Type="nvarchar" Mode="In" />
+    <Parameter Name="HoTen_QuanLy" Type="nvarchar" Mode="In" />
+    <Parameter Name="SoDienThoai_QuanLy" Type="nvarchar" Mode="In" />
+    <Parameter Name="CapMoi" Type="nvarchar" Mode="In" />
+    <Parameter Name="GiaHan" Type="nvarchar" Mode="In" />
+    <Parameter Name="BoSungCong" Type="nvarchar" Mode="In" />
+    <Parameter Name="CapLai" Type="nvarchar" Mode="In" />
+    <Parameter Name="ChuyenNT" Type="nvarchar" Mode="In" />
+    <Parameter Name="ThoiHanThe" Type="date" Mode="In" />
+    <Parameter Name="KhuVucLamViec" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="CongLamViec" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="NhomNT" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="DienThoaiThongMinh" Type="int" Mode="In" />
+    <Parameter Name="GhiChuHPDQ" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="Detail_RegisterPeople_Price" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_CT_DKTN" Type="int" Mode="In" />
+    <Parameter Name="Price" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="Detail_RegisterPeople_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_CT_DKTN" Type="int" Mode="In" />
+    <Parameter Name="HoVaTen" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgaySinh" Type="date" Mode="In" />
+    <Parameter Name="CCCD" Type="nvarchar" Mode="In" />
+    <Parameter Name="HoKhau" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="CV_ID" Type="int" Mode="In" />
+    <Parameter Name="SoDienThoai" Type="nvarchar" Mode="In" />
+    <Parameter Name="Ten_NTP" Type="nvarchar" Mode="In" />
+    <Parameter Name="HoTen_QuanLy" Type="nvarchar" Mode="In" />
+    <Parameter Name="SoDienThoai_QuanLy" Type="nvarchar" Mode="In" />
+    <Parameter Name="CapMoi" Type="nvarchar" Mode="In" />
+    <Parameter Name="GiaHan" Type="nvarchar" Mode="In" />
+    <Parameter Name="BoSungCong" Type="nvarchar" Mode="In" />
+    <Parameter Name="CapLai" Type="nvarchar" Mode="In" />
+    <Parameter Name="ChuyenNT" Type="nvarchar" Mode="In" />
+    <Parameter Name="ThoiHanThe" Type="date" Mode="In" />
+    <Parameter Name="KhuVucLamViec" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="CongLamViec" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="NhomNT" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="DienThoaiThongMinh" Type="int" Mode="In" />
+    <Parameter Name="GhiChuHPDQ" Type="nvarchar(max)" Mode="In" />
+  </Function>
   <Function Name="DK_CardExtend_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="IDGHT" Type="int" Mode="In" />
   </Function>
@@ -257,6 +385,57 @@
     <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
     <Parameter Name="IDDKT" Type="int" Mode="In" />
   </Function>
+  <Function Name="RegisterPeople_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_DKTN" Type="int" Mode="In" />
+  </Function>
+  <Function Name="RegisterPeople_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="NoiDung" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="BPQL_ID" Type="int" Mode="In" />
+    <Parameter Name="NhanVienNT_ID" Type="int" Mode="In" />
+    <Parameter Name="NhaThau_ID" Type="int" Mode="In" />
+    <Parameter Name="HopDong" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgayTrinhKy" Type="datetime" Mode="In" />
+    <Parameter Name="File_CCAT" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="File_IMG" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="TrinhKy_ID" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang_ID" Type="int" Mode="In" />
+    <Parameter Name="LoaiNT_ID" Type="int" Mode="In" />
+    <Parameter Name="ID_DKTN" Type="int" Mode="InOut" />
+  </Function>
+  <Function Name="RegisterPeople_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_DKTN" Type="int" Mode="In" />
+    <Parameter Name="NoiDung" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="BPQL_ID" Type="int" Mode="In" />
+    <Parameter Name="NhaThau_ID" Type="int" Mode="In" />
+    <Parameter Name="HopDong" Type="nvarchar" Mode="In" />
+    <Parameter Name="NgayTrinhKy" Type="datetime" Mode="In" />
+    <Parameter Name="File_CCAT" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="File_IMG" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="TrinhKy_ID" Type="int" Mode="In" />
+    <Parameter Name="LoaiNT_ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="RegisterPeople_UpdateFlow" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_DKTN" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang_ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="SignOff_Flow_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="DKTN_ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="SignOff_Flow_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="DKTN_ID" Type="int" Mode="In" />
+    <Parameter Name="CapDuyet" Type="int" Mode="In" />
+    <Parameter Name="LuongXuLy" Type="int" Mode="In" />
+    <Parameter Name="NhanVienID" Type="int" Mode="In" />
+    <Parameter Name="NgayDuyet" Type="datetime" Mode="In" />
+    <Parameter Name="TinhTrangID" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="SignOff_Flow_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID_TK_TN" Type="int" Mode="In" />
+    <Parameter Name="NgayDuyet" Type="datetime" Mode="In" />
+    <Parameter Name="TinhTrangID" Type="int" Mode="In" />
+    <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
+  </Function>
   <Function Name="TK_CardExtend_Cancel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="GHTID" Type="int" Mode="In" />
   </Function>
@@ -292,10 +471,15 @@
     <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
   </Function>
   <EntityContainer Name="EPORTAL_REGISTERModelStoreContainer">
+    <EntitySet Name="Detail_RegisterPeople" EntityType="Self.Detail_RegisterPeople" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DK_CardExtend" EntityType="Self.DK_CardExtend" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DK_CardRegistrationInfor" EntityType="Self.DK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DK_DetailCardExtend" EntityType="Self.DK_DetailCardExtend" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DK_DetailCardRegistrationInfor" EntityType="Self.DK_DetailCardRegistrationInfor" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Flow" EntityType="Self.Flow" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="RegisterPeople" EntityType="Self.RegisterPeople" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SignerType" EntityType="Self.SignerType" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SignOff_Flow" EntityType="Self.SignOff_Flow" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="TK_CardExtend" EntityType="Self.TK_CardExtend" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="TK_CardRegistrationInfor" EntityType="Self.TK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
   </EntityContainer>

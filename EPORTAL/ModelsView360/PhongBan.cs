@@ -31,6 +31,8 @@ public partial class PhongBan
 
     public string TenPhongBan { get; set; }
 
+    public Nullable<int> status { get; set; }
+
 
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

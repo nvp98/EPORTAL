@@ -22,6 +22,9 @@ using System.Globalization;
 using DocumentFormat.OpenXml.Wordprocessing;
 using EPORTAL.ModelsOrganizational;
 using EPORTAL.ModelsServey;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Web.Services.Description;
+using ClosedXML.Excel;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -241,8 +244,40 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
         public FileResult DownloadExcel()
         {
-            string path = "/App_Data/BM_Đăng ký thẻ người.xlsx";
-            return File(path, "application/vnd.ms-excel", "BM_Đăng ký thẻ người.xlsx");
+            string path = "BM_Đăng ký thẻ người.xlsx";
+            string filePath = Server.MapPath("~/App_Data/" + path);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return null; // Xử lý lỗi nếu file không tồn tại
+            }
+            var kvlv = db.NT_Workplace.ToList();
+            var cong = db.NT_Gate.ToList();
+            var cv = db.NT_Position.ToList();
+
+            // Tạo workbook từ file gốc
+            using (var workbook = new XLWorkbook(filePath))
+            {
+                var worksheet =  workbook.Worksheet("DL");
+                for (var i = 0; i < kvlv.Count; i++)
+                {
+                    worksheet.Cell(i+2, 3).Value = kvlv[i].TenKV;
+                }
+                for (var i = 0; i < cong.Count; i++)
+                {
+                    worksheet.Cell(i+2, 8).Value = cong[i].Gate;
+                }
+                for (var i = 0; i < cv.Count; i++)
+                {
+                    worksheet.Cell(i+2, 5).Value = cv[i].TenCV;
+                }
+                // Lưu lại file Excel
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", path);
+                }
+            }
         }
         public ActionResult Create()
         {
@@ -252,15 +287,376 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             List<SignerType> kv = db_dk.SignerTypes.ToList();
             ViewBag.IDLTK = new SelectList(kv, "ID_LTK", "TenLoai");
 
-            List<ModelsView360.PhongBan> pb = db.PhongBans.ToList();
+            List<ModelsView360.PhongBan> pb = db.PhongBans.Where(x=>x.status==1).ToList();
             ViewBag.IDPhongBan = new SelectList(pb, "IDPhongBan", "TenPhongBan");
 
             return PartialView();
         }
+
+        [HttpPost]
+        public ActionResult InsertEdit(HttpPostedFileBase file, int id)
+        {
+            int status = 1, dtc = 0;
+
+            string LoaiTK = "", msg = "";
+            string HoVaTen = "";
+            string filePath = string.Empty;
+            string path = Server.MapPath("~/PDFHocAT/");
+            if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
+            {
+                string pathex = Server.MapPath("~/UploadedFiles/DKHocATEX/");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(pathex);
+                }
+                filePath = pathex + Path.GetFileName(file.FileName);
+
+                file.SaveAs(filePath);
+                Stream stream = file.InputStream;
+
+                IExcelDataReader reader = null;
+                if (file.FileName.ToLower().EndsWith(".xls"))
+                {
+                    reader = ExcelReaderFactory.CreateBinaryReader(stream);
+                }
+                else if (file.FileName.ToLower().EndsWith(".xlsx"))
+                {
+                    reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                }
+                else
+                {
+                    msg = "Vui lòng chọn đúng định dạng file Excel";
+                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = msg });
+                }
+                DataSet result = reader.AsDataSet();
+                DataTable dt = result.Tables[0];
+                reader.Close();
+                if (dt.Rows.Count > 0)
+                {
+                    try
+                    {
+                        for (int i = 4; i < dt.Rows.Count; i++)
+                        {
+                            dtc++;
+                            string HoTen = dt.Rows[i][1].ToString().Trim();
+                            if (HoTen != "")
+                            {
+                                HoVaTen = HoTen;
+                                string BirthDay = dt.Rows[i][2].ToString().Trim();
+
+                                try
+                                {
+                                    if (BirthDay == "")
+                                    {
+                                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                        foreach (var item in ID_CT)
+                                        {
+                                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                        }
+                                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Kiểm tra lại ngày sinh. Nhân viên : {HoVaTen} " });
+                                    }
+                                    DateTime NgaySinh1 = DateTime.ParseExact(BirthDay, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
+                                }
+                                catch
+                                {
+
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Kiểm tra lại định dạng ngày của Ngày sinh. Nhân viên : {HoVaTen} " });
+                                }
+                                DateTime NgaySinh = DateTime.ParseExact(BirthDay, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
+
+
+                                string CCCD = dt.Rows[i][3].ToString().Trim();
+                                string HoKhau = dt.Rows[i][4].ToString().Trim();
+
+                                string ChucVu = dt.Rows[i][5].ToString().Trim();
+                                var IDCV = db.NT_Position.Where(x => x.TenCV == ChucVu).FirstOrDefault();
+                                if (IDCV == null)
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng kiểm tra lại chức vụ. Nhân viên : {HoVaTen} " });
+
+                                }
+                                string SoDienThoai = dt.Rows[i][6].ToString().Trim();
+                                string Ten_NTP = dt.Rows[i][7].ToString().Trim();
+                                string HoTen_QuanLy = dt.Rows[i][8].ToString().Trim();
+                                string SoDienThoai_QuanLy = dt.Rows[i][9].ToString().Trim();
+                                string CapMoi = dt.Rows[i][10].ToString().Trim();
+                                if (CapMoi != "")
+                                {
+                                    var CheckCCCD = db_nt.NT_NhanVienVP.Where(x => x.CCCD.Contains(CCCD) && x.TinhTrang == 0).FirstOrDefault();
+                                    var CheckNVNT = db_nt.NT_NhanVienNT.Where(x => x.CCCD.Contains(CCCD) && x.TTLV == 1 || x.CCCD == CCCD && x.TTLV == 1).FirstOrDefault();
+                                    if (CheckNVNT != null)
+                                    {
+                                        if (CheckNVNT.TTLV == 1)
+                                        {
+
+                                            var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                            foreach (var item in ID_CT)
+                                            {
+                                                db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                            }
+                                            return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Nhân viên chưa cắt thẻ Nhà thầu cũ. Nhân viên : {HoVaTen} " });
+                                        }
+                                    }
+                                    if (CheckCCCD != null)
+                                    {
+
+                                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                        foreach (var item in ID_CT)
+                                        {
+                                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                        }
+                                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Nhân viên nằm trong danh sách vi phạm. Nhân viên : {HoVaTen} " });
+
+                                    }
+                                }
+                                string GiaHan = dt.Rows[i][11].ToString().Trim();
+                                string BoSungCong = dt.Rows[i][12].ToString().Trim();
+                                string CapLai = dt.Rows[i][13].ToString().Trim();
+                                string ChuyenDoiNT = dt.Rows[i][14].ToString().Trim();
+
+                                if (CapMoi == "" && GiaHan == "" && BoSungCong == "" && CapLai == "" && ChuyenDoiNT == "")
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"NVui lòng tích chọn loại đăng ký thẻ. Nhân viên : {HoVaTen} " });
+
+
+                                }
+
+                                if (LoaiTK == "1" && GiaHan != "" || LoaiTK == "1" && BoSungCong != "" || LoaiTK == "1" && CapLai != "" || LoaiTK == "1" && ChuyenDoiNT != "")
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : {HoVaTen} " });
+
+                                }
+
+                                if (LoaiTK == "2" && CapMoi != "" || LoaiTK == "2" && BoSungCong != "" || LoaiTK == "2" && CapLai != "" || LoaiTK == "2" && ChuyenDoiNT != "")
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : {HoVaTen} " });
+                                }
+
+                                if (LoaiTK == "3" && CapMoi != "" || LoaiTK == "3" && GiaHan != "" || LoaiTK == "3" && CapLai != "" || LoaiTK == "3" && ChuyenDoiNT != "")
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : {HoVaTen} " });
+                                }
+                                if (LoaiTK == "4" && CapMoi != "" || LoaiTK == "4" && GiaHan != "" || LoaiTK == "4" && BoSungCong != "" || LoaiTK == "4" && ChuyenDoiNT != "")
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : {HoVaTen} " });
+                                }
+
+                                if (LoaiTK == "5" && CapMoi != "" || LoaiTK == "5" && GiaHan != "" || LoaiTK == "5" && CapLai != "" || LoaiTK == "5" && BoSungCong != "")
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : {HoVaTen} " });
+                                }
+
+
+
+                                string THThe = dt.Rows[i][16].ToString().Trim();
+                                try
+                                {
+                                    if (THThe == "")
+                                    {
+
+                                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                        foreach (var item in ID_CT)
+                                        {
+                                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                        }
+                                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng kiểm tra thời hạn thẻ. Nhân viên : {HoVaTen} " });
+                                    }
+                                    DateTime ThoiHanThe1 = DateTime.ParseExact(THThe, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
+
+                                }
+                                catch
+                                {
+
+                                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                    foreach (var item in ID_CT)
+                                    {
+                                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                    }
+                                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng kiểm tra định dạng ngày thời hạn thẻ. Nhân viên : {HoVaTen} " });
+                                }
+                                DateTime ThoiHanThe = DateTime.ParseExact(THThe, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
+
+                                string KhuVuc = dt.Rows[i][17].ToString().Trim();
+                                var NameKV = new List<string>();
+                                string[] arrList = KhuVuc.Trim().Split(',');
+                                foreach (var str in arrList)
+                                {
+                                    var IDKV = db.NT_Workplace.Where(x => x.TenKV == str.Trim()).FirstOrDefault();
+
+                                    if (IDKV == null && id != 0)
+                                    {
+
+                                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                        foreach (var item in ID_CT)
+                                        {
+                                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                        }
+                                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $"Vui lòng kiểm tra lại khu vực làm việc. Nhân viên : {HoVaTen} " });
+                                    }
+                                    else
+                                    {
+                                        NameKV.Add(IDKV.IDKV.ToString());
+                                    }
+                                }
+                                var ListKV = string.Join(",", NameKV);
+
+                                string NameGate = dt.Rows[i][18].ToString().Trim();
+                                var Name = new List<string>();
+                                string[] arrListStr = NameGate.Split(',');
+                                foreach (var str in arrListStr)
+                                {
+                                    var IDGate = db.NT_Gate.Where(x => x.Gate == str.Trim()).FirstOrDefault();
+
+                                    if (IDGate == null && id != 0)
+                                    {
+
+                                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                                        foreach (var item in ID_CT)
+                                        {
+                                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                                        }
+                                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $" Vui lòng kiểm tra lại cổng ra vào. Nhân viên : {HoVaTen} " });
+
+                                    }
+                                    else
+                                    {
+                                        Name.Add(IDGate.IDGate.ToString());
+                                    }
+                                }
+                                var ListGate = string.Join(",", Name);
+
+
+                                string NameGroup = "";
+
+
+                                string GhiChu = dt.Rows[i][19].ToString().Trim();
+
+                                int DienThoaiDiDong = (dt.Rows[i][15].ToString() == "") ? 0 : 1;
+                                var insert = db_dk.Detail_RegisterPeople_Insert
+                                (id,
+                                HoTen,
+                                NgaySinh,
+                                CCCD,
+                                HoKhau,
+                                (IDCV == null) ? 0 : IDCV.IDCV,
+                                SoDienThoai,
+                                Ten_NTP,
+                                HoTen_QuanLy,
+                                SoDienThoai_QuanLy,
+                                CapMoi,
+                                GiaHan,
+                                BoSungCong,
+                                CapLai,
+                                ChuyenDoiNT,
+                                ThoiHanThe,
+                                ListKV,
+                                ListGate,
+
+                                null,
+                                GhiChu,
+                                DienThoaiDiDong,
+                                "");
+                                dtc++;
+                            }
+
+
+
+                        }
+                        if (status == 0)
+                        {
+                            msg = (status == 0) ? "Có những dòng dữ liệu có thể không hợp lệ, vui long kiểm tra kỹ trước khi xác nhận" : "thêm thành công";
+                        }
+                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $" Thêm thành công " });
+                    }
+                    catch (Exception ex)
+                    {
+
+                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                        foreach (var item in ID_CT)
+                        {
+                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                        }
+                        return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = $" Kiểm tra lại thông tin. Nhân viên : {HoVaTen} " });
+                    }
+
+                }
+                else
+                {
+                    if (id != 0)
+                    {
+                        var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                        foreach (var item in ID_CT)
+                        {
+                            db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                        }
+                       // db_dk.RegisterPeople_Delete(id);
+                    }
+                    return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = "File import không đúng định dạng. Vui lòng tải biểu mẫu file import" });
+                }
+
+            }
+            else
+            {
+                if (id != 0)
+                {
+                    var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == id).ToList();
+                    foreach (var item in ID_CT)
+                    {
+                        db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
+                    }
+                   // db_dk.RegisterPeople_Delete(id);
+                }
+                // TempData["msgSuccess"] = "<script>alert('Vui lòng nhập dữ liệu');</script>";
+                return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = "Vui lòng nhập dữ liệu" });
+            }
+            return Json(new { success = "success", data = Url.Action("Edit", new { id = id }), message = msg });
+        }
         [HttpPost]
         public ActionResult Create(List_Detail_RegisterPeopleValidation _DO, FormCollection collection)
         {
-            int ID_DKTN = 0;
+             int ID_DKTN = 0;
             string NoiDung = "";
             string HopDong = "";
             string LoaiNT = "";
@@ -268,7 +664,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             string BP = "";
             string LoaiTK = "";
             string HoVaTen = "";
-            int dtc = 0;
+            int dtc = 0,status=1;
 
 
             string path = Server.MapPath("~/PDFHocAT/");
@@ -410,10 +806,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             {
                                 HoVaTen = HoTen;
                                 string BirthDay = dt.Rows[i][2].ToString().Trim();
+
                                 try
                                 {
                                     if (BirthDay == "")
                                     {
+                                        status = 0;
                                         if (ID_DKTN != 0)
                                         {
                                             var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == ID_DKTN).ToList();
@@ -421,11 +819,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                             {
                                                 db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                             }
-                                            db_dk.RegisterPeople_Delete(ID_DKTN);
+                                           /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
                                         }
                                         TempData["msgSuccess"] = "<script>alert('Kiểm tra lại ngày sinh. Nhân viên : " + HoVaTen + "');</script>";
 
-                                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                        return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                     }
                                     DateTime NgaySinh1 = DateTime.ParseExact(BirthDay, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
                                 }
@@ -438,11 +836,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                         {
                                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                         }
-                                        db_dk.RegisterPeople_Delete(ID_DKTN);
+                                       /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
                                     }
                                     TempData["msgSuccess"] = "<script>alert('Kiểm tra lại định dạng ngày của Ngày sinh. Nhân viên : " + HoVaTen + "');</script>";
 
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
                                 DateTime NgaySinh = DateTime.ParseExact(BirthDay, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
 
@@ -459,10 +857,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                  /*  db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng kiểm tra lại chức vụ. Nhân viên : " + HoVaTen + "');</script>";
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
                                 string SoDienThoai = dt.Rows[i][6].ToString().Trim();
                                 string Ten_NTP = dt.Rows[i][7].ToString().Trim();
@@ -482,10 +880,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                             {
                                                 db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                             }
-                                            db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                           /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                            status = 0;
                                             TempData["msgSuccess"] = "<script>alert('Nhân viên chưa cắt thẻ Nhà thầu cũ. Vui lòng kiểm tra Nhân viên : " + HoVaTen + "');</script>";
-                                            return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                            return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                         }
                                     }
                                     if (CheckCCCD != null)
@@ -495,10 +893,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                         {
                                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                         }
-                                        db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                       /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                        status = 0;
                                         TempData["msgSuccess"] = "<script>alert('Nhân viên nằm trong danh sách vi phạm. Vui lòng kiểm tra Nhân viên : " + HoVaTen + "');</script>";
-                                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                        return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                     }
                                 }
                                 string GiaHan = dt.Rows[i][11].ToString().Trim();
@@ -513,10 +911,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                   /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert( Vui lòng tích chọn loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
 
                                 }    
 
@@ -527,11 +925,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                    /*db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
 
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
 
                                 if (LoaiTK == "2" && CapMoi != "" || LoaiTK == "2" && BoSungCong != "" || LoaiTK == "2" && CapLai != "" || LoaiTK == "2" && ChuyenDoiNT != "")
@@ -541,11 +939,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
+                                   /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
 
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
 
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
 
                                 if (LoaiTK == "3" && CapMoi != "" || LoaiTK == "3" && GiaHan != "" || LoaiTK == "3" && CapLai != "" || LoaiTK == "3" && ChuyenDoiNT != "")
@@ -555,11 +954,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                    /*db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
 
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
                                 if (LoaiTK == "4" && CapMoi != "" || LoaiTK == "4" && GiaHan != "" || LoaiTK == "4" && BoSungCong != "" || LoaiTK == "4" && ChuyenDoiNT != "")
                                 {
@@ -568,11 +967,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                    /*db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
 
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
 
                                 if (LoaiTK == "5" && CapMoi != "" || LoaiTK == "5" && GiaHan != "" || LoaiTK == "5" && CapLai != "" || LoaiTK == "5" && BoSungCong != "")
@@ -582,16 +981,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                   /* db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ.Nhân viên : " + HoVaTen + "');</script>";
 
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
 
 
 
-                                string THThe = dt.Rows[i][15].ToString().Trim();
+                                string THThe = dt.Rows[i][16].ToString().Trim();
                                 try
                                 {
                                     if (THThe == "")
@@ -601,10 +1000,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                         {
                                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                         }
-                                        db_dk.RegisterPeople_Delete(ID_DKTN);
+                                     /*   db_dk.RegisterPeople_Delete(ID_DKTN);*/
 
+                                        status = 0;
                                         TempData["msgSuccess"] = "<script>alert('Vui lòng kiểm tra thời hạn thẻ. Nhân viên : " + HoVaTen + "');</script>";
-                                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                        return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                     }
                                     DateTime ThoiHanThe1 = DateTime.ParseExact(THThe, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
 
@@ -616,14 +1016,14 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     {
                                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                     }
-                                    db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                  /*  db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                    status = 0;
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng kiểm tra định dạng ngày thời hạn thẻ. Nhân viên : " + HoVaTen + "');</script>";
-                                    return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                    return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                 }
                                 DateTime ThoiHanThe = DateTime.ParseExact(THThe, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
 
-                                string KhuVuc = dt.Rows[i][16].ToString().Trim();
+                                string KhuVuc = dt.Rows[i][17].ToString().Trim();
                                 var NameKV = new List<string>();
                                 string[] arrList = KhuVuc.Trim().Split(',');
                                 foreach (var str in arrList)
@@ -637,11 +1037,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                         {
                                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                         }
-                                        db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                     /*   db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                        status = 0;
                                         TempData["msgSuccess"] = "<script>alert('Vui lòng kiểm tra lại khu vực làm việc. Nhân viên : " + HoVaTen + "');</script>";
 
-                                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                        return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                     }
                                     else
                                     {
@@ -650,9 +1050,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 }
                                 var ListKV = string.Join(",", NameKV);
 
-                                string NameGate = dt.Rows[i][17].ToString().Trim();
+                                string NameGate = dt.Rows[i][18].ToString().Trim();
                                 var Name = new List<string>();
-                                string[] arrListStr = NameGate.Split(',');
+                                 string[] arrListStr = NameGate.Split(',');
                                 foreach (var str in arrListStr)
                                 {
                                     var IDGate = db.NT_Gate.Where(x => x.Gate == str.Trim()).FirstOrDefault();
@@ -664,10 +1064,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                         {
                                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                                         }
-                                        db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                                      /*  db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                                        status = 0;
                                         TempData["msgSuccess"] = "<script>alert('Vui lòng kiểm tra lại cổng ra vào.  Nhân viên : " + HoVaTen + "');</script>";
-                                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                                        return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                                     }
                                     else
                                     {
@@ -677,8 +1077,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 var ListGate = string.Join(",", Name);
 
 
-                                string NameGroup = dt.Rows[i][18].ToString().Trim();
-                                var IDGroup = db.NT_ContractorGroup.Where(x => x.NameContractorGroup == NameGroup).FirstOrDefault();
+                                string NameGroup =/* dt.Rows[i][18].ToString().Trim()*/ "";
+                               /* var IDGroup = db.NT_ContractorGroup.Where(x => x.NameContractorGroup == NameGroup).FirstOrDefault();
                                 if (IDGroup == null)
                                 {
                                     var ID_CT = db_dk.Detail_RegisterPeople.Where(x => x.DKTN_ID == ID_DKTN).ToList();
@@ -690,16 +1090,18 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                                     TempData["msgSuccess"] = "<script>alert('Vui lòng kiểm tra lại nhóm Nhà thầu.  Nhân viên : " + HoVaTen + "');</script>";
                                     return RedirectToAction("Index", "List_RegisterPeople_NT");
-                                }
+                                }*/
 
                                 string GhiChu = dt.Rows[i][19].ToString().Trim();
+                                //var a = dt.Rows[i][15].ToString();
+                                int DienThoaiDiDong = (dt.Rows[i][15].ToString() == "") ? 0:1 ;
                                 var insert = db_dk.Detail_RegisterPeople_Insert
                                 (ID_DKTN,
                                 HoTen,
                                 NgaySinh,
                                 CCCD,
                                 HoKhau,
-                                IDCV.IDCV,
+                                (IDCV==null)?0: IDCV.IDCV,
                                 SoDienThoai,
                                 Ten_NTP,
                                 HoTen_QuanLy,
@@ -712,13 +1114,20 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 ThoiHanThe,
                                 ListKV,
                                 ListGate,
-                                Convert.ToInt32(IDGroup.IDGroup),
+                                /*Convert.ToInt32(IDGroup.IDGroup)*/
+                                null,
+                                GhiChu,
+                                DienThoaiDiDong,
                                 "");
                                 dtc++;
                             }
 
 
 
+                        }
+                        if (status == 0)
+                        {
+                            TempData["msgSuccess"] = "<script>alert('Có những dòng dữ liệu có thể không hợp lệ, vui long kiểm tra kỹ trước khi xác nhận');</script>";
                         }
                         return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
 
@@ -730,10 +1139,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         {
                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                         }
-                        db_dk.RegisterPeople_Delete(ID_DKTN);
-
+                        /*db_dk.RegisterPeople_Delete(ID_DKTN);*/
+                        status = 0;
                         TempData["msgSuccess"] = "<script>alert('Kiểm tra lại thông tin.  Nhân viên : " + HoVaTen + "');</script>";
-                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                        return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = ID_DKTN });
                     }
 
                 }
@@ -746,7 +1155,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         {
                             db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                         }
-                        db_dk.RegisterPeople_Delete(ID_DKTN);
+                      /*  db_dk.RegisterPeople_Delete(ID_DKTN);*/
                     }
                     TempData["msgSuccess"] = "<script>alert('File import không đúng định dạng. Vui lòng tải biểu mẫu file import');</script>";
                 }
@@ -761,7 +1170,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     {
                         db_dk.Detail_RegisterPeople_Delete(item.ID_CT_DKTN);
                     }
-                    db_dk.RegisterPeople_Delete(ID_DKTN);
+                  /*  db_dk.RegisterPeople_Delete(ID_DKTN);*/
                 }
                 TempData["msgSuccess"] = "<script>alert('Vui lòng nhập dữ liệu');</script>";
             }
@@ -773,7 +1182,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             List<NT_Partner> nt = db.NT_Partner.ToList();
             ViewBag.NTList = new SelectList(nt, "ID", "FullName");
 
-            List<ModelsView360.PhongBan> pb = db.PhongBans.ToList();
+            List<ModelsView360.PhongBan> pb = db.PhongBans.Where(x => x.status == 1).ToList();
             ViewBag.IDPhongBan = new SelectList(pb, "IDPhongBan", "TenPhongBan");
 
             List<SignerType> tk = db_dk.SignerTypes.ToList();
@@ -837,13 +1246,13 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             {
                 HttpNotFound();
             }
-            return PartialView(DO);
+            return View(DO);
 
         }
         [HttpPost]
         public ActionResult Edit(List_Detail_RegisterPeopleValidation _DO, FormCollection collection)
         {
-            int DKTN_ID = 0;
+            int DKTN_ID = 0;    
             if (collection.Count > 2)
             {
                 try
@@ -855,8 +1264,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     var DO = db_dk.RegisterPeoples.Where(x => x.ID_DKTN == DKTN_ID).FirstOrDefault();
                     foreach (var key in collection.AllKeys)
                     {
-                        if (key != "__RequestVerificationToken" && key.Split('_')[0] == "NhomNT" && key != "XacNhan")
+                        if (key != "__RequestVerificationToken" && key.Split('_')[0] == "GhiChu" && key != "XacNhan")
                         {
+                            var GhiChu = collection["GhiChu_" + key.Split('_')[1]];
                             ListDS.Add(new List_Detail_RegisterPeopleValidation()
                             {
                                 HoVaTen = collection["HoTen_" + key.Split('_')[1]],
@@ -875,7 +1285,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 ChuyenNT = collection["ChuyenNT_" + key.Split('_')[1]],
                                 ThoiHanThe = DateTime.ParseExact(collection["ThoiHanThe_" + key.Split('_')[1]], "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None),
                                 KhuVucLamViec = collection["KhuVucLamViec_" + key.Split('_')[1]],
-                                NhomNT = Convert.ToInt32(collection["NhomNT_" + key.Split('_')[1]]),
+                               // NhomNT = Convert.ToInt32(collection["NhomNT_" + key.Split('_')[1]]),
+                                DienThoaiDiDong=(collection["DienThoaiDiDong_" + key.Split('_')[1]]==null)?0: Convert.ToInt32(collection["DienThoaiDiDong_" + key.Split('_')[1]]),
                                 CongLamViec = collection["Cong_" + key.Split('_')[1]],
                                 GhiChu = collection["GhiChu_" + key.Split('_')[1]]
                             });
@@ -926,8 +1337,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                   item.ThoiHanThe,
                                   item.KhuVucLamViec,
                                   item.CongLamViec,
-                                  item.NhomNT,
-                                  "");
+                                  /* item.NhomNT,*/
+                                  null,
+                                 item.GhiChu,
+                                 item.DienThoaiDiDong,
+                                 "");
                         }
                         else if (item.GiaHan != null)
                         {
@@ -950,7 +1364,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                  item.ThoiHanThe,
                                  item.KhuVucLamViec,
                                  item.CongLamViec,
-                                 item.NhomNT,
+                                 /*item.NhomNT,*/
+                                 null,
+                                 item.GhiChu,
+                                 item.DienThoaiDiDong,
                                  "");
                         }
                         else if (item.BoSungCong != null)
@@ -974,7 +1391,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                  item.ThoiHanThe,
                                  item.KhuVucLamViec,
                                  item.CongLamViec,
-                                 item.NhomNT,
+                                 /* item.NhomNT,*/
+                                 null,
+                                    item.GhiChu,
+                                 item.DienThoaiDiDong,
                                  "");
                         }
                         else if (item.CapLai != null)
@@ -998,7 +1418,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                  item.ThoiHanThe,
                                  item.KhuVucLamViec,
                                  item.CongLamViec,
-                                 item.NhomNT,
+                                 /* item.NhomNT,*/
+                                 null,
+                                  item.GhiChu,
+                                 item.DienThoaiDiDong,
                                  "");
                         }
                         else if (item.ChuyenNT != null)
@@ -1022,7 +1445,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                  item.ThoiHanThe,
                                  item.KhuVucLamViec,
                                  item.CongLamViec,
-                                 item.NhomNT,
+                                  /*item.NhomNT,*/
+                                  null,
+                                  item.GhiChu,
+                                 item.DienThoaiDiDong,
                                  "");
                         }
 
@@ -1084,7 +1510,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 List<SignerType> kv = db_dk.SignerTypes.ToList();
                 ViewBag.ID_LTK = new SelectList(kv, "ID_LTK", "TenLoai", DO.TrinhKy_ID);
 
-                List<ModelsView360.PhongBan> pb = db.PhongBans.ToList();
+                List<ModelsView360.PhongBan> pb = db.PhongBans.Where(x=>x.status==1).ToList();
                 ViewBag.IDPhongBan = new SelectList(pb, "IDPhongBan", "TenPhongBan", DO.BPQL_ID);
             }
 
@@ -1281,7 +1707,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 List<SignerType> kv = db_dk.SignerTypes.ToList();
                 ViewBag.ID_LTK = new SelectList(kv, "ID_LTK", "TenLoai", DO.TrinhKy_ID);
 
-                List<ModelsView360.PhongBan> pb = db.PhongBans.ToList();
+                List<ModelsView360.PhongBan> pb = db.PhongBans.Where(x => x.status == 1).ToList();
                 ViewBag.IDPhongBan = new SelectList(pb, "IDPhongBan", "TenPhongBan", DO.BPQL_ID);
             }
 
@@ -1603,8 +2029,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            ThoiHanThe = (DateTime)a.ThoiHanThe,
                            KhuVucLamViec = a.KhuVucLamViec,
                            CongLamViec = a.CongLamViec,
-                           NhomNT = (int)a.NhomNT,
+                          // NhomNT = (int)a.NhomNT,
                            GhiChu = a.GhiChu,
+                           DienThoaiDiDong=a.DienThoaiThongMinh??0,
                            DKTN_ID = (int)a.DKTN_ID,
                            Price = a.Price
                        }).ToList();
@@ -1643,9 +2070,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            ThoiHanThe = (DateTime)a.ThoiHanThe,
                            KhuVucLamViec = a.KhuVucLamViec,
                            CongLamViec = a.CongLamViec,
-                           NhomNT = (int)a.NhomNT,
+                          // NhomNT = (int)a.NhomNT,
                            GhiChu = a.GhiChu,
                            DKTN_ID = (int)a.DKTN_ID,
+                           DienThoaiDiDong=a.DienThoaiThongMinh??0,
                            Price = a.Price
                        }).ToList();
             if (id != null)
@@ -1683,8 +2111,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         }
         public ActionResult ExportTo_Pdfsss(int? id)
         {
-
-
             var root = Server.MapPath("~/UploadedFiles/PDFDangKyThe/");
             var pdfname = String.Format("{0}.pdf", Guid.NewGuid().ToString());
             var path = Path.Combine(root, pdfname);

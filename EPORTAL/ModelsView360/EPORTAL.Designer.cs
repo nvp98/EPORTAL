@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'D:\HPDQ\OneDrive - hoaphat.com.vn\Working\Software\EPORTAL_DEV\PORTAL-main\EPORTAL\ModelsView360\EPORTAL.edmx'. 
+﻿// T4 code generation is enabled for model 'D:\BaoBao\EPORTAL\EPORTAL\EPORTAL\ModelsView360\EPORTAL.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

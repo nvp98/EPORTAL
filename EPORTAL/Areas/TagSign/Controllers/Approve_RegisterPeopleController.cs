@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Presentation;
 using EPORTAL.ModelsPartner;
 using EPORTAL.ModelsTagSign;
 using EPORTAL.ModelsView360;
@@ -18,7 +19,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
         EPORTALEntities db = new EPORTALEntities();
         EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
         // GET: TagSign/Approve_RegisterPeople
-        public ActionResult Index_(int? page, int? NTID, DateTime? begind, DateTime? endd)
+        public ActionResult Index_(int? page, int? NTID, DateTime? begind, DateTime? endd,int? id)
         {
             DateTime Now = DateTime.Now;
             DateTime startDay = new DateTime(Now.Year, Now.Month, 1);
@@ -53,6 +54,10 @@ namespace EPORTAL.Areas.TagSign.Controllers
             else
             {
                 data = data.Where(x => x.NgayTrinh >= begind && x.NgayTrinh <= endd).ToList();
+            }
+            if (id != 0)
+            {
+                data = data.Where(x => x.TrinhKy_ID == id).ToList();
             }
 
             if (page == null) page = 1;

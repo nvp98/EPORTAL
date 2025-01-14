@@ -131,21 +131,11 @@
     <FunctionImportMapping FunctionImportName="TK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_UpdateTK" />
     <FunctionImportMapping FunctionImportName="DK_CardExtend_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Up" />
     <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Up" />
-    <EntitySetMapping Name="CollectMoneys">
-      <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CollectMoney">
-        <MappingFragment StoreEntitySet="CollectMoney">
-          <ScalarProperty Name="TongSoTien" ColumnName="TongSoTien" />
-          <ScalarProperty Name="TongSoThe" ColumnName="TongSoThe" />
-          <ScalarProperty Name="SoPhieuThu" ColumnName="SoPhieuThu" />
-          <ScalarProperty Name="NgayThu" ColumnName="NgayThu" />
-          <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
-          <ScalarProperty Name="ID_PT" ColumnName="ID_PT" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="Detail_RegisterPeople">
       <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.Detail_RegisterPeople">
         <MappingFragment StoreEntitySet="Detail_RegisterPeople">
+          <ScalarProperty Name="GhiChuHPDQ" ColumnName="GhiChuHPDQ" />
+          <ScalarProperty Name="DienThoaiThongMinh" ColumnName="DienThoaiThongMinh" />
           <ScalarProperty Name="Price" ColumnName="Price" />
           <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
           <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
@@ -230,6 +220,5 @@
     <FunctionImportMapping FunctionImportName="SignOff_Flow_Delete" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Delete" />
     <FunctionImportMapping FunctionImportName="SignOff_Flow_Insert" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Insert" />
     <FunctionImportMapping FunctionImportName="SignOff_Flow_Update" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Update" />
-    <FunctionImportMapping FunctionImportName="TK_CarteTemp_Delete" FunctionName="EPORTAL_REGISTERModel.Store.TK_CarteTemp_Delete" />
   </EntityContainerMapping>
 </Mapping>

@@ -271,7 +271,7 @@
                                     </tbody>
                                 </table>
                                 <div class="pager">
-                                    @Html.PagedListPager(Model, page => Url.Action("Index", "List_RegisterPeople_NT", new { area = "TagSign", page }))
+                                    @Html.PagedListPager(Model, page => Url.Action("Index_HPDQ", "List_RegisterPeople_NT", new { area = "TagSign", page }))
                                     <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
                                 </div>
                             </div>

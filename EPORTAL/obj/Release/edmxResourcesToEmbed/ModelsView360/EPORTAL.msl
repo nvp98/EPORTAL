@@ -373,6 +373,7 @@
     <EntitySetMapping Name="PhongBans">
       <EntityTypeMapping TypeName="EPORTALModel.PhongBan">
         <MappingFragment StoreEntitySet="PhongBan">
+          <ScalarProperty Name="status" ColumnName="status" />
           <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
           <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
         </MappingFragment>

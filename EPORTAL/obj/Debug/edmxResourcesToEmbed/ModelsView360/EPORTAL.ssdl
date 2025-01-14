@@ -50,6 +50,15 @@
     <Property Name="Createdate" Type="date" />
     <Property Name="VideoID" Type="int" />
   </EntityType>
+  <EntityType Name="AuthorizationVitual">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="VirtualID" Type="int" />
+    <Property Name="NhanVienID" Type="int" />
+    <Property Name="Createdate" Type="date" />
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
   <EntityType Name="Calender">
     <Key>
       <PropertyRef Name="IDPlan" />
@@ -160,6 +169,8 @@
     <Property Name="Chukychinh" Type="nvarchar" MaxLength="100" />
     <Property Name="IDQuyenHT" Type="int" />
     <Property Name="GroupQuyen" Type="nvarchar" MaxLength="50" />
+    <Property Name="Email" Type="varchar" MaxLength="50" />
+    <Property Name="CCCD" Type="varchar" MaxLength="15" />
   </EntityType>
   <EntityType Name="NT_Authority">
     <Key>
@@ -292,6 +303,7 @@
     </Key>
     <Property Name="IDGate" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Gate" Type="nvarchar" MaxLength="200" />
+    <Property Name="TinhTrang" Type="int" />
   </EntityType>
   <EntityType Name="NT_Partner">
     <Key>
@@ -344,6 +356,7 @@
     </Key>
     <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TenPhongBan" Type="nvarchar" MaxLength="50" />
+    <Property Name="status" Type="int" />
   </EntityType>
   <EntityType Name="Projects">
     <Key>
@@ -373,12 +386,33 @@
     <Property Name="IDQuyen" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TenQuyen" Type="nvarchar" MaxLength="50" />
   </EntityType>
+  <EntityType Name="Register_Gate">
+    <Key>
+      <PropertyRef Name="IDRE" />
+    </Key>
+    <Property Name="IDRE" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IDCong" Type="int" />
+    <Property Name="MaNV" Type="varchar" MaxLength="20" />
+    <Property Name="TrangThai" Type="int" />
+    <Property Name="NgayDK" Type="date" />
+    <Property Name="NgayHetHan" Type="date" />
+  </EntityType>
   <EntityType Name="Signingstatus">
     <Key>
       <PropertyRef Name="IDTT" />
     </Key>
     <Property Name="IDTT" Type="int" Nullable="false" />
     <Property Name="NameSatus" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="Terminal">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="IPAdress" Type="varchar" MaxLength="50" />
+    <Property Name="TenVT" Type="varchar(max)" />
+    <Property Name="IDCong" Type="int" />
+    <Property Name="TinhTrang" Type="int" />
   </EntityType>
   <EntityType Name="ThongTinCaNhan">
     <Key>
@@ -412,6 +446,27 @@
     <Property Name="IDPhongBan" Type="int" />
     <Property Name="AlbumID" Type="int" />
   </EntityType>
+  <EntityType Name="Virtual">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Title" Type="nvarchar" MaxLength="100" />
+    <Property Name="URL" Type="nvarchar" MaxLength="200" />
+    <Property Name="Images" Type="nvarchar" MaxLength="150" />
+    <Property Name="Date" Type="date" />
+    <Property Name="Note" Type="nvarchar" MaxLength="250" />
+    <Property Name="IDPhongBan" Type="int" />
+    <Property Name="FilePDF" Type="nvarchar" MaxLength="150" />
+    <Property Name="IDGroup" Type="int" />
+  </EntityType>
+  <EntityType Name="VirtualGroup">
+    <Key>
+      <PropertyRef Name="IDGroup" />
+    </Key>
+    <Property Name="IDGroup" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="GroupName" Type="nvarchar" MaxLength="500" />
+  </EntityType>
   <EntityType Name="Vitri">
     <Key>
       <PropertyRef Name="IDViTri" />
@@ -419,30 +474,6 @@
     <Property Name="IDViTri" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="TenViTri" Type="nvarchar" MaxLength="50" />
   </EntityType>
-  <Association Name="FK_AuthorizationContractors_NhanVien">
-    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
-    <End Role="AuthorizationContractors" Type="Self.AuthorizationContractors" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="NhanVien">
-        <PropertyRef Name="ID" />
-      </Principal>
-      <Dependent Role="AuthorizationContractors">
-        <PropertyRef Name="IDNhanVien" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_AuthorizationUSER_NhanVien">
-    <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
-    <End Role="AuthorizationUSER" Type="Self.AuthorizationUSER" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="NhanVien">
-        <PropertyRef Name="ID" />
-      </Principal>
-      <Dependent Role="AuthorizationUSER">
-        <PropertyRef Name="NhanVienID" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="FK_AuthorizationVideo_NhanVien">
     <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
     <End Role="AuthorizationVideo" Type="Self.AuthorizationVideo" Multiplicity="*" />
@@ -539,30 +570,6 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor">
-    <End Role="NT_CardRegistrationInfor" Type="Self.NT_CardRegistrationInfor" Multiplicity="0..1" />
-    <End Role="NT_DetailCardRegistrationInfor" Type="Self.NT_DetailCardRegistrationInfor" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="NT_CardRegistrationInfor">
-        <PropertyRef Name="IDDS" />
-      </Principal>
-      <Dependent Role="NT_DetailCardRegistrationInfor">
-        <PropertyRef Name="IDDS" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_NT_DetailExtendcard_NT_Extendcard">
-    <End Role="NT_Extendcard" Type="Self.NT_Extendcard" Multiplicity="0..1" />
-    <End Role="NT_DetailExtendcard" Type="Self.NT_DetailExtendcard" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="NT_Extendcard">
-        <PropertyRef Name="IDGH" />
-      </Principal>
-      <Dependent Role="NT_DetailExtendcard">
-        <PropertyRef Name="IDGH" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="FK_ThongTinCaNhan_NhanVien">
     <End Role="NhanVien" Type="Self.NhanVien" Multiplicity="0..1" />
     <End Role="ThongTinCaNhan" Type="Self.ThongTinCaNhan" Multiplicity="*" />
@@ -631,6 +638,9 @@
   <Function Name="AuthorizationVideo_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="ID" Type="int" Mode="In" />
   </Function>
+  <Function Name="AuthorizationVitual_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+  </Function>
   <Function Name="Calender_Confirm" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="IDPlan" Type="int" Mode="In" />
     <Parameter Name="Status" Type="int" Mode="In" />
@@ -685,8 +695,10 @@
     <Parameter Name="MaQuyen" Type="int" Mode="In" />
     <Parameter Name="IDPhongBan" Type="int" Mode="In" />
   </Function>
-  <Function Name="Get_ID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
   <Function Name="Get_IDGroup" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="NhanVienID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="Get_IDGroupVirtual" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="NhanVienID" Type="int" Mode="In" />
   </Function>
   <Function Name="KD_KyDuyet_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -816,6 +828,14 @@
     <Parameter Name="IDPhongBan" Type="int" Mode="In" />
     <Parameter Name="IDTinhTrangLV" Type="int" Mode="In" />
     <Parameter Name="IDViTri" Type="int" Mode="In" />
+  </Function>
+  <Function Name="NhanVienCCCD_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="MaNV" Type="varchar" Mode="In" />
+    <Parameter Name="CCCD" Type="varchar" Mode="In" />
+  </Function>
+  <Function Name="NhanVienEmail_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="MaNV" Type="varchar" Mode="In" />
+    <Parameter Name="Email" Type="varchar" Mode="In" />
   </Function>
   <Function Name="NT_Authority_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="ID" Type="int" Mode="In" />
@@ -1088,6 +1108,7 @@
   </Function>
   <Function Name="NT_Gate_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="Gate" Type="nvarchar" Mode="In" />
+    <Parameter Name="tinhtrang" Type="int" Mode="In" />
   </Function>
   <Function Name="NT_Gate_searchByID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="IDGate" Type="int" Mode="In" />
@@ -1098,6 +1119,7 @@
   <Function Name="NT_Gate_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="IDGate" Type="int" Mode="In" />
     <Parameter Name="Gate" Type="nvarchar" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
   </Function>
   <Function Name="NT_Partner_Additional" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="ID" Type="int" Mode="In" />
@@ -1185,6 +1207,43 @@
     <Parameter Name="IDGroup" Type="int" Mode="In" />
     <Parameter Name="GroupName" Type="nvarchar" Mode="In" />
   </Function>
+  <Function Name="sp_ReGate_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_ReGate_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDCong" Type="int" Mode="In" />
+    <Parameter Name="MaNV" Type="varchar" Mode="In" />
+    <Parameter Name="TrangThai" Type="int" Mode="In" />
+    <Parameter Name="NgayDK" Type="date" Mode="In" />
+    <Parameter Name="NgayHH" Type="date" Mode="In" />
+  </Function>
+  <Function Name="sp_ReGate_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDRE" Type="int" Mode="In" />
+    <Parameter Name="IDCong" Type="int" Mode="In" />
+    <Parameter Name="MaNV" Type="varchar" Mode="In" />
+    <Parameter Name="TrangThai" Type="int" Mode="In" />
+    <Parameter Name="NgayDK" Type="date" Mode="In" />
+    <Parameter Name="ngayHH" Type="date" Mode="In" />
+  </Function>
+  <Function Name="sp_RegisterGate_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="varchar" Mode="In" />
+  </Function>
+  <Function Name="sp_Terminal_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IP" Type="varchar" Mode="In" />
+    <Parameter Name="TenVT" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="IDCong" Type="int" Mode="In" />
+    <Parameter Name="TinhTrang" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_Terminal_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_Terminal_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="IP" Type="varchar" Mode="In" />
+    <Parameter Name="TenVT" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="IDCong" Type="int" Mode="In" />
+    <Parameter Name="tinhtrang" Type="int" Mode="In" />
+  </Function>
   <Function Name="TaiKhoan_ID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="ID" Type="int" Mode="In" />
   </Function>
@@ -1271,6 +1330,47 @@
     <Parameter Name="IDPhongBan" Type="int" Mode="In" />
     <Parameter Name="AlbumID" Type="int" Mode="In" />
   </Function>
+  <Function Name="Virtual_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="Virtual_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="title" Type="nvarchar" Mode="In" />
+    <Parameter Name="URL" Type="nvarchar" Mode="In" />
+    <Parameter Name="Images" Type="nvarchar" Mode="In" />
+    <Parameter Name="Date" Type="date" Mode="In" />
+    <Parameter Name="Note" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+    <Parameter Name="FilePDF" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDGroup" Type="int" Mode="In" />
+  </Function>
+  <Function Name="Virtual_select" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+  </Function>
+  <Function Name="Virtual_select_USER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="search" Type="nvarchar(max)" Mode="In" />
+    <Parameter Name="NhanVienID" Type="int" Mode="In" />
+  </Function>
+  <Function Name="Virtual_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="ID" Type="int" Mode="In" />
+    <Parameter Name="title" Type="nvarchar" Mode="In" />
+    <Parameter Name="URL" Type="nvarchar" Mode="In" />
+    <Parameter Name="Images" Type="nvarchar" Mode="In" />
+    <Parameter Name="Date" Type="date" Mode="In" />
+    <Parameter Name="Note" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDPhongBan" Type="int" Mode="In" />
+    <Parameter Name="FilePDF" Type="nvarchar" Mode="In" />
+    <Parameter Name="IDGroup" Type="int" Mode="In" />
+  </Function>
+  <Function Name="VirtualGroup_delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDGroup" Type="int" Mode="In" />
+  </Function>
+  <Function Name="VirtualGroup_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="GroupName" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="VirtualGroup_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="IDGroup" Type="int" Mode="In" />
+    <Parameter Name="GroupName" Type="nvarchar" Mode="In" />
+  </Function>
   <Function Name="Vitri_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
     <Parameter Name="IDVitri" Type="int" Mode="InOut" />
     <Parameter Name="TenVitri" Type="nvarchar" Mode="In" />
@@ -1282,6 +1382,7 @@
     <EntitySet Name="AuthorizationContractors" EntityType="Self.AuthorizationContractors" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="AuthorizationUSER" EntityType="Self.AuthorizationUSER" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="AuthorizationVideo" EntityType="Self.AuthorizationVideo" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="AuthorizationVitual" EntityType="Self.AuthorizationVitual" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Calender" EntityType="Self.Calender" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="DangKy" EntityType="Self.DangKy" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="KD_KyDuyet" EntityType="Self.KD_KyDuyet" Schema="dbo" store:Type="Tables" />
@@ -1308,19 +1409,15 @@
     <EntitySet Name="Projects" EntityType="Self.Projects" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ProjectsGroup" EntityType="Self.ProjectsGroup" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Quyen" EntityType="Self.Quyen" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Register_Gate" EntityType="Self.Register_Gate" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Signingstatus" EntityType="Self.Signingstatus" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Terminal" EntityType="Self.Terminal" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="ThongTinCaNhan" EntityType="Self.ThongTinCaNhan" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="TinhTrangLV" EntityType="Self.TinhTrangLV" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Video" EntityType="Self.Video" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Virtual" EntityType="Self.Virtual" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="VirtualGroup" EntityType="Self.VirtualGroup" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Vitri" EntityType="Self.Vitri" Schema="dbo" store:Type="Tables" />
-    <AssociationSet Name="FK_AuthorizationContractors_NhanVien" Association="Self.FK_AuthorizationContractors_NhanVien">
-      <End Role="NhanVien" EntitySet="NhanVien" />
-      <End Role="AuthorizationContractors" EntitySet="AuthorizationContractors" />
-    </AssociationSet>
-    <AssociationSet Name="FK_AuthorizationUSER_NhanVien" Association="Self.FK_AuthorizationUSER_NhanVien">
-      <End Role="NhanVien" EntitySet="NhanVien" />
-      <End Role="AuthorizationUSER" EntitySet="AuthorizationUSER" />
-    </AssociationSet>
     <AssociationSet Name="FK_AuthorizationVideo_NhanVien" Association="Self.FK_AuthorizationVideo_NhanVien">
       <End Role="NhanVien" EntitySet="NhanVien" />
       <End Role="AuthorizationVideo" EntitySet="AuthorizationVideo" />
@@ -1352,14 +1449,6 @@
     <AssociationSet Name="FK_NhanVien_Vitri" Association="Self.FK_NhanVien_Vitri">
       <End Role="Vitri" EntitySet="Vitri" />
       <End Role="NhanVien" EntitySet="NhanVien" />
-    </AssociationSet>
-    <AssociationSet Name="FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor" Association="Self.FK_NT_DetailCardRegistrationInfor_NT_CardRegistrationInfor">
-      <End Role="NT_CardRegistrationInfor" EntitySet="NT_CardRegistrationInfor" />
-      <End Role="NT_DetailCardRegistrationInfor" EntitySet="NT_DetailCardRegistrationInfor" />
-    </AssociationSet>
-    <AssociationSet Name="FK_NT_DetailExtendcard_NT_Extendcard" Association="Self.FK_NT_DetailExtendcard_NT_Extendcard">
-      <End Role="NT_Extendcard" EntitySet="NT_Extendcard" />
-      <End Role="NT_DetailExtendcard" EntitySet="NT_DetailExtendcard" />
     </AssociationSet>
     <AssociationSet Name="FK_ThongTinCaNhan_NhanVien" Association="Self.FK_ThongTinCaNhan_NhanVien">
       <End Role="NhanVien" EntitySet="NhanVien" />

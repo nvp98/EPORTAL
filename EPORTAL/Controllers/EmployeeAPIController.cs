@@ -24,7 +24,7 @@ namespace EPORTAL.Controllers
 
             return View();
         }
-        List<Employees_API.data> GetAPI()
+        List<Employees_API.Employee> GetAPI()
         {
             string link = ConfigurationManager.AppSettings["LinkAPI"];
             using (WebClient webClient = new WebClient())
@@ -34,10 +34,10 @@ namespace EPORTAL.Controllers
                 //Getdata(json);
                 //Json khong dung chuan
                 //=>Nen cat chuoi, cat chuoi the nay cu chuoi qua
-                json = json.Remove(0, 36);
-                json = json.Replace("}]}", "}]");
-                var list = JsonConvert.DeserializeObject<List<Employees_API.data>>(json);
-                return list.ToList();
+              /*  json = json.Remove(0, 36);
+                json = json.Replace("}]}", "}]");*/
+                var list = JsonConvert.DeserializeObject<Employees_API>(json);
+                return list.data.ToList();
             }
 
         }
@@ -80,9 +80,9 @@ namespace EPORTAL.Controllers
             {
 
                 List<NhanVien> LNV = _db.NhanViens.ToList();
-                if (MyAuthentication.Username == "HPDQ12806" || MyAuthentication.Username == "HPDQ18461")
-                {
-                    List<Employees_API.data> listNV = GetAPI();
+               /* if (MyAuthentication.Username == "HPDQ12806" || MyAuthentication.Username == "HPDQ18461")
+                {*/
+                    List<Employees_API.Employee> listNV = GetAPI();
                     if (listNV.Count > 0)
                     {
                         foreach (var item in listNV)
@@ -166,11 +166,11 @@ namespace EPORTAL.Controllers
                         return RedirectToAction("Index", "Account");
                     }
                 }
-            }
+           /* }
             else
             {
                 return RedirectToAction("", "Login");
-            }
+            }*/
             return View();
         }
     }

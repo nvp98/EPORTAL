@@ -155,6 +155,8 @@
     <EntitySetMapping Name="NhanViens">
       <EntityTypeMapping TypeName="EPORTALModel.NhanVien">
         <MappingFragment StoreEntitySet="NhanVien">
+          <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="MaNV" ColumnName="MaNV" />
           <ScalarProperty Name="MatKhau" ColumnName="MatKhau" />
@@ -312,6 +314,7 @@
     <EntitySetMapping Name="NT_Gate">
       <EntityTypeMapping TypeName="EPORTALModel.NT_Gate">
         <MappingFragment StoreEntitySet="NT_Gate">
+          <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
           <ScalarProperty Name="IDGate" ColumnName="IDGate" />
           <ScalarProperty Name="Gate" ColumnName="Gate" />
         </MappingFragment>
@@ -370,6 +373,7 @@
     <EntitySetMapping Name="PhongBans">
       <EntityTypeMapping TypeName="EPORTALModel.PhongBan">
         <MappingFragment StoreEntitySet="PhongBan">
+          <ScalarProperty Name="status" ColumnName="status" />
           <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
           <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
         </MappingFragment>
@@ -1014,10 +1018,145 @@
     </FunctionImportMapping>
     <FunctionImportMapping FunctionImportName="Video_update" FunctionName="EPORTALModel.Store.Video_update" />
     <FunctionImportMapping FunctionImportName="Vitri_insert" FunctionName="EPORTALModel.Store.Vitri_insert" />
-    <FunctionImportMapping FunctionImportName="Get_ID" FunctionName="EPORTALModel.Store.Get_ID" />
     <FunctionImportMapping FunctionImportName="Get_IDGroup" FunctionName="EPORTALModel.Store.Get_IDGroup">
       <ResultMapping>
         <ComplexTypeMapping TypeName="EPORTALModel.Get_IDGroup_Result">
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <EntitySetMapping Name="Register_Gate">
+      <EntityTypeMapping TypeName="EPORTALModel.Register_Gate">
+        <MappingFragment StoreEntitySet="Register_Gate">
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="IDCong" ColumnName="IDCong" />
+          <ScalarProperty Name="NgayHetHan" ColumnName="NgayHetHan" />
+          <ScalarProperty Name="NgayDK" ColumnName="NgayDK" />
+          <ScalarProperty Name="TrangThai" ColumnName="TrangThai" />
+          <ScalarProperty Name="IDRE" ColumnName="IDRE" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Terminals">
+      <EntityTypeMapping TypeName="EPORTALModel.Terminal">
+        <MappingFragment StoreEntitySet="Terminal">
+          <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
+          <ScalarProperty Name="IDCong" ColumnName="IDCong" />
+          <ScalarProperty Name="TenVT" ColumnName="TenVT" />
+          <ScalarProperty Name="IPAdress" ColumnName="IPAdress" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="sp_ReGate_Delete" FunctionName="EPORTALModel.Store.sp_ReGate_Delete" />
+    <FunctionImportMapping FunctionImportName="sp_ReGate_Insert" FunctionName="EPORTALModel.Store.sp_ReGate_Insert" />
+    <FunctionImportMapping FunctionImportName="sp_ReGate_Update" FunctionName="EPORTALModel.Store.sp_ReGate_Update" />
+    <FunctionImportMapping FunctionImportName="sp_Terminal_Insert" FunctionName="EPORTALModel.Store.sp_Terminal_Insert" />
+    <FunctionImportMapping FunctionImportName="sp_Terminal_Update" FunctionName="EPORTALModel.Store.sp_Terminal_Update" />
+    <FunctionImportMapping FunctionImportName="sp_RegisterGate_Search" FunctionName="EPORTALModel.Store.sp_RegisterGate_Search">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.sp_RegisterGate_Search_Result">
+          <ScalarProperty Name="IDRE" ColumnName="IDRE" />
+          <ScalarProperty Name="IDCong" ColumnName="IDCong" />
+          <ScalarProperty Name="MaNV" ColumnName="MaNV" />
+          <ScalarProperty Name="TrangThai" ColumnName="TrangThai" />
+          <ScalarProperty Name="NgayDK" ColumnName="NgayDK" />
+          <ScalarProperty Name="NgayHetHan" ColumnName="NgayHetHan" />
+          <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+          <ScalarProperty Name="HoTenKhongDau" ColumnName="HoTenKhongDau" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="sp_Terminal_Search" FunctionName="EPORTALModel.Store.sp_Terminal_Search">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.sp_Terminal_Search_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="IPAdress" ColumnName="IPAdress" />
+          <ScalarProperty Name="TenVT" ColumnName="TenVT" />
+          <ScalarProperty Name="IDCong" ColumnName="IDCong" />
+          <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
+          <ScalarProperty Name="Gate" ColumnName="Gate" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="NhanVienEmail_Update" FunctionName="EPORTALModel.Store.NhanVienEmail_Update" />
+    <FunctionImportMapping FunctionImportName="NhanVienCCCD_Update" FunctionName="EPORTALModel.Store.NhanVienCCCD_Update" />
+    <EntitySetMapping Name="AuthorizationVituals">
+      <EntityTypeMapping TypeName="EPORTALModel.AuthorizationVitual">
+        <MappingFragment StoreEntitySet="AuthorizationVitual">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Createdate" ColumnName="Createdate" />
+          <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+          <ScalarProperty Name="VirtualID" ColumnName="VirtualID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="AuthorizationVitual_delete" FunctionName="EPORTALModel.Store.AuthorizationVitual_delete" />
+    <EntitySetMapping Name="Virtuals">
+      <EntityTypeMapping TypeName="EPORTALModel.Virtual">
+        <MappingFragment StoreEntitySet="Virtual">
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+          <ScalarProperty Name="FilePDF" ColumnName="FilePDF" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="Images" ColumnName="Images" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="Virtual_delete" FunctionName="EPORTALModel.Store.Virtual_delete" />
+    <FunctionImportMapping FunctionImportName="Virtual_insert" FunctionName="EPORTALModel.Store.Virtual_insert" />
+    <FunctionImportMapping FunctionImportName="Virtual_select" FunctionName="EPORTALModel.Store.Virtual_select">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.Virtual_select_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Images" ColumnName="Images" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+          <ScalarProperty Name="FilePDF" ColumnName="FilePDF" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="Virtual_select_USER" FunctionName="EPORTALModel.Store.Virtual_select_USER">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.Virtual_select_USER_Result">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Images" ColumnName="Images" />
+          <ScalarProperty Name="Note" ColumnName="Note" />
+          <ScalarProperty Name="FilePDF" ColumnName="FilePDF" />
+          <ScalarProperty Name="URL" ColumnName="URL" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
+          <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="Virtual_update" FunctionName="EPORTALModel.Store.Virtual_update" />
+    <EntitySetMapping Name="VirtualGroups">
+      <EntityTypeMapping TypeName="EPORTALModel.VirtualGroup">
+        <MappingFragment StoreEntitySet="VirtualGroup">
+          <ScalarProperty Name="GroupName" ColumnName="GroupName" />
+          <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="VirtualGroup_delete" FunctionName="EPORTALModel.Store.VirtualGroup_delete" />
+    <FunctionImportMapping FunctionImportName="VirtualGroup_insert" FunctionName="EPORTALModel.Store.VirtualGroup_insert" />
+    <FunctionImportMapping FunctionImportName="VirtualGroup_update" FunctionName="EPORTALModel.Store.VirtualGroup_update" />
+    <FunctionImportMapping FunctionImportName="Get_IDGroupVirtual" FunctionName="EPORTALModel.Store.Get_IDGroupVirtual">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="EPORTALModel.Get_IDGroupVirtual_Result">
           <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
           <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
         </ComplexTypeMapping>

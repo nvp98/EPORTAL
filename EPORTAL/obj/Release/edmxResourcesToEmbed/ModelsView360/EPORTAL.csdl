@@ -369,6 +369,7 @@
     <Property Name="IDPhongBan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="TenPhongBan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_PhongBan" FromRole="PhongBan" ToRole="NhanVien" />
+    <Property Name="status" Type="Int32" />
   </EntityType>
   <EntityType Name="Project">
     <Key>

@@ -62,6 +62,10 @@ public partial class Detail_RegisterPeople
 
     public string Price { get; set; }
 
+    public Nullable<int> DienThoaiThongMinh { get; set; }
+
+    public string GhiChuHPDQ { get; set; }
+
 }
 
 }

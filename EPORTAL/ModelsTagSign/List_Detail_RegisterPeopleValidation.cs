@@ -19,6 +19,7 @@ namespace EPORTAL.ModelsTagSign
         public string Ten_NTP { get; set; }
         public string HoTen_QuanLy { get; set; }
         public string SoDienThoai_QuanLy { get; set; }
+        public string GhiChuHPDQ { get; set; }
 
 
         public string CapMoi { get; set; }
@@ -30,6 +31,7 @@ namespace EPORTAL.ModelsTagSign
         public string KhuVucLamViec { get; set; }
         public string CongLamViec { get; set; }
         public int NhomNT { get; set; }
+        public int DienThoaiDiDong { get; set; }
         public string GhiChu { get; set; }
         public string Price { get; set; }
 

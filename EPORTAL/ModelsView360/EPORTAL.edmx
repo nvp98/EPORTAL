@@ -361,6 +361,7 @@
           </Key>
           <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TenPhongBan" Type="nvarchar" MaxLength="50" />
+          <Property Name="status" Type="int" />
         </EntityType>
         <EntityType Name="Projects">
           <Key>
@@ -1832,6 +1833,7 @@
           <Property Name="IDPhongBan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TenPhongBan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_PhongBan" FromRole="PhongBan" ToRole="NhanVien" />
+          <Property Name="status" Type="Int32" />
         </EntityType>
         <EntityType Name="Project">
           <Key>
@@ -2954,7 +2956,7 @@
             <Parameter Name="GroupName" Mode="In" Type="String" />
           </FunctionImport>
           <FunctionImport Name="Get_IDGroupVirtual" ReturnType="Collection(EPORTALModel.Get_IDGroupVirtual_Result)">
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+          <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
           </FunctionImport>
         </EntityContainer>
         <ComplexType Name="Album_searchByID_Result">
@@ -3763,6 +3765,7 @@
           <EntitySetMapping Name="PhongBans">
             <EntityTypeMapping TypeName="EPORTALModel.PhongBan">
               <MappingFragment StoreEntitySet="PhongBan">
+                <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="IDPhongBan" ColumnName="IDPhongBan" />
                 <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
               </MappingFragment>

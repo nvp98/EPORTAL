@@ -176,6 +176,8 @@
     <NavigationProperty Name="TinhTrangLV" Relationship="Self.FK_NhanVien_TinhTrangLV" FromRole="NhanVien" ToRole="TinhTrangLV" />
     <NavigationProperty Name="Vitri" Relationship="Self.FK_NhanVien_Vitri" FromRole="NhanVien" ToRole="Vitri" />
     <NavigationProperty Name="ThongTinCaNhans" Relationship="Self.FK_ThongTinCaNhan_NhanVien" FromRole="NhanVien" ToRole="ThongTinCaNhan" />
+    <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CCCD" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
   </EntityType>
   <EntityType Name="NT_Authority">
     <Key>
@@ -313,6 +315,7 @@
     </Key>
     <Property Name="IDGate" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="Gate" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="TinhTrang" Type="Int32" />
   </EntityType>
   <EntityType Name="NT_Partner">
     <Key>
@@ -366,6 +369,7 @@
     <Property Name="IDPhongBan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="TenPhongBan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_PhongBan" FromRole="PhongBan" ToRole="NhanVien" />
+    <Property Name="status" Type="Int32" />
   </EntityType>
   <EntityType Name="Project">
     <Key>
@@ -1200,6 +1204,7 @@
     </FunctionImport>
     <FunctionImport Name="NT_Gate_insert">
       <Parameter Name="Gate" Mode="In" Type="String" />
+      <Parameter Name="tinhtrang" Mode="In" Type="Int32" />
     </FunctionImport>
     <FunctionImport Name="NT_Gate_searchByID" ReturnType="Collection(EPORTALModel.NT_Gate_searchByID_Result)">
       <Parameter Name="IDGate" Mode="In" Type="Int32" />
@@ -1210,6 +1215,7 @@
     <FunctionImport Name="NT_Gate_update">
       <Parameter Name="IDGate" Mode="In" Type="Int32" />
       <Parameter Name="Gate" Mode="In" Type="String" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
     </FunctionImport>
     <FunctionImport Name="NT_Partner_Additional">
       <Parameter Name="ID" Mode="In" Type="Int32" />
@@ -1389,6 +1395,103 @@
     </FunctionImport>
     <FunctionImport Name="Get_ID" ReturnType="Collection(Int32)" />
     <FunctionImport Name="Get_IDGroup" ReturnType="Collection(EPORTALModel.Get_IDGroup_Result)">
+      <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <EntitySet Name="Register_Gate" EntityType="EPORTALModel.Register_Gate" />
+    <EntitySet Name="Terminals" EntityType="EPORTALModel.Terminal" />
+    <FunctionImport Name="sp_ReGate_Delete">
+      <Parameter Name="id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_ReGate_Insert">
+      <Parameter Name="IDCong" Mode="In" Type="Int32" />
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="TrangThai" Mode="In" Type="Int32" />
+      <Parameter Name="NgayDK" Mode="In" Type="DateTime" />
+      <Parameter Name="NgayHH" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_ReGate_Update">
+      <Parameter Name="IDRE" Mode="In" Type="Int32" />
+      <Parameter Name="IDCong" Mode="In" Type="Int32" />
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="TrangThai" Mode="In" Type="Int32" />
+      <Parameter Name="NgayDK" Mode="In" Type="DateTime" />
+      <Parameter Name="ngayHH" Mode="In" Type="DateTime" />
+    </FunctionImport>
+    <FunctionImport Name="sp_Terminal_Insert">
+      <Parameter Name="IP" Mode="In" Type="String" />
+      <Parameter Name="TenVT" Mode="In" Type="String" />
+      <Parameter Name="IDCong" Mode="In" Type="Int32" />
+      <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_Terminal_Update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="IP" Mode="In" Type="String" />
+      <Parameter Name="TenVT" Mode="In" Type="String" />
+      <Parameter Name="IDCong" Mode="In" Type="Int32" />
+      <Parameter Name="tinhtrang" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_RegisterGate_Search" ReturnType="Collection(EPORTALModel.sp_RegisterGate_Search_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="sp_Terminal_Search" ReturnType="Collection(EPORTALModel.sp_Terminal_Search_Result)">
+      <Parameter Name="search" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="NhanVienEmail_Update">
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="NhanVienCCCD_Update">
+      <Parameter Name="MaNV" Mode="In" Type="String" />
+      <Parameter Name="CCCD" Mode="In" Type="String" />
+    </FunctionImport>
+    <EntitySet Name="AuthorizationVituals" EntityType="EPORTALModel.AuthorizationVitual" />
+    <FunctionImport Name="AuthorizationVitual_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <EntitySet Name="Virtuals" EntityType="EPORTALModel.Virtual" />
+    <FunctionImport Name="Virtual_delete">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Virtual_insert">
+      <Parameter Name="title" Mode="In" Type="String" />
+      <Parameter Name="URL" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="FilePDF" Mode="In" Type="String" />
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Virtual_select" ReturnType="Collection(EPORTALModel.Virtual_select_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Virtual_select_USER" ReturnType="Collection(EPORTALModel.Virtual_select_USER_Result)">
+      <Parameter Name="search" Mode="In" Type="String" />
+      <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="Virtual_update">
+      <Parameter Name="ID" Mode="In" Type="Int32" />
+      <Parameter Name="title" Mode="In" Type="String" />
+      <Parameter Name="URL" Mode="In" Type="String" />
+      <Parameter Name="Images" Mode="In" Type="String" />
+      <Parameter Name="Date" Mode="In" Type="DateTime" />
+      <Parameter Name="Note" Mode="In" Type="String" />
+      <Parameter Name="IDPhongBan" Mode="In" Type="Int32" />
+      <Parameter Name="FilePDF" Mode="In" Type="String" />
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <EntitySet Name="VirtualGroups" EntityType="EPORTALModel.VirtualGroup" />
+    <FunctionImport Name="VirtualGroup_delete">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="VirtualGroup_insert">
+      <Parameter Name="GroupName" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="VirtualGroup_update">
+      <Parameter Name="IDGroup" Mode="In" Type="Int32" />
+      <Parameter Name="GroupName" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="Get_IDGroupVirtual" ReturnType="Collection(EPORTALModel.Get_IDGroupVirtual_Result)">
       <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
     </FunctionImport>
   </EntityContainer>
@@ -1720,6 +1823,103 @@
     <Property Type="Int32" Name="AlbumID" Nullable="true" />
   </ComplexType>
   <ComplexType Name="Get_IDGroup_Result">
+    <Property Type="Int32" Name="IDGroup" Nullable="true" />
+    <Property Type="Int32" Name="NhanVienID" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="Register_Gate">
+    <Key>
+      <PropertyRef Name="IDRE" />
+    </Key>
+    <Property Name="IDRE" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
+    <Property Name="TrangThai" Type="Int32" />
+    <Property Name="NgayDK" Precision="0" Type="DateTime" />
+    <Property Name="NgayHetHan" Precision="0" Type="DateTime" />
+    <Property Name="IDCong" Type="Int32" />
+    <Property Name="MaNV" MaxLength="20" FixedLength="false" Unicode="false" Type="String" />
+  </EntityType>
+  <EntityType Name="Terminal">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="IPAdress" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="TenVT" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="IDCong" Type="Int32" />
+    <Property Name="TinhTrang" Type="Int32" />
+  </EntityType>
+  <ComplexType Name="sp_RegisterGate_Search_Result">
+    <Property Type="Int32" Name="IDRE" Nullable="false" />
+    <Property Type="Int32" Name="IDCong" Nullable="true" />
+    <Property Type="String" Name="MaNV" Nullable="true" MaxLength="20" />
+    <Property Type="Int32" Name="TrangThai" Nullable="true" />
+    <Property Type="DateTime" Name="NgayDK" Nullable="true" />
+    <Property Type="DateTime" Name="NgayHetHan" Nullable="true" />
+    <Property Type="String" Name="HoTen" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="HoTenKhongDau" Nullable="true" MaxLength="50" />
+  </ComplexType>
+  <ComplexType Name="sp_Terminal_Search_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="IPAdress" Nullable="true" MaxLength="50" />
+    <Property Type="String" Name="TenVT" Nullable="true" />
+    <Property Type="Int32" Name="IDCong" Nullable="true" />
+    <Property Type="Int32" Name="TinhTrang" Nullable="true" />
+    <Property Type="String" Name="Gate" Nullable="true" MaxLength="200" />
+  </ComplexType>
+  <EntityType Name="AuthorizationVitual">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="VirtualID" Type="Int32" />
+    <Property Name="NhanVienID" Type="Int32" />
+    <Property Name="Createdate" Type="DateTime" Precision="0" />
+    <Property Name="ID" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Virtual">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="Title" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="URL" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Images" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Date" Type="DateTime" Precision="0" />
+    <Property Name="Note" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <Property Name="IDPhongBan" Type="Int32" />
+    <Property Name="FilePDF" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="IDGroup" Type="Int32" />
+  </EntityType>
+  <ComplexType Name="Virtual_select_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="FilePDF" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDGroup" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="Virtual_select_USER_Result">
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Title" Nullable="true" MaxLength="100" />
+    <Property Type="String" Name="Images" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="Note" Nullable="true" MaxLength="250" />
+    <Property Type="String" Name="FilePDF" Nullable="true" MaxLength="150" />
+    <Property Type="String" Name="URL" Nullable="true" MaxLength="200" />
+    <Property Type="DateTime" Name="Date" Nullable="true" />
+    <Property Type="Int32" Name="IDPhongBan" Nullable="true" />
+    <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="IDGroup" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="VirtualGroup">
+    <Key>
+      <PropertyRef Name="IDGroup" />
+    </Key>
+    <Property Name="IDGroup" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="GroupName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <ComplexType Name="Get_IDGroupVirtual_Result">
     <Property Type="Int32" Name="IDGroup" Nullable="true" />
     <Property Type="Int32" Name="NhanVienID" Nullable="true" />
   </ComplexType>

@@ -10,6 +10,7 @@ using PagedList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 
@@ -57,9 +58,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                           ThoiHanThe = (DateTime)a.ThoiHanThe,
                           KhuVucLamViec = a.KhuVucLamViec,
                           CongLamViec = a.CongLamViec,
-                          NhomNT = (int)a.NhomNT,
+                          //NhomNT = (int)a.NhomNT,
                           GhiChu = a.GhiChu,
-                          DKTN_ID = (int)a.DKTN_ID
+                          DienThoaiDiDong=a.DienThoaiThongMinh??0,
+                          DKTN_ID = (int)a.DKTN_ID,
+                          Price =a.Price,
                       };
             if (id != null)
             {
@@ -95,7 +98,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            NgaySinh = (DateTime)a.NgaySinh,
                            CCCD = a.CCCD,
                            HoKhau = a.HoKhau,
-                           CV_ID = (int)a.CV_ID,
+                           // Thay đổi kiểu DKTN_ID và CV_ID thành Nullable<int> (int?)
+                           DKTN_ID = a.DKTN_ID ?? 0,  // Sử dụng 0 nếu giá trị null
+                           CV_ID = a.CV_ID ?? 0,      // Sử dụng 0 nếu giá trị null
                            SoDienThoai = a.SoDienThoai,
                            Ten_NTP = a.Ten_NTP,
                            HoTen_QuanLy = a.HoTen_QuanLy,
@@ -108,14 +113,15 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            ThoiHanThe = (DateTime)a.ThoiHanThe,
                            KhuVucLamViec = a.KhuVucLamViec,
                            CongLamViec = a.CongLamViec,
-                           NhomNT = (int)a.NhomNT,
+                           NhomNT = a.NhomNT ?? 0,  // Thay đổi thành Nullable<int> (int?)
                            GhiChu = a.GhiChu,
-                           DKTN_ID = (int)a.DKTN_ID
-                       }).ToList();
-            List_Detail_RegisterPeopleValidation DO = new List_Detail_RegisterPeopleValidation();
-            if (res.Count > 0)
+                           DienThoaiDiDong=a.DienThoaiThongMinh??0,
+                           Price = a.Price
+                       }).SingleOrDefault();
+           // List_Detail_RegisterPeopleValidation DO = new List_Detail_RegisterPeopleValidation();
+            if (res!=null)
             {
-                foreach (var a in res)
+            /*    foreach (var a in res)
                 {
                     DO.ID_CT_DKTN = (int)a.ID_CT_DKTN;
                     DO.HoVaTen = a.HoVaTen;
@@ -138,13 +144,13 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     DO.NhomNT = (int)a.NhomNT;
                     DO.GhiChu = a.GhiChu;
                     DO.DKTN_ID = (int)a.DKTN_ID;
-                }
-                ViewBag.NgaySinh = DO.NgaySinh.ToString("yyyy-MM-dd");
+                }*/
+                ViewBag.NgaySinh = res.NgaySinh.ToString("yyyy-MM-dd");
 
-                ViewBag.ThoiHanThe = DO.ThoiHanThe.ToString("yyyy-MM-dd");
+                ViewBag.ThoiHanThe = res.ThoiHanThe.ToString("yyyy-MM-dd");
 
                 List<NT_ContractorGroup> n = db.NT_ContractorGroup.ToList();
-                ViewBag.IDGroup = new SelectList(n, "IDGroup", "NameContractorGroup", DO.NhomNT);
+                ViewBag.IDGroup = new SelectList(n, "IDGroup", "NameContractorGroup", res.NhomNT);
 
                 List<NT_Gate> c = db.NT_Gate.ToList();
                 ViewBag.Selected = new SelectList(c, "IDGate", "Gate");
@@ -153,13 +159,13 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 ViewBag.SelectedKV = new SelectList(nkv, "IDKV", "TenKV");
 
                 List<NT_Position> chucvu = db.NT_Position.ToList();
-                ViewBag.IDCV = new SelectList(chucvu, "IDCV", "TenCV", DO.CV_ID);
+                ViewBag.IDCV = new SelectList(chucvu, "IDCV", "TenCV", res.CV_ID);
             }
             else
             {
                 HttpNotFound();
             }
-            return PartialView(DO);
+            return PartialView(res);
 
         }
         [HttpPost]
@@ -212,7 +218,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                         NameKhuVuc,
                                         Name,
                                       _DO.NhomNT,
-                                      "");
+                                      "",
+                                      _DO.DienThoaiDiDong,
+                                      _DO.Price);
                 TempData["msgError"] = "<script>alert('Chỉnh sửa thành công');</script>";
             }
             else if (_DO.SelectedKV != null && _DO.Selected == null)
@@ -249,7 +257,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                      NameKhuVuc,
                                     DO.CongLamViec,
                                    _DO.NhomNT,
-                                   "");
+                                   "",
+                                   _DO.DienThoaiDiDong,
+                                   _DO.Price);
                 TempData["msgError"] = "<script>alert('Chỉnh sửa thành công');</script>";
             }
             else if (_DO.SelectedKV == null && _DO.Selected != null)
@@ -286,7 +296,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             DO.KhuVucLamViec,
                             Name,
                           _DO.NhomNT,
-                          "");
+                          "", 
+                          _DO.DienThoaiDiDong,
+                          _DO.Price);
 
                 TempData["msgError"] = "<script>alert('Chỉnh sửa thành công');</script>";
             }
@@ -312,7 +324,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            DO.KhuVucLamViec,
                            DO.CongLamViec,
                           _DO.NhomNT,
-                          "");
+                          "",
+                          _DO.DienThoaiDiDong,
+                          _DO.Price);
                 TempData["msgError"] = "<script>alert('Chỉnh sửa thành công');</script>";
             }
             return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DO.DKTN_ID });
@@ -352,10 +366,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                           ThoiHanThe = (DateTime)a.ThoiHanThe,
                           KhuVucLamViec = a.KhuVucLamViec,
                           CongLamViec = a.CongLamViec,
-                          NhomNT = (int)a.NhomNT,
+                          NhomNT = a.NhomNT??0,
                           GhiChu = a.GhiChu,
                           DKTN_ID = (int)a.DKTN_ID, 
-                          Price = a.Price
+                          Price = a.Price,
+                          DienThoaiDiDong=a.DienThoaiThongMinh??0,
                       };
             if (id != null)
             {
@@ -394,9 +409,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            ThoiHanThe = (DateTime)a.ThoiHanThe,
                            KhuVucLamViec = a.KhuVucLamViec,
                            CongLamViec = a.CongLamViec,
-                           NhomNT = (int)a.NhomNT,
+                           NhomNT = a.NhomNT ?? 0,
                            GhiChu = a.GhiChu,
-                           DKTN_ID = (int)a.DKTN_ID
+                           DKTN_ID = (int)a.DKTN_ID,
+                           DienThoaiDiDong = a.DienThoaiThongMinh ?? 0,
+                           Price     = a.Price,
+
                        }).ToList();
             List_Detail_RegisterPeopleValidation DO = new List_Detail_RegisterPeopleValidation();
             if (res.Count > 0)
@@ -424,6 +442,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     DO.NhomNT = (int)a.NhomNT;
                     DO.GhiChu = a.GhiChu;
                     DO.DKTN_ID = (int)a.DKTN_ID;
+                    DO.Price = a.Price;
                 }
             }
             else
@@ -436,7 +455,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         [HttpPost]
         public ActionResult Cancel(List_Detail_RegisterPeopleValidation _DO)
         {
-            db_dk.Detail_RegisterPeople_Price(_DO.ID_CT_DKTN, _DO.GhiChu);
+            db_dk.Detail_RegisterPeople_Price(_DO.ID_CT_DKTN, _DO.Price);
             return RedirectToAction("Index_HPDQ", "Detail_List_RegisterPeople_NT", new { id = _DO.DKTN_ID });
         }
     }

@@ -89,10 +89,11 @@
                                                 Đánh dấu "X" vào
                                                 những ô cần chọn
                                             </th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Điện thoại thông minh<br> (Đánh dấu "X" nếu đăng ký)"</th>
                                             <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Thời hạn thẻ</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Khu vực làm việc</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Cổng đăng ký ra/vào</th>
-                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Nhóm NT</th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Ghi chú</th>
                                             <th class="text-center" rowspan="2" width="100px" style="vertical-align:middle">Thao tác</th>
                                         </tr>
                                         <tr style="background-color: #f8f9fa;">
@@ -127,15 +128,17 @@
                                                         @{
                                                             DateTime ngaysinh = DateTime.Parse(item.NgaySinh.ToString());
                                                         }
-                                                        @ngaysinh.ToString("dd/MM/yyyy")
+                                                       @ngaysinh.ToString("dd/MM/yyyy")
                                                     </td>
                                                     <td>@item.CCCD</td>
                                                     <td>@item.HoKhau</td>
                                                     <td>
                                                         @{
-                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
+                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault() ;
+                                                            string a = (IDCV == null) ? "" : IDCV.TenCV.ToString();
+
                                                         }
-                                                        @IDCV.TenCV.ToString()
+                                                        @a
                                                     </td>
                                                     <td>
                                                         @item.SoDienThoai
@@ -190,6 +193,15 @@
                                                     {
                                                         <td></td>
                                                     }
+                                                    @if (item.DienThoaiThongMinh == 1 )
+                                                    {
+                                                        <td>X</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+
                                                     <td class="text-center" width="180px">
                                                         @{
                                                             DateTime thoihan = DateTime.Parse(item.ThoiHanThe.ToString());
@@ -219,6 +231,7 @@
                                                         string[] arrListStr = item.CongLamViec.Split(',');
                                                         foreach (var ar in arrListStr)
                                                         {
+                                                            if (String.IsNullOrEmpty(ar)) { break; }
                                                             int IDGate = Convert.ToInt32(ar);
                                                             var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
                                                             List = String.Concat(Cong.Gate + " , " + List);
@@ -228,11 +241,14 @@
                                                         @List
                                                     </td>
                                                     <td>
+                                                        @item.GhiChu
+                                                    </td>
+                                                    @*<td>
                                                         @{
                                                             var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
                                                         }
                                                         @IDCong.NameContractorGroup
-                                                    </td>
+                                                    </td>*@
                                                     <td class="text-center">
                                                         <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "Detail_List_RegisterPeople_NT", new { id = item.ID_CT_DKTN , iddkt = ID_DKTN})"
                                                            onclick="return confirm('Bạn muốn xóa Thông tin  : @item.HoVaTen')">
@@ -243,6 +259,7 @@
                                                         <script type="text/javascript">
                                                                         $('#btn-editdsct_@item.ID_CT_DKTN').click(function () {
                                                                             var url = $('#myModaleEditDS_@item.ID_CT_DKTN').data('url');
+                                                                            console.log(url)
                                                                             $.get(url, function (data) {
                                                                                 $("#myModaleEditDS_@item.ID_CT_DKTN").html(data);
                                                                                 $("#ModalTitle").html("Cập nhật Thông Tin");
@@ -257,10 +274,20 @@
                                         }
                                     </tbody>
                                     <tr id="vt">
-                                        <th colspan="18" class="font-weight-bold font-size-lg">
+                                        <th class="font-weight-bold font-size-lg">
                                             <button id="add-vt" type="button" class="btn btn-light border border-white"><i class="fas fa-plus"></i></button>
 
                                         </th>
+                                            <input type="text" name="id" value="@ID_DKTN" hidden class="form-control" />
+                                            <th class="text-center">
+                                                <div class="form-group">
+                                                    <input type="file" id="FileExcel1" data-url="@Url.Action("InsertEdit", "List_RegisterPeople_NT", new { id = ID_DKTN})" name="FileExcel" class="form-control" />
+                                                </div>
+                                            </th>
+                                            <th class="text-center">
+                                                <button id="importExcel" class="form-control btn-success"> import </button>
+                                            </th>
+                                        
                                     </tr>
                                 </table>
 
@@ -282,122 +309,129 @@
             var i = 2;
             $("#add-vt").click(function () {
                 var renderList = $(`<tr>
-                                                                        <td class='text-center delItem' > <i class="fa fa-trash" aria-hidden="true"></i> </td>
-                                                                        <td >
-                                                                            <textarea class='form-control' cols='20' id='HoTen_${i}' name='HoTen_${i}' placeholder='Họ và tên' rows='1'></textarea>
-                                                                            <span id="Errorfullname_${i}" style="color: red; text-transform: none; font-weight: normal "></span>
-                                                                        </td>
+                                        <td class='text-center delItem' > <i class="fa fa-trash" aria-hidden="true"></i> </td>
+                                        <td >
+                                            <textarea class='form-control' cols='20' id='HoTen_${i}' name='HoTen_${i}' placeholder='Họ và tên' rows='1'></textarea>
+                                            <span id="Errorfullname_${i}" style="color: red; text-transform: none; font-weight: normal "></span>
+                                        </td>
 
-                                                                         <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field BirthDay must be a number.' id='NgaySinh_${i}'  name='NgaySinh_${i}' placeholder='' type='date' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='BirthDay' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                            <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field BirthDay must be a number.' id='NgaySinh_${i}'  name='NgaySinh_${i}' placeholder='' type='date' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='BirthDay' data-valmsg-replace='true'></span>
+                                        </td>
 
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field CCCD must be a number.' id='CCCD_${i}'  name='CCCD_${i}' placeholder='CCCD' type='text' value=''>
-                                                                           <span class='field-validation-valid text-danger' data-valmsg-for='CCCD' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field CCCD must be a number.' id='CCCD_${i}'  name='CCCD_${i}' placeholder='CCCD' type='text' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='CCCD' data-valmsg-replace='true'></span>
+                                        </td>
 
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoKhau_${i}'  name='HoKhau_${i}' placeholder='Hộ khẩu thường trú' type='text' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoKhau_${i}'  name='HoKhau_${i}' placeholder='Hộ khẩu thường trú' type='text' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                        </td>
 
-                                                                       <td style=''>
-                                                                            <select class="form-control marginTB5 SelectCV" name="ChucVu_${i}" id="ChucVu_${i}">
-                                                                              <option value ='null'>-Chức Vụ-</option>
-                                                                              @foreach (var item in ViewBag.IDCV)
-                                                                                {
-                                                                                  <option value='@item.Value'>@item.Text</option>
-                                                                                }
-                                                                            </select>
-                                                                        </td>
+                                        <td style=''>
+                                            <select class="form-control marginTB5 SelectCV" name="ChucVu_${i}" id="ChucVu_${i}">
+                                                <option value ='null'>-Chức Vụ-</option>
+                                                @foreach (var item in ViewBag.IDCV)
+                                                {
+                                                    <option value='@item.Value'>@item.Text</option>
+                                                }
+                                            </select>
+                                        </td>
 
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_${i}'  name='SoDienThoai_${i}' placeholder='Số điện thoại' type='number' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_${i}'  name='SoDienThoai_${i}' placeholder='Số điện thoại' type='text' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
+                                        </td>
 
-                                                                          <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='Ten_NTP_${i}'  name='Ten_NTP_${i}' placeholder='Tên Nhà thầu phụ' type='text' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                            <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='Ten_NTP_${i}'  name='Ten_NTP_${i}' placeholder='Tên Nhà thầu phụ' type='text' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                        </td>
 
-                                                                              <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoTen_QuanLy_${i}'  name='HoTen_QuanLy_${i}' placeholder='Họ tên Quản lý' type='text' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                                <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field PermanentResidence must be a number.' id='HoTen_QuanLy_${i}'  name='HoTen_QuanLy_${i}' placeholder='Họ tên Quản lý' type='text' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='PermanentResidence' data-valmsg-replace='true'></span>
+                                        </td>
 
-                                                                          <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_QuanLy_${i}'  name='SoDienThoai_QuanLy_${i}' placeholder='Số điện thoại' type='number' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
-                                                                        </td>
+                                            <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field Phone must be a number.' id='SoDienThoai_QuanLy_${i}'  name='SoDienThoai_QuanLy_${i}' placeholder='Số điện thoại' type='text' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
+                                        </td>
 
 
-                                                                          <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='CapMoi_${i}'  name='CapMoi_${i}' placeholder='' type='radio' value='1'>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
-                                                                        </td>
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='GiaHan_${i}'  name='GiaHan_${i}' placeholder='' type='radio' value='2'>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
-                                                                        </td>
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='BoSungCong_${i}'  name='BoSungCong_${i}' placeholder='' type='radio' value='3'>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
-                                                                        </td>
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='CapLai_${i}'  name='CapLai_${i}' placeholder='' type='radio' value='4'>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
-                                                                        </td>
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='ChuyenNT_${i}'  name='ChuyenNT_${i}' placeholder='' type='radio' value='5'>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
-                                                                        </td>
-                                                                        <td style=''>
-                                                                            <input class='form-control' data-val='true' data-val-number='The field CreateDate must be a number.' id='ThoiHanThe_${i}'  name='ThoiHanThe_${i}' placeholder='' type='date' value=''>
-                                                                            <span class='field-validation-valid text-danger' data-valmsg-for='CreateDate' data-valmsg-replace='true'></span>
-                                                                        </td>
-                                                                         <td style=''>
-                                                                            <select class="form-control marginTB5 SelectKV" name="KhuVucLamViec_${i}" id="KhuVucLamViec_${i}" multiple="multiple">
-                                                                              <option value ='null'>-Khu vực-</option>
-                                                                              @foreach (var item in ViewBag.IDKV)
-                                                                                {
-                                                                                  <option value='@item.Value'>@item.Text</option>
-                                                                                }
-                                                                            </select>
-                                                                        </td>
+                                            <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='CapMoi_${i}'  name='CapMoi_${i}' placeholder='' type='radio' value='1'>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
+                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field StorageCard must be a number.' id='GiaHan_${i}'  name='GiaHan_${i}' placeholder='' type='radio' value='2'>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='StorageCard' data-valmsg-replace='true'></span>
+                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='BoSungCong_${i}'  name='BoSungCong_${i}' placeholder='' type='radio' value='3'>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='CapLai_${i}'  name='CapLai_${i}' placeholder='' type='radio' value='4'>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='ChuyenNT_${i}'  name='ChuyenNT_${i}' placeholder='' type='radio' value='5'>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                        </td> 
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='DienThoaiDiDong_${i}'  name='DienThoaiDiDong_${i}' placeholder='' type='checkbox' value='1'>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
+                                        </td>
+                                        <td style=''>
+                                            <input class='form-control' data-val='true' data-val-number='The field CreateDate must be a number.' id='ThoiHanThe_${i}'  name='ThoiHanThe_${i}' placeholder='' type='date' value=''>
+                                            <span class='field-validation-valid text-danger' data-valmsg-for='CreateDate' data-valmsg-replace='true'></span>
+                                        </td>
+                                            <td style=''>
+                                            <select class="form-control marginTB5 SelectKV" name="KhuVucLamViec_${i}" id="KhuVucLamViec_${i}" multiple="multiple">
+                                                <option value ='null'>-Khu vực-</option>
+                                                @foreach (var item in ViewBag.IDKV)
+                                                {
+                                                    <option value='@item.Value'>@item.Text</option>
+                                                }
+                                            </select>
+                                        </td>
 
-                                                                         <td style=''>
-                                                                            <select class="form-control marginTB5 SelectCong" name="Cong_${i}" id="Cong_${i}" multiple="multiple">
-                                                                              <option value ='null'>-Cổng-</option>
-                                                                              @foreach (var item in ViewBag.IDGate)
-                                                                                {
-                                                                                  <option value='@item.Value'>@item.Text</option>
-                                                                                }
-                                                                            </select>
-                                                                        </td>
-
-                                                                         <td style=''>
-                                                                            <select class="form-control marginTB5 SelectNhom" name="NhomNT_${i}" id="NhomNT_${i}">
-                                                                              <option value ='null'>-Nhóm-</option>
-                                                                              @foreach (var item in ViewBag.IDGroup)
-                                                                                {
-                                                                                  <option value='@item.Value'>@item.Text</option>
-                                                                                }
-                                                                            </select>
-                                                                        </td>
-                                                                    </tr>`);
+                                            <td style=''>
+                                            <select class="form-control marginTB5 SelectCong" name="Cong_${i}" id="Cong_${i}" multiple="multiple">
+                                                <option value ='null'>-Cổng-</option>
+                                                @foreach (var item in ViewBag.IDGate)
+                                                {
+                                                    <option value='@item.Value'>@item.Text</option>
+                                                }
+                                            </select>
+                                        </td>
+                                          <td style=''>
+                                              <input class='form-control' data-val='true'  id='GhiChu_${i}'  name='GhiChu_${i}' placeholder='Ghi chú' type='text' value=''>
+                                              <span class='field-validation-valid text-danger' data-valmsg-for='Phone' data-valmsg-replace='true'></span>
+                                          </td>
+                                     @*       <td style=''>
+                                            <select class="form-control marginTB5 SelectNhom" name="NhomNT_${i}" id="NhomNT_${i}">
+                                                <option value ='null'>-Nhóm-</option>
+                                                @foreach (var item in ViewBag.IDGroup)
+                                                {
+                                                    <option value='@item.Value'>@item.Text</option>
+                                                }
+                                            </select>
+                                        </td>*@
+                                    </tr>`);
                 i++;
                 $("#vt").before(renderList);
                 $(".SelectCong").chosen({
                     width: "100%",
                 });
-                $("#table .chosen-search-input").val("Chọn cổng");
+               // $("#table .chosen-search-input").val("Chọn cổng");
                 $(".SelectKV").chosen({
                     width: "100%",
                 });
-                $("#table .chosen-search-input").val("Chọn khu vực");
+               // $("#table .chosen-search-input").val("Chọn khu vực");
             });
 
          $("#IDNT").change(function () {
@@ -428,7 +462,36 @@
 
 </script>
 <script type="text/javascript">
-    $("#IDNT").chosen({
+    $("#importExcel").click(function () {
+        var formData = new FormData();
+        var fileInput = $('#FileExcel1')[0].files[0];
+        var url = $('#FileExcel1').data('url');
+
+        if (fileInput) {
+            formData.append('file', fileInput);  // Thêm tệp vào FormData
+            console.log(url);
+            // Gửi tệp lên server qua AJAX
+            $.ajax({
+                url: url, // URL tới Controller action
+                type: 'POST',  // Chuyển thành POST thay vì PUT
+                data: formData,
+                contentType: false,  // Không gửi header content-type (do FormData)
+                processData: false,  // Không xử lý dữ liệu (FormData tự xử lý)
+                success: function (response) {
+                    alert(response.message);
+                    location.reload()
+                },
+                error: function (xhr, status, error) {
+                    location.reload()
+                }
+            });
+        } else {
+            console.log('Please select a file.');
+        }
+    });
+
+
+   /* $("#IDNT").chosen({
         width: "100%"
     });
     $("#IDLTK").chosen({
@@ -437,8 +500,8 @@
 
     $("#IDPhongBan").chosen({
         width: "100%"
-    });
-    $('#btn-add-ds').click(function () {
+    });*/
+    /*$('#btn-add-ds').click(function () {
         var url = $('#myModal_add').data('url');
         $.get(url, function (data) {
             $("#myModal_add").html(data);
@@ -451,7 +514,7 @@
         $.get(url, function (data) {
             $("#myModal_Download").html(data);
         });
-    });
+    });*/
 </script>
 
 

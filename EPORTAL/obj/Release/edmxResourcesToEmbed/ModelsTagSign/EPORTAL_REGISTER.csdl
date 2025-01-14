@@ -235,7 +235,6 @@
       <Parameter Name="FileUpload" Mode="In" Type="String" />
       <Parameter Name="FileComplete" Mode="In" Type="String" />
     </FunctionImport>
-    <EntitySet Name="CollectMoneys" EntityType="EPORTAL_REGISTERModel.CollectMoney" />
     <EntitySet Name="Detail_RegisterPeople" EntityType="EPORTAL_REGISTERModel.Detail_RegisterPeople" />
     <EntitySet Name="Flows" EntityType="EPORTAL_REGISTERModel.Flow" />
     <EntitySet Name="RegisterPeoples" EntityType="EPORTAL_REGISTERModel.RegisterPeople" />
@@ -265,6 +264,8 @@
       <Parameter Name="CongLamViec" Mode="In" Type="String" />
       <Parameter Name="NhomNT" Mode="In" Type="Int32" />
       <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="DienThoaiThongMinh" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuHPDQ" Mode="In" Type="String" />
     </FunctionImport>
     <FunctionImport Name="Detail_RegisterPeople_Price">
       <Parameter Name="ID_CT_DKTN" Mode="In" Type="Int32" />
@@ -291,6 +292,8 @@
       <Parameter Name="CongLamViec" Mode="In" Type="String" />
       <Parameter Name="NhomNT" Mode="In" Type="Int32" />
       <Parameter Name="GhiChu" Mode="In" Type="String" />
+      <Parameter Name="DienThoaiThongMinh" Mode="In" Type="Int32" />
+      <Parameter Name="GhiChuHPDQ" Mode="In" Type="String" />
     </FunctionImport>
     <FunctionImport Name="RegisterPeople_Delete">
       <Parameter Name="ID_DKTN" Mode="In" Type="Int32" />
@@ -410,17 +413,6 @@
     <Property Name="NgayDuyet" Type="DateTime" Precision="0" />
     <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
   </EntityType>
-  <EntityType Name="CollectMoney">
-    <Key>
-      <PropertyRef Name="ID_PT" />
-    </Key>
-    <Property Name="ID_PT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="DKTN_ID" Type="Int32" />
-    <Property Name="NgayThu" Type="DateTime" Precision="0" />
-    <Property Name="SoPhieuThu" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="TongSoThe" Type="Int32" />
-    <Property Name="TongSoTien" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-  </EntityType>
   <EntityType Name="Detail_RegisterPeople">
     <Key>
       <PropertyRef Name="ID_CT_DKTN" />
@@ -447,6 +439,8 @@
     <Property Name="NhomNT" Type="Int32" />
     <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="Price" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="DienThoaiThongMinh" Type="Int32" />
+    <Property Name="GhiChuHPDQ" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
   </EntityType>
   <EntityType Name="Flow">
     <Key>
