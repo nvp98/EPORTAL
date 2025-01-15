@@ -63,7 +63,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="small mb-1">Chức vụ</label>
-                                @Html.DropDownListFor(model => model.CV_ID, ViewBag.IDCV as SelectList, new { @id = "IDCV", @class = "form-control" })
+                                 @Html.DropDownListFor(model => model.CV_ID, ViewBag.IDCV as SelectList, new { @id = "IDCV", @class = "form-control" })
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -123,38 +123,45 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <label class="small mb-1">Điện thoại thông minh</label>
+                            <div class="row">
+
+                                <div class="col-md-6">
+                                    <label>@Html.RadioButtonFor(m => m.DienThoaiDiDong, 0) Không sử dụng</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>@Html.RadioButtonFor(m => m.DienThoaiDiDong, 1) Sử dụng</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label class="small mb-1">Thời hạn thẻ</label>
                                 @Html.EditorFor(model => model.ThoiHanThe, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "ThoiHanThe", @type = "date", @Value = ViewBag.ThoiHanThe } })
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="small mb-1">Nhóm nhà thầu</label>
-                                @Html.DropDownListFor(model => model.NhomNT, ViewBag.IDGroup as SelectList, new { @id = "IDGroup", @class = "form-control" })
-                            </div>
-                        </div>
+
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="small mb-1">Khu vực làm việc</label>
                                 @Html.DropDownList("SelectedKV", null, "", new { id = "SelectedKV", @class = "form-control", style = "width:100%", multiple = "multiple", placeholder = "Chọn khu vực" })
                             </div>
-
                         </div>
+
                         @{
                             string[] arrList = Model.KhuVucLamViec.Split(',');
                         }
-                        @foreach (var item in arrList)
-                        {
-                            <div class="col-md-12 font-weight-bold float-left text-left">
+                        <div class="col-md-12 font-weight-bold float-left text-left">
+                            @foreach (var item in arrList)
+                            {
 
-                                @{
-                                    var IDKV = Convert.ToInt32(item);
-                                    var Name = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
-                                    @Name.TenKV
-                                }
-                            </div>
-                        }
+                                if (String.IsNullOrEmpty(item)) { break; }
+                                var IDKV = Convert.ToInt32(item);
+                                var Name = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                @Name.TenKV
+                            }
+                        </div>
+
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="small mb-1">Cổng</label>
@@ -165,17 +172,24 @@
                         @{
                             string[] arrListStr = Model.CongLamViec.Split(',');
                         }
-                        @foreach (var item in arrListStr)
-                        {
-                            <div class="col-md-12 font-weight-bold float-left text-left">
+                        <div class="col-md-12 font-weight-bold float-left text-left">
+                            @foreach (var item in arrListStr)
+                            {
 
-                                @{
-                                    var IDGate = Convert.ToInt32(item);
-                                    var Name = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
-                                    @Name.Gate
-                                }
+
+                                if (String.IsNullOrEmpty(item)) { break; }
+                                var IDGate = Convert.ToInt32(item);
+                                var Name = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                @Name.Gate
+
+                            }
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Ghi chú</label>
+                                @Html.EditorFor(model => model.GhiChu, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GhiChuNT", @text = "" } })
                             </div>
-                        }
+                        </div>
                     </div>
                     <div class="btn-margin-top text-center">
 
@@ -199,19 +213,12 @@
     $("#IDCA").chosen({
         width: "100%"
     });
-    $(function () {
-        $("#Selected").chosen({
-            width: "100%"
-        });
+    $("#Selected").chosen({
+        width: "100%"
     });
     $("#Selected").val("Chọn cổng");
-    $(function () {
-        $("#SelectedKV").chosen({
-            width: "100%"
-        });
+    $("#SelectedKV").chosen({
+        width: "100%"
     });
     $("#SelectedKV").val("Chọn khu vực");
 </script>
-
-
-

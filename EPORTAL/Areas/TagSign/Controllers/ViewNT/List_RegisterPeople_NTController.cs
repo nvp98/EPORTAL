@@ -730,6 +730,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     NhaThauID = collection["IDNT"];
                     BP = collection["IDPhongBan"];
                     LoaiTK = collection["IDLTK"];
+                    if (NoiDung == null)
+                    {
+                        TempData["msgSuccess"] = "<script>alert('Vui lòng điền nội dung trích yếu');</script>";
+                        return RedirectToAction("Index", "List_RegisterPeople_NT");
+                    }
                     if (LoaiNT == null)
                     {
                         TempData["msgSuccess"] = "<script>alert('Vui lòng chọn loại nhân viên nhà thầu');</script>";

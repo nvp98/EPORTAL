@@ -48,24 +48,24 @@
                     {
                         <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                             <span>BM.03A/QT.20</span>
-                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 15/07/2024 </p>
-                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 01 </p>
+                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 30/11/2024 </p>
+                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 02 </p>
                         </div>
                     }
                     else if (ID_DKTN.LoaiNT_ID == 2)
                     {
                         <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                             <span>BM.03B/QT.20</span>
-                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 15/07/2024 </p>
-                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 01 </p>
+                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 30/11/2024 </p>
+                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 02 </p>
                         </div>
                     }
                     else if (ID_DKTN.LoaiNT_ID == 3)
                     {
                         <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                             <span>BM.03C/QT.20</span>
-                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 15/07/2024 </p>
-                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 01 </p>
+                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 30/11/2024 </p>
+                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 02 </p>
                         </div>
                     }
 
@@ -154,10 +154,10 @@
                                                 Đánh dấu "X" vào
                                                 những ô cần chọn
                                             </th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Điện thoại di động <br> (Đánh dấu "X" nếu đăng ký)"</th>
                                             <th class="text-center" rowspan="2" width="150px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Thời hạn thẻ</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Khu vực làm việc</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Cổng đăng ký ra/vào</th>
-                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Nhóm NT</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Ghi chú</th>
                                         </tr>
 
@@ -184,111 +184,119 @@
 
                                             foreach (var item in Model)
                                             {
-                                                <tr>
-                                                    <td class="text-center" style="padding-left: 5px; border: 1px solid black;"> @RowNo@{RowNo++;}</td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.HoVaTen</td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.NgaySinh.ToString("dd-MM-yyyy")</td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.CCCD</td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.HoKhau</td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @{
-                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
-                                                        }
-                                                        @IDCV.TenCV.ToString()
-                                                    </td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @item.SoDienThoai
-                                                    </td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @item.Ten_NTP
-                                                    </td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @item.HoTen_QuanLy
-                                                    </td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @item.SoDienThoai_QuanLy
-                                                    </td>
-                                                    @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                    }
+                                                                                <tr>
+                                                                                    <td class="text-center" style="padding-left: 5px; border: 1px solid black;"> @RowNo@{RowNo++;}</td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.HoVaTen</td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.NgaySinh.ToString("dd-MM-yyyy")</td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.CCCD</td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.HoKhau</td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @{
+                                                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
+                                                                                        }
+                                                                                        @IDCV.TenCV.ToString()
+                                                                                    </td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @item.SoDienThoai
+                                                                                    </td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @item.Ten_NTP
+                                                                                    </td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @item.HoTen_QuanLy
+                                                                                    </td>
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @item.SoDienThoai_QuanLy
+                                                                                    </td>
+                                                                                    @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                                                    }
 
-                                                    @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                    }
-                                                    @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                    }
-                                                    @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                    }
-                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                    }
-                                                    <td width="180px" style="padding-left: 5px; border: 1px solid black;">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
-                                                    @{
-                                                        string ListKhuVuc = "";
-                                                        string[] arrList = item.KhuVucLamViec.Split(',');
-                                                        foreach (var ar in arrList)
-                                                        {
-                                                            if (ar != "")
-                                                            {
-                                                                int IDKV = Convert.ToInt32(ar);
-                                                                var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
-                                                                ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
-                                                            }
+                                                                                    @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                                                    }
+                                                                                    @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                                                    }
+                                                                                    @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                                                    }
+                                                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                                                    }
+                                                                                    @if (item.DienThoaiDiDong == 1)
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                                                    }
+                                                                                    <td width="180px" style="padding-left: 5px; border: 1px solid black;">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
+                                                                                    @{
+                                                                                        string ListKhuVuc = "";
+                                                                                        string[] arrList = item.KhuVucLamViec.Split(',');
+                                                                                        foreach (var ar in arrList)
+                                                                                        {
+                                                                                            if (ar != "")
+                                                                                            {
+                                                                                                int IDKV = Convert.ToInt32(ar);
+                                                                                                var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                                                                                ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
+                                                                                            }
 
-                                                        }
-                                                    }
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @ListKhuVuc
-                                                    </td>
+                                                                                        }
+                                                                                    }
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @ListKhuVuc
+                                                                                    </td>
 
-                                                    @{
-                                                        string List = "";
-                                                        string[] arrListStr = item.CongLamViec.Split(',');
-                                                        foreach (var ar in arrListStr)
-                                                        {
-                                                            int IDGate = Convert.ToInt32(ar);
-                                                            var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
-                                                            List = String.Concat(Cong.Gate + " , " + List);
-                                                        }
-                                                    }
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @List
-                                                    </td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">
-                                                        @{
-                                                            var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
-                                                        }
-                                                        @IDCong.NameContractorGroup
-                                                    </td>
-                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
-                                                </tr>
+                                                                                    @{
+                                                                                        string List = "";
+                                                                                        string[] arrListStr = item.CongLamViec.Split(',');
+                                                                                        foreach (var ar in arrListStr)
+                                                                                        {
+                                                                                            int IDGate = Convert.ToInt32(ar);
+                                                                                            var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                                                                            List = String.Concat(Cong.Gate + " , " + List);
+                                                                                        }
+                                                                                    }
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">
+                                                                                        @List
+                                                                                    </td>
+                                                                                    @* <td style="padding-left: 5px; border: 1px solid black;">
+            @{
+                var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
+            }
+            @IDCong.NameContractorGroup
+        </td>*@
+                                                                                    <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
+                                                                                </tr>
 
                                             }
 
@@ -299,7 +307,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12 pt-3 pull-right" style="margin-top: 1%;">
+                    <div class="col-md-12 pt-3 pull-right" style="margin-top: 1px;margin-right: 150px;">
                         @{
                             DateTime Date = (DateTime)ID_DKTN.NgayTrinhKy;
                         }
@@ -690,7 +698,7 @@
                                             }
 
                                         }
-                                        <th style="text-align: center !important;" width="20%"> P.HCĐN</th>
+                                        <th style="text-align: center !important;" width="20%"> P.ĐN</th>
                                         <th style="text-align: center !important;" width="15%"> BP quản lý</th>
                                         <th style="text-align: center !important;" width="5%">
                                             @{

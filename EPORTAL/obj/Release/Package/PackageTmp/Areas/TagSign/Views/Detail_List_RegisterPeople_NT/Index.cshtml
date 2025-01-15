@@ -19,7 +19,7 @@
 @{
     EPORTALEntities db = new EPORTALEntities();
     EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
-    EPORTAL_NTEntities dbNT = new EPORTAL_NTEntities();
+  EPORTAL_NTEntities dbNT = new EPORTAL_NTEntities();
 
     var DKTN_ID = ViewData["id"];
     var bmid = Convert.ToInt32(DKTN_ID);
@@ -102,12 +102,16 @@
                                                 Đánh dấu "X" vào
                                                 những ô cần chọn
                                             </th>
+                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Điện thoại di động <br> (Đánh dấu "X" nếu đăng ký)"</th>
                                             <th class="text-center" rowspan="2" width="150px" style="vertical-align:middle">Thời hạn thẻ</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Khu vực làm việc</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Cổng đăng ký ra/vào</th>
-                                            <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Nhóm NT</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Ghi chú</th>
-                                        </tr>
+                                            @if (ctid.TinhTrang_ID == 2)
+                                            {
+                                                <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Ghi chú HPDQ</th>
+                                            }
+                                            </tr>
                                         <tr>
                                             <th width="250px" class="text-center">Tên NTP</th>
                                             <th width="250px" class="text-center">Họ tên quản lý</th>
@@ -131,111 +135,123 @@
 
                                             foreach (var item in Model)
                                             {
-                                                <tr>
-                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
-                                                    <td swidth="300px">@item.HoVaTen</td>
-                                                    <td>@item.NgaySinh.ToString("dd-MM-yyyy")</td>
-                                                    <td>@item.CCCD</td>
-                                                    <td>@item.HoKhau</td>
-                                                    <td>
-                                                        @{
-                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
-                                                        }
-                                                        @IDCV.TenCV.ToString()
-                                                    </td>
-                                                    <td>
-                                                        @item.SoDienThoai
-                                                    </td>
-                                                    <td>
-                                                        @item.Ten_NTP
-                                                    </td>
-                                                    <td>
-                                                        @item.HoTen_QuanLy
-                                                    </td>
-                                                    <td>
-                                                        @item.SoDienThoai_QuanLy
-                                                    </td>
-                                                    @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
-                                                    {
-                                                        <td>X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
+                                                                                <tr>
+                                                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
+                                                                                    <td swidth="300px">@item.HoVaTen</td>
+                                                                                    <td>@item.NgaySinh.ToString("dd-MM-yyyy")</td>
+                                                                                    <td>@item.CCCD</td>
+                                                                                    <td>@item.HoKhau</td>
+                                                                                    <td>
+                                                                                        @{
+                                                                                            var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
+                                                                                        }
+                                                                                        @IDCV.TenCV.ToString()
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @item.SoDienThoai
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @item.Ten_NTP
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @item.HoTen_QuanLy
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @item.SoDienThoai_QuanLy
+                                                                                    </td>
+                                                                                    @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
+                                                                                    {
+                                                                                        <td>X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td></td>
+                                                                                    }
 
-                                                    @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
-                                                    {
-                                                        <td>X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
-                                                    {
-                                                        <td>X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
-                                                    {
-                                                        <td>X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
-                                                    {
-                                                        <td>X</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    <td width="180px">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
-                                                    @{
-                                                        string ListKhuVuc = "";
-                                                        string[] arrList = item.KhuVucLamViec.Split(',');
-                                                        foreach (var ar in arrList)
-                                                        {
-                                                            if (ar != "")
-                                                            {
-                                                                int IDKV = Convert.ToInt32(ar);
-                                                                var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
-                                                                ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
-                                                            }
+                                                                                    @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
+                                                                                    {
+                                                                                        <td>X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td></td>
+                                                                                    }
+                                                                                    @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
+                                                                                    {
+                                                                                        <td>X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td></td>
+                                                                                    }
+                                                                                    @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
+                                                                                    {
+                                                                                        <td>X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td></td>
+                                                                                    }
+                                                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                                                    {
+                                                                                        <td>X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td></td>
+                                                                                    }
+                                                                                    @if (item.DienThoaiDiDong == 1)
+                                                                                    {
+                                                                                        <td>X</td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td></td>
+                                                                                    }
+                                                                                    <td width="180px">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
+                                                                                    @{
+                                                                                        string ListKhuVuc = "";
+                                                                                        string[] arrList = item.KhuVucLamViec.Split(',');
+                                                                                        foreach (var ar in arrList)
+                                                                                        {
+                                                                                            if (ar != "")
+                                                                                            {
+                                                                                                int IDKV = Convert.ToInt32(ar);
+                                                                                                var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                                                                                ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
+                                                                                            }
 
-                                                        }
-                                                    }
-                                                    <td>
-                                                        @ListKhuVuc
-                                                    </td>
+                                                                                        }
+                                                                                    }
+                                                                                    <td>
+                                                                                        @ListKhuVuc
+                                                                                    </td>
 
-                                                    @{
-                                                        string List = "";
-                                                        string[] arrListStr = item.CongLamViec.Split(',');
-                                                        foreach (var ar in arrListStr)
-                                                        {
-                                                            int IDGate = Convert.ToInt32(ar);
-                                                            var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
-                                                            List = String.Concat(Cong.Gate + " , " + List);
-                                                        }
-                                                    }
-                                                    <td>
-                                                        @List
-                                                    </td>
-                                                    <td>
-                                                        @{
-                                                            var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
-                                                        }
-                                                        @IDCong.NameContractorGroup
-                                                    </td>
-                                                    <td>@item.GhiChu</td>
-                                                </tr>
+                                                                                    @{
+                                                                                        string List = "";
+                                                                                        string[] arrListStr = item.CongLamViec.Split(',');
+                                                                                        foreach (var ar in arrListStr)
+                                                                                        {
+                                                                                            int IDGate = Convert.ToInt32(ar);
+                                                                                            var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                                                                            List = String.Concat(Cong.Gate + " , " + List);
+                                                                                        }
+                                                                                    }
+                                                                                    <td>
+                                                                                        @List
+                                                                                    </td>
+                                                                                    @*  <td>
+            @{
+                var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
+            }
+            @IDCong.NameContractorGroup
+        </td>*@
+                                                                                    <td>@item.GhiChu</td>
+                                                                                    @if (ctid.TinhTrang_ID == 2)
+                                                                                    {
+                                                                                        <td>@item.Price</td>
+                                                                                    }
+                                                                                </tr>
                                             }
 
                                         }

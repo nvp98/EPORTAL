@@ -647,7 +647,7 @@
                                             </a>
                                         </li>
                                     }*@
-                                    @*@if (listControll.Contains("View"))
+                                   @* @if (listControll.Contains("View"))
                                     {
                                         <li>
                                             <a id="ListCardRegisInforl" href="@Url.Action("Index", "View", new {area="TagSign"})">
@@ -733,7 +733,8 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                @{  var CapMoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 1 && x.TinhTrang_ID == 1).ToList();
+                                                @{  
+                                                    var CapMoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 1 && x.TinhTrang_ID == 1 ).ToList();
                                                     List<int> Sum_CapMoi = new List<int>();
                                                     foreach(var capmoi in CapMoi_)
                                                     {
@@ -775,7 +776,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                @{ var GiaHan_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 2 && x.TinhTrang_ID == 1).ToList();
+                                                @{ var GiaHan_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 2 && x.TinhTrang_ID == 1 ).ToList();
                                                     List<int> Sum_GiaHan = new List<int>();
                                                     foreach (var giahan in GiaHan_)
                                                     {
@@ -857,7 +858,9 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                @{ var CapLai_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 4 && x.TinhTrang_ID == 1).ToList();
+                                                @{  
+                                                   
+                                                    var CapLai_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 4 && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_CapLai = new List<int>();
                                                     foreach (var caplai in CapLai_)
                                                     {
@@ -888,7 +891,7 @@
 
                                                         }
 
-                                                    }
+                                                   }
 
                                                 }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 4})">
