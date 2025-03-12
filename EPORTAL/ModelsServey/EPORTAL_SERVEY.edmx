@@ -31,6 +31,7 @@
           <Property Name="IDOT" Type="int" />
           <Property Name="IDNV" Type="int" />
           <Property Name="IDGroup" Type="int" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="ChiTietDKNT">
           <Key>
@@ -334,18 +335,6 @@
           <Property Name="EndTime" Type="DateTime" Precision="0" />
           <Property Name="StatusSV" Type="Boolean" />
         </EntityType>
-        <EntityType Name="OptionServey">
-          <Key>
-            <PropertyRef Name="IDOT" />
-          </Key>
-          <Property Name="IDOT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ContentOT" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="IDSV" Type="Int32" />
-          <Property Name="FilePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="OrderBy" Type="Int32" />
-          <Property Name="MaOT" Type="Int32" />
-          <Property Name="isShow" Type="Int32" />
-        </EntityType>
         <EntityType Name="PartTogether">
           <Key>
             <PropertyRef Name="ID" />
@@ -372,7 +361,6 @@
         <EntityContainer Name="EPORTAL_SERVEYEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="EmployeeServeys" EntityType="Self.EmployeeServey" />
           <EntitySet Name="ListServeys" EntityType="Self.ListServey" />
-          <EntitySet Name="OptionServeys" EntityType="Self.OptionServey" />
           <EntitySet Name="PartTogethers" EntityType="Self.PartTogether" />
           <EntitySet Name="ResultServeys" EntityType="Self.ResultServey" />
           <FunctionImport Name="EmployeeServey_delete">
@@ -551,6 +539,7 @@
             <Parameter Name="IDOT" Mode="In" Type="Int32" />
           </FunctionImport>
           <EntitySet Name="GhiChus" EntityType="EPORTAL_SERVEYModel.GhiChu" />
+          <EntitySet Name="OptionServeys" EntityType="EPORTAL_SERVEYModel.OptionServey" />
         </EntityContainer>
         <ComplexType Name="EmployeeServey_selectNV_Result">
           <Property Type="Int32" Name="ID" Nullable="false" />
@@ -602,6 +591,7 @@
           <Property Name="IDOT" Type="Int32" />
           <Property Name="IDNV" Type="Int32" />
           <Property Name="IDGroup" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="GroupKhaoSat">
           <Key>
@@ -656,6 +646,18 @@
           <Property Name="IDSV" Type="Int32" />
           <Property Name="NoiDung" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="OptionServey">
+          <Key>
+            <PropertyRef Name="IDOT" />
+          </Key>
+          <Property Name="IDOT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ContentOT" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="FilePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OrderBy" Type="Int32" />
+          <Property Name="MaOT" Type="Int32" />
+          <Property Name="isShow" Type="Int32" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -683,19 +685,6 @@
                 <ScalarProperty Name="StartTime" ColumnName="StartTime" />
                 <ScalarProperty Name="EndTime" ColumnName="EndTime" />
                 <ScalarProperty Name="StatusSV" ColumnName="StatusSV" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="OptionServeys">
-            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.OptionServey">
-              <MappingFragment StoreEntitySet="OptionServey">
-                <ScalarProperty Name="isShow" ColumnName="isShow" />
-                <ScalarProperty Name="MaOT" ColumnName="MaOT" />
-                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
-                <ScalarProperty Name="ContentOT" ColumnName="ContentOT" />
-                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
-                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
-                <ScalarProperty Name="OrderBy" ColumnName="OrderBy" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -801,6 +790,7 @@
           <EntitySetMapping Name="CTKhaoSats">
             <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTKhaoSat">
               <MappingFragment StoreEntitySet="CTKhaoSat">
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
                 <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
                 <ScalarProperty Name="IDNV" ColumnName="IDNV" />
                 <ScalarProperty Name="IDOT" ColumnName="IDOT" />
@@ -873,6 +863,19 @@
                 <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
                 <ScalarProperty Name="IDSV" ColumnName="IDSV" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OptionServeys">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.OptionServey">
+              <MappingFragment StoreEntitySet="OptionServey">
+                <ScalarProperty Name="isShow" ColumnName="isShow" />
+                <ScalarProperty Name="MaOT" ColumnName="MaOT" />
+                <ScalarProperty Name="OrderBy" ColumnName="OrderBy" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="ContentOT" ColumnName="ContentOT" />
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
