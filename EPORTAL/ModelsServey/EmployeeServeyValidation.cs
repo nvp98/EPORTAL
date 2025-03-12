@@ -34,10 +34,12 @@ namespace EPORTAL.ModelsServey
         public string[] Selected { get; set; }
         public Nullable<int> OTID { get; set; }
         public string ContentOT { get; set; }
+        public string LyDo { get; set; }
         public bool? XNSV { get; set; }
         public bool StatusSV { get; set; }
         public List<PartTogetherValidation> LSPart{ get; set; }
         public Nullable<int> MenuOT { get; set; }
         public List<String> ListSelect { get; set; }
+        public List<String> ListSelectKhac { get; set; }
     }
 }

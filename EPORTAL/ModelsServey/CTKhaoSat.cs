@@ -19,5 +19,6 @@ namespace EPORTAL.ModelsServey
         public Nullable<int> IDOT { get; set; }
         public Nullable<int> IDNV { get; set; }
         public Nullable<int> IDGroup { get; set; }
+        public string GhiChu { get; set; }
     }
 }

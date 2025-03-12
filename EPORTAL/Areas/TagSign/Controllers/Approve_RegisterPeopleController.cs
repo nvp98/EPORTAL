@@ -91,7 +91,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 if (item.CapDuyet == 1)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -117,7 +117,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 2)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 1 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x=>x.TinhTrang_ID==1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -143,7 +143,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 3)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 2 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -169,7 +169,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 4)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 3 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -195,7 +195,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 5)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 4 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -221,7 +221,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 6)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 5 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -247,7 +247,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 7)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 6 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -273,7 +273,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 else if (item.CapDuyet == 8)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet == 7 && x.TinhTrangID == 1 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
-                                      join ca in db_dk.RegisterPeoples on kd.DKTN_ID equals ca.ID_DKTN
+                                      join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
                                           ID_TK_TN = (int)kd.ID_TK_TN,
@@ -344,36 +344,45 @@ namespace EPORTAL.Areas.TagSign.Controllers
         {
 
             var _DO = db_dk.SignOff_Flow.Where(x => x.NhanVienID == idnv && x.DKTN_ID == id).FirstOrDefault();
-            var res = (from kd in db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == _DO.ID_TK_TN)
-                       select new Follow_RegisterPeopleValidation
-                       {
-                           ID_TK_TN = (int)kd.ID_TK_TN,
-                           DKTN_ID = (int)kd.DKTN_ID,
-                           CapDuyet = (int)kd.CapDuyet,
-                           TinhTrangID = (int)kd.TinhTrangID,
-                           NhanVienID = (int)kd.NhanVienID,
-                           NgayDuyet = (DateTime?)kd.NgayDuyet ?? default,
-                           GhiChu = kd.GhiChu
-                       }).ToList();
-            Follow_RegisterPeopleValidation DO = new Follow_RegisterPeopleValidation();
-            if (res.Count > 0)
+            var check = db_dk.SignOff_Flow.Where(x => x.CapDuyet < _DO.CapDuyet && x.TinhTrangID != 1 && x.DKTN_ID == id).Any();
+            if (!check)
             {
-                foreach (var kd in res)
+                var res = (from kd in db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == _DO.ID_TK_TN)
+                           select new Follow_RegisterPeopleValidation
+                           {
+                               ID_TK_TN = (int)kd.ID_TK_TN,
+                               DKTN_ID = (int)kd.DKTN_ID,
+                               CapDuyet = (int)kd.CapDuyet,
+                               TinhTrangID = (int)kd.TinhTrangID,
+                               NhanVienID = (int)kd.NhanVienID,
+                               NgayDuyet = (DateTime?)kd.NgayDuyet ?? default,
+                               GhiChu = kd.GhiChu
+                           }).ToList();
+                Follow_RegisterPeopleValidation DO = new Follow_RegisterPeopleValidation();
+                if (res.Count > 0)
                 {
-                    DO.ID_TK_TN = (int)kd.ID_TK_TN;
-                    DO.DKTN_ID = (int)kd.DKTN_ID;
-                    DO.CapDuyet = (int)kd.CapDuyet;
-                    DO.TinhTrangID = (int)kd.TinhTrangID;
-                    DO.NhanVienID = (int)kd.NhanVienID;
-                    DO.NgayDuyet = (DateTime?)kd.NgayDuyet ?? default;
-                    DO.GhiChu = kd.GhiChu;
+                    foreach (var kd in res)
+                    {
+                        DO.ID_TK_TN = (int)kd.ID_TK_TN;
+                        DO.DKTN_ID = (int)kd.DKTN_ID;
+                        DO.CapDuyet = (int)kd.CapDuyet;
+                        DO.TinhTrangID = (int)kd.TinhTrangID;
+                        DO.NhanVienID = (int)kd.NhanVienID;
+                        DO.NgayDuyet = (DateTime?)kd.NgayDuyet ?? default;
+                        DO.GhiChu = kd.GhiChu;
+                    }
                 }
+                else
+                {
+                    HttpNotFound();
+                }
+                return PartialView(DO);
             }
             else
             {
-                HttpNotFound();
+                TempData["msgSuccess"] = "<script>alert('Cấp duyệt trước đó đã hủy hoặc chưa duyệt');</script>";
+                return RedirectToAction("Index");
             }
-            return PartialView(DO);
         }
         [HttpPost]
         public ActionResult Approve(Follow_RegisterPeopleValidation _DO)
@@ -381,15 +390,23 @@ namespace EPORTAL.Areas.TagSign.Controllers
             var ID_DKT = db_dk.RegisterPeoples.Where(x=>x.ID_DKTN ==  _DO.DKTN_ID).FirstOrDefault();
             try
             {
-                db_dk.SignOff_Flow_Update(_DO.ID_TK_TN, DateTime.Now, 1, _DO.GhiChu);
-
-
-                var DO = db_dk.SignOff_Flow.Where(x => x.DKTN_ID == _DO.DKTN_ID && x.TinhTrangID == 0).FirstOrDefault();
-                if (DO == null)
+                var a = db_dk.SignOff_Flow.Where(x => x.DKTN_ID == _DO.DKTN_ID && x.CapDuyet < _DO.CapDuyet && x.TinhTrangID == 2).Any();
+                if (!a)
                 {
-                    db_dk.RegisterPeople_UpdateFlow(_DO.DKTN_ID, 3);
+                    db_dk.SignOff_Flow_Update(_DO.ID_TK_TN, DateTime.Now, 1, _DO.GhiChu);
+
+
+                    var DO = db_dk.SignOff_Flow.Where(x => x.DKTN_ID == _DO.DKTN_ID && x.TinhTrangID == 0).FirstOrDefault();
+                    if (DO == null)
+                    {
+                        db_dk.RegisterPeople_UpdateFlow(_DO.DKTN_ID, 3);
+                    }
+                    TempData["msgSuccess"] = "<script>alert('Phê duyệt thành công');</script>";
                 }
-                TempData["msgSuccess"] = "<script>alert('Phê duyệt thành công');</script>";
+                else
+                {
+                    TempData["msgSuccess"] = "<script>alert('Phiếu này đã được cấp duyệt trước đó hủy');</script>";
+                }
             }
             catch (Exception e)
             {
@@ -401,37 +418,45 @@ namespace EPORTAL.Areas.TagSign.Controllers
         public ActionResult CancelApprove(int? idnv, int? id)
         {
             var _DO = db_dk.SignOff_Flow.Where(x => x.NhanVienID == idnv && x.DKTN_ID == id).FirstOrDefault();
-
-            var res = (from kd in db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == _DO.ID_TK_TN)
-                       select new Follow_RegisterPeopleValidation
-                       {
-                           ID_TK_TN = (int)kd.ID_TK_TN,
-                           DKTN_ID = (int)kd.DKTN_ID,
-                           CapDuyet = (int)kd.CapDuyet,
-                           TinhTrangID = (int)kd.TinhTrangID,
-                           NhanVienID = (int)kd.NhanVienID,
-                           NgayDuyet = (DateTime?)kd.NgayDuyet ?? default,
-                           GhiChu = kd.GhiChu
-                       }).ToList();
-            Follow_RegisterPeopleValidation DO = new Follow_RegisterPeopleValidation();
-            if (res.Count > 0)
+            var check = db_dk.SignOff_Flow.Where(x => x.CapDuyet < _DO.CapDuyet && x.TinhTrangID != 1 && x.DKTN_ID == id).Any();
+            if (!check)
             {
-                foreach (var kd in res)
+                var res = (from kd in db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == _DO.ID_TK_TN)
+                           select new Follow_RegisterPeopleValidation
+                           {
+                               ID_TK_TN = (int)kd.ID_TK_TN,
+                               DKTN_ID = (int)kd.DKTN_ID,
+                               CapDuyet = (int)kd.CapDuyet,
+                               TinhTrangID = (int)kd.TinhTrangID,
+                               NhanVienID = (int)kd.NhanVienID,
+                               NgayDuyet = (DateTime?)kd.NgayDuyet ?? default,
+                               GhiChu = kd.GhiChu
+                           }).ToList();
+                Follow_RegisterPeopleValidation DO = new Follow_RegisterPeopleValidation();
+                if (res.Count > 0)
                 {
-                    DO.ID_TK_TN = (int)kd.ID_TK_TN;
-                    DO.DKTN_ID = (int)kd.DKTN_ID;
-                    DO.CapDuyet = (int)kd.CapDuyet;
-                    DO.TinhTrangID = (int)kd.TinhTrangID;
-                    DO.NhanVienID = (int)kd.NhanVienID;
-                    DO.NgayDuyet = (DateTime?)kd.NgayDuyet ?? default;
-                    DO.GhiChu = kd.GhiChu;
+                    foreach (var kd in res)
+                    {
+                        DO.ID_TK_TN = (int)kd.ID_TK_TN;
+                        DO.DKTN_ID = (int)kd.DKTN_ID;
+                        DO.CapDuyet = (int)kd.CapDuyet;
+                        DO.TinhTrangID = (int)kd.TinhTrangID;
+                        DO.NhanVienID = (int)kd.NhanVienID;
+                        DO.NgayDuyet = (DateTime?)kd.NgayDuyet ?? default;
+                        DO.GhiChu = kd.GhiChu;
+                    }
                 }
+                else
+                {
+                    HttpNotFound();
+                }
+                return PartialView(DO);
             }
             else
             {
-                HttpNotFound();
+                TempData["msgSuccess"] = "<script>alert('Cấp duyệt trước đó đã hủy hoặc chưa duyệt');</script>";
+                return RedirectToAction("Index");
             }
-            return PartialView(DO);
         }
         [HttpPost]
         public ActionResult CancelApprove(Follow_RegisterPeopleValidation _DO)

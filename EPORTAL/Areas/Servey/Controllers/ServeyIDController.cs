@@ -40,7 +40,8 @@ namespace EPORTAL.Areas.Servey.Controllers
             var ctks = dbSV.CTKhaoSats.ToList();
             ViewBag.TenDK = dbSV.ListServeys.Where(x => x.IDSV == IDSV).FirstOrDefault().ContentSV;
             ViewBag.TinhTrangDK = employ != null?employ.OTID : null;
-            ViewBag.checkShowDK = ctks.Where(x=>x.IDNV == MyAuthentication.ID && x.IDSV ==IDSV && x.IDOT ==25 ).Count() != 0 ? "true" : "false";
+            ViewBag.checkShowDK = ctks.Where(x=>x.IDNV == MyAuthentication.ID && x.IDSV ==IDSV && x.IDOT ==48 ).Count() != 0 ? "true" : "false";
+            ViewBag.DKKhong = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 49).Count() != 0 ? "true" : "false";
             ViewBag.IDSV = IDSV;
             var group = (from a in dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV)
                          select new GroupKhaoSatView
@@ -53,6 +54,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                                            {
                                                ID = a.ID,
                                                //IDNV = aaa.IDNV,
+                                               GhiChu = dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().GhiChu,
                                                Answer = (int?) dbSV.CTKhaoSats.Where(x=>x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().IDOT ?? default,
                                                //ContentSV = aa,
                                                //XNSV = a.XNSV,
@@ -70,9 +72,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                                                                isShow =ks.isShow
                                                            }).OrderBy(x => x.OrderBy).ToList()
                                  //MenuOT = a.MenuOT,
-                             }
+                             },
                          }).OrderBy(x=>x.MaNhom).ToList();
-
+            var khongtgia = dbSV.CTKhaoSats.Where(x => x.IDNV == MyAuthentication.ID && x.IDOT == 49).FirstOrDefault();
 
             var res1 = new List<OptionList>();
             List<OptionSelect> ops = new List<OptionSelect>();
@@ -95,6 +97,14 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.GioiTinh = new SelectList(ops2, "option", "name");
             ViewBag.LSOP = new SelectList(ops, "option", "name");
             ViewBag.LSOP1 = new SelectList(ops1, "option", "name");
+            List<OptionSelect> opsLyDo = new List<OptionSelect>();
+            opsLyDo.Add(new OptionSelect { option = "CBNV nữ đang nuôi con nhỏ < 12 tháng", name = "CBNV nữ đang nuôi con nhỏ < 12 tháng" });
+            opsLyDo.Add(new OptionSelect { option = "CBNV nữ đang mang thai từ 25 tuần trở lên hoặc có bệnh lý thai kỳ", name = "CBNV nữ đang mang thai từ 25 tuần trở lên hoặc có bệnh lý thai kỳ" });
+            opsLyDo.Add(new OptionSelect { option = "CBNV đang nằm viện điều trị", name = "CBNV đang nằm viện điều trị" });
+            opsLyDo.Add(new OptionSelect { option = "CBNV bị tai nạn đang điều trị ngoại trú như: Gãy tay, chân, chấn thương nặng", name = "CBNV bị tai nạn đang điều trị ngoại trú như: Gãy tay, chân, chấn thương nặng" });
+            opsLyDo.Add(new OptionSelect { option = "Lý do khác", name = "Lý do khác" });
+            ViewBag.LyDo = new SelectList(opsLyDo, "option", "name");
+            ViewBag.LyDoChon = khongtgia?.GhiChu;
 
             var IDNV = MyAuthentication.ID;
             var pb = db.PhongBans.ToList();
@@ -104,7 +114,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             var ChiTietDKNT = dbSV.ChiTietDKNTs.ToList();
             var Diachi = dbSV.DiaDiems.ToList();
 
-            List<GhiChu> nt = dbSV.GhiChus.Where(x => x.IDSV == IDSV).ToList();
+            List<GhiChu> nt = dbSV.GhiChus.ToList();
             ViewBag.GhiChu = new SelectList(nt, "NoiDung", "NoiDung");
 
             List<OptionServey> opt = dbSV.OptionServeys.Where(x => x.IDSV == IDSV).ToList();
@@ -129,12 +139,10 @@ namespace EPORTAL.Areas.Servey.Controllers
                     ListMagroup.Add(item.MaNhom);
                     ListIDgroupRe.Add(item.ID);
                 }
-             
             }
             ViewBag.ColumHeader = columnHeaders;
             ViewBag.ColumHeaderRe = columnHeaderRE;
             ViewBag.Magroup = ListMagroup;
-
 
             //ds đki nguoi cung cty
             var listCom = (from a in dknt.Where(x => x.IDNV == IDNV  && x.isCom ==1 && x.IDSV == IDSV)
@@ -243,7 +251,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
             if (LS.Count > 0)
             {
-                foreach (var item in LSNV)
+                foreach (var item in LS)
                 {
                     ListNV.Add(new EmployeeValidation { ID = item.ID, HoTen = item.MaNV + " - " + item.HoTen });
                 }
@@ -277,11 +285,17 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     var ot = option.Where(x => x.IDOT == ctksNV.FirstOrDefault().IDOT).FirstOrDefault().ContentOT;
                     columnSelect.Add(ot);
+                    //if (ctksNV.FirstOrDefault().IDOT == 49) columnSelect.Add(ctksNV.FirstOrDefault().GhiChu);
                 }
                 else
                 {
                     columnSelect.Add("");
                 }
+            }
+            var ctksNVend = ctks.Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDOT ==49).ToList();
+            if(ctksNVend.Count() != 0)
+            {
+                columnSelect.Add(ctksNVend.FirstOrDefault().GhiChu);
             }
             ViewBag.columnSelect = columnSelect;
 
@@ -317,7 +331,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                         keysSelectChoose.Add(sl);
                     }
                 }
-                if (keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("25") || keysToRemove.Contains("25")) { // 25 OTID server chính
+                if (keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("49") || keysToRemove.Contains("49")) { // 25 OTID server lựa chọn 0
                     foreach (var key in gr)
                     {
                         var sl = collection["gr.OptionList.Answer[" + key.ID + "]"];
@@ -325,13 +339,21 @@ namespace EPORTAL.Areas.Servey.Controllers
                         {
                             dbSV.EmployeeServey_updateOT(MyAuthentication.ID, ListGR[0].IDSV, 0);
                             dbSV.CTKhaoSat_insert(ListGR[0].IDSV, int.Parse(sl), MyAuthentication.ID, key.ID);
+                            int IDOT = int.Parse(sl);
+                            int idsv = int.Parse(ListGR[0].IDSV.ToString());
+                            var ketqua = dbSV.CTKhaoSats.Where(x => x.IDSV == idsv && x.IDOT == IDOT && x.IDNV == MyAuthentication.ID && x.IDGroup == key.ID).FirstOrDefault();
+                            if(ketqua.IDOT == 49)
+                            {
+                                ketqua.GhiChu = collection["LyDo"];
+                                dbSV.SaveChanges();
+                            }
                         }
                     }
                     // check trường hợp chọn không xóa kết quả
-                    var kk = dbSV.CTKhaoSats.Where(x=>x.IDOT ==25 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
+                    var kk = dbSV.CTKhaoSats.Where(x=>x.IDOT ==49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
                     if(kk.Count != 0)
                     {
-                        var recordToDelete = dbSV.CTKhaoSats.Where(x=> x.IDOT != 25 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
+                        var recordToDelete = dbSV.CTKhaoSats.Where(x=> x.IDOT != 49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
                         var recordToDelete2 = dbSV.CTDKNguoiThans.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList();
                         dbSV.CTKhaoSats.RemoveRange(recordToDelete);
                         dbSV.CTDKNguoiThans.RemoveRange(recordToDelete2);

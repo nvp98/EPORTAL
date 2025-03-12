@@ -125,16 +125,16 @@
                             <div class="row col-10">
 
                                 <div class="col-3">
-                                    @* <a href="../../../../assets/pdf/thongbaoDL2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông báo</a> *@
-                                    <a href="../../../../assets/pdf/TaiLieuHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tài liệu H - Day</a>
+                                     <a href="../../../../assets/pdf/thongbaoDL2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông báo</a> 
+                                   @* <a href="../../../../assets/pdf/TaiLieuHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tài liệu H - Day</a>*@
                                 </div>
                                 <div class="col-3">
-                                    @* <a href="../../../../assets/pdf/chuongtrinhDL2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>CHƯƠNG TRÌNH DỰ KIẾN</a> *@
-                                    <a href="../../../../assets/pdf/TotrinhHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>
+                                     <a href="../../../../assets/pdf/chuongtrinhDL2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>CHƯƠNG TRÌNH DỰ KIẾN</a> 
+                                  @*  <a href="../../../../assets/pdf/TotrinhHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>*@
                                 </div>
                                 <div class="col-3">
-                                    @* <a href="../../../../assets/pdf/huongdanDL2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>HƯỚNG DẪN ĐĂNG KÝ</a> *@
-                                    <a href="../../../../assets/pdf/ThongTinHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông tin chương trình</a>
+                                     <a href="../../../../assets/pdf/huongdanDL2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>HƯỚNG DẪN ĐĂNG KÝ</a> 
+                                   @* <a href="../../../../assets/pdf/ThongTinHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông tin chương trình</a>*@
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -183,7 +183,7 @@
                                         {
                                             <th class="text-center">@hd</th>
                                         }
-                                        @*<th class="text-center">Thao tác</th>*@
+                                        <th class="text-center">Lý do không tham gia (ghi chú)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,7 +196,6 @@
 
                                                 <td>@hd</td>
                                             }
-
                                             @*<td>@ViewBag.ThongTinDK.CuLy</td>
 
                                                 <td>@ViewBag.ThongTinDK.MauAo</td>
@@ -231,7 +230,7 @@
                                         <div class="questions__servey" style="background-image: url(../../../../assets/images/); background-size: 100% 100%; background-repeat: no-repeat; ">
                                             <h3 style="margin: revert;" class="font-weight-bold"> @ViewBag.TenDK</h3>
                                             <div class="font-weight-bold text-danger">
-                                                (CBNV có đăng ký tham gia các hoạt động thì vui lòng hoàn thành)
+                                                @*(CBNV có đăng ký tham gia các hoạt động thì vui lòng hoàn thành)*@
                                             </div>
                                         </div>
 
@@ -239,11 +238,11 @@
                                         @foreach (var gr in Model)
                                         {
                                             dem++;
-                                            <div class="font-weight-bold font-size-xlg LuaChon_@gr.ID" style=@( ViewBag.checkShowDK == "true" && gr.ID != 6 ? "display:none" : "")>
+                                            <div class="font-weight-bold font-size-xlg LuaChon_@gr.ID" style=@(ViewBag.checkShowDK == "false" && gr.ID==13 ? "display:none" : "")>
                                                 @gr.TenNhom
                                             </div>
                                             //thêm lưu ý
-                                            if (Request.QueryString["IDSV"] == "6")
+                                            @*if (Request.QueryString["IDSV"] == "6")
                                             {
                                                 <div class="font-weight-bold text-danger">
                                                     Dành cho CBNV tham gia trên tinh thần tự nguyện không bắt buộc.​ <br>
@@ -259,80 +258,46 @@
 
                                                     Khung giờ dự thi : 5 khung giờ cố định mỗi ngày (CBNV Chỉ lựa chọn duy nhất 1 khung giờ dự thi)
                                                 </div>
-                                            }
+                                            }*@
                                             for (int i = 0; i < gr.OptionList.OptionLS.Count; i++)
                                             {
                                                 var k = i + 1; n++;
-                                                if (gr.OptionList.XNSV == true && gr.OptionList.Status == false)
-                                                {
+                                                var checkShow = @gr.OptionList.OptionLS[i].isShow == 0 ? "d-none" : "";
 
-                                                    var checkShow = @gr.OptionList.OptionLS[i].isShow == 0 ? "d-none" : "";
+                                                <div class="questions__question LuaChon_@gr.ID " style=@(ViewBag.checkShowDK == "false" && gr.ID==13 ? "display:none" : "")>
+                                                    @*@Html.RadioButtonFor(m => gr.OptionList.Answer, gr.OptionList.OptionLS[i].IDOT, new { id = @n,  })*@
+                                                    @if (gr.OptionList.Answer == @gr.OptionList.OptionLS[i].IDOT)
+                                                    {
+                                                        <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" checked type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
+                                                    }
+                                                    else if (@gr.OptionList.OptionLS[i].isShow == 0)
+                                                    {
+                                                        <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" checked type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
+                                                    }
+                                                    else
+                                                    {
+                                                        <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
+                                                    }
+                                                    @*<input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">*@
+                                                    <label for="@n" data-question-number="@k" class="font-weight-bold">
+                                                        @gr.OptionList.OptionLS[i].ContentOT
+                                                        @if (gr.OptionList.OptionLS[i].FilePath != null && gr.OptionList.OptionLS[i].FilePath.Length > 0)
+                                                        {
+                                                            <a href="@Url.Content("~/UploadedFiles/FileServey/" + System.IO.Path.GetFileName(gr.OptionList.OptionLS[i].FilePath))" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>File đính kèm</a>
+                                                        }
+                                                    </label>
+                                                </div>
 
-                                                    <div class="questions__question LuaChon_@gr.ID @checkShow" style=@(gr.OptionList.XNSV == true || (ViewBag.checkShowDK == "true" && gr.ID != 6 ) ? " display:none" : "")>
-                                                        @if (gr.OptionList.Answer == @gr.OptionList.OptionLS[i].IDOT)
-                                                        {
-                                                            <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" checked type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
-                                                        }
-                                                        else if (@gr.OptionList.OptionLS[i].isShow == 0)
-                                                        {
-                                                            <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" checked type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
-                                                        }
-                                                        else
-                                                        {
-                                                            <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
-                                                        }
-                                                        @*@Html.RadioButtonFor(m => gr.OptionList.Answer, gr.OptionList.OptionLS[i].IDOT, new { id = @n, disabled = "disabled",})*@
 
-                                                        <label for="@k" data-question-number="@n" class="font-weight-bold">
-                                                            @gr.OptionList.OptionLS[i].ContentOT
-                                                            @if (gr.OptionList.OptionLS[i].FilePath != null && gr.OptionList.OptionLS[i].FilePath.Length > 0)
-                                                            {
-                                                                <a href="@Url.Content("~/UploadedFiles/FileServey/" + System.IO.Path.GetFileName(gr.OptionList.OptionLS[i].FilePath))" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>File đính kèm</a>
-                                                            }
-                                                        </label>
-                                                    </div>
-                                                    <div class="col-3" style="background-image:url(../../../../assets/images/ao_vang.png)">
-
-                                                    </div>
-                                                }
-                                                else
-                                                {
-
-                                                    var checkShow = @gr.OptionList.OptionLS[i].isShow == 0 ? "d-none" : "";
-
-                                                    <div class="questions__question LuaChon_@gr.ID @checkShow" style=@(gr.OptionList.XNSV == true && gr.OptionList.Status == false ||  (ViewBag.checkShowDK == "true" && gr.ID != 6 ) ? "display:none" : "")>
-                                                        @*@Html.RadioButtonFor(m => gr.OptionList.Answer, gr.OptionList.OptionLS[i].IDOT, new { id = @n,  })*@
-                                                        @if (gr.OptionList.Answer == @gr.OptionList.OptionLS[i].IDOT)
-                                                        {
-                                                            <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" checked type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
-                                                        }
-                                                        else if (@gr.OptionList.OptionLS[i].isShow == 0)
-                                                        {
-                                                            <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" checked type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
-                                                        }
-                                                        else
-                                                        {
-                                                            <input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">
-                                                        }
-                                                        @*<input data-val="true" data-val-number="The field Answer must be a number." id="@n" name="gr.OptionList.Answer[@gr.ID]" type="radio" value="@gr.OptionList.OptionLS[i].IDOT">*@
-                                                        <label for="@n" data-question-number="@k" class="font-weight-bold">
-                                                            @gr.OptionList.OptionLS[i].ContentOT
-                                                            @if (gr.OptionList.OptionLS[i].FilePath != null && gr.OptionList.OptionLS[i].FilePath.Length > 0)
-                                                            {
-                                                                <a href="@Url.Content("~/UploadedFiles/FileServey/" + System.IO.Path.GetFileName(gr.OptionList.OptionLS[i].FilePath))" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>File đính kèm</a>
-                                                            }
-                                                        </label>
-                                                    </div>
-                                                }
 
                                             }
                                         }
 
 
                                         @*<div class="questions__question">
-                                                <input type="radio" name="answer" id="answer-2">
-                                                <label for="answer-2" data-question-number="2">Kralj</label>
-                                            </div>*@
+            <input type="radio" name="answer" id="answer-2">
+            <label for="answer-2" data-question-number="2">Kralj</label>
+        </div>*@
 
                                     </div>
                                 </div>
@@ -350,26 +315,31 @@
                         <!--</div>
                             </div>
                         </div>-->
-                        <div class="font-weight-bold font-italic form-group " style=@(4 == 4 ? "display:none" : "")>
-                            <span class="text-danger font-size-lg">*</span> &nbsp;Đăng ký ăn suất chay :&nbsp;&nbsp;
+                    <div class="formLyDo" style=@(ViewBag.DKKhong == "false" ? "display:none" : "")>
+                        <h4 class="font-weight-bold">Lý do không tham gia:</h4>
+                        <select class="form-control marginTB5 SelectLyDo" name="LyDo" id="LyDo">
+                            @foreach (var item in ViewBag.LyDo)
+                            {
+                                if (item.Value == ViewBag.LyDoChon)
+                                {
+                                    <option value='@item.Value' selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value='@item.Value'>@item.Text</option>
+                                }
 
+                            }
+                        </select>
+                    </div>
 
-                            Không:&nbsp;
-                            @*@Html.RadioButtonFor(m => Model[0].MenuOT, 0, new { id = "option_false", })*@
-                            &nbsp;&nbsp;&nbsp;Ăn chay Rằm(Mùng 1):&nbsp;
-                            @*@Html.RadioButtonFor(m => Model[0].MenuOT, 1, new { id = "option_true", @onclick = "javascriptMethodName()" })*@
-                            &nbsp;&nbsp;&nbsp;Ăn chay trường:&nbsp;
-                            @*@Html.RadioButtonFor(m => Model[0].MenuOT, 2, new { id = "option_true2", @onclick = "javascriptMethodName()" })*@
-                        </div>
-
-
-                        <div class="formPart" style=@(ViewBag.checkShowDK == "true" ? "display:none" : "")>
+                        <div class="formPart" style=@(ViewBag.checkShowDK == "false" ? "display:none" : "")>
                             <div class="m-auto w-100">
 
                             </div>
-                            <h4 class="font-weight-bold d-none">2. Đăng ký cho người thân (Là vợ/chồng làm cùng Công ty) - Mục dành cho vợ đăng ký </h4>
+                            <h4 class="font-weight-bold">2. Mục dành cho vợ/chồng làm cùng Công ty đăng ký đi chung đoàn (Chỉ vợ đăng ký mục này) </h4>
 
-                            <div class="card-body d-none" style="padding:15px 10px;">
+                            <div class="card-body" style="padding:15px 10px;">
                                 <div class="table-responsive" style="">
                                     <table class="table table-bordered table-hover" id="table1" width="100%" cellpadding="0" data-show-columns="true">
                                         <thead class="thead-light">
@@ -378,7 +348,7 @@
                                                 <th class="text-center">Họ và Tên</th>
                                                 <th class="text-center">Bộ Phận</th>
                                                 @*<th class="text-center">Năm Sinh</th>*@
-                                                <th class="text-center" style="min-width:150px">Mối quan hệ</th>
+                                                @*<th class="text-center" style="min-width:150px">Mối quan hệ</th>*@
 
                                                 @foreach (var hd in ViewBag.ColumHeaderRe)
                                                 {
@@ -402,7 +372,7 @@
 
                                                     <td>@item.PhongBan</td>
                                                     @*<td>@item.NamSinh</td>*@
-                                                    <td>@item.QuanHe</td>
+                                                    @*<td>@item.QuanHe</td>*@
                                                     @foreach (var sel in item.ListSelect)
                                                     {
                                                         <td>@sel</td>
@@ -438,9 +408,9 @@
                                 </div>
                             </div>
 
-                            @* <h4 class="font-weight-bold ">3. Đăng ký cho người thân (Không làm trong Công ty)</h4> *@
-                            <h4 class="font-weight-bold @(Request.QueryString["IDSV"] == "7"?"d-none":"")">II. ĐĂNG KÝ THÔNG TIN CON CỦA CBNV THAM GIA TẶNG SÁCH</h4>
-                            <div class="card-body @(Request.QueryString["IDSV"] == "7"?"d-none":"")" style="padding:15px 10px;">
+                             <h4 class="font-weight-bold ">3. Đăng ký cho người thân (Không làm trong Công ty)</h4> 
+                            @*<h4 class="font-weight-bold @(Request.QueryString["IDSV"] == "7"?"d-none":"")">II. ĐĂNG KÝ THÔNG TIN CON CỦA CBNV THAM GIA TẶNG SÁCH</h4>*@
+                            <div class="card-body"  style="padding:15px 10px;">
                                 <div class="table-responsive" style="">
                                     <table class="table table-bordered table-hover" id="table2" width="100%" cellpadding="0" data-show-columns="true">
                                         <thead class="thead-light">
@@ -551,12 +521,12 @@
 
     </div>
 </div>
+
 <script type="text/javascript">
     function disableButton() {
         document.getElementById("submitButton").disabled = true;
         document.getElementById("submit-op").submit();
     }
-
 
     $('#btn-add').click(function () {
         var url = $('#myModal').data('url');
@@ -591,14 +561,14 @@ $(document).ready(function () {
                                                             <td></td>
                                                             <td></td>
 
-                                                             <td >
+                                                             @*<td >
                                                                 <select class="form-control " name="reCung_${i}" id="reCung_${i}">
                                                                   @foreach (var item in ViewBag.LSOP1)
                                                                     {
                                                                       <option value='@item.Value'>@item.Text</option>
                                                                     }
                                                                 </select>
-                                                            </td>
+                                                            </td>*@
                                                            @foreach(var sl in ViewBag.Magroup)
                                                             {
                                                                 <td>
@@ -616,7 +586,7 @@ $(document).ready(function () {
                                                                 </td>
                                                             }
                                                              <td >
-                                                                 <select class="form-control " id='noteCung_${i}' name='noteCung_${i}' ">
+                                                                 <select class="form-control " id='notecung_${i}' name='notecung_${i}' ">
                                                                       @foreach (var item in ViewBag.GhiChu)
                                                                         {
                                                                           <option value='@item.Value'>@item.Text</option>
@@ -645,15 +615,14 @@ $(document).ready(function () {
                                                             </td>
 
                                                             <td style=''>
-                                                                <input class='form-control' data-val='true'  data-val-number='The field BirthDay must be a number.' id='nsKhac_${i}'  name='nsKhac_${i}' placeholder='' type='date' value=''>
+                                                                <input class='form-control input-date' data-val='true' onkeypress="return false"  data-val-number='The field BirthDay must be a number.' id='nsKhac_${i}'  name='nsKhac_${i}' placeholder='' type='date' value=''>
                                                              </td>
                                                              <td >
                                                                 <select class="form-control " name="reKhac_${i}" id="reKhac_${i}">
-                                                                  @* @foreach (var item in ViewBag.LSOP)
+                                                                   @foreach (var item in ViewBag.LSOP)
                                                                     {
                                                                       <option value='@item.Value'>@item.Text</option>
-                                                                    } *@
-                                                                    <option value='Con'>Con</option>
+                                                                    }
                                                                 </select>
                                                             </td>
                                                             <td >
@@ -693,9 +662,8 @@ $(document).ready(function () {
             $(".SelectNV").chosen({
                 width: "100%",
             });
-
         });
-
+    
                 //$("#table").on("change", ".SelectBP", function () {
                 //    var idpb = $(this).val();
                 //    var iddex = $(this).attr('id').split("_")[1];
@@ -716,18 +684,26 @@ $(document).ready(function () {
 
     $("form .questions input:radio").change(function () {
         op = $(this).val();
-        if ( $(this).val() ==25) {
+        if ( $(this).val() ==48) { // thay 25 bằng ID lựa chọn
             // Disable your roomnumber element here
-            $('.formPart').hide();
-            $('.LuaChon_7').hide(); // ẩn hiện theo IDOT
-            $('.LuaChon_8').hide();
-        } else {
-            // Re-enable here I guess
             $('.formPart').show();
+            $('.formLyDo').hide();
             $('.LuaChon_7').show(); // ẩn hiện theo IDOT
             $('.LuaChon_8').show();
+            $('.LuaChon_12').show();
+            $('.LuaChon_13').show();
+
+        } else if ($(this).val() == 49) {
+            // Re-enable here I guess
+            $('.formPart').hide();
+            $('.formLyDo').show();
+            $('.LuaChon_7').hide(); // ẩn hiện theo IDOT
+            $('.LuaChon_8').hide();
+            $('.LuaChon_13').hide();
         }
     });
+
+
     $("#table").on("change", ".checkRe", function () {
         var check = $(this).is(':checked');
         var iddex = $(this).attr('id').split("_")[1];
@@ -839,7 +815,9 @@ $(document).ready(function () {
     })
 
 });
+
 </script>
+
 
 
 

@@ -32,6 +32,7 @@ namespace EPORTAL.ModelsServey
         public Nullable<int> IDSV { get; set; }
         public Nullable<bool> XNSV { get; set; }
         public string ContentSV { get; set; }
+        public string GhiChu { get; set; }
         public List<OptionValidation> OptionLS { get; set; }
         public int? Answer { get; set; }
         public Nullable<bool> Status { get; set; }

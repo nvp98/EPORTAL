@@ -172,6 +172,58 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         public ActionResult Edit(List_Detail_RegisterPeopleValidation _DO, FormCollection collection)
         {
             var DO = db_dk.Detail_RegisterPeople.Where(x => x.ID_CT_DKTN == _DO.ID_CT_DKTN).FirstOrDefault();
+            var LoaiTK = db_dk.RegisterPeoples.Where(x => x.ID_DKTN == DO.DKTN_ID).Select(x => x.TrinhKy_ID).FirstOrDefault().ToString();
+            var CapMoi = collection["CapMoi"];
+            var GiaHan = collection["GiaHan"];
+            var BoSungCong = collection["BoSungCong"];
+            var CapLai =collection["CapLai"];
+            var ChuyenNT = collection["ChuyenNT"];
+            if (CapMoi == "" && GiaHan == "" && BoSungCong == "" && CapLai == "" && ChuyenNT == "")
+            {
+               
+                TempData["msgSuccess"] = "<script>alert( Vui lòng tích chọn loại đăng ký thẻ. Nhân viên : " + _DO.HoVaTen + "');</script>";
+                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id =_DO.DKTN_ID });
+
+            }
+
+            if (LoaiTK == "1" && GiaHan != "" || LoaiTK == "1" && BoSungCong != "" || LoaiTK == "1" && CapLai != "" || LoaiTK == "1" && ChuyenNT != "")
+            {
+                
+                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + _DO.HoVaTen + "');</script>";
+
+                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DO.DKTN_ID });
+            }
+
+            if (LoaiTK == "2" && CapMoi != "" || LoaiTK == "2" && BoSungCong != "" || LoaiTK == "2" && CapLai != "" || LoaiTK == "2" && ChuyenNT != "")
+            {
+                 
+                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + _DO.HoVaTen + "');</script>";
+
+                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DO.DKTN_ID });
+            }
+
+            if (LoaiTK == "3" && CapMoi != "" || LoaiTK == "3" && GiaHan != "" || LoaiTK == "3" && CapLai != "" || LoaiTK == "3" && ChuyenNT != "")
+            {
+                
+                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + _DO.HoVaTen + "');</script>";
+
+                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DO.DKTN_ID });
+            }
+            if (LoaiTK == "4" && CapMoi != "" || LoaiTK == "4" && GiaHan != "" || LoaiTK == "4" && BoSungCong != "" || LoaiTK == "4" && ChuyenNT != "")
+            {
+               
+                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + _DO.HoVaTen + "');</script>";
+
+                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DO.DKTN_ID });
+            }
+
+            if (LoaiTK == "5" && CapMoi != "" || LoaiTK == "5" && GiaHan != "" || LoaiTK == "5" && CapLai != "" || LoaiTK == "5" && BoSungCong != "")
+            {
+                
+                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ.Nhân viên : " + _DO.HoVaTen + "');</script>";
+
+                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DO.DKTN_ID });
+            }
             if (_DO.SelectedKV != null && _DO.Selected != null)
             {
                 string NameKhuVuc = "";

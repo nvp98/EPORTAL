@@ -25,6 +25,7 @@ using EPORTAL.ModelsServey;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Web.Services.Description;
 using ClosedXML.Excel;
+using System.Data.Entity;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -294,7 +295,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         }
 
         [HttpPost]
-        public ActionResult InsertEdit(HttpPostedFileBase file, int id)
+        public  ActionResult InsertEdit(HttpPostedFileBase file, int id)
         {
             int status = 1, dtc = 0;
 
@@ -302,6 +303,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             string HoVaTen = "";
             string filePath = string.Empty;
             string path = Server.MapPath("~/PDFHocAT/");
+            LoaiTK = db_dk.RegisterPeoples.Where(x=>x.ID_DKTN==id).Select(x=>x.TrinhKy_ID).FirstOrDefault().Value.ToString();
             if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
             {
                 string pathex = Server.MapPath("~/UploadedFiles/DKHocATEX/");
@@ -1271,6 +1273,59 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     {
                         if (key != "__RequestVerificationToken" && key.Split('_')[0] == "GhiChu" && key != "XacNhan")
                         {
+                            string LoaiTK = DO.TrinhKy_ID.ToString();
+                            var HoVaTen = collection["HoTen_" + key.Split('_')[1]];
+                            var CapMoi = collection["CapMoi_" + key.Split('_')[1]];
+                            var GiaHan = collection["GiaHan_" + key.Split('_')[1]];
+                            var BoSungCong = collection["BoSungCong_" + key.Split('_')[1]];
+                            var CapLai = collection["CapLai_" + key.Split('_')[1]];
+                            var ChuyenNT = collection["ChuyenNT_" + key.Split('_')[1]];
+                            if ( String.IsNullOrEmpty(CapMoi)  && String.IsNullOrEmpty(GiaHan) && String.IsNullOrEmpty(BoSungCong) && String.IsNullOrEmpty(CapLai) && String.IsNullOrEmpty(ChuyenNT))
+                            {
+
+                                TempData["msgSuccess"] = "<script>alert( Vui lòng tích chọn loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
+                                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = _DO.DKTN_ID });
+
+                            }
+
+                            if (LoaiTK == "1" && !String.IsNullOrEmpty(GiaHan) || LoaiTK == "1" && !String.IsNullOrEmpty(BoSungCong) || LoaiTK == "1" && !String.IsNullOrEmpty(CapLai) || LoaiTK == "1" && !String.IsNullOrEmpty(ChuyenNT))
+                            {
+
+                                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
+
+                                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DKTN_ID });
+                            }
+
+                            if (LoaiTK == "2" && !String.IsNullOrEmpty(CapMoi) || LoaiTK == "2" && !String.IsNullOrEmpty(BoSungCong) || LoaiTK == "2" && !String.IsNullOrEmpty(CapLai) || LoaiTK == "2" && !String.IsNullOrEmpty(ChuyenNT))
+                            {
+
+                                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
+
+                                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DKTN_ID });
+                            }
+
+                            if (LoaiTK == "3" && !String.IsNullOrEmpty(CapMoi) || LoaiTK == "3" && !String.IsNullOrEmpty(GiaHan) || LoaiTK == "3" && !String.IsNullOrEmpty(CapLai) || LoaiTK == "3" && !String.IsNullOrEmpty(ChuyenNT))
+                            {
+
+                                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
+
+                                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DKTN_ID });
+                            }
+                            if (LoaiTK == "4" && !String.IsNullOrEmpty(CapMoi) || LoaiTK == "4" && !String.IsNullOrEmpty(GiaHan) || LoaiTK == "4" && !String.IsNullOrEmpty(BoSungCong) || LoaiTK == "4" && !String.IsNullOrEmpty(ChuyenNT))
+                            {
+
+                                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
+
+                                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DKTN_ID });
+                            }
+
+                            if (LoaiTK == "5" && !String.IsNullOrEmpty(CapMoi) || LoaiTK == "5" && !String.IsNullOrEmpty(GiaHan) || LoaiTK == "5" && !String.IsNullOrEmpty(CapLai) || LoaiTK == "5" && !String.IsNullOrEmpty(BoSungCong))
+                            {
+
+                                TempData["msgSuccess"] = "<script>alert('Vui lòng tích chọn đúng loại đăng ký thẻ.Nhân viên : " + HoVaTen + "');</script>";
+
+                                return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = DKTN_ID });
+                            }
                             var GhiChu = collection["GhiChu_" + key.Split('_')[1]];
                             ListDS.Add(new List_Detail_RegisterPeopleValidation()
                             {
@@ -1283,11 +1338,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 Ten_NTP = collection["Ten_NTP_" + key.Split('_')[1]],
                                 HoTen_QuanLy = collection["HoTen_QuanLy_" + key.Split('_')[1]],
                                 SoDienThoai_QuanLy = collection["SoDienThoai_QuanLy_" + key.Split('_')[1]],
-                                CapMoi = collection["CapMoi_" + key.Split('_')[1]],
-                                GiaHan = collection["GiaHan_" + key.Split('_')[1]],
-                                BoSungCong = collection["BoSungCong_" + key.Split('_')[1]],
-                                CapLai = collection["CapLai_" + key.Split('_')[1]],
-                                ChuyenNT = collection["ChuyenNT_" + key.Split('_')[1]],
+                                CapMoi = CapMoi,
+                                GiaHan = GiaHan,
+                                BoSungCong = BoSungCong,
+                                CapLai = CapLai,
+                                ChuyenNT = ChuyenNT,
                                 ThoiHanThe = DateTime.ParseExact(collection["ThoiHanThe_" + key.Split('_')[1]], "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None),
                                 KhuVucLamViec = collection["KhuVucLamViec_" + key.Split('_')[1]],
                                // NhomNT = Convert.ToInt32(collection["NhomNT_" + key.Split('_')[1]]),

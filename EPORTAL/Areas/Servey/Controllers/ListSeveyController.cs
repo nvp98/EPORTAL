@@ -699,6 +699,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                 var dsSV = dbSV.EmployeeServeys.ToList();
                 var selectSV = dbSV.OptionServey_selectOT(id).ToList();
 
+                var DsLyDo = dbSV.CTKhaoSats.Where(x=>x.GhiChu != null && x.IDSV ==id).ToList();
+
 
                 var LSPart = dbSV.PartTogethers.ToList();
                 List<PartTogetherValidation> Ls = (from a in LSPart
@@ -736,7 +738,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                                XNSV = a.XNSV,
                                TenPhongBan = b.PhongBan.TenPhongBan,
                                LSPart = Ls.Where(x => x.IDESV == a.IDNV).ToList(),
-                               MenuOT = a.MenuOT
+                               MenuOT = a.MenuOT,
+                               LyDo = DsLyDo.Where(x=>x.IDNV == a.IDNV).FirstOrDefault()?.GhiChu,
                            }).ToList();
 
 
@@ -782,7 +785,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                         Worksheet.Cell("E" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("E" + row).Style.Alignment.WrapText = true;
 
-                        Worksheet.Cell("F" + row).Value = menu;
+                        Worksheet.Cell("F" + row).Value = item.LyDo;
                         Worksheet.Cell("F" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
                         Worksheet.Cell("F" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.WrapText = true;
@@ -1003,7 +1006,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                     item.ListSelect = columnSelectCom;
                 }
 
-
+                var DsLyDo = dbSV.CTKhaoSats.Where(x => x.IDSV == id && x.GhiChu != null).ToList();
                 var res = (from a in dsSV.Where(x => x.IDSV == id)
                            join b in IDs on a.IDNV equals b.ID
                            join c in selectDC on a.IDDC equals c.ID into ulk
@@ -1020,13 +1023,15 @@ namespace EPORTAL.Areas.Servey.Controllers
                                XNSV = a.XNSV,
                                TenPhongBan = b.PhongBan.TenPhongBan,
                                LSPart = Ls.Where(x => x.IDNV == a.IDNV).ToList(),
-                               MenuOT = a.MenuOT
+                               MenuOT = a.MenuOT,
+                               LyDo = DsLyDo.Where(x => x.IDNV == a.IDNV).FirstOrDefault()?.GhiChu,
                            }).ToList();
-
+             
                 // ketqua Dang ky
                 foreach (var item in res)
                 {
                     List<string> columnSelect = new List<string> { };
+                    List<string> columnSelectKhac = new List<string> { };
                     foreach (var dk in ListIDgroup)
                     {
                         var ctksNV = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == dk).ToList();
@@ -1034,13 +1039,23 @@ namespace EPORTAL.Areas.Servey.Controllers
                         {
                             //var ot = option.Where(x => x.IDOT == ctksNV.FirstOrDefault().IDOT).FirstOrDefault().ContentOT;
                             columnSelect.Add("1");
+                            if(dk != 48 && dk != 49) // điền điểm đón người thân trùng với người đăng ký
+                            {
+                                columnSelectKhac.Add("1");
+                            }
+                            else
+                            {
+                                columnSelectKhac.Add("");
+                            }
                         }
                         else
                         {
                             columnSelect.Add("");
+                            columnSelectKhac.Add("");
                         }
                     }
                     item.ListSelect = columnSelect;
+                    item.ListSelectKhac = columnSelectKhac;
                 }
 
                 if (res.Count > 0)
@@ -1116,7 +1131,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                             selec.Value = data;
                             selec = selec.CellRight(); // Di chuyển sang ô bên phải
                         }
-
+                        selec.Value = item.LyDo;
 
 
                         //Worksheet.Cell("K" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 7).Count() != 0 ? "1" : "";
@@ -1292,7 +1307,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                                     var selecCom = Worksheet.Cell("P" + row); // Lấy ô bắt đầu
                                                                            // Chèn dữ liệu từ danh sách vào các ô liên tiếp trong hàng
-                                    foreach (string data in pa.ListSelect)
+                                    foreach (string data in item.ListSelectKhac)  // điền chọn điểm đăng ký theo người đăng ký
                                     {
                                         selecCom.Value = data;
                                         selecCom = selecCom.CellRight(); // Di chuyển sang ô bên phải
@@ -1442,7 +1457,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                                     var selecCom = Worksheet.Cell("P" + row); // Lấy ô bắt đầu
                                                                               // Chèn dữ liệu từ danh sách vào các ô liên tiếp trong hàng
-                                    foreach (string data in pa.ListSelect)
+                                    foreach (string data in item.ListSelectKhac) // chèn đúng select của người đăng ký
                                     {
                                         selecCom.Value = data;
                                         selecCom = selecCom.CellRight(); // Di chuyển sang ô bên phải

@@ -29,7 +29,6 @@ namespace EPORTAL.ModelsServey
     
         public virtual DbSet<EmployeeServey> EmployeeServeys { get; set; }
         public virtual DbSet<ListServey> ListServeys { get; set; }
-        public virtual DbSet<OptionServey> OptionServeys { get; set; }
         public virtual DbSet<PartTogether> PartTogethers { get; set; }
         public virtual DbSet<ResultServey> ResultServeys { get; set; }
         public virtual DbSet<CTKhaoSat> CTKhaoSats { get; set; }
@@ -38,6 +37,7 @@ namespace EPORTAL.ModelsServey
         public virtual DbSet<ChiTietDKNT> ChiTietDKNTs { get; set; }
         public virtual DbSet<CTDKNguoiThan> CTDKNguoiThans { get; set; }
         public virtual DbSet<GhiChu> GhiChus { get; set; }
+        public virtual DbSet<OptionServey> OptionServeys { get; set; }
     
         public virtual int EmployeeServey_delete(Nullable<int> iD)
         {
