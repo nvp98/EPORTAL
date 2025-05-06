@@ -164,7 +164,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                                 .Where(x => maNVs.Contains(x.MaNhanVien))
                                 .ToList();
 
-            var viewModelList = nhanVienPage.Select(nv => new KhaiBaoTongHopViewModel
+            var viewDataList = nhanVienPage.Select(nv => new KhaiBaoTongHopViewModel
             {
                 NhanVien = new KhaiBaoNhanVienDto
                 {
@@ -197,8 +197,9 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
             ViewBag.SearchMaNV = searchMaNV;
+            ViewBag.ExistData = viewDataList.Count > 0;
 
-            return View(viewModelList);
+            return View(viewDataList);
         }
 
         public ActionResult ExportExcel()
@@ -226,7 +227,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     var worksheet = excelPackage.Workbook.Worksheets.Add("DanhSach");
 
-                    string[] headers = { "STT", "Mã NV", "Tên NV", "Vợ/Chồng", "Năm sinh Vợ/Chồng", "Tên con", "Năm sinh con", "Giấy KS", "Ngày xác nhận" };
+                    string[] headers = { "STT", "Mã NV", "Tên NV", "Vợ/Chồng", "Năm sinh Vợ/Chồng", "Tên con", "Năm sinh con", "Giấy khai sinh", "Ngày xác nhận" };
                     for (int i = 0; i < headers.Length; i++)
                     {
                         worksheet.Cells[1, i + 1].Value = headers[i];
@@ -261,14 +262,14 @@ namespace EPORTAL.Areas.Servey.Controllers
                                         if (System.IO.File.Exists(filePath))
                                         {
                                             var fileInfo = new FileInfo(filePath);
-                                            worksheet.Column(8).Width = 14;
-                                            worksheet.Row(row).Height = 45;
+                                            worksheet.Column(8).Width = 33;
+                                            worksheet.Row(row).Height = 220;
                                             var picture = worksheet.Drawings.AddPicture(
                                                 $"img_{row}_{Guid.NewGuid()}",
                                                 fileInfo
                                             );
-                                            picture.SetPosition(row - 1, 0, 7, 0);
-                                            picture.SetSize(80, 60);
+                                            picture.SetPosition(row - 1, 0, 7, 3);
+                                            picture.SetSize(280, 210);
                                         }
                                         else
                                         {
@@ -288,10 +289,10 @@ namespace EPORTAL.Areas.Servey.Controllers
                             worksheet.Cells[row, 1].Value = stt++;
                             worksheet.Cells[row, 2].Value = nhanVien.MaNhanVien;
                             worksheet.Cells[row, 3].Value = nhanVien.TenNhanVien;
-                            worksheet.Cells[row, 4].Value = "Không thay đổi so với App nhân sự";
-                            worksheet.Cells[row, 5].Value = "Không thay đổi so với App nhân sự";
-                            worksheet.Cells[row, 6].Value = "Không thay đổi so với App nhân sự";
-                            worksheet.Cells[row, 7].Value = "Không thay đổi so với App nhân sự";
+                            worksheet.Cells[row, 4].Value = "";
+                            worksheet.Cells[row, 5].Value = "";
+                            worksheet.Cells[row, 6].Value = "";
+                            worksheet.Cells[row, 7].Value = "";
                             worksheet.Cells[row, 9].Value = nhanVien.NgayKhaiBao.Value.ToString("dd/MM/yyyy HH:mm:ss");
                             row++;
                         }

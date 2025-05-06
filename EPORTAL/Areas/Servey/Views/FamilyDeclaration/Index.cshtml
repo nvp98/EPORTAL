@@ -66,12 +66,12 @@
                             <h5 class="card-title">2. Thông tin Vợ/Chồng</h5>
                             <div class="mb-3">
                                 <label class="form-label">Tên Vợ/Chồng</label>
-                                @Html.TextBoxFor(model => model.VoChong.TenVoChong, new { @class = "form-control", id = "spouseName", required = "required" })
+                                @Html.TextBoxFor(model => model.VoChong.TenVoChong, new { @class = "form-control", id = "spouseName" })
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Năm sinh Vợ/Chồng</label>
-                                @Html.TextBoxFor(model => model.VoChong.NamSinhVoChong, new { @class = "form-control", id = "spouseBirthYear", type = "number", required = "required" })
+                                @Html.TextBoxFor(model => model.VoChong.NamSinhVoChong, new { @class = "form-control", id = "spouseBirthYear", type = "number" })
                             </div>
                         </div>
                     </div>
@@ -80,8 +80,8 @@
                         <div class="card-body">
                             <h5 class="card-title">3. Thông tin Con</h5>
                             <ul>
-                                <li>Kê khai tất cả con, bao gồm thông tin đã có trên App nhân sự</li>
-                                <li>Phải đính kèm giấy khai sinh</li>
+                                <li>Kê khai tất cả con (bao gồm thông tin đã có trên App nhân sự)</li>
+                                <li>Phải đính kèm giấy khai sinh cho tất cả các con</li>
                             </ul>
 
                             <div id="childrenList"></div>
@@ -141,14 +141,14 @@
                     const isVisibleNoChangeForm = $('#noChangeForm').is(':visible');
                     const isCheckedCheckChange = $('#confirmCheckChange').is(':checked');
                     const isVisibleInfoForm = $('#infoForm').is(':visible');
-                    const name = $('#spouseName').val().trim();
-                    const birthYear = $('#spouseBirthYear').val().trim();
+                    //const name = $('#spouseName').val().trim();
+                    //const birthYear = $('#spouseBirthYear').val().trim();
 
-                    if (isVisibleInfoForm && (!name || !birthYear)) {
-                        e.preventDefault();
-                        alert('Vui lòng nhập đầy đủ thông tin vợ/chồng.');
-                        return false;
-                    }
+                    //if (isVisibleInfoForm && (!name || !birthYear)) {
+                    //    e.preventDefault();
+                    //    alert('Vui lòng nhập đầy đủ thông tin vợ/chồng.');
+                    //    return false;
+                    //}
 
                     if (isVisibleInfoForm && $('#childrenList').children().length === 0) {
                         e.preventDefault();
@@ -206,7 +206,7 @@
                         updateChildTitles();
                     });
                 });
-
+                
                 function updateChildTitles() {
                     const children = $childrenList.find('div.border');
                     children.each((index, child) => {
