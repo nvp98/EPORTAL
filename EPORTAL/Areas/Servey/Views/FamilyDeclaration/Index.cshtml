@@ -210,7 +210,12 @@
                 function updateChildTitles() {
                     const children = $childrenList.find('div.border');
                     children.each((index, child) => {
-                        $(child).find('h6').text(`Con ${index + 1}`);
+                        const $child = $(child);
+                        $child.find('h6').text(`Con ${index + 1}`);
+
+                        $child.find('input[name^="DanhSachConCai"][name$=".TenCon"]').attr('name', `DanhSachConCai[${index}].TenCon`);
+                        $child.find('input[name^="DanhSachConCai"][name$=".NamSinhCon"]').attr('name', `DanhSachConCai[${index}].NamSinhCon`);
+                        $child.find('input[type="file"]').attr('name', `DanhSachConCaiFiles`);
                     });
                 }
             });
