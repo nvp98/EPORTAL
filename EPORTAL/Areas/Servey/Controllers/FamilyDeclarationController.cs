@@ -226,7 +226,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     var worksheet = excelPackage.Workbook.Worksheets.Add("DanhSach");
 
-                    string[] headers = { "STT", "Mã NV", "Tên NV", "Vợ/Chồng", "Năm sinh VC", "Tên con", "Năm sinh", "Giấy KS" };
+                    string[] headers = { "STT", "Mã NV", "Tên NV", "Vợ/Chồng", "Năm sinh Vợ/Chồng", "Tên con", "Năm sinh con", "Giấy KS", "Ngày xác nhận" };
                     for (int i = 0; i < headers.Length; i++)
                     {
                         worksheet.Cells[1, i + 1].Value = headers[i];
@@ -251,6 +251,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                                 worksheet.Cells[row, 5].Value = voChong?.NamSinhVoChong;
                                 worksheet.Cells[row, 6].Value = con.TenCon;
                                 worksheet.Cells[row, 7].Value = con.NamSinhCon;
+                                worksheet.Cells[row, 9].Value = nhanVien.NgayKhaiBao.Value.ToString("dd/MM/yyyy HH:mm:ss");
 
                                 if (!string.IsNullOrEmpty(con.GiayKhaiSinh))
                                 {
@@ -287,8 +288,11 @@ namespace EPORTAL.Areas.Servey.Controllers
                             worksheet.Cells[row, 1].Value = stt++;
                             worksheet.Cells[row, 2].Value = nhanVien.MaNhanVien;
                             worksheet.Cells[row, 3].Value = nhanVien.TenNhanVien;
-                            worksheet.Cells[row, 4].Value = voChong?.TenVoChong;
-                            worksheet.Cells[row, 5].Value = voChong?.NamSinhVoChong;
+                            worksheet.Cells[row, 4].Value = "Không thay đổi so với App nhân sự";
+                            worksheet.Cells[row, 5].Value = "Không thay đổi so với App nhân sự";
+                            worksheet.Cells[row, 6].Value = "Không thay đổi so với App nhân sự";
+                            worksheet.Cells[row, 7].Value = "Không thay đổi so với App nhân sự";
+                            worksheet.Cells[row, 9].Value = nhanVien.NgayKhaiBao.Value.ToString("dd/MM/yyyy HH:mm:ss");
                             row++;
                         }
                     }
