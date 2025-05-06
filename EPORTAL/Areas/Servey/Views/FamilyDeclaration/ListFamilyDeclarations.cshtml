@@ -14,18 +14,18 @@
 
 <div class="container mt-4">
     <h4 class="mb-3">Danh sách Nhân viên đã khai báo Vợ/Chồng, Con</h4>
+    <form method="get" action="@Url.Action("ListFamilyDeclarations")" class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" name="searchMaNV" value="@ViewBag.SearchMaNV" class="form-control" placeholder="Nhập mã nhân viên..." />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </div>
+    </form>
 
     @{
         if (ViewBag.ExistData != null && ViewBag.ExistData)
         {
-            <form method="get" action="@Url.Action("ListFamilyDeclarations")" class="row mb-3">
-                <div class="col-md-4">
-                    <input type="text" name="searchMaNV" value="@ViewBag.SearchMaNV" class="form-control" placeholder="Nhập mã nhân viên..." />
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                </div>
-            </form>
             <div class="text-end mb-3">
                 <a href="@Url.Action("ExportExcel", "FamilyDeclaration")" class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Xuất Excel
@@ -146,32 +146,32 @@
             int pageSize = ViewBag.PageSize;
         }*@
     @*@{
-        if (ViewBag.ExistData != null && ViewBag.ExistData)
-        {
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
+            if (ViewBag.ExistData != null && ViewBag.ExistData)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
 
-                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = 1, pageSize = pageSize })">First</a>
-                    </li>
-                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage - 1, pageSize = pageSize })">Previous</a>
-                    </li>
-                    @for (int i = 1; i <= totalPages; i++)
-                    {
-                        <li class="page-item @(i == currentPage ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = i, pageSize = ViewBag.PageSize, searchMaNV = ViewBag.SearchMaNV })">@i</a>
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = 1, pageSize = pageSize })">First</a>
                         </li>
-                    }
-                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage + 1, pageSize = pageSize })">Next</a>
-                    </li>
-                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = totalPages, pageSize = pageSize })">Last</a>
-                    </li>
-                </ul>
-            </nav>
-        }
-    }*@
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage - 1, pageSize = pageSize })">Previous</a>
+                        </li>
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = i, pageSize = ViewBag.PageSize, searchMaNV = ViewBag.SearchMaNV })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage + 1, pageSize = pageSize })">Next</a>
+                        </li>
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = totalPages, pageSize = pageSize })">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }*@
 </div>
 
