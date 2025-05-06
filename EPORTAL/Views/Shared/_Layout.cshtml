@@ -350,6 +350,24 @@
                                     Đăng ký
                                 </a>
                             </li>
+                           
+                            <li>
+                                <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
+                                    <i class="metismenu-icon fa-solid fa-list-ol"></i>
+                                    Khai báo thông tin Vợ/Chồng, Con
+                                </a>
+
+                            </li>
+                            @if (listControll.Contains("FamilyDeclaration"))
+                            {
+                                <li>
+                                    <a href="@Url.Action("ListFamilyDeclarations", "FamilyDeclaration", new { area = "Servey" })">
+                                        <i class="metismenu-icon fa-solid fa-list-ol"></i>
+                                        Danh sách Nhân viên khai báo thông tin Vợ/Chồng, Con
+                                    </a>
+
+                                </li>
+                            }
 
 
 
@@ -571,14 +589,14 @@
                                 </a>
                                 <ul id="listatld">
                                     @*@if (listControll.Contains("ListHandle"))
-                                    {
-                                        <li>
-                                            <a id="Gate" href="@Url.Action("Index", "ListHandle", new {area="TagSign"})">
-                                                <i class="fa fa-file-code p-lg-1"></i>
-                                                Danh sách thẻ tạm
-                                            </a>
-                                        </li>
-                                    }*@
+                {
+                    <li>
+                        <a id="Gate" href="@Url.Action("Index", "ListHandle", new {area="TagSign"})">
+                            <i class="fa fa-file-code p-lg-1"></i>
+                            Danh sách thẻ tạm
+                        </a>
+                    </li>
+                }*@
                                     @if (listControll.Contains("ListCardRegisInfor"))
                                     {
                                         <li>
@@ -630,32 +648,32 @@
                                         </li>
                                     }
                                     @*@if (listControll.Contains("ListCarteTemporaire"))
-                                    {
-                                        <li>
-                                            <a id="ListCardRegisInfor" href="@Url.Action("Index", "ListCarteTemporaire", new {area="TagSign"})">
-                                                <i class="fa fa-file-image p-lg-1 "></i>
-                                                Đăng ký cấp thẻ tạm
-                                            </a>
-                                        </li>
-                                    }
-                                    @if (listControll.Contains("List_Signature"))
-                                    {
-                                        <li>
-                                            <a id="ListCardRegisInfor" href="@Url.Action("DSKyTruoc", "List_Signature", new {area="TagSign"})">
-                                                <i class="fa fa-file-powerpoint p-lg-1 "></i>
-                                                Danh sách ký trước
-                                            </a>
-                                        </li>
-                                    }*@
-                                   @* @if (listControll.Contains("View"))
-                                    {
-                                        <li>
-                                            <a id="ListCardRegisInforl" href="@Url.Action("Index", "View", new {area="TagSign"})">
-                                                <i class="fa fa-file-pdf p-lg-1 "></i>
-                                                Thẻ tạm đã xử lý BP. AN
-                                            </a>
-                                        </li>
-                                    }*@
+                {
+                    <li>
+                        <a id="ListCardRegisInfor" href="@Url.Action("Index", "ListCarteTemporaire", new {area="TagSign"})">
+                            <i class="fa fa-file-image p-lg-1 "></i>
+                            Đăng ký cấp thẻ tạm
+                        </a>
+                    </li>
+                }
+                @if (listControll.Contains("List_Signature"))
+                {
+                    <li>
+                        <a id="ListCardRegisInfor" href="@Url.Action("DSKyTruoc", "List_Signature", new {area="TagSign"})">
+                            <i class="fa fa-file-powerpoint p-lg-1 "></i>
+                            Danh sách ký trước
+                        </a>
+                    </li>
+                }*@
+                                    @* @if (listControll.Contains("View"))
+                {
+                    <li>
+                        <a id="ListCardRegisInforl" href="@Url.Action("Index", "View", new {area="TagSign"})">
+                            <i class="fa fa-file-pdf p-lg-1 "></i>
+                            Thẻ tạm đã xử lý BP. AN
+                        </a>
+                    </li>
+                }*@
 
                                     <li>
                                         <a href="#">
@@ -664,39 +682,39 @@
                                             <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                         </a>
                                         <ul id="Approve">
-                                            @{ 
+                                            @{
                                                 var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == EPORTAL.Models.MyAuthentication.ID).SingleOrDefault();
                                                 var idnv = db.NhanViens.Where(x => x.ID == nd.IDNhanVien).FirstOrDefault();
 
                                             }
                                             @*<li>
-                                                <a id="Approve" href="@Url.Action("Index", "Approve", new {area="TagSign"})">
-                                                    <i class="fa fa-check-square p-lg-1 "></i>
-                                                    Đăng ký cấp phát thẻ
-                                                </a>
-                                            </li>*@
+                            <a id="Approve" href="@Url.Action("Index", "Approve", new {area="TagSign"})">
+                                <i class="fa fa-check-square p-lg-1 "></i>
+                                Đăng ký cấp phát thẻ
+                            </a>
+                        </li>*@
                                             @*<li>
-                                                <a id="Approve" href="@Url.Action("Index", "ApproveExtension", new {area="TagSign"})">
-                                                    <i class="fa fa-check-square p-lg-1 "></i>
-                                                    Đăng ký gia hạn thẻ
-                                                </a>
-                                            </li>*@
+                            <a id="Approve" href="@Url.Action("Index", "ApproveExtension", new {area="TagSign"})">
+                                <i class="fa fa-check-square p-lg-1 "></i>
+                                Đăng ký gia hạn thẻ
+                            </a>
+                        </li>*@
                                             @*<li>*@
-                                                @*<a id="Approve" href="@Url.Action("DSDuyet", "List_Signature", new {area="TagSign",loai=0})">
-                                                    <i class="fa fa-check-square p-lg-1 "></i>
-                                                    Đăng ký thẻ tạm
-                                                </a>
-                                            </li>*@
+                                            @*<a id="Approve" href="@Url.Action("DSDuyet", "List_Signature", new {area="TagSign",loai=0})">
+                                <i class="fa fa-check-square p-lg-1 "></i>
+                                Đăng ký thẻ tạm
+                            </a>
+                        </li>*@
                                             @*<li>
-                                                <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign"})">
-                                                    <i class="fa fa-newspaper p-lg-1"></i>
-                                                    Đăng ký thẻ người
-                                                </a>
-                                            </li>*@
-                                           <li>
-                                                @{  var TheNguoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 0 && x.TinhTrang_ID == 1 || x.TrinhKy_ID == null && x.TinhTrang_ID == 1).ToList();
+                            <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign"})">
+                                <i class="fa fa-newspaper p-lg-1"></i>
+                                Đăng ký thẻ người
+                            </a>
+                        </li>*@
+                                            <li>
+                                                @{ var TheNguoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 0 && x.TinhTrang_ID == 1 || x.TrinhKy_ID == null && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_TheNguoi = new List<int>();
-                                                    foreach(var thenguoi in TheNguoi_)
+                                                    foreach (var thenguoi in TheNguoi_)
                                                     {
                                                         var TheNguoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).ToList();
                                                         foreach (var item in TheNguoi)
@@ -733,15 +751,15 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                @{  
-                                                    var CapMoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 1 && x.TinhTrang_ID == 1 ).ToList();
+                                                @{
+                                                    var CapMoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 1 && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_CapMoi = new List<int>();
-                                                    foreach(var capmoi in CapMoi_)
+                                                    foreach (var capmoi in CapMoi_)
                                                     {
                                                         var CapMoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).ToList();
                                                         foreach (var item in CapMoi)
                                                         {
-                                                            if(item.CapDuyet == 1)
+                                                            if (item.CapDuyet == 1)
                                                             {
                                                                 var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).Count();
                                                                 if (Count > 0)
@@ -776,7 +794,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                @{ var GiaHan_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 2 && x.TinhTrang_ID == 1 ).ToList();
+                                                @{ var GiaHan_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 2 && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_GiaHan = new List<int>();
                                                     foreach (var giahan in GiaHan_)
                                                     {
@@ -858,8 +876,8 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                @{  
-                                                   
+                                                @{
+
                                                     var CapLai_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 4 && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_CapLai = new List<int>();
                                                     foreach (var caplai in CapLai_)
@@ -891,7 +909,7 @@
 
                                                         }
 
-                                                   }
+                                                    }
 
                                                 }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 4})">
@@ -901,11 +919,11 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a id="Contract" href="@Url.Action("Index", "Contractsigned", new {area="TagSign"})">
-                                                    <i class="fa fa-newspaper p-lg-1"></i>
-                                                    Hợp đồng chờ xử lý
-                                                </a>
-                                            </li>*@
+                            <a id="Contract" href="@Url.Action("Index", "Contractsigned", new {area="TagSign"})">
+                                <i class="fa fa-newspaper p-lg-1"></i>
+                                Hợp đồng chờ xử lý
+                            </a>
+                        </li>*@
                                         </ul>
                                     </li>
                                     <li>
@@ -916,29 +934,29 @@
                                         </a>
                                         <ul id="Approve">
                                             @*<li>
-                                                <a id="FollowTheSiger" href="@Url.Action("Index", "FollowTheSiger", new {area="TagSign"})">
-                                                    <i class="fa fa-check-square p-lg-1 "></i>
-                                                    Đăng ký cấp phát thẻ
-                                                </a>
-                                            </li>*@
+                            <a id="FollowTheSiger" href="@Url.Action("Index", "FollowTheSiger", new {area="TagSign"})">
+                                <i class="fa fa-check-square p-lg-1 "></i>
+                                Đăng ký cấp phát thẻ
+                            </a>
+                        </li>*@
                                             @*<li>
-                                                <a id="FollowTheSiger" href="@Url.Action("Index", "FollowRenew", new {area="TagSign"})">
-                                                    <i class="fa fa-check-square p-lg-1 "></i>
-                                                    Đăng ký gia hạn thẻ
-                                                </a>
-                                            </li>*@
+                            <a id="FollowTheSiger" href="@Url.Action("Index", "FollowRenew", new {area="TagSign"})">
+                                <i class="fa fa-check-square p-lg-1 "></i>
+                                Đăng ký gia hạn thẻ
+                            </a>
+                        </li>*@
                                             @*<li>
-                                                <a id="Approve" href="@Url.Action("DSDuyet", "List_Signature", new {area="TagSign",loai=1})">
-                                                    <i class="fa fa-check-square p-lg-1 "></i>
-                                                    Đăng ký thẻ tạm
-                                                </a>
-                                            </li>*@
+                            <a id="Approve" href="@Url.Action("DSDuyet", "List_Signature", new {area="TagSign",loai=1})">
+                                <i class="fa fa-check-square p-lg-1 "></i>
+                                Đăng ký thẻ tạm
+                            </a>
+                        </li>*@
                                             @*<li>
-                                                <a id="Contract" href="@Url.Action("Index_", "Approve_RegisterPeople", new {area="TagSign"})">
-                                                    <i class="fa fa-newspaper p-lg-1"></i>
-                                                    Đăng ký thẻ người
-                                                </a>
-                                            </li>*@
+                            <a id="Contract" href="@Url.Action("Index_", "Approve_RegisterPeople", new {area="TagSign"})">
+                                <i class="fa fa-newspaper p-lg-1"></i>
+                                Đăng ký thẻ người
+                            </a>
+                        </li>*@
                                             <li>
                                                 <a id="Contract" href="@Url.Action("Index_", "Approve_RegisterPeople", new {area="TagSign", id = 0})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
@@ -982,14 +1000,14 @@
                                         </li>
                                     }
                                     @*@if (listControll.Contains("Result"))
-                                    {
-                                        <li>
-                                            <a id="InOutAndResult_Result" href="@Url.Action("Index", "Result", new {area="TagSign"})">
-                                                <i class="fa fa-clone p-lg-1"></i>
-                                                Danh sách NVNT đã duyệt
-                                            </a>
-                                        </li>
-                                    }*@
+                {
+                    <li>
+                        <a id="InOutAndResult_Result" href="@Url.Action("Index", "Result", new {area="TagSign"})">
+                            <i class="fa fa-clone p-lg-1"></i>
+                            Danh sách NVNT đã duyệt
+                        </a>
+                    </li>
+                }*@
 
                                 </ul>
                             </li>

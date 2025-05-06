@@ -1,0 +1,219 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model EPORTAL.ModelsView360.DTOs.KhaiBaoTongHopViewModel
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Khai báo thông tin Vợ/Chồng, Con</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"].ToString())
+}
+    <body class="bg-light">
+        @using (Html.BeginForm("Create", "FamilyDeclaration", FormMethod.Post, new { enctype = "multipart/form-data", @id = "familyForm" }))
+        {
+            @Html.AntiForgeryToken()
+        <div class="container py-5">
+            <h2 class="mb-4">Khai báo thông tin Vợ/Chồng, Con</h2>
+            @if (ViewBag.DataNhanVien != null)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    Bạn đã khai báo vào @((ViewBag.NgayKhaiBao as DateTime?)?.ToString("dd/MM/yyyy HH:mm:ss"))
+                </div>
+
+            }
+            else
+            {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">1. Thông tin Vợ/Chồng, Con trên App nhân sự</h5>
+                        <div class="form-check">
+                            @Html.RadioButtonFor(
+                                model => model.NhanVien.LoaiKhaiBao,
+                                0,
+                                new { @class = "form-check-input change-info-radio", id = "noChange" }
+                            )
+                            <label class="form-check-label" for="noChange">Không thay đổi</label>
+                        </div>
+                        <div class="form-check">
+                            @Html.RadioButtonFor(
+                                model => model.NhanVien.LoaiKhaiBao,
+                                1,
+                                new { @class = "form-check-input change-info-radio", id = "hasChange" }
+                            )
+                            <label class="form-check-label" for="hasChange">Có thay đổi / bổ sung</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="infoForm" class="hidden" enctype="multipart/form-data">
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">2. Thông tin Vợ/Chồng</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Tên Vợ/Chồng</label>
+                                @Html.TextBoxFor(model => model.VoChong.TenVoChong, new { @class = "form-control", id = "spouseName", required = "required" })
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Năm sinh Vợ/Chồng</label>
+                                @Html.TextBoxFor(model => model.VoChong.NamSinhVoChong, new { @class = "form-control", id = "spouseBirthYear", type = "number", required = "required" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">3. Thông tin Con</h5>
+                            <ul>
+                                <li>Kê khai tất cả con, bao gồm thông tin đã có trên App nhân sự</li>
+                                <li>Phải đính kèm giấy khai sinh</li>
+                            </ul>
+
+                            <div id="childrenList"></div>
+                            <button type="button" class="btn btn-secondary" id="addChildBtn">Thêm Con</button>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox"
+                               name="NhanVien.DaXacNhan"
+                               value="true"
+                               @(Model.NhanVien != null && Model.NhanVien.DaXacNhan == true ? "checked=\"checked\"" : "")
+                               class="form-check-input"
+                               id="confirmCheckChange"
+                               required />
+                        <label class="form-check-label" style="color: red" for="confirmCheckChange">Tôi xác nhận thông tin trên là đúng</label>
+                    </div>
+                    <button type="submit" id="btn-submit" class="btn btn-primary">Gửi khai báo</button>
+                </div>
+                <div id="noChangeForm" class="hidden">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox"
+                               name="NhanVien.DaXacNhan"
+                               value="true"
+                               @(Model.NhanVien != null && Model.NhanVien.DaXacNhan == true ? "checked=\"checked\"" : "")
+                               class="form-check-input"
+                               id="confirmCheckNoChange"
+                               required />
+                        <label class="form-check-label" style="color: red" for="confirmCheckNoChange">Tôi xác nhận không thay đổi thông tin so với App nhân sự</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gửi xác nhận</button>
+                </div>
+            }
+
+        </div>
+        }
+
+        <script>
+            $(document).ready(function () {
+                const $changeRadios = $('input[name="changeInfo"]');
+                const $infoForm = $('#infoForm');
+                const $noChangeForm = $('#noChangeForm');
+                const $childrenList = $('#childrenList');
+                const $addChildBtn = $('#addChildBtn');
+
+                $('.change-info-radio').on('change', function () {
+                    if ($(this).val() === '1') {
+                        $infoForm.removeClass('hidden');
+                        $noChangeForm.addClass('hidden');
+                    } else {
+                        $noChangeForm.removeClass('hidden');
+                        $infoForm.addClass('hidden');
+                    }
+                });
+
+                $('#familyForm').on('submit', function (e) {
+                    const isCheckedCheckNoChange = $('#confirmCheckNoChange').is(':checked');
+                    const isVisibleNoChangeForm = $('#noChangeForm').is(':visible');
+                    const isCheckedCheckChange = $('#confirmCheckChange').is(':checked');
+                    const isVisibleInfoForm = $('#infoForm').is(':visible');
+                    const name = $('#spouseName').val().trim();
+                    const birthYear = $('#spouseBirthYear').val().trim();
+
+                    if (isVisibleInfoForm && (!name || !birthYear)) {
+                        e.preventDefault();
+                        alert('Vui lòng nhập đầy đủ thông tin vợ/chồng.');
+                        return false;
+                    }
+
+                    if (isVisibleInfoForm && $('#childrenList').children().length === 0) {
+                        e.preventDefault();
+                        alert('Vui lòng nhập đầy đủ thông tin con.');
+                        return false;
+                    }
+
+                    let allFilesFilled = true;
+
+                    $('input[name="DanhSachConCaiFiles"]').each(function () {
+                        if (!$(this).val()) {
+                            allFilesFilled = false;
+                        }
+                    });
+
+                    if (!allFilesFilled) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn đầy đủ file giấy khai sinh.');
+                        return false;
+                    }
+
+                    if ((isVisibleNoChangeForm && !isCheckedCheckNoChange) || (isVisibleInfoForm && !isCheckedCheckChange)) {
+                        e.preventDefault();
+                        alert('Vui lòng xác nhận trước khi gửi.');
+                    }
+                });
+
+                $addChildBtn.on('click', function () {
+                    const index = $childrenList.children().length;
+
+                    const $childDiv = $(`
+                                                        <div class="border p-3 mb-3 rounded position-relative">
+                                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2 removeChildBtn" aria-label="Xóa"></button>
+                                                            <h6>Con ${index + 1}</h6>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Tên Con</label>
+                                                                <input type="text" class="form-control" name="DanhSachConCai[${index}].TenCon" required>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Năm sinh</label>
+                                                                <input type="number" class="form-control" name="DanhSachConCai[${index}].NamSinhCon" required >
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Giấy khai sinh</label>
+                                                                <input type="file" class="form-control" name="DanhSachConCaiFiles" accept="image/*" required>
+                                                            </div>
+
+                                                        </div>
+                                                    `);
+
+                    $childrenList.append($childDiv);
+
+                    $childDiv.find('.removeChildBtn').on('click', function () {
+                        $childDiv.remove();
+                        updateChildTitles();
+                    });
+                });
+
+                function updateChildTitles() {
+                    const children = $childrenList.find('div.border');
+                    children.each((index, child) => {
+                        $(child).find('h6').text(`Con ${index + 1}`);
+                    });
+                }
+            });
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+
+</html>
