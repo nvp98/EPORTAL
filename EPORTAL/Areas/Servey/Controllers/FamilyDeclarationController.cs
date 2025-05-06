@@ -269,7 +269,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                                                 fileInfo
                                             );
                                             picture.SetPosition(row - 1, 0, 7, 3);
-                                            picture.SetSize(280, 210);
+                                            picture.SetSize(360, 270);
                                         }
                                         else
                                         {
