@@ -289,8 +289,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                             worksheet.Cells[row, 1].Value = stt++;
                             worksheet.Cells[row, 2].Value = nhanVien.MaNhanVien;
                             worksheet.Cells[row, 3].Value = nhanVien.TenNhanVien;
-                            worksheet.Cells[row, 4].Value = "";
-                            worksheet.Cells[row, 5].Value = "";
+                            worksheet.Cells[row, 4].Value = voChong?.TenVoChong;
+                            worksheet.Cells[row, 5].Value = voChong?.NamSinhVoChong;
                             worksheet.Cells[row, 6].Value = "";
                             worksheet.Cells[row, 7].Value = "";
                             worksheet.Cells[row, 9].Value = nhanVien.NgayKhaiBao.Value.ToString("dd/MM/yyyy HH:mm:ss");

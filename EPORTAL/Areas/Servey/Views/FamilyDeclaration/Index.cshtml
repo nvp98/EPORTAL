@@ -137,42 +137,58 @@
                 });
 
                 $('#familyForm').on('submit', function (e) {
-                    const isCheckedCheckNoChange = $('#confirmCheckNoChange').is(':checked');
+                    const isVisibleInfoForm = $('#infoForm').is(':visible');
                     const isVisibleNoChangeForm = $('#noChangeForm').is(':visible');
                     const isCheckedCheckChange = $('#confirmCheckChange').is(':checked');
-                    const isVisibleInfoForm = $('#infoForm').is(':visible');
-                    //const name = $('#spouseName').val().trim();
-                    //const birthYear = $('#spouseBirthYear').val().trim();
-
-                    //if (isVisibleInfoForm && (!name || !birthYear)) {
-                    //    e.preventDefault();
-                    //    alert('Vui lòng nhập đầy đủ thông tin vợ/chồng.');
-                    //    return false;
-                    //}
-
-                    if (isVisibleInfoForm && $('#childrenList').children().length === 0) {
-                        e.preventDefault();
-                        alert('Vui lòng nhập đầy đủ thông tin con.');
-                        return false;
-                    }
-
-                    let allFilesFilled = true;
-
-                    $('input[name="DanhSachConCaiFiles"]').each(function () {
-                        if (!$(this).val()) {
-                            allFilesFilled = false;
-                        }
-                    });
-
-                    if (!allFilesFilled) {
-                        e.preventDefault();
-                        alert('Vui lòng chọn đầy đủ file giấy khai sinh.');
-                        return false;
-                    }
+                    const isCheckedCheckNoChange = $('#confirmCheckNoChange').is(':checked');
 
                     if ((isVisibleNoChangeForm && !isCheckedCheckNoChange) || (isVisibleInfoForm && !isCheckedCheckChange)) {
                         e.preventDefault();
                         alert('Vui lòng xác nhận trước khi gửi.');
+                        return false;
+                    }
+
+                    if (!isVisibleInfoForm) return true;
+
+                    const hasSpouseName = $('#spouseName').val().trim() !== '';
+                    const hasSpouseBirth = $('#spouseBirthYear').val().trim() !== '';
+                    const hasSpouse = hasSpouseName || hasSpouseBirth;
+
+                    const numChildren = $('#childrenList').children().length;
+
+                    if (!hasSpouse && numChildren === 0) {
+                        e.preventDefault();
+                        alert('Vui lòng khai báo thông tin Vợ/Chồng hoặc ít nhất một Con.');
+                        return false;
+                    }
+
+                    if (hasSpouse) {
+                        if (!hasSpouseName || !hasSpouseBirth) {
+                            e.preventDefault();
+                            alert('Vui lòng nhập đầy đủ Tên và Năm sinh của Vợ/Chồng.');
+                            return false;
+                        }
+                    }
+
+                    if (numChildren > 0) {
+                        let isValid = true;
+
+                        $('#childrenList').children().each(function () {
+                            const tenCon = $(this).find('input[name$=".TenCon"]').val().trim();
+                            const namSinhCon = $(this).find('input[name$=".NamSinhCon"]').val().trim();
+                            const file = $(this).find('input[type="file"]').val();
+
+                            if (!tenCon || !namSinhCon || !file) {
+                                isValid = false;
+                                return false;
+                            }
+                        });
+
+                        if (!isValid) {
+                            e.preventDefault();
+                            alert('Vui lòng nhập đầy đủ Họ tên, Năm sinh và Giấy khai sinh cho tất cả các con.');
+                            return false;
+                        }
                     }
                 });
 
