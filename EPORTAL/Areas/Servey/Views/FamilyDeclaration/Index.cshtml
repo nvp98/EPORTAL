@@ -65,13 +65,18 @@
                         <div class="card-body">
                             <h5 class="card-title">2. Cập nhật thông tin Vợ/Chồng (Nếu có thay đổi)</h5>
                             <div class="mb-3">
-                                <label class="form-label">Tên Vợ/Chồng</label>
+                                <label class="form-label">Họ và tên Vợ/Chồng</label>
                                 @Html.TextBoxFor(model => model.VoChong.TenVoChong, new { @class = "form-control", id = "spouseName" })
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Năm sinh Vợ/Chồng</label>
-                                @Html.TextBoxFor(model => model.VoChong.NamSinhVoChong, new { @class = "form-control", id = "spouseBirthYear", type = "number" })
+                                @Html.DropDownListFor(model => model.VoChong.NamSinhVoChong,
+                      (IEnumerable<SelectListItem>)ViewBag.VoChong_NamSinhVoChong,
+                      "-- Chọn năm sinh --",
+                      new { @class = "form-control", id = "spouseBirthYear"})
+
+
                             </div>
                         </div>
                     </div>
@@ -96,7 +101,7 @@
                                class="form-check-input"
                                id="confirmCheckChange"
                                required />
-                        <label class="form-check-label" style="color: red" for="confirmCheckChange">Tôi xác nhận thông tin trên là đúng</label>
+                        <label class="form-check-label" style="color: red" for="confirmCheckChange">Tôi cam đoan thông tin trên là đúng</label>
                     </div>
                     <button type="submit" id="btn-submit" class="btn btn-primary">Gửi khai báo</button>
                 </div>
@@ -125,6 +130,14 @@
                 const $noChangeForm = $('#noChangeForm');
                 const $childrenList = $('#childrenList');
                 const $addChildBtn = $('#addChildBtn');
+
+                function generateYearOptions(start, end) {
+                    let options = '<option value="">-- Chọn năm sinh --</option>';
+                    for (let year = end; year >= start; year--) {
+                        options += `<option value="${year}">${year}</option>`;
+                    }
+                    return options;
+                }
 
                 $('.change-info-radio').on('change', function () {
                     if ($(this).val() === '1') {
@@ -175,7 +188,7 @@
 
                         $('#childrenList').children().each(function () {
                             const tenCon = $(this).find('input[name$=".TenCon"]').val().trim();
-                            const namSinhCon = $(this).find('input[name$=".NamSinhCon"]').val().trim();
+                            const namSinhCon = $(this).find('select[name$=".NamSinhCon"]').val().trim();
                             const file = $(this).find('input[type="file"]').val();
 
                             if (!tenCon || !namSinhCon || !file) {
@@ -193,27 +206,29 @@
                 });
 
                 $addChildBtn.on('click', function () {
+
                     const index = $childrenList.children().length;
 
                     const $childDiv = $(`
-                                                        <div class="border p-3 mb-3 rounded position-relative">
-                                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2 removeChildBtn" aria-label="Xóa"></button>
-                                                            <h6>Con ${index + 1}</h6>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Tên Con</label>
-                                                                <input type="text" class="form-control" name="DanhSachConCai[${index}].TenCon" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Năm sinh</label>
-                                                                <input type="number" class="form-control" name="DanhSachConCai[${index}].NamSinhCon" required >
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Giấy khai sinh</label>
-                                                                <input type="file" class="form-control" name="DanhSachConCaiFiles" accept=".jpg, .jpeg, .png" required>
-                                                            </div>
-
-                                                        </div>
-                                                    `);
+                        <div class="border p-3 mb-3 rounded position-relative">
+                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2 removeChildBtn" aria-label="Xóa"></button>
+                            <h6>Con</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Họ và tên Con</label>
+                                <input type="text" class="form-control" name="DanhSachConCai[${index}].TenCon" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Năm sinh</label>
+                                <select class="form-control" name="DanhSachConCai[${index}].NamSinhCon" required>
+                                    ${generateYearOptions(1970, new Date().getFullYear())}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Giấy khai sinh <span class="text-muted">(chỉ chấp nhận .jpg, .jpeg, .png)</span></label>
+                                <input type="file" class="form-control" name="DanhSachConCaiFiles" accept=".jpg, .jpeg, .png" required title="Chỉ chấp nhận file .jpg, .jpeg, .png">
+                            </div>
+                        </div>
+                    `);
 
                     $childrenList.append($childDiv);
 
@@ -221,16 +236,18 @@
                         $childDiv.remove();
                         updateChildTitles();
                     });
+
+                    updateChildTitles();
                 });
-                
+
                 function updateChildTitles() {
                     const children = $childrenList.find('div.border');
                     children.each((index, child) => {
                         const $child = $(child);
                         $child.find('h6').text(`Con ${index + 1}`);
 
-                        $child.find('input[name^="DanhSachConCai"][name$=".TenCon"]').attr('name', `DanhSachConCai[${index}].TenCon`);
-                        $child.find('input[name^="DanhSachConCai"][name$=".NamSinhCon"]').attr('name', `DanhSachConCai[${index}].NamSinhCon`);
+                        $child.find('input[type="text"]').attr('name', `DanhSachConCai[${index}].TenCon`);
+                        $child.find('select').attr('name', `DanhSachConCai[${index}].NamSinhCon`);
                         $child.find('input[type="file"]').attr('name', `DanhSachConCaiFiles`);
                     });
                 }

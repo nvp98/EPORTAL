@@ -29,6 +29,17 @@ namespace EPORTAL.Areas.Servey.Controllers
                 DanhSachConCai = new List<KhaiBaoConCaiDto>()
             };
 
+            int currentYear = DateTime.Now.Year;
+            int maxYear = currentYear - 17;
+
+            ViewBag.VoChong_NamSinhVoChong = Enumerable.Range(1950, maxYear - 1950 + 1)
+                .Reverse()
+                .Select(y => new SelectListItem
+                {
+                    Value = y.ToString(),
+                    Text = y.ToString()
+                }).ToList();
+
             var dataNhanVien = _context.KhaiBao_NhanVien
                 .Where(x => x.MaNhanVien == MyAuthentication.Username)
                 .FirstOrDefault();
