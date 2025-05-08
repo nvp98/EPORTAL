@@ -5,6 +5,7 @@
 @model List<EPORTAL.ModelsView360.DTOs.KhaiBaoTongHopViewModel>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <style>
     a {
@@ -12,166 +13,185 @@
     }
 </style>
 
-<div class="container mt-4">
-    <h4 class="mb-3">Danh sách Nhân viên đã khai báo Vợ/Chồng, Con</h4>
-    <form method="get" action="@Url.Action("ListFamilyDeclarations")" class="row mb-3">
-        <div class="col-md-4">
-            <input type="text" name="searchMaNV" value="@ViewBag.SearchMaNV" class="form-control" placeholder="Nhập mã nhân viên..." />
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-        </div>
-    </form>
+<div class="app-main__outer">
+    <div class="app-main__inner">
 
-    @{
-        if (ViewBag.ExistData != null && ViewBag.ExistData)
-        {
-            <div class="text-end mb-3">
-                <a href="@Url.Action("ExportExcel", "FamilyDeclaration")" class="btn btn-success">
-                    <i class="bi bi-file-earmark-excel"></i> Xuất Excel
-                </a>
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="bi bi-people" style="font-size: 2rem; color: #007bff;"></i>
+                    </div>
+                    <div>
+                        Khai báo thông tin Vợ/Chồng, Con
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <table class="table table-bordered align-middle">
-                <thead class="table-primary text-center">
-                    <tr>
-                        <th>STT</th>
-                        <th style="width: 25%;">Tên nhân viên</th>
-                        <th style="width: 20%;">Vợ/Chồng</th>
-                        <th>Danh sách con</th>
-                        <th>Ngày xác nhận</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        int stt = (ViewBag.CurrentPage - 1) * ViewBag.PageSize + 1;
-                    }
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td style="text-align: center">@stt</td>
-                            <td class="text-center fw-semibold">@item.NhanVien.MaNhanVien - @item.NhanVien.TenNhanVien</td>
-                            <td>
-                                @if (@item.VoChong == null)
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-body">
+                        <div>
+                            <h4 class="mb-3">Danh sách Nhân viên đã khai báo Vợ/Chồng, Con</h4>
+                            <form method="get" action="@Url.Action("ListFamilyDeclarations")" class="row mb-3 align-items-end">
+                                <div class="col-md-4">
+                                    <input type="text" name="searchMaNV" value="@ViewBag.SearchMaNV" class="form-control" placeholder="Nhập mã nhân viên..." />
+                                </div>
+                                <div class="col-md-4 d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                                    @if (ViewBag.ExistData != null && ViewBag.ExistData)
+                                    {
+                                        <a href="@Url.Action("ExportExcel", "FamilyDeclaration")" class="btn btn-success">
+                                            <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                                        </a>
+                                    }
+                                </div>
+                            </form>
+
+                            @{
+                                if (ViewBag.ExistData != null && ViewBag.ExistData)
                                 {
-                                    <div>Không thay đổi so với App nhân sự</div>
-                                }
-                                else
-                                {
-                                    <div><strong>Họ tên: </strong>@item.VoChong.TenVoChong</div>
-                                    <div><strong>Năm sinh: </strong>@item.VoChong.NamSinhVoChong</div>
-                                }
-                            </td>
-                            <td>
-                                @if (@item.DanhSachConCai.Count == 0)
-                                {
-                                    <div>Không thay đổi so với App nhân sự</div>
-                                }
-                                else
-                                {
-                                    <table class="table table-bordered table-sm mb-0">
-                                        <thead class="table-light text-center">
+                                    <table class="table table-bordered align-middle">
+                                        <thead class="table-primary text-center">
                                             <tr>
-                                                <th style="width: 35%;">Tên con</th>
-                                                <th style="width: 15%;">Năm sinh</th>
-                                                <th style="width: 25%;">Giấy khai sinh</th>
+                                                <th>STT</th>
+                                                <th style="width: 25%;">Tên nhân viên</th>
+                                                <th style="width: 20%;">Vợ/Chồng</th>
+                                                <th>Danh sách con</th>
+                                                <th>Ngày xác nhận</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var dataConCai in item.DanhSachConCai)
+                                            @{
+                                                int stt = (ViewBag.CurrentPage - 1) * ViewBag.PageSize + 1;
+                                            }
+                                            @foreach (var item in Model)
                                             {
                                                 <tr>
-                                                    <td>@dataConCai.TenCon</td>
-                                                    <td class="text-center">@dataConCai.NamSinhCon</td>
+                                                    <td style="text-align: center">@stt</td>
+                                                    <td class="text-center fw-semibold">@item.NhanVien.MaNhanVien - @item.NhanVien.TenNhanVien</td>
                                                     <td>
-                                                        @if (!string.IsNullOrEmpty(dataConCai.GiayKhaiSinh))
+                                                        @if (@item.VoChong == null)
                                                         {
-                                                            <a href="@Url.Content(dataConCai.GiayKhaiSinh)" target="_blank">
-                                                                <img src="@Url.Content(dataConCai.GiayKhaiSinh)" alt="Giấy khai sinh" class="img-thumbnail" style="max-height: 80px;" />
-                                                            </a>
+                                                            <div>Không thay đổi so với App nhân sự</div>
                                                         }
+                                                        else
+                                                        {
+                                                            <div><strong>Họ tên: </strong>@item.VoChong.TenVoChong</div>
+                                                            <div><strong>Năm sinh: </strong>@item.VoChong.NamSinhVoChong</div>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (@item.DanhSachConCai.Count == 0)
+                                                        {
+                                                            <div>Không thay đổi so với App nhân sự</div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <table class="table table-bordered table-sm mb-0">
+                                                                <thead class="table-light text-center">
+                                                                    <tr>
+                                                                        <th style="width: 35%;">Tên con</th>
+                                                                        <th style="width: 15%;">Năm sinh</th>
+                                                                        <th style="width: 25%;">Giấy khai sinh</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var dataConCai in item.DanhSachConCai)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@dataConCai.TenCon</td>
+                                                                            <td class="text-center">@dataConCai.NamSinhCon</td>
+                                                                            <td>
+                                                                                @if (!string.IsNullOrEmpty(dataConCai.GiayKhaiSinh))
+                                                                                {
+                                                                                    <a href="@Url.Content(dataConCai.GiayKhaiSinh)" target="_blank">
+                                                                                        <img src="@Url.Content(dataConCai.GiayKhaiSinh)" alt="Giấy khai sinh" class="img-thumbnail" style="max-height: 80px;" />
+                                                                                    </a>
+                                                                                }
 
+                                                                            </td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @(item.NhanVien.NgayKhaiBao.HasValue ? item.NhanVien.NgayKhaiBao.Value.ToString("dd/MM/yyyy") : "")
                                                     </td>
                                                 </tr>
+                                                stt++;
                                             }
                                         </tbody>
                                     </table>
+
+                                    int currentPage = ViewBag.CurrentPage;
+                                    int totalPages = ViewBag.TotalPages;
+                                    int pageSize = ViewBag.PageSize;
+
+                                    <nav class="mt-4">
+                                        <ul class="pagination justify-content-center">
+
+                                            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                                <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = 1, pageSize = pageSize })">First</a>
+                                            </li>
+                                            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                                <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage - 1, pageSize = pageSize })">Previous</a>
+                                            </li>
+                                            @for (int i = 1; i <= totalPages; i++)
+                                            {
+                                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                                    <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = i, pageSize = ViewBag.PageSize, searchMaNV = ViewBag.SearchMaNV })">@i</a>
+                                                </li>
+                                            }
+                                            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                                <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage + 1, pageSize = pageSize })">Next</a>
+                                            </li>
+                                            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                                <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = totalPages, pageSize = pageSize })">Last</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                 }
-                            </td>
-                            <td class="text-center">
-                                @(item.NhanVien.NgayKhaiBao.HasValue ? item.NhanVien.NgayKhaiBao.Value.ToString("dd/MM/yyyy") : "")
-                            </td>
-                        </tr>
-                        stt++;
-                    }
-                </tbody>
-            </table>
+                                else
+                                {
+                                    <div class="alert alert-warning">Chưa có dữ liệu.</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            int currentPage = ViewBag.CurrentPage;
-            int totalPages = ViewBag.TotalPages;
-            int pageSize = ViewBag.PageSize;
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item web_name">
+                        <span>Công ty cổ phần thép Hòa Phát Dung Quất</span>
+                    </div>
 
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-
-                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = 1, pageSize = pageSize })">First</a>
-                    </li>
-                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage - 1, pageSize = pageSize })">Previous</a>
-                    </li>
-                    @for (int i = 1; i <= totalPages; i++)
-                    {
-                        <li class="page-item @(i == currentPage ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = i, pageSize = ViewBag.PageSize, searchMaNV = ViewBag.SearchMaNV })">@i</a>
-                        </li>
-                    }
-                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage + 1, pageSize = pageSize })">Next</a>
-                    </li>
-                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = totalPages, pageSize = pageSize })">Last</a>
-                    </li>
-                </ul>
-            </nav>
-        }
-        else
-        {
-            <div class="alert alert-warning">Chưa có dữ liệu.</div>
-        }
-    }
-
-    @*@{
-            int currentPage = ViewBag.CurrentPage;
-            int totalPages = ViewBag.TotalPages;
-            int pageSize = ViewBag.PageSize;
-        }*@
-    @*@{
-            if (ViewBag.ExistData != null && ViewBag.ExistData)
-            {
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-
-                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = 1, pageSize = pageSize })">First</a>
-                        </li>
-                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage - 1, pageSize = pageSize })">Previous</a>
-                        </li>
-                        @for (int i = 1; i <= totalPages; i++)
-                        {
-                            <li class="page-item @(i == currentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = i, pageSize = ViewBag.PageSize, searchMaNV = ViewBag.SearchMaNV })">@i</a>
-                            </li>
-                        }
-                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = currentPage + 1, pageSize = pageSize })">Next</a>
-                        </li>
-                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("ListFamilyDeclarations", new { page = totalPages, pageSize = pageSize })">Last</a>
-                        </li>
-                    </ul>
-                </nav>
-            }
-        }*@
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hóa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
 
