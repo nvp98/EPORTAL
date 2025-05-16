@@ -19,6 +19,7 @@ namespace EPORTAL.Areas.Servey.Controllers
         String controll = "FamilyDeclaration";
 
         // GET: FamilyDeclaration
+        [Authorize]
         public ActionResult Index()
         {
 

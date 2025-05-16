@@ -38,12 +38,13 @@
                             <p class="text-center" style="margin: 0 auto; padding: 0px 0px 10px 0px; font-size: 25px; color: #027bb9">DUNG QUẤT</p>
                             @using (Html.BeginForm("LoginUser", "Login", new { id = "myForm" }))
                             {
+                                <input type="hidden" name="returnUrl" value="@Request.QueryString["ReturnUrl"]" />
                                 <div class="form-group">
                                     <label class="small mb-1" for="inputEmailAddress">Tài khoản <span class="text-danger">(* Nhập mã nhân viên )</span></label>
                                     <div class="login__field">
                                         <i class="login__icon fas fa-user"></i>
-                                       @Html.TextBoxFor(m => m.MaNV, new { @class = "form-control", @placeholder = "Mã nhân viên" })
-                                       @Html.ValidationMessageFor(m => m.MaNV, "", new { @class = "text-danger" })
+                                        @Html.TextBoxFor(m => m.MaNV, new { @class = "form-control", @placeholder = "Mã nhân viên" })
+                                        @Html.ValidationMessageFor(m => m.MaNV, "", new { @class = "text-danger" })
                                         <div id="show_error_user"></div>
                                     </div>
                                 </div>
@@ -74,7 +75,7 @@
                                     </div>
 
                                 </div>
-                              }
+                            }
                         </div>
                     </div>
                 </div>

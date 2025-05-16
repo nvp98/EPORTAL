@@ -57,7 +57,7 @@ namespace EPORTAL.Controllers
 
         }
         [HttpPost]
-        public ActionResult LoginUser(LoginValidation u)
+        public ActionResult LoginUser(LoginValidation u, string returnUrl)
         {
 
             NhanVien user1 = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.CCCD.Substring(x.CCCD.Length - 5,5) == u.MatKhau).FirstOrDefault();
@@ -71,6 +71,11 @@ namespace EPORTAL.Controllers
                 if (user == null) user = user1;
                 string Cookie = string.Format("{0};{1};{2};{3};{4};{5};{6}", user.ID, user.MaNV, user.HoTen, user.IDPhongBan, user.IDQuyen, user.IDQuyenHT, user.GroupQuyen);
                 FormsAuthentication.SetAuthCookie(Cookie, false);
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
 
                 var check = dbSV.EmployeeServeys.Where(x => x.IDNV == user.ID).ToList();
                 var check_q = db.AuthorizationContractors.Where(x => x.IDNhanVien == user.ID && x.IDLKD == 1 
