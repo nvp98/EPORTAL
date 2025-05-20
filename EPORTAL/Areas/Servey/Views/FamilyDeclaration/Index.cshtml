@@ -7,6 +7,11 @@
 {
     @Html.Raw(TempData["msgSuccess"].ToString())
 }
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"].ToString())
+}
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <style>
@@ -41,7 +46,7 @@
             <div class="row">
                 <div class="card col-lg-12">
                     @{
-                        var deadline = new DateTime(2025, 5, 19);
+                        var deadline = new DateTime(2025, 5, 20);
                         var today = DateTime.Today;
                         var daysLeft = (deadline - today).Days;
                     }
@@ -62,6 +67,46 @@
                             }
                         </div>
                     </div>
+                    @using (Html.BeginForm("CleanUpInvalidFamilyDeclarations", "FamilyDeclaration", FormMethod.Post, new { onsubmit = "return confirm('Xóa tất cả bản ghi có MaNhanVien null?');" }))
+                    {
+                        if (ViewBag.Authentication == "HPDQ18461")
+                        {
+                            <button type="submit" class="btn btn-danger">
+                                Xóa dữ liệu không hợp lệ (MaNhanVien = null)
+                            </button>
+                            <h3>Thống kê MaNhanVien bị null</h3>
+                            <ul>
+                                <li>KhaiBao_NhanVien: @ViewBag.NullNhanVienCount bản ghi</li>
+                                <li>KhaiBao_VoChong: @ViewBag.NullVoChongCount bản ghi</li>
+                                <li>KhaiBao_ConCai: @ViewBag.NullConCaiCount bản ghi</li>
+                            </ul>
+                            <h3>Thống kê MaNhanVien thiếu Giấy KS</h3>
+                            if (ViewBag.MaNhanVienKhongGiayKhaiSinh != null)
+                            {
+                                <p><strong>Mã nhân viên thiếu giấy khai sinh:</strong> @ViewBag.MaNhanVienKhongGiayKhaiSinh</p>
+                            }
+
+                        }
+                    }
+                    @using (Html.BeginForm("DeleteAllFamilyDeclarations", "FamilyDeclaration", FormMethod.Post, new { onsubmit = "return confirm('Xóa toàn bộ dữ liệu khai báo?');" }))
+                    {
+                        if (ViewBag.Authentication == "HPDQ18461")
+                        {
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu?')">
+                                Xóa toàn bộ dữ liệu khai báo
+                            </button>
+                        }
+                    }
+                    @using (Html.BeginForm("XoaDataTest", "FamilyDeclaration", FormMethod.Post, new { onsubmit = "return confirm('Xóa Data test?');" }))
+                    {
+                        if (ViewBag.Authentication == "HPDQ18461")
+                        {
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa dữ liệu test?')">
+                                Xóa dữ liệu test
+                            </button>
+                        }
+                    }
+
                     @if (daysLeft >= 0)
                     {
                         <div class="card-body">
@@ -250,25 +295,26 @@
                                             const index = $childrenList.children().length;
 
                                             const $childDiv = $(`
-                                                                                                                                                                                                  <div class="border p-3 mb-3 rounded position-relative">
-                                                                                                                                                                                                      <button type="button" class="btn-close position-absolute top-0 end-0 m-2 removeChildBtn" aria-label="Xóa"></button>
-                                                                                                                                                                                                      <h6>Con</h6>
-                                                                                                                                                                                                      <div class="mb-3">
-                                                                                                                                                                                                          <label class="form-label">Họ và tên Con</label>
-                                                                                                                                                                                                          <input type="text" class="form-control" name="DanhSachConCai[${index}].TenCon" required>
-                                                                                                                                                                                                      </div>
-                                                                                                                                                                                                      <div class="mb-3">
-                                                                                                                                                                                                          <label class="form-label">Năm sinh</label>
-                                                                                                                                                                                                          <select class="form-control w-auto" name="DanhSachConCai[${index}].NamSinhCon" required>
-                                                                                                                                                                                                              ${generateYearOptions(1970, new Date().getFullYear())}
-                                                                                                                                                                                                          </select>
-                                                                                                                                                                                                      </div>
-                                                                                                                                                                                                      <div class="mb-3">
-                                                                                                                                                                                                          <label class="form-label">Giấy khai sinh <span class="text-muted">(chỉ chấp nhận file ảnh có định dạng .jpg, .jpeg, .png)</span></label>
-                                                                                                                                                                                                          <input type="file" class="form-control" name="DanhSachConCaiFiles" accept=".jpg, .jpeg, .png" required title="Chỉ chấp nhận file .jpg, .jpeg, .png">
-                                                                                                                                                                                                      </div>
-                                                                                                                                                                                                  </div>
-                                                                                                                                                                                              `);
+                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="border p-3 mb-3 rounded position-relative">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <button type="button" class="btn-close position-absolute top-0 end-0 m-2 removeChildBtn" aria-label="Xóa"></button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <h6>Con</h6>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="mb-3">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label class="form-label">Họ và tên Con</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" class="form-control" name="DanhSachConCai[${index}].TenCon" required>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="mb-3">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label class="form-label">Năm sinh</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <select class="form-control w-auto" name="DanhSachConCai[${index}].NamSinhCon" required>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${generateYearOptions(1970, new Date().getFullYear())}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    </select>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="mb-3">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label class="form-label">Giấy khai sinh <span class="text-muted">(chỉ chấp nhận file ảnh có định dạng .jpg, .jpeg, .png)</span></label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="file" class="form-control" name="DanhSachConCaiFiles" accept="image/*" required title="Chỉ chấp nhận file hình ảnh">
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              `);
 
                                             $childrenList.append($childDiv);
 
@@ -299,7 +345,7 @@
                         </div>
                     }
                 </div>
-                </div>
+            </div>
         </div>
     </div>
 
