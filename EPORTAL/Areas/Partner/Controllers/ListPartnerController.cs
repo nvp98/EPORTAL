@@ -9,9 +9,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -75,47 +72,26 @@ namespace EPORTAL.Areas.Partner.Controllers
         [HttpPost]
         public ActionResult Create(NT_PartnerValidation _DO)
         {
-
             try
             {
 
-                if (Request != null)
+                var existingInDB = db.NT_Partner.Where(x => x.BPID == _DO.BPID).FirstOrDefault();
+
+                if (existingInDB != null)
                 {
-                    //Check trùng mã MaNV
-                    if (!checkBPID(_DO.BPID) == false)
-                    {
-                        
-                        // API
-                        using (var client = new HttpClient())
-                        {
-                            //string authInfo = "andy" + ":" + "password";
-                            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
-                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authInfo);
-                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                            client.BaseAddress = new Uri(baseAddress);
-                            //HTTP POST
-                            HttpResponseMessage result =  client.PostAsJsonAsync("api/PartnerAPI", _DO).Result;
-                            result.EnsureSuccessStatusCode();
-                            
-                            
-                        }
-                        //
-
-                        var a = db.NT_Partner_insert(_DO.BPID, _DO.FullName, _DO.Taxcode, _DO.Address, _DO.Customer, _DO.Vendor, _DO.Email, _DO.ShortName, _DO.CodeUnis);
-                        TempData["msgSuccess"] = "<script>alert('Thêm mới thành công');</script>";
-                    }
-                    else
-                    {
-                        TempData["msgSuccess"] = "<script>alert('Mã Nhân Viên đã tồn tại');</script>";
-                    }
-
+                    TempData["msgSuccess"] = "<script>alert('Mã Nhà thầu đã tồn tại');</script>";
+                    return RedirectToAction("Index", "ListPartner");
+                } else
+                {
+                    var a = db.NT_Partner_insert(_DO.BPID, _DO.FullName, _DO.Taxcode, _DO.Address, _DO.Customer, _DO.Vendor, _DO.Email, _DO.ShortName, _DO.CodeUnis);
+                    TempData["msgSuccess"] = "<script>alert('Thêm mới thành công');</script>";
                 }
             }
             catch (Exception e)
             {
                 TempData["msgError"] = "<script>alert('Có lỗi khi thêm mới: " + e.Message + "');</script>";
             }
-            //return View();
+
             return RedirectToAction("Index", "ListPartner");
         }
 
@@ -172,7 +148,6 @@ namespace EPORTAL.Areas.Partner.Controllers
 
                 if (Request != null)
                 {
-                    //
                     var a = db.NT_Partner_update(_DO.ID, _DO.BPID, _DO.FullName, _DO.Taxcode, _DO.Address, _DO.Customer, _DO.Vendor, _DO.Email, _DO.ShortName, _DO.CodeUnis);
                     TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
                 }
@@ -346,11 +321,11 @@ namespace EPORTAL.Areas.Partner.Controllers
             else
                 return false;
         }
-        [HttpPost]
-        public JsonResult IsAlreadyBP(int BPID)
-        {
-            return Json(checkBPID(BPID));
-        }
+        //[HttpPost]
+        //public JsonResult IsAlreadyBP(int BPID)
+        //{
+        //    return Json(checkBPID(BPID));
+        //}
         public ActionResult ExportToExcel()
         {
             var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.EX).First();

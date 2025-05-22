@@ -75,8 +75,10 @@ namespace EPORTAL.Areas.Servey.Controllers
                 select nv.MaNV + " - " + pb.TenPhongBan
             ).Distinct().ToList();
 
-
             ViewBag.MaNhanVienKhongGiayKhaiSinh = string.Join(", ", maNhanViensKhongCoGiayKhaiSinh);
+
+            var soLuongLoai1 = _context.KhaiBao_NhanVien.Count(x => x.LoaiKhaiBao == 1);
+            ViewBag.SoLuongLoaiKhaiBao1 = soLuongLoai1;
 
             return View(model);
         }
@@ -131,16 +133,16 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     foreach (var item in model.DanhSachConCai)
                     {
-                        if (DanhSachConCaiFiles != null && DanhSachConCaiFiles.Count() > index)
+                        if (DanhSachConCaiFiles == null || DanhSachConCaiFiles.Count() <= index)
+                        {
+                            fileError = true;
+                        }
+                        else
                         {
                             var file = DanhSachConCaiFiles.ElementAt(index);
-                            if (file != null && file.ContentLength > 0)
+                            if (file == null || file.ContentLength == 0 || !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                             {
-                                // Kiểm tra ContentType
-                                if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    fileError = true;
-                                }
+                                fileError = true;
                             }
                         }
                         index++;
@@ -148,7 +150,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                     if (fileError)
                     {
-                        TempData["msgError"] = "<script>alert('Định dạng file không hợp lệ. Chỉ chấp nhận file ảnh');</script>";
+                        TempData["msgError"] = "<script>alert('Tất cả các file đính kèm phải là ảnh hợp lệ (.jpg, .png, v.v.) và không được để trống');</script>";
                         return RedirectToAction("Index");
                     }
 
@@ -162,19 +164,13 @@ namespace EPORTAL.Areas.Servey.Controllers
                             MaNhanVien = nhanvien.MaNhanVien
                         };
 
-                        if (DanhSachConCaiFiles != null && DanhSachConCaiFiles.Count() > index)
-                        {
-                            var file = DanhSachConCaiFiles.ElementAt(index);
-                            if (file != null && file.ContentLength > 0 && file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-                            {
-                                var ext = Path.GetExtension(file.FileName).ToLower();
-                                var uniqueName = Guid.NewGuid().ToString() + ext;
-                                var fullPath = Path.Combine(folderPath, uniqueName);
-                                file.SaveAs(fullPath);
+                        var file = DanhSachConCaiFiles.ElementAt(index);
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        var uniqueName = Guid.NewGuid().ToString() + ext;
+                        var fullPath = Path.Combine(folderPath, uniqueName);
+                        file.SaveAs(fullPath);
 
-                                concai.GiayKhaiSinh = "/Uploads/GiayKhaiSinh/" + uniqueName;
-                            }
-                        }
+                        concai.GiayKhaiSinh = "/Uploads/GiayKhaiSinh/" + uniqueName;
 
                         _context.KhaiBao_ConCai.Add(concai);
                         index++;

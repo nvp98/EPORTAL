@@ -15,7 +15,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="small mb-1">Business Partner</label>
-                                @Html.TextBox("BPID", null, new { @id = "BPID", @type = "number", @class = "form-control", @onchange = "checkBPID();" })
+                                @Html.TextBox("BPID", null, new { @id = "BPID", @type = "number", @class = "form-control"})
                                 @*@Html.ValidationMessageFor(model => model.BPID, "", new { @class = "text-danger" })*@
                                 <span id="ErrorBPID" style="color: red; text-transform: none; font-weight: normal "></span>
                             </div>

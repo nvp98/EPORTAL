@@ -211,22 +211,22 @@
         }
         return true;
     }
-    function checkBPID() {
-        var BPID = $("#BPID").val();
-        var ErrorBPID = document.getElementById("ErrorBPID");
-        ErrorBPID.innerHTML = "";
-        $.ajax({
-            type: "POST",
-            url: "/ListPartner/IsAlreadyBP?BPID=" + BPID,
-            success: function (result) {
-                if (result == false) {
-                    //alert('Mã BP đã tồn tại!');
-                    ErrorBPID.innerHTML = "Mã BP đã tồn tại!";
-                    return false;
-                }
-            }
-        })
-    };
+    //function checkBPID() {
+    //    var BPID = $("#BPID").val();
+    //    var ErrorBPID = document.getElementById("ErrorBPID");
+    //    ErrorBPID.innerHTML = "";
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "/ListPartner/IsAlreadyBP?BPID=" + BPID,
+    //        success: function (result) {
+    //            if (result == false) {
+    //                //alert('Mã BP đã tồn tại!');
+    //                ErrorBPID.innerHTML = "Mã BP đã tồn tại!";
+    //                return false;
+    //            }
+    //        }
+    //    })
+    //};
     function submitForm(event) {
         var ErrorFullName = document.getElementById("ErrorFullName");
         if ($('#FullName').val() == "") {
