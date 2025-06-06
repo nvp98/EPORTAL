@@ -32,7 +32,6 @@
         <EntityTypeShape EntityType="EPORTALModel.NT_Permission" Width="1.5" PointX="17.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTALModel.NT_Position" Width="1.5" PointX="17.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTALModel.NT_Workingtime" Width="1.5" PointX="17.75" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="EPORTALModel.NT_Workplace" Width="1.5" PointX="7.75" PointY="17.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTALModel.PhongBan" Width="1.5" PointX="0.75" PointY="7.625" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTALModel.Project" Width="1.5" PointX="9.75" PointY="17.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTALModel.ProjectsGroup" Width="1.5" PointX="11.75" PointY="17.75" IsExpanded="true" />
@@ -60,6 +59,10 @@
         <EntityTypeShape EntityType="EPORTALModel.AuthorizationVitual" Width="1.5" PointX="3.375" PointY="19.75" />
         <EntityTypeShape EntityType="EPORTALModel.Virtual" Width="1.5" PointX="14.375" PointY="19.75" />
         <EntityTypeShape EntityType="EPORTALModel.VirtualGroup" Width="1.5" PointX="19.375" PointY="15.75" />
+        <EntityTypeShape EntityType="EPORTALModel.KhaiBao_ConCai" Width="1.5" PointX="19.375" PointY="18.75" />
+        <EntityTypeShape EntityType="EPORTALModel.KhaiBao_NhanVien" Width="1.5" PointX="20.375" PointY="0.75" />
+        <EntityTypeShape EntityType="EPORTALModel.KhaiBao_VoChong" Width="1.5" PointX="20.375" PointY="3.75" />
+        <EntityTypeShape EntityType="EPORTALModel.NT_Workplace" Width="1.5" PointX="5.375" PointY="19.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

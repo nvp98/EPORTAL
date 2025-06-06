@@ -96,7 +96,10 @@
 
 
                                 <div class="col-md-12 col-lg-12" style=" text-align: left;">
-                                    <h6><b>Bộ phận Liên quan<span style="color:red;">(*)</span></b></h6>
+                                    <h6><b>
+    Bộ phận liên quan đối với trường hợp Nhà thầu đăng ký ra vào cổng Cảng chuyên dụng/ Cảng tổng hợp (*).<br />
+    Lưu ý: Trường hợp BP.LOGISTICS là BP.QL thì không cần trình ký Bộ phận liên quan.<span style="color:red;">(*)</span>
+</b></h6>
                                 </div>
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
@@ -115,7 +118,7 @@
                                                 @Html.DropDownListFor(model => model.CBNV4, ViewBag.KTV_LQ_CD_List as SelectList, "----- Chọn CBNV trình ký -----", new { @id = "C4", @class = "form-control" })
                                             </td>
                                             <td class="text-center">
-                                                <span class="text-center" style="margin-top: 8px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ghi chú: Kỹ thuật viên ký nháy BP. Cảng - Bộ phận liên quam <span style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+                                                <span class="text-center" style="margin-top: 8px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ghi chú: Kỹ thuật viên ký nháy BP.LOGISTICS - Bộ phận liên quan <span style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
                                             </td>
                                         </tr>
 
@@ -127,11 +130,11 @@
                                                 @Html.DropDownListFor(model => model.CBNV5, ViewBag.TP_QL_CD_List as SelectList, "----- Chọn CBNV trình ký -----", new { @id = "C5", @class = "form-control" })
                                             </td>
                                             <td class="text-center">
-                                                <span class="text-center" style="margin-top: 8px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ghi chú: Trưởng phó ký chính BP. Cảng - Bộ phận liên quan <span style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+                                                <span class="text-center" style="margin-top: 8px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ghi chú: Trưởng phó ký chính BP.LOGISTICS - Bộ phận liên quan <span style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
                                             </td>
                                         </tr>
 
-                                        <tr>
+                                        @*<tr>
                                             <td>
                                                 Kỹ thuật viên<span style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> :
                                             </td>
@@ -153,7 +156,7 @@
                                             <td class="text-center">
                                                 <span class="text-center" style="margin-top: 8px"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ghi chú: Trưởng phó ký chính Cảng tổng hợp - Bộ phận liên quan <span style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
                                             </td>
-                                        </tr>
+                                        </tr>*@
                                     </tbody>
                                 </table>
 

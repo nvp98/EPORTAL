@@ -152,30 +152,35 @@
           <Property Name="GhiChuVP1C" Type="nvarchar" MaxLength="250" />
           <Property Name="NgayKyVP1C" Type="datetime" />
         </EntityType>
-        <EntityType Name="NhanVien">
+        <EntityType Name="KhaiBao_ConCai">
           <Key>
-            <PropertyRef Name="ID" />
+            <PropertyRef Name="ConCaiID" />
           </Key>
-          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="MaNV" Type="varchar" MaxLength="10" />
-          <Property Name="MatKhau" Type="nvarchar" MaxLength="50" />
-          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
-          <Property Name="HoTenKhongDau" Type="nvarchar" MaxLength="50" />
-          <Property Name="NgaySinh" Type="date" />
-          <Property Name="DiaChi" Type="nvarchar" MaxLength="150" />
-          <Property Name="DienThoai" Type="varchar" MaxLength="11" />
-          <Property Name="NgayVaoLam" Type="date" />
-          <Property Name="IDPhongBan" Type="int" />
-          <Property Name="IDTinhTrangLV" Type="int" />
-          <Property Name="IDViTri" Type="int" />
-          <Property Name="IsGV" Type="bit" />
-          <Property Name="IDQuyen" Type="int" />
-          <Property Name="Chukynhay" Type="nvarchar" MaxLength="100" />
-          <Property Name="Chukychinh" Type="nvarchar" MaxLength="100" />
-          <Property Name="IDQuyenHT" Type="int" />
-          <Property Name="GroupQuyen" Type="nvarchar" MaxLength="50" />
-          <Property Name="Email" Type="varchar" MaxLength="50" />
-          <Property Name="CCCD" Type="varchar" MaxLength="15" />
+          <Property Name="ConCaiID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenCon" Type="nvarchar" MaxLength="200" />
+          <Property Name="NamSinhCon" Type="int" />
+          <Property Name="GiayKhaiSinh" Type="nvarchar" MaxLength="500" />
+          <Property Name="MaNhanVien" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="KhaiBao_NhanVien">
+          <Key>
+            <PropertyRef Name="KhaiBaoID" />
+          </Key>
+          <Property Name="KhaiBaoID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaNhanVien" Type="nvarchar" MaxLength="50" />
+          <Property Name="TenNhanVien" Type="nvarchar" MaxLength="200" />
+          <Property Name="LoaiKhaiBao" Type="smallint" />
+          <Property Name="DaXacNhan" Type="bit" />
+          <Property Name="NgayKhaiBao" Type="datetime" />
+        </EntityType>
+        <EntityType Name="KhaiBao_VoChong">
+          <Key>
+            <PropertyRef Name="VoChongID" />
+          </Key>
+          <Property Name="VoChongID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenVoChong" Type="nvarchar" MaxLength="200" />
+          <Property Name="NamSinhVoChong" Type="int" />
+          <Property Name="MaNhanVien" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="NT_Authority">
           <Key>
@@ -355,13 +360,30 @@
           <Property Name="IDKV" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TenKV" Type="nvarchar" MaxLength="100" />
         </EntityType>
-        <EntityType Name="PhongBan">
+        <EntityType Name="NhanVien">
           <Key>
-            <PropertyRef Name="IDPhongBan" />
+            <PropertyRef Name="ID" />
           </Key>
-          <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="TenPhongBan" Type="nvarchar" MaxLength="50" />
-          <Property Name="status" Type="int" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaNV" Type="varchar" MaxLength="10" />
+          <Property Name="MatKhau" Type="nvarchar" MaxLength="50" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
+          <Property Name="HoTenKhongDau" Type="nvarchar" MaxLength="50" />
+          <Property Name="NgaySinh" Type="date" />
+          <Property Name="DiaChi" Type="nvarchar" MaxLength="150" />
+          <Property Name="DienThoai" Type="varchar" MaxLength="11" />
+          <Property Name="NgayVaoLam" Type="date" />
+          <Property Name="IDPhongBan" Type="int" />
+          <Property Name="IDTinhTrangLV" Type="int" />
+          <Property Name="IDViTri" Type="int" />
+          <Property Name="IsGV" Type="bit" />
+          <Property Name="IDQuyen" Type="int" />
+          <Property Name="Chukynhay" Type="nvarchar" MaxLength="100" />
+          <Property Name="Chukychinh" Type="nvarchar" MaxLength="100" />
+          <Property Name="IDQuyenHT" Type="int" />
+          <Property Name="GroupQuyen" Type="nvarchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="50" />
+          <Property Name="CCCD" Type="varchar" MaxLength="15" />
         </EntityType>
         <EntityType Name="Projects">
           <Key>
@@ -383,6 +405,14 @@
           </Key>
           <Property Name="IDGroup" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="GroupName" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="PhongBan">
+          <Key>
+            <PropertyRef Name="IDPhongBan" />
+          </Key>
+          <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenPhongBan" Type="nvarchar" MaxLength="50" />
+          <Property Name="status" Type="int" />
         </EntityType>
         <EntityType Name="Quyen">
           <Key>
@@ -419,6 +449,13 @@
           <Property Name="IDCong" Type="int" />
           <Property Name="TinhTrang" Type="int" />
         </EntityType>
+        <EntityType Name="TinhTrangLV">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="TinhTrangLV" Type="nvarchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="ThongTinCaNhan">
           <Key>
             <PropertyRef Name="IDThongTin" />
@@ -430,13 +467,6 @@
           <Property Name="FileHinh" Type="nvarchar" MaxLength="300" />
           <Property Name="XacNhan" Type="bit" />
           <Property Name="NgayKhai" Type="smalldatetime" />
-        </EntityType>
-        <EntityType Name="TinhTrangLV">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
-          <Property Name="TinhTrangLV" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Video">
           <Key>
@@ -1395,7 +1425,9 @@
           <EntitySet Name="KD_TinhTrangXL" EntityType="Self.KD_TinhTrangXL" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="KD_TrinhKy" EntityType="Self.KD_TrinhKy" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="KD_TrinhKyGH" EntityType="Self.KD_TrinhKyGH" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="NhanVien" EntityType="Self.NhanVien" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="KhaiBao_ConCai" EntityType="Self.KhaiBao_ConCai" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="KhaiBao_NhanVien" EntityType="Self.KhaiBao_NhanVien" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="KhaiBao_VoChong" EntityType="Self.KhaiBao_VoChong" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Authority" EntityType="Self.NT_Authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_CardRegistrationInfor" EntityType="Self.NT_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Confirm" EntityType="Self.NT_Confirm" Schema="dbo" store:Type="Tables" />
@@ -1410,15 +1442,16 @@
           <EntitySet Name="NT_Position" EntityType="Self.NT_Position" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Workingtime" EntityType="Self.NT_Workingtime" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Workplace" EntityType="Self.NT_Workplace" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="PhongBan" EntityType="Self.PhongBan" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NhanVien" EntityType="Self.NhanVien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Projects" EntityType="Self.Projects" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProjectsGroup" EntityType="Self.ProjectsGroup" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PhongBan" EntityType="Self.PhongBan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Quyen" EntityType="Self.Quyen" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Register_Gate" EntityType="Self.Register_Gate" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Signingstatus" EntityType="Self.Signingstatus" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Terminal" EntityType="Self.Terminal" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="ThongTinCaNhan" EntityType="Self.ThongTinCaNhan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TinhTrangLV" EntityType="Self.TinhTrangLV" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ThongTinCaNhan" EntityType="Self.ThongTinCaNhan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Video" EntityType="Self.Video" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Virtual" EntityType="Self.Virtual" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="VirtualGroup" EntityType="Self.VirtualGroup" Schema="dbo" store:Type="Tables" />
@@ -1819,13 +1852,6 @@
           <Property Name="IDCA" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TenCA" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="NT_Workplace">
-          <Key>
-            <PropertyRef Name="IDKV" />
-          </Key>
-          <Property Name="IDKV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TenKV" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="PhongBan">
           <Key>
             <PropertyRef Name="IDPhongBan" />
@@ -2097,7 +2123,6 @@
           <EntitySet Name="NT_Permission" EntityType="Self.NT_Permission" />
           <EntitySet Name="NT_Position" EntityType="Self.NT_Position" />
           <EntitySet Name="NT_Workingtime" EntityType="Self.NT_Workingtime" />
-          <EntitySet Name="NT_Workplace" EntityType="Self.NT_Workplace" />
           <EntitySet Name="PhongBans" EntityType="Self.PhongBan" />
           <EntitySet Name="Projects" EntityType="Self.Project" />
           <EntitySet Name="ProjectsGroups" EntityType="Self.ProjectsGroup" />
@@ -2958,6 +2983,10 @@
           <FunctionImport Name="Get_IDGroupVirtual" ReturnType="Collection(EPORTALModel.Get_IDGroupVirtual_Result)">
           <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
           </FunctionImport>
+          <EntitySet Name="KhaiBao_ConCai" EntityType="EPORTALModel.KhaiBao_ConCai" />
+          <EntitySet Name="KhaiBao_NhanVien" EntityType="EPORTALModel.KhaiBao_NhanVien" />
+          <EntitySet Name="KhaiBao_VoChong" EntityType="EPORTALModel.KhaiBao_VoChong" />
+          <EntitySet Name="NT_Workplace" EntityType="EPORTALModel.NT_Workplace" />
         </EntityContainer>
         <ComplexType Name="Album_searchByID_Result">
           <Property Type="Int32" Name="IDAlbum" Nullable="false" />
@@ -3387,6 +3416,43 @@
           <Property Type="Int32" Name="IDGroup" Nullable="true" />
           <Property Type="Int32" Name="NhanVienID" Nullable="true" />
         </ComplexType>
+        <EntityType Name="KhaiBao_ConCai">
+          <Key>
+            <PropertyRef Name="ConCaiID" />
+          </Key>
+          <Property Name="ConCaiID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenCon" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="NamSinhCon" Type="Int32" />
+          <Property Name="GiayKhaiSinh" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="MaNhanVien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="KhaiBao_NhanVien">
+          <Key>
+            <PropertyRef Name="KhaiBaoID" />
+          </Key>
+          <Property Name="KhaiBaoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaNhanVien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TenNhanVien" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiKhaiBao" Type="Int16" />
+          <Property Name="DaXacNhan" Type="Boolean" />
+          <Property Name="NgayKhaiBao" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="KhaiBao_VoChong">
+          <Key>
+            <PropertyRef Name="VoChongID" />
+          </Key>
+          <Property Name="VoChongID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenVoChong" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="NamSinhVoChong" Type="Int32" />
+          <Property Name="MaNhanVien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="NT_Workplace">
+          <Key>
+            <PropertyRef Name="IDKV" />
+          </Key>
+          <Property Name="IDKV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenKV" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -3751,14 +3817,6 @@
               <MappingFragment StoreEntitySet="NT_Workingtime">
                 <ScalarProperty Name="IDCA" ColumnName="IDCA" />
                 <ScalarProperty Name="TenCA" ColumnName="TenCA" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="NT_Workplace">
-            <EntityTypeMapping TypeName="EPORTALModel.NT_Workplace">
-              <MappingFragment StoreEntitySet="NT_Workplace">
-                <ScalarProperty Name="IDKV" ColumnName="IDKV" />
-                <ScalarProperty Name="TenKV" ColumnName="TenKV" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -4554,6 +4612,47 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="KhaiBao_ConCai">
+            <EntityTypeMapping TypeName="EPORTALModel.KhaiBao_ConCai">
+              <MappingFragment StoreEntitySet="KhaiBao_ConCai">
+                <ScalarProperty Name="MaNhanVien" ColumnName="MaNhanVien" />
+                <ScalarProperty Name="GiayKhaiSinh" ColumnName="GiayKhaiSinh" />
+                <ScalarProperty Name="NamSinhCon" ColumnName="NamSinhCon" />
+                <ScalarProperty Name="TenCon" ColumnName="TenCon" />
+                <ScalarProperty Name="ConCaiID" ColumnName="ConCaiID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KhaiBao_NhanVien">
+            <EntityTypeMapping TypeName="EPORTALModel.KhaiBao_NhanVien">
+              <MappingFragment StoreEntitySet="KhaiBao_NhanVien">
+                <ScalarProperty Name="NgayKhaiBao" ColumnName="NgayKhaiBao" />
+                <ScalarProperty Name="DaXacNhan" ColumnName="DaXacNhan" />
+                <ScalarProperty Name="LoaiKhaiBao" ColumnName="LoaiKhaiBao" />
+                <ScalarProperty Name="TenNhanVien" ColumnName="TenNhanVien" />
+                <ScalarProperty Name="MaNhanVien" ColumnName="MaNhanVien" />
+                <ScalarProperty Name="KhaiBaoID" ColumnName="KhaiBaoID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KhaiBao_VoChong">
+            <EntityTypeMapping TypeName="EPORTALModel.KhaiBao_VoChong">
+              <MappingFragment StoreEntitySet="KhaiBao_VoChong">
+                <ScalarProperty Name="MaNhanVien" ColumnName="MaNhanVien" />
+                <ScalarProperty Name="NamSinhVoChong" ColumnName="NamSinhVoChong" />
+                <ScalarProperty Name="TenVoChong" ColumnName="TenVoChong" />
+                <ScalarProperty Name="VoChongID" ColumnName="VoChongID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NT_Workplace">
+            <EntityTypeMapping TypeName="EPORTALModel.NT_Workplace">
+              <MappingFragment StoreEntitySet="NT_Workplace">
+                <ScalarProperty Name="TenKV" ColumnName="TenKV" />
+                <ScalarProperty Name="IDKV" ColumnName="IDKV" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

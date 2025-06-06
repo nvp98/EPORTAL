@@ -1886,8 +1886,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                            }).ToList();
             ViewBag.TP_HCDN = new SelectList(TP_HCDN, "IDNhanVien", "HoTen");
 
-
-            var KTV_LQ_CD = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 2 && x.NhanVien.IDPhongBan == 31)
+            int BPLogictis = db.PhongBans.Where(x => x.TenPhongBan.Contains("Logistics")).FirstOrDefault()?.IDPhongBan??0;
+            var KTV_LQ_CD = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 2 && x.NhanVien.IDPhongBan == BPLogictis)
                              join a in db.NhanViens on au.IDNhanVien equals a.ID
                              select new CheckInforUser
                              {
@@ -1896,7 +1896,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                              }).ToList();
             ViewBag.KTV_LQ_CD_List = new SelectList(KTV_LQ_CD, "IDNhanVien", "HoTen");
 
-            var TP_QL_CD = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 1 && x.NhanVien.IDPhongBan == 31)
+            var TP_QL_CD = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 1 && x.NhanVien.IDPhongBan == BPLogictis)
                             join a in db.NhanViens on au.IDNhanVien equals a.ID
                             select new CheckInforUser
                             {

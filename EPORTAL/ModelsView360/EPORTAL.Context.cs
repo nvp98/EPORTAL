@@ -89,8 +89,6 @@ public partial class EPORTALEntities : DbContext
 
     public virtual DbSet<NT_Workingtime> NT_Workingtime { get; set; }
 
-    public virtual DbSet<NT_Workplace> NT_Workplace { get; set; }
-
     public virtual DbSet<PhongBan> PhongBans { get; set; }
 
     public virtual DbSet<Project> Projects { get; set; }
@@ -118,6 +116,14 @@ public partial class EPORTALEntities : DbContext
     public virtual DbSet<Virtual> Virtuals { get; set; }
 
     public virtual DbSet<VirtualGroup> VirtualGroups { get; set; }
+
+    public virtual DbSet<KhaiBao_ConCai> KhaiBao_ConCai { get; set; }
+
+    public virtual DbSet<KhaiBao_NhanVien> KhaiBao_NhanVien { get; set; }
+
+    public virtual DbSet<KhaiBao_VoChong> KhaiBao_VoChong { get; set; }
+
+    public virtual DbSet<NT_Workplace> NT_Workplace { get; set; }
 
 
     public virtual int Album_delete(Nullable<int> iDAlbum)
