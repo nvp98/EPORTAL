@@ -285,6 +285,7 @@
     <Compile Include="Areas\Publish\Controllers\ResponToComplainController.cs" />
     <Compile Include="Areas\Publish\Controllers\StatisticPageController.cs" />
     <Compile Include="Areas\Publish\PublishAreaRegistration.cs" />
+    <Compile Include="Areas\Servey\Controllers\FamilyDeclarationController.cs" />
     <Compile Include="Areas\Servey\Controllers\ListSeveyController.cs" />
     <Compile Include="Areas\Servey\Controllers\ServeyIDController.cs" />
     <Compile Include="Areas\Servey\Controllers\UserServeyController.cs" />
@@ -743,6 +744,7 @@
     <Compile Include="ModelsServey\GroupKhaoSat.cs">
       <DependentUpon>EPORTAL_SERVEY.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelsServey\KhaiBaoTongHopViewModel.cs" />
     <Compile Include="ModelsServey\ListServey.cs">
       <DependentUpon>EPORTAL_SERVEY.tt</DependentUpon>
     </Compile>
@@ -1033,6 +1035,15 @@
       <DependentUpon>EPORTAL.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelsView360\KD_TrinhKyGH.cs">
+      <DependentUpon>EPORTAL.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelsView360\KhaiBao_ConCai.cs">
+      <DependentUpon>EPORTAL.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelsView360\KhaiBao_NhanVien.cs">
+      <DependentUpon>EPORTAL.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelsView360\KhaiBao_VoChong.cs">
       <DependentUpon>EPORTAL.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelsView360\NhanVien.cs">
@@ -4342,6 +4353,8 @@
     <Content Include="Areas\TagSign\Views\List_RegisterPeople_NT\Edit_HPDQ.cshtml" />
     <Content Include="Areas\TagSign\Views\List_RegisterPeople_NT\PrintTest_Print.cshtml" />
     <Content Include="Areas\TagSign\Views\List_RegisterPeople_NT\CancelApprove.cshtml" />
+    <Content Include="Areas\Servey\Views\FamilyDeclaration\Index.cshtml" />
+    <Content Include="Areas\Servey\Views\FamilyDeclaration\ListFamilyDeclarations.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
