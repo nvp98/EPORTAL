@@ -14,5 +14,7 @@ namespace EPORTAL.ModelsServey
         public string FilePath { get; set; }
         public HttpPostedFileBase FileUpload { get; set; }
         public Nullable<int> OrderBy { get; set; }
+        public Nullable<int> MaOT { get; set; }
+        public string TenNhom { get; set; }
     }
 }

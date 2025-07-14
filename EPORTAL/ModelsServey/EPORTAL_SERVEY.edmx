@@ -66,7 +66,7 @@
           <Key>
             <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="IDSV" Type="int" />
           <Property Name="NoiDung" Type="nvarchar" MaxLength="100" />
         </EntityType>
@@ -473,7 +473,6 @@
           <FunctionImport Name="RsultServey_delete">
           <Parameter Name="ID" Mode="In" Type="Int32" />
           </FunctionImport>
-          <EntitySet Name="CTKhaoSats" EntityType="EPORTAL_SERVEYModel.CTKhaoSat" />
           <EntitySet Name="GroupKhaoSats" EntityType="EPORTAL_SERVEYModel.GroupKhaoSat" />
           <FunctionImport Name="CTKhaoSat_delete">
             <Parameter Name="IDSV" Mode="In" Type="Int32" />
@@ -540,6 +539,7 @@
           </FunctionImport>
           <EntitySet Name="GhiChus" EntityType="EPORTAL_SERVEYModel.GhiChu" />
           <EntitySet Name="OptionServeys" EntityType="EPORTAL_SERVEYModel.OptionServey" />
+          <EntitySet Name="CTKhaoSats" EntityType="EPORTAL_SERVEYModel.CTKhaoSat" />
         </EntityContainer>
         <ComplexType Name="EmployeeServey_selectNV_Result">
           <Property Type="Int32" Name="ID" Nullable="false" />
@@ -582,17 +582,6 @@
           <Property Type="Boolean" Name="isCom" Nullable="true" />
           <Property Type="String" Name="Note" Nullable="true" MaxLength="200" />
         </ComplexType>
-        <EntityType Name="CTKhaoSat">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IDSV" Type="Int32" />
-          <Property Name="IDOT" Type="Int32" />
-          <Property Name="IDNV" Type="Int32" />
-          <Property Name="IDGroup" Type="Int32" />
-          <Property Name="GhiChu" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="GroupKhaoSat">
           <Key>
             <PropertyRef Name="ID" />
@@ -657,6 +646,17 @@
           <Property Name="OrderBy" Type="Int32" />
           <Property Name="MaOT" Type="Int32" />
           <Property Name="isShow" Type="Int32" />
+        </EntityType>
+        <EntityType Name="CTKhaoSat">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSV" Type="Int32" />
+          <Property Name="IDOT" Type="Int32" />
+          <Property Name="IDNV" Type="Int32" />
+          <Property Name="IDGroup" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -787,18 +787,6 @@
           <FunctionImportMapping FunctionImportName="ResultServey_create" FunctionName="EPORTAL_SERVEYModel.Store.ResultServey_create" />
           <FunctionImportMapping FunctionImportName="ResultServey_update" FunctionName="EPORTAL_SERVEYModel.Store.ResultServey_update" />
           <FunctionImportMapping FunctionImportName="RsultServey_delete" FunctionName="EPORTAL_SERVEYModel.Store.RsultServey_delete" />
-          <EntitySetMapping Name="CTKhaoSats">
-            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTKhaoSat">
-              <MappingFragment StoreEntitySet="CTKhaoSat">
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
-                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
-                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
-                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="GroupKhaoSats">
             <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.GroupKhaoSat">
               <MappingFragment StoreEntitySet="GroupKhaoSat">
@@ -879,6 +867,18 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="CTKhaoSats">
+            <EntityTypeMapping TypeName="EPORTAL_SERVEYModel.CTKhaoSat">
+              <MappingFragment StoreEntitySet="CTKhaoSat">
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="IDGroup" ColumnName="IDGroup" />
+                <ScalarProperty Name="IDNV" ColumnName="IDNV" />
+                <ScalarProperty Name="IDOT" ColumnName="IDOT" />
+                <ScalarProperty Name="IDSV" ColumnName="IDSV" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -894,7 +894,7 @@
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="true" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
         <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>

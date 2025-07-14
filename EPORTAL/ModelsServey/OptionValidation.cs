@@ -52,6 +52,8 @@ namespace EPORTAL.ModelsServey
         public OptionList OptionList { get; set; }
         public bool isCompany { get; set; }
         public bool IsChecked { get; set; }
+        public int? isShowRe { get; set; }
+        public int? isChon { get; set; }
 
     }
 

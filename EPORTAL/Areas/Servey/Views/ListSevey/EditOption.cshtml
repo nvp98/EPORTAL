@@ -19,10 +19,15 @@
                 @Html.HiddenFor(model => model.IDSV)
                 <fieldset id="SubmitForm">
                     <div class="row">
-                        <div class="form-group col-md-9 " style="display:grid">
+                        <div class="form-group col-md-6 " style="display:grid">
                             <label class="mb-1">Tên Option</label>
                             @Html.TextAreaFor(model => model.ContentOT, new { @class = "form-control", @rows = 1, placeholder = "Tên option", @id = "ContentOT", })
                             @Html.ValidationMessageFor(model => model.ContentOT, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group col-md-3 " style="display:grid">
+                            <label class="mb-1">MaOT</label>
+                            @Html.TextBoxFor(model => model.MaOT, new { @class = "form-control", @rows = 1, @type = "number", placeholder = "", @id = "MaOT", })
+                            @Html.ValidationMessageFor(model => model.MaOT, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group col-md-3 " style="display:grid">
                             <label class="mb-1">Thứ tự sắp xếp</label>

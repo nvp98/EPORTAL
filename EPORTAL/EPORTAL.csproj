@@ -4355,6 +4355,7 @@
     <Content Include="Areas\TagSign\Views\List_RegisterPeople_NT\CancelApprove.cshtml" />
     <Content Include="Areas\Servey\Views\FamilyDeclaration\Index.cshtml" />
     <Content Include="Areas\Servey\Views\FamilyDeclaration\ListFamilyDeclarations.cshtml" />
+    <Content Include="Areas\Servey\Views\ListSevey\CreateGroup.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

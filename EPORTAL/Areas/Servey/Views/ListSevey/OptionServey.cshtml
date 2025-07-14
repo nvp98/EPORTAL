@@ -59,6 +59,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
+                                <button type="button" id="btn-nhom" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Cập nhật Nhóm </button>
+                                <div class="modal" id="myModalNhom" role="dialog" data-url='@Url.Action("CreateGroup","ListSevey",new { id =ViewBag.IDSV})' style="margin-top:50px"></div>
                                 <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
                                 <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("CreateOption","ListSevey",new { id =ViewBag.IDSV})' style="margin-top:50px"></div>
                             </div>
@@ -73,6 +75,7 @@
                                             <th width="30px" class="text-center">STT</th>
                                             <th class="text-center" width="100px">Thao tác</th>
                                             <th class="text-center" >Lựa chọn</th>
+                                            <th class="text-center w-25" >Nhóm lựa chọn</th>
                                             <th class="text-center w-25" >Thứ tự sắp xếp</th>
                                             <th class="text-center w-25" >File đính kèm</th>
                                         </tr>
@@ -107,6 +110,7 @@
                                                         </script>
                                                     </td>
                                                     <td >@item.ContentOT</td>
+                                                    <td >@item.TenNhom</td>
                                                     <td class="text-center">@item.OrderBy</td>
                                                     <td class="text-center" >
                                                         @if (item.FilePath != null && item.FilePath.Length > 0)
@@ -154,6 +158,14 @@
             $("#myModal").html(data);
             $("#ModalTitle").html("Thêm Khảo sát");
             $("#myModal").modal('show');
+        });
+    });
+    $('#btn-nhom').click(function () {
+        var url = $('#myModalNhom').data('url');
+        $.get(url, function (data) {
+            $("#myModalNhom").html(data);
+            $("#ModalTitle").html("Thêm Group Khảo sát");
+            $("#myModalNhom").modal('show');
         });
     });
     $('#btn-Import').click(function () {

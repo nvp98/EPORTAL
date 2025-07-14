@@ -212,6 +212,7 @@ namespace EPORTAL.Areas.Servey.Controllers
         {
             var res = (from a in dbSV.OptionServeys.Where(x => x.IDSV == id)
                        join b in dbSV.ListServeys on a.IDSV equals b.IDSV
+                       let nhom = dbSV.GroupKhaoSats.FirstOrDefault(x => x.ID == a.MaOT)
                        select new OptionServeyValidation
                        {
                            IDOT =a.IDOT,
@@ -219,7 +220,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                            ContentSV = b.ContentSV,
                            ContentOT =a.ContentOT,
                            FilePath =a.FilePath,
-                           OrderBy = a.OrderBy
+                           OrderBy = a.OrderBy,
+                           MaOT =a.MaOT,
+                           TenNhom = nhom != null? nhom.TenNhom : "",
                        }).ToList();
             ViewBag.IDSV = id;
             ViewBag.ContentSV = dbSV.ListServeys.Where(x=>x.IDSV ==id).FirstOrDefault().ContentSV;
@@ -264,6 +267,61 @@ namespace EPORTAL.Areas.Servey.Controllers
             //return View();
             return RedirectToAction("OptionServey", "ListSevey",new { id =_DO.IDSV});
         }
+
+        public ActionResult CreateGroup(int? id)
+        {
+            ViewBag.IDSV = id;
+            var res = new GroupKhaoSatView();
+            res.IDSV = id;
+            var listGroup = dbSV.GroupKhaoSats.Where(x => x.IDSV == id).ToList();
+            ViewBag.ListGroup = listGroup;
+            return PartialView(res);
+        }
+        [HttpPost]
+        public ActionResult CreateGroup(GroupKhaoSatView _DO, FormCollection collection)
+        {
+
+            try
+            {
+                if (_DO.TenNhom != "") {
+                    var newGroup = new GroupKhaoSat()
+                    {
+                        IDSV = _DO.IDSV,
+                        TenNhom = _DO.TenNhom,
+                        isChon = _DO.isChon,
+                        isShowRe = _DO.isShowRe,
+                    };
+                    dbSV.GroupKhaoSats.Add(newGroup);
+                    dbSV.SaveChanges();
+                    newGroup.MaNhom = newGroup.ID;
+                    dbSV.SaveChanges();
+                }
+                //var ListVT = new List<OptionServeyValidation>();
+                //foreach (var key in collection.AllKeys)
+                //{
+                //    if (key.Split('_')[0] == "ContentOTT")
+                //    {
+                //        ListVT.Add(new OptionServeyValidation() { ContentOT = collection[key], OrderBy = int.Parse(collection["OrderByT_" + key.Split('_')[1]]) });
+                //    }
+                //}
+                //foreach (var item in ListVT)
+                //{
+                //    var k = dbSV.OptionServey_create(item.ContentOT, _DO.IDSV, null, item.OrderBy);
+                //}
+
+
+                //var a = dbSV.ListServey_update(_DO.IDSV, _DO.ContentSV, _DO.StartTime, _DO.EndTime, _DO.StatusSV);
+                TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
+            }
+            catch (Exception e)
+            {
+                TempData["msgError"] = "<script>alert('Có lỗi khi chỉnh sửa: " + e.Message + "');</script>";
+            }
+            //return View();
+            return RedirectToAction("OptionServey", "ListSevey", new { id = _DO.IDSV });
+        }
+
+
         public ActionResult EditOption(int id)
         {
             //var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.EDIT).First();
@@ -279,7 +337,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                            IDSV = a.IDSV,
                            ContentOT = a.ContentOT,
                            FilePath =a.FilePath,
-                           OrderBy = a.OrderBy
+                           OrderBy = a.OrderBy,
+                           MaOT = a.MaOT,
                        }).ToList();
             OptionServeyValidation DO = new OptionServeyValidation();
             if (res.Count > 0)
@@ -292,6 +351,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                     DO.ContentOT = a.ContentOT;
                     DO.FilePath = a.FilePath;
                     DO.OrderBy = a.OrderBy;
+                    DO.MaOT = a.MaOT;
                 }
                 //List<PhongBan> pb = db.PhongBans.ToList();
                 //ViewBag.IDPhongBan = new SelectList(pb, "IDPhongBan", "TenPhongBan", DO.IDPhongBan);
@@ -340,12 +400,18 @@ namespace EPORTAL.Areas.Servey.Controllers
                             _DO.FilePath = "~/UploadedFiles/FileServey/" + FileName;
                         }
                         int a = dbSV.OptionServey_update(_DO.IDOT,_DO.ContentOT,_DO.IDSV,_DO.FilePath,_DO.OrderBy);
+                        var option = dbSV.OptionServeys.FirstOrDefault(x=>x.IDOT == _DO.IDOT);
+                        option.MaOT = _DO.MaOT;
+                        dbSV.SaveChanges();
                         TempData["msgSuccess"] = "<script>alert('Thêm mới thành công');</script>";
                     }
                 }
                 else
                 {
                     var a = dbSV.OptionServey_update(_DO.IDOT, _DO.ContentOT, _DO.IDSV, _DO.FilePath, _DO.OrderBy);
+                    var option = dbSV.OptionServeys.FirstOrDefault(x => x.IDOT == _DO.IDOT);
+                    option.MaOT = _DO.MaOT;
+                    dbSV.SaveChanges();
                 }
                 //var a = dbSV.ListServey_update(_DO.IDSV, _DO.ContentSV, _DO.StartTime, _DO.EndTime, _DO.StatusSV);
                 TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
@@ -1006,7 +1072,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                     item.ListSelect = columnSelectCom;
                 }
 
-                var DsLyDo = dbSV.CTKhaoSats.Where(x => x.IDSV == id && x.GhiChu != null).ToList();
+                var DsLyDo = dbSV.CTKhaoSats.Where(x => x.IDSV == id).ToList();
                 var res = (from a in dsSV.Where(x => x.IDSV == id)
                            join b in IDs on a.IDNV equals b.ID
                            join c in selectDC on a.IDDC equals c.ID into ulk
@@ -1024,7 +1090,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                                TenPhongBan = b.PhongBan.TenPhongBan,
                                LSPart = Ls.Where(x => x.IDNV == a.IDNV).ToList(),
                                MenuOT = a.MenuOT,
-                               LyDo = DsLyDo.Where(x => x.IDNV == a.IDNV).FirstOrDefault()?.GhiChu,
+                               LyDo = DsLyDo.Where(x => x.IDNV == a.IDNV).Count() != 0?DsLyDo.Where(x => x.IDNV == a.IDNV).FirstOrDefault()?.GhiChu:"",
                            }).ToList();
              
                 // ketqua Dang ky
@@ -1133,81 +1199,6 @@ namespace EPORTAL.Areas.Servey.Controllers
                         }
                         selec.Value = item.LyDo;
 
-
-                        //Worksheet.Cell("K" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 7).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("K" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("K" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("K" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("L" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 8).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("L" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("L" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("L" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("M" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 9).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("M" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("M" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("M" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("N" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 10).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("N" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("N" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("N" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("O" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 11).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("O" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("O" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("O" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("P" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 12).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("P" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("P" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("P" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("Q" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 13).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("Q" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("Q" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("Q" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("R" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 14).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("R" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("R" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("R" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("S" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 15).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("S" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("S" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("S" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("T" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 16).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("T" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("T" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("T" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("U" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 17).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("U" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("U" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("U" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("V" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 18).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("V" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("V" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("V" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("W" + row).Value = ctKS.Where(x => x.IDNV == item.IDNV && x.IDSV == item.IDSV && x.IDOT == 19).Count() != 0 ? "1" : "";
-                        //Worksheet.Cell("W" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("W" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("W" + row).Style.Alignment.WrapText = true;
-
-                        //Worksheet.Cell("X" + row).Value = item.ContentOT;
-                        //Worksheet.Cell("X" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("X" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("X" + row).Style.Alignment.WrapText = true;
-                        //Worksheet.Cell("F" + row).Value = menu;
-                        //Worksheet.Cell("F" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                        //Worksheet.Cell("F" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                        //Worksheet.Cell("F" + row).Style.Alignment.WrapText = true;
-
                         if (item.LSPart.Count > 0)
                         {
                             foreach (var pa in item.LSPart)
@@ -1313,65 +1304,6 @@ namespace EPORTAL.Areas.Servey.Controllers
                                         selecCom = selecCom.CellRight(); // Di chuyển sang ô bên phải
                                     }
 
-                                    //Worksheet.Cell("M" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 9).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("M" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("M" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("M" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("N" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 10).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("N" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("N" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("N" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("O" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 11).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("O" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("O" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("O" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("P" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 12).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("P" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("P" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("P" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("Q" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 13).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("Q" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("Q" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("Q" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("R" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 14).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("R" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("R" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("R" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("S" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 15).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("S" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("S" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("S" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("T" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 16).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("T" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("T" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("T" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("U" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 17).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("U" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("U" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("U" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("V" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 18).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("V" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("V" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("V" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("W" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 19).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("W" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("W" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("W" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("X" + row).Value = pa.DiaChi;
-                                    //Worksheet.Cell("X" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("X" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("X" + row).Style.Alignment.WrapText = true;
                                 }
                                 else
                                 {
@@ -1462,66 +1394,6 @@ namespace EPORTAL.Areas.Servey.Controllers
                                         selecCom.Value = data;
                                         selecCom = selecCom.CellRight(); // Di chuyển sang ô bên phải
                                     }
-
-                                    //Worksheet.Cell("M" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 9).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("M" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("M" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("M" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("N" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 10).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("N" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("N" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("N" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("O" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 11).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("O" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("O" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("O" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("P" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 12).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("P" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("P" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("P" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("Q" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 13).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("Q" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("Q" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("Q" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("R" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 14).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("R" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("R" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("R" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("S" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 15).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("S" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("S" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("S" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("T" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 16).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("T" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("T" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("T" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("U" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 17).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("U" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("U" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("U" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("V" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 18).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("V" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("V" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("V" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("W" + row).Value = ctNTDK.Where(x => x.IDNguoiThan == pa.ID && x.IDSV == item.IDSV && x.IDOT == 19).Count() != 0 ? "1" : "";
-                                    //Worksheet.Cell("W" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("W" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("W" + row).Style.Alignment.WrapText = true;
-
-                                    //Worksheet.Cell("X" + row).Value = pa.DiaChi;
-                                    //Worksheet.Cell("X" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-                                    //Worksheet.Cell("X" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-                                    //Worksheet.Cell("X" + row).Style.Alignment.WrapText = true;
                                 }
                                 //row++;
                             }

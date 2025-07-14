@@ -1,0 +1,67 @@
+﻿@model EPORTAL.ModelsServey.GroupKhaoSatView
+@*<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+    <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />*@
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="modal-dialog" style="max-width:800px" id="formF">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="ModalTitle"></h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+
+                @Html.HiddenFor(model => model.IDSV)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <fieldset id="SubmitForm">
+                    <div class="row">
+                        <div class="form-group col-md-6 " style="display:grid">
+                            <label class="mb-1">Tên Group</label>
+                            @Html.TextAreaFor(model => model.TenNhom, new { @class = "form-control", @rows = 1, placeholder = "Tên group", @id = "TenNhom", })
+                            @Html.ValidationMessageFor(model => model.TenNhom, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group col-md-3 " style="display:grid">
+                            <label class="mb-1">isShowRe</label>
+                            @Html.TextBoxFor(model => model.isShowRe, new { @class = "form-control", @rows = 1, @type = "number", placeholder = "", @id = "isShowRe", })
+                            @Html.ValidationMessageFor(model => model.isShowRe, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group col-md-3 " style="display:grid">
+                            <label class="mb-1">isChon</label>
+                            @Html.TextBoxFor(model => model.isChon, new { @class = "form-control", @rows = 1, @type = "number", placeholder = "", @id = "isChon", })
+                            @Html.ValidationMessageFor(model => model.isChon, "", new { @class = "text-danger" })
+                        </div>
+                        <ul id="list_nhom" style="width:100%">
+                            @foreach (var group in ViewBag.ListGroup as List<EPORTAL.ModelsServey.GroupKhaoSat>)
+                            {
+                                <li data-id="@group.ID">
+                                    @group.ID - @group.MaNhom  -  @group.TenNhom
+                                </li>
+                            }
+                        </ul>
+                        @*<div class="form-group col-md-12">
+                            <button id="add-vt" type="button" class="btn btn-secondary border border-white"><i class="fas fa-plus"></i></button>
+                        </div>*@
+
+                    </div>
+
+
+                    <div class="btn-margin-top text-center">
+                        <input type="submit" value="Thêm" class="btn btn-primary pull-right " />
+                        <input type="reset" value="Hủy" class="btn btn-danger pull-right button_cancel mr-1" data-dismiss="modal" />
+                    </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+
+

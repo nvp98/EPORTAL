@@ -10,12 +10,12 @@
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.OptionServey" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.PartTogether" Width="1.5" PointX="2.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.ResultServey" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="EPORTAL_SERVEYModel.CTKhaoSat" Width="1.5" PointX="5.375" PointY="3.75" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.GroupKhaoSat" Width="1.5" PointX="5.375" PointY="6.75" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.DiaDiem" Width="1.5" PointX="7.375" PointY="0.75" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.ChiTietDKNT" Width="1.5" PointX="0.75" PointY="7.75" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.CTDKNguoiThan" Width="1.5" PointX="2.75" PointY="7.75" />
         <EntityTypeShape EntityType="EPORTAL_SERVEYModel.GhiChu" Width="1.5" PointX="7.375" PointY="3.75" />
+        <EntityTypeShape EntityType="EPORTAL_SERVEYModel.CTKhaoSat" Width="1.5" PointX="7.375" PointY="6.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

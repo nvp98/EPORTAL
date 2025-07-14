@@ -44,36 +44,32 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.DKKhong = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 49).Count() != 0 ? "true" : "false";
             ViewBag.IDSV = IDSV;
             var group = (from a in dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV)
+                         let CtKS = dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault()
                          select new GroupKhaoSatView
                          {
                              ID = a.ID,
-                             IDSV=a.IDSV,
+                             IDSV = a.IDSV,
                              MaNhom = a.MaNhom,
                              TenNhom = a.TenNhom,
-                             OptionList =  new OptionList
-                                           {
-                                               ID = a.ID,
-                                               //IDNV = aaa.IDNV,
-                                               GhiChu = dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().GhiChu,
-                                               Answer = (int?) dbSV.CTKhaoSats.Where(x=>x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().IDOT ?? default,
-                                               //ContentSV = aa,
-                                               //XNSV = a.XNSV,
-                                               //IDSV = IDSV,
-                                               //Status = dbSV.ListServeys.Where(x => x.StartTime <= ts && x.EndTime >= ts).ToList().Count() > 0 ? true : false,
-                                               OptionLS = (from ks in dbSV.OptionServeys.Where(x => x.IDSV == IDSV && x.MaOT == a.MaNhom )
-                                                           select new OptionValidation
-                                                           {
-                                                               IDOT = ks.IDOT,
-                                                               ContentOT = ks.ContentOT,
-                                                               FilePath = ks.FilePath,
-                                                               OrderBy = ks.OrderBy,
-                                                               IDSV = (int)a.IDSV,
-                                                               MaOT = ks.MaOT,
-                                                               isShow =ks.isShow
-                                                           }).OrderBy(x => x.OrderBy).ToList()
-                                 //MenuOT = a.MenuOT,
+                             OptionList = new OptionList
+                             {
+                                 ID = a.ID,
+                                 GhiChu = CtKS != null? CtKS.GhiChu:"",
+                                 Answer = (int?)dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().IDOT ?? default,
+                                 OptionLS = (from ks in dbSV.OptionServeys.Where(x => x.IDSV == IDSV && x.MaOT == a.MaNhom)
+                                             select new OptionValidation
+                                             {
+                                                 IDOT = ks.IDOT,
+                                                 ContentOT = ks.ContentOT,
+                                                 FilePath = ks.FilePath,
+                                                 OrderBy = ks.OrderBy,
+                                                 IDSV = (int)a.IDSV,
+                                                 MaOT = ks.MaOT,
+                                                 isShow = ks.isShow
+                                             }).OrderBy(x => x.OrderBy).ToList()
                              },
-                         }).OrderBy(x=>x.MaNhom).ToList();
+                         }).OrderBy(x => x.MaNhom).ToList();
+
             var khongtgia = dbSV.CTKhaoSats.Where(x => x.IDNV == MyAuthentication.ID && x.IDOT == 49).FirstOrDefault();
 
             var res1 = new List<OptionList>();
