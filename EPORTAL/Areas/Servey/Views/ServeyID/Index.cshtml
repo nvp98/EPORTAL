@@ -125,17 +125,17 @@
                             <div class="row col-10">
 
                                 <div class="col-3">
-                                     <a href="../../../../assets/pdf/totrinhHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a> 
-                                   @* <a href="../../../../assets/pdf/TaiLieuHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tài liệu H - Day</a>*@
+                                    <a href="../../../../assets/pdf/totrinhHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>
+                                    @* <a href="../../../../assets/pdf/TaiLieuHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tài liệu H - Day</a>*@
                                 </div>
                                 <div class="col-3">
-                                     <a href="../../../../assets/pdf/theleHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>THỂ LỆ</a> 
-                                  @*  <a href="../../../../assets/pdf/TotrinhHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>*@
+                                    <a href="../../../../assets/pdf/theleHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>THỂ LỆ</a>
+                                    @*  <a href="../../../../assets/pdf/TotrinhHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>*@
                                 </div>
-                                <!--<div class="col-3">
-                                     <a href="../../../../assets/pdf/huongdanDL2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>HƯỚNG DẪN ĐĂNG KÝ</a>--> 
-                                   @* <a href="../../../../assets/pdf/ThongTinHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông tin chương trình</a>*@
-                                <!--</div>-->
+                                <div class="col-3">
+                                    <a href="../../../../assets/pdf/giaithuongHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>GIẢI THƯỞNG</a>
+                                    @*<a href="../../../../assets/pdf/ThongTinHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông tin chương trình</a>*@
+                                </div>
                             </div>
                             <div class="col-md-2">
                                 @if (ViewBag.TinhTrangDK == 0)
@@ -183,7 +183,7 @@
                                         {
                                             <th class="text-center">@hd</th>
                                         }
-                                        <th class="text-center">Lý do không tham gia (ghi chú)</th>
+                                        @*<th class="text-center">Lý do không tham gia (ghi chú)</th>*@
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -243,22 +243,22 @@
                                             </div>
                                             //thêm lưu ý
                                             @*if (Request.QueryString["IDSV"] == "6")
-                                            {
-                                                <div class="font-weight-bold text-danger">
-                                                    Dành cho CBNV tham gia trên tinh thần tự nguyện không bắt buộc.​ <br>
+                                                {
+                                                    <div class="font-weight-bold text-danger">
+                                                        Dành cho CBNV tham gia trên tinh thần tự nguyện không bắt buộc.​ <br>
 
-                                                    Quyên góp vật phẩm (truyện, sách có tính giáo dục) quyên góp tối thiểu 1, tối đa 3 vật phẩm.
+                                                        Quyên góp vật phẩm (truyện, sách có tính giáo dục) quyên góp tối thiểu 1, tối đa 3 vật phẩm.
 
-                                                </div>
-                                            }
-                                            else if (Request.QueryString["IDSV"] == "7")
-                                            {
-                                                <div class="font-weight-bold text-danger">
-                                                    Ngày dự thi 16 -17/8/2024 ​ <br>
+                                                    </div>
+                                                }
+                                                else if (Request.QueryString["IDSV"] == "7")
+                                                {
+                                                    <div class="font-weight-bold text-danger">
+                                                        Ngày dự thi 16 -17/8/2024 ​ <br>
 
-                                                    Khung giờ dự thi : 5 khung giờ cố định mỗi ngày (CBNV Chỉ lựa chọn duy nhất 1 khung giờ dự thi)
-                                                </div>
-                                            }*@
+                                                        Khung giờ dự thi : 5 khung giờ cố định mỗi ngày (CBNV Chỉ lựa chọn duy nhất 1 khung giờ dự thi)
+                                                    </div>
+                                                }*@
                                             for (int i = 0; i < gr.OptionList.OptionLS.Count; i++)
                                             {
                                                 var k = i + 1; n++;
@@ -295,9 +295,9 @@
 
 
                                         @*<div class="questions__question">
-            <input type="radio" name="answer" id="answer-2">
-            <label for="answer-2" data-question-number="2">Kralj</label>
-        </div>*@
+                                                <input type="radio" name="answer" id="answer-2">
+                                                <label for="answer-2" data-question-number="2">Kralj</label>
+                                            </div>*@
 
                                     </div>
                                 </div>
@@ -315,23 +315,23 @@
                         <!--</div>
                             </div>
                         </div>-->
-                    <div class="formLyDo" style=@(ViewBag.DKKhong == "false" ? "display:none" : "")>
-                        <h4 class="font-weight-bold">Lý do không tham gia:</h4>
-                        <select class="form-control marginTB5 SelectLyDo" name="LyDo" id="LyDo">
-                            @foreach (var item in ViewBag.LyDo)
-                            {
-                                if (item.Value == ViewBag.LyDoChon)
+                        <div class="formLyDo" style=@(ViewBag.DKKhong == "false" ? "display:none" : "")>
+                            <h4 class="font-weight-bold">Lý do không tham gia:</h4>
+                            <select class="form-control marginTB5 SelectLyDo" name="LyDo" id="LyDo">
+                                @foreach (var item in ViewBag.LyDo)
                                 {
-                                    <option value='@item.Value' selected>@item.Text</option>
-                                }
-                                else
-                                {
-                                    <option value='@item.Value'>@item.Text</option>
-                                }
+                                    if (item.Value == ViewBag.LyDoChon)
+                                    {
+                                        <option value='@item.Value' selected>@item.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value='@item.Value'>@item.Text</option>
+                                    }
 
-                            }
-                        </select>
-                    </div>
+                                }
+                            </select>
+                        </div>
 
                         <div class="formPart" style=@(ViewBag.checkShowDK == "false" ? "display:none" : "")>
                             <div class="m-auto w-100">
@@ -408,9 +408,9 @@
                                 </div>
                             </div>
 
-                             <h4 class="font-weight-bold ">3. Đăng ký cho người thân (Không làm trong Công ty)</h4> 
+                            <h4 class="font-weight-bold ">3. Đăng ký cho người thân (Không làm trong Công ty)</h4>
                             @*<h4 class="font-weight-bold @(Request.QueryString["IDSV"] == "7"?"d-none":"")">II. ĐĂNG KÝ THÔNG TIN CON CỦA CBNV THAM GIA TẶNG SÁCH</h4>*@
-                            <div class="card-body"  style="padding:15px 10px;">
+                            <div class="card-body" style="padding:15px 10px;">
                                 <div class="table-responsive" style="">
                                     <table class="table table-bordered table-hover" id="table2" width="100%" cellpadding="0" data-show-columns="true">
                                         <thead class="thead-light">
@@ -523,6 +523,23 @@
 </div>
 
 <script type="text/javascript">
+    $("form .questions input:radio").change(function () {
+        if ($(this).val() >= 60 && $(this).val() <= 64) { // thay 25 bằng ID lựa chọn
+            // Disable your roomnumber element here
+            $('input[name="gr.OptionList.Answer[15]"]').removeAttr('checked').prop('checked', false);
+            //$('.LuaChon_15').hide();
+
+        } else if ($(this).val() >= 65 && $(this).val() <= 69) {
+            // Re-enable here I guess
+            $('input[name="gr.OptionList.Answer[14]"]').removeAttr('checked').prop('checked', false);
+            //$('.LuaChon_14').hide();
+           
+        }
+    });
+</script>
+
+<script type="text/javascript">
+
     function disableButton() {
         document.getElementById("submitButton").disabled = true;
         document.getElementById("submit-op").submit();
@@ -663,7 +680,7 @@ $(document).ready(function () {
                 width: "100%",
             });
         });
-    
+
                 //$("#table").on("change", ".SelectBP", function () {
                 //    var idpb = $(this).val();
                 //    var iddex = $(this).attr('id').split("_")[1];

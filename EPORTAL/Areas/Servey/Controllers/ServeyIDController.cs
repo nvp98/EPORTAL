@@ -327,7 +327,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                         keysSelectChoose.Add(sl);
                     }
                 }
-                if (keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("49") || keysToRemove.Contains("49")) { // 25 OTID server lựa chọn 0
+                if (keysSelectChoose.Count != 0 || keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("49") || keysToRemove.Contains("49")) { // 25 OTID server lựa chọn 0
                     foreach (var key in gr)
                     {
                         var sl = collection["gr.OptionList.Answer[" + key.ID + "]"];
