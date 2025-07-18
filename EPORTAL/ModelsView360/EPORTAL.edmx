@@ -2984,9 +2984,9 @@
           <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
           </FunctionImport>
           <EntitySet Name="KhaiBao_ConCai" EntityType="EPORTALModel.KhaiBao_ConCai" />
-          <EntitySet Name="KhaiBao_NhanVien" EntityType="EPORTALModel.KhaiBao_NhanVien" />
           <EntitySet Name="KhaiBao_VoChong" EntityType="EPORTALModel.KhaiBao_VoChong" />
           <EntitySet Name="NT_Workplace" EntityType="EPORTALModel.NT_Workplace" />
+          <EntitySet Name="KhaiBao_NhanVien" EntityType="EPORTALModel.KhaiBao_NhanVien" />
         </EntityContainer>
         <ComplexType Name="Album_searchByID_Result">
           <Property Type="Int32" Name="IDAlbum" Nullable="false" />
@@ -3426,17 +3426,6 @@
           <Property Name="GiayKhaiSinh" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="MaNhanVien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="KhaiBao_NhanVien">
-          <Key>
-            <PropertyRef Name="KhaiBaoID" />
-          </Key>
-          <Property Name="KhaiBaoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="MaNhanVien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="TenNhanVien" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="LoaiKhaiBao" Type="Int16" />
-          <Property Name="DaXacNhan" Type="Boolean" />
-          <Property Name="NgayKhaiBao" Type="DateTime" Precision="3" />
-        </EntityType>
         <EntityType Name="KhaiBao_VoChong">
           <Key>
             <PropertyRef Name="VoChongID" />
@@ -3452,6 +3441,17 @@
           </Key>
           <Property Name="IDKV" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TenKV" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="KhaiBao_NhanVien">
+          <Key>
+            <PropertyRef Name="KhaiBaoID" />
+          </Key>
+          <Property Name="KhaiBaoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaNhanVien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TenNhanVien" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiKhaiBao" Type="Int16" />
+          <Property Name="DaXacNhan" Type="Boolean" />
+          <Property Name="NgayKhaiBao" Type="DateTime" Precision="3" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -4623,18 +4623,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="KhaiBao_NhanVien">
-            <EntityTypeMapping TypeName="EPORTALModel.KhaiBao_NhanVien">
-              <MappingFragment StoreEntitySet="KhaiBao_NhanVien">
-                <ScalarProperty Name="NgayKhaiBao" ColumnName="NgayKhaiBao" />
-                <ScalarProperty Name="DaXacNhan" ColumnName="DaXacNhan" />
-                <ScalarProperty Name="LoaiKhaiBao" ColumnName="LoaiKhaiBao" />
-                <ScalarProperty Name="TenNhanVien" ColumnName="TenNhanVien" />
-                <ScalarProperty Name="MaNhanVien" ColumnName="MaNhanVien" />
-                <ScalarProperty Name="KhaiBaoID" ColumnName="KhaiBaoID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="KhaiBao_VoChong">
             <EntityTypeMapping TypeName="EPORTALModel.KhaiBao_VoChong">
               <MappingFragment StoreEntitySet="KhaiBao_VoChong">
@@ -4650,6 +4638,18 @@
               <MappingFragment StoreEntitySet="NT_Workplace">
                 <ScalarProperty Name="TenKV" ColumnName="TenKV" />
                 <ScalarProperty Name="IDKV" ColumnName="IDKV" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KhaiBao_NhanVien">
+            <EntityTypeMapping TypeName="EPORTALModel.KhaiBao_NhanVien">
+              <MappingFragment StoreEntitySet="KhaiBao_NhanVien">
+                <ScalarProperty Name="NgayKhaiBao" ColumnName="NgayKhaiBao" />
+                <ScalarProperty Name="DaXacNhan" ColumnName="DaXacNhan" />
+                <ScalarProperty Name="LoaiKhaiBao" ColumnName="LoaiKhaiBao" />
+                <ScalarProperty Name="TenNhanVien" ColumnName="TenNhanVien" />
+                <ScalarProperty Name="MaNhanVien" ColumnName="MaNhanVien" />
+                <ScalarProperty Name="KhaiBaoID" ColumnName="KhaiBaoID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
