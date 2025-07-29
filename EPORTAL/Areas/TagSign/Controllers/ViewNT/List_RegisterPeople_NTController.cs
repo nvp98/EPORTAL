@@ -1283,7 +1283,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             if ( String.IsNullOrEmpty(CapMoi)  && String.IsNullOrEmpty(GiaHan) && String.IsNullOrEmpty(BoSungCong) && String.IsNullOrEmpty(CapLai) && String.IsNullOrEmpty(ChuyenNT))
                             {
 
-                                TempData["msgSuccess"] = "<script>alert( Vui lòng tích chọn loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
+                                TempData["msgSuccess"] = "<script>alert(' Vui lòng tích chọn loại đăng ký thẻ. Nhân viên : " + HoVaTen + "');</script>";
                                 return RedirectToAction("Edit", "List_RegisterPeople_NT", new { id = _DO.DKTN_ID });
 
                             }
@@ -1933,10 +1933,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             ViewBag.VP1C_List = new SelectList(VP1C, "IDNhanVien", "HoTen");
 
 
-            return PartialView();
+            return View();
         }
         [HttpPost]
-        public ActionResult CheckInformation(List_RegisterPeopleValidation _DO, FormCollection collection, int? id)
+        public ActionResult CheckInformation(List_RegisterPeopleValidation _DO, FormCollection collection, int? id, List<BPLienQuanEXT> BPLienQuanEXT)
         {
             try
             {
@@ -1945,6 +1945,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 DateTime? DateNow = DateTime.ParseExact(Date, format, CultureInfo.InvariantCulture);
                 List<int> List_NhanVien = new List<int>();
                 List<List_RegisterPeopleValidation> List = new List<List_RegisterPeopleValidation>();
+
+               
                 foreach (var key in collection.AllKeys)
                 {
                     if (key != "__RequestVerificationToken")
@@ -1981,7 +1983,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                             });
                         }
-                        if (key == "CBNV4" && collection["CBNV4"] != "")
+                        if (key == "CBNV4" && collection["CBNV4"] != "") // KTV BPLQ
                         {
                             string ID_NV1 = collection["CBNV4"];
                             List.Add(new List_RegisterPeopleValidation()
@@ -1991,7 +1993,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                             });
                         }
-                        if (key == "CBNV5" && collection["CBNV5"] != "")
+                        if (key == "CBNV5" && collection["CBNV5"] != "") //TP BPLQ
                         {
                             string ID_NV1 = collection["CBNV5"];
                             List.Add(new List_RegisterPeopleValidation()
@@ -2001,26 +2003,27 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                             });
                         }
-                        if (key == "CBNV6" && collection["CBNV6"] != "")
-                        {
-                            string ID_NV1 = collection["CBNV6"];
-                            List.Add(new List_RegisterPeopleValidation()
-                            {
-                                ID_NV = Convert.ToInt32(ID_NV1),
-                                LuongXuLY = 6
+                        
+                        //if (key == "CBNV6" && collection["CBNV6"] != "")
+                        //{
+                        //    string ID_NV1 = collection["CBNV6"];
+                        //    List.Add(new List_RegisterPeopleValidation()
+                        //    {
+                        //        ID_NV = Convert.ToInt32(ID_NV1),
+                        //        LuongXuLY = 6
 
-                            });
-                        }
-                        if (key == "CBNV7" && collection["CBNV7"] != "")
-                        {
-                            string ID_NV1 = collection["CBNV7"];
-                            List.Add(new List_RegisterPeopleValidation()
-                            {
-                                ID_NV = Convert.ToInt32(ID_NV1),
-                                LuongXuLY = 7
+                        //    });
+                        //}
+                        //if (key == "CBNV7" && collection["CBNV7"] != "")
+                        //{
+                        //    string ID_NV1 = collection["CBNV7"];
+                        //    List.Add(new List_RegisterPeopleValidation()
+                        //    {
+                        //        ID_NV = Convert.ToInt32(ID_NV1),
+                        //        LuongXuLY = 7
 
-                            });
-                        }
+                        //    });
+                        //}
                         if (key == "CBNV8" && collection["CBNV8"] != "")
                         {
                             string ID_NV1 = collection["CBNV8"];
@@ -2029,15 +2032,60 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             {
                                 ID_NV = Convert.ToInt32(ID_NV1),
                                 LuongXuLY = 8
-
+                                
                             });
                         }
                     }
                 }
+                //BPLQ bổ sung
+                if (BPLienQuanEXT != null)
+                {
+                    foreach (var item in BPLienQuanEXT)
+                    {
+                        if (item != null)
+                        {
+                            if (item.NhanVienIDKTV != null && item.NhanVienTPBP != null || item.NhanVienTPBP != null)
+                            {
+                                if (item.NhanVienIDKTV != null)
+                                {
+                                    List.Add(new List_RegisterPeopleValidation()
+                                    {
+                                        ID_NV = Convert.ToInt32(item.NhanVienIDKTV),
+                                        LuongXuLY = 4
+
+                                    });
+                                }
+                                if (item.NhanVienTPBP != null)
+                                {
+                                    List.Add(new List_RegisterPeopleValidation()
+                                    {
+                                        ID_NV = Convert.ToInt32(item.NhanVienTPBP),
+                                        LuongXuLY = 5
+
+                                    });
+                                }
+                            }
+                        }
+
+                    }
+                }
+
                 int CapDuyet = 1;
+                List = List.OrderBy(x => x.LuongXuLY).ToList();
                 foreach (var item in List)
                 {
-                    db_dk.SignOff_Flow_Insert(id, CapDuyet, item.LuongXuLY, item.ID_NV, null, 0, null);
+                    if(item.LuongXuLY == 4)
+                    {
+                        db_dk.SignOff_Flow_Insert(id, 4, item.LuongXuLY, item.ID_NV, null, 0, null);
+                    }
+                    if (item.LuongXuLY == 5)
+                    {
+                        db_dk.SignOff_Flow_Insert(id, 5, item.LuongXuLY, item.ID_NV, null, 0, null);
+                    }
+                    if(item.LuongXuLY != 4 && item.LuongXuLY != 5)
+                    {
+                        db_dk.SignOff_Flow_Insert(id, CapDuyet, item.LuongXuLY, item.ID_NV, null, 0, null);
+                    }
                     CapDuyet++;
 
                 }
@@ -2052,6 +2100,30 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             }
             return RedirectToAction("Index", "List_RegisterPeople_NT");
         }
+
+        [HttpGet]
+        public JsonResult GetListBP()
+        {
+            var model = db.PhongBans.Where(x=>x.status ==1).Select(x => new { x.IDPhongBan, x.TenPhongBan }).ToList();
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult GetListKyDuyet(int IDPhongBan)
+        {
+            var nhanvien = db.NhanViens.Where(x => x.IDTinhTrangLV == 1 && x.IDPhongBan == IDPhongBan).Select(x => new { x.HoTen,x.MaNV,x.ID }).AsNoTracking();
+            var data = (from au in db.AuthorizationContractors
+                        join a in nhanvien on au.IDNhanVien equals a.ID
+                        join kd in db.KD_LoaiKyDuyet on au.IDLKD equals kd.IDLKD
+                        select new CheckInforUser
+                        {
+                            IDNhanVien = (int)au.IDNhanVien,
+                            HoTen = a.HoTen + " : " + a.MaNV,
+                            IDLKD = (int)au.IDLKD
+                        }).ToList();
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult Cancel(int? id)
         {
             try

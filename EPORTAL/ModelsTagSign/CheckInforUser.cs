@@ -10,5 +10,6 @@ namespace EPORTAL.ModelsTagSign
         public int IDNhanVien { get; set; }
         public string MaNV { get; set; }
         public string HoTen { get; set; }
+        public int IDLKD { get; set; }
     }
 }
