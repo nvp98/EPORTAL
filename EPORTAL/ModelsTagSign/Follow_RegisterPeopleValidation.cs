@@ -24,6 +24,7 @@ namespace EPORTAL.ModelsTagSign
 
         public int TrinhKy_ID { get; set; }
         public int LoaiNT_ID { get; set; }
-        
+        public int? IDPhongBan { get; set; }
+
     }
 }

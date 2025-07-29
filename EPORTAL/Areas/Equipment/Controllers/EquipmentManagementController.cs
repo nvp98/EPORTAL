@@ -26,7 +26,10 @@ namespace EPORTAL.Areas.Equipment.Controllers
             if (search == null) search = "";
             ViewBag.search = search;
             if (statusCheck == null) statusCheck = "";
-            var res = from a in db.NV_QuanLyThietBi_select(search)
+            var nhanvien = dbE.NhanViens.AsNoTracking().ToList();
+            var res = (from a in db.NV_QuanLyThietBi_select(search)
+                      let b = nhanvien.FirstOrDefault(x=>x.MaNV == a.MaNV)
+                      let c = nhanvien.FirstOrDefault(x => x.MaNV == a.AdminNM)
                       select new NV_QuanLyThietBiValidation
                       {
                           IDQLTB = a.IDQLTB,
@@ -34,7 +37,7 @@ namespace EPORTAL.Areas.Equipment.Controllers
                           ServiceTag = a.ServiceTag,
                           IDTB = a.IDTB,
                           //MaNV = a.MaNV == null ? "" : (a.MaNV + "-" + dbE.NhanViens.Where(x => x.MaNV == a.MaNV).Select(x => x.HoTen).Single()),
-                          MaNV = TenNV(a.MaNV) ,
+                          MaNV =b != null? b.MaNV +"-"+ b.HoTen:"" ,
                           Phone = a.Phone,
                           IDSC = a.IDSC,
                           NgayLap = a.NgayLap,
@@ -47,9 +50,9 @@ namespace EPORTAL.Areas.Equipment.Controllers
                           TenLoiSC = a.TenLoiSC,
                           TenPhongBan = a.TenPhongBan,
                           //AdminNM = a.AdminNM == null ? "" : (a.AdminNM + "-" + dbE.NhanViens.Where(x => x.MaNV == a.AdminNM).Select(x => x.HoTen).Single())
-                          AdminNM = TenNV(a.AdminNM) 
+                          AdminNM = c != null ? c.MaNV + "-" + c.HoTen : "",
 
-                      };
+                      }).OrderByDescending(x=>x.IDQLTB).AsQueryable();
             if (begind != null && endd != null)
             {
                 res = res.Where(x => x.NgayLap >= begind && x.NgayLap <= endd);
@@ -68,7 +71,7 @@ namespace EPORTAL.Areas.Equipment.Controllers
             int pageSize = 50;
             int pageNumber = (page ?? 1);
 
-            return View(res.OrderByDescending(x => x.IDQLTB).ToList().ToPagedList(pageNumber, pageSize));
+            return View(res.ToList().ToPagedList(pageNumber, pageSize));
         }
         public string TenNV(string MaNV)
         {

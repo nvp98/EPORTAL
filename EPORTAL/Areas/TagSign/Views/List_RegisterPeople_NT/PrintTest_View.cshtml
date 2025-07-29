@@ -255,8 +255,8 @@
                                                         {
                                                             <td style="padding-left: 5px; border: 1px solid black;"></td>
                                                         }
-                                                        
-                                                        @if (item.DienThoaiDiDong==1)
+
+                                                        @if (item.DienThoaiDiDong == 1)
                                                         {
                                                             <td style="padding-left: 5px; border: 1px solid black;">X</td>
                                                         }
@@ -297,139 +297,139 @@
                                                             @List
                                                         </td>
                                                         @*<td style="padding-left: 5px; border: 1px solid black;">
-                                                            @{
-                                                                var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
-                                                            }
-                                                            @IDCong.NameContractorGroup
-                                                        </td>*@
+                                                @{
+                                                    var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
+                                                }
+                                                @IDCong.NameContractorGroup
+                                            </td>*@
                                                         <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
                                                     </tr>
                                                 }
                                                 else
                                                 {
-                                    <tr style="background-color: orangered; color: white;">
-                                        <td class="text-center" style="padding-left: 5px; border: 1px solid black;"> @RowNo@{RowNo++;}</td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">@item.HoVaTen</td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">@item.NgaySinh.ToString("dd-MM-yyyy")</td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">@item.CCCD</td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">@item.HoKhau</td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @{
-                                                var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
-                                            }
-                                            @IDCV.TenCV.ToString()
-                                        </td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @item.SoDienThoai
-                                        </td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @item.Ten_NTP
-                                        </td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @item.HoTen_QuanLy
-                                        </td>
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @item.SoDienThoai_QuanLy
-                                        </td>
-                                        @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                        }
+                                                    <tr style="background-color: orangered; color: white;">
+                                                        <td class="text-center" style="padding-left: 5px; border: 1px solid black;"> @RowNo@{RowNo++;}</td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">@item.HoVaTen</td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">@item.NgaySinh.ToString("dd-MM-yyyy")</td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">@item.CCCD</td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">@item.HoKhau</td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @{
+                                                                var IDCV = db.NT_Position.Where(x => x.IDCV == item.CV_ID).FirstOrDefault();
+                                                            }
+                                                            @IDCV.TenCV.ToString()
+                                                        </td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @item.SoDienThoai
+                                                        </td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @item.Ten_NTP
+                                                        </td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @item.HoTen_QuanLy
+                                                        </td>
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @item.SoDienThoai_QuanLy
+                                                        </td>
+                                                        @if (item.CapMoi == "1" || item.CapMoi == "X" || item.CapMoi == "x")
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                        }
 
-                                        @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                        }
-                                        @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                        }
-                                        @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                        }
-                                        @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                        }
-                                        @if (item.DienThoaiDiDong == 1)
-                                        {
-                                            <td>X</td>
-                                        }
-                                        else
-                                        {
-                                            <td></td>
-                                        }
-                                        <td width="180px" style="padding-left: 5px; border: 1px solid black;">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
-                                        @{
-                                            string ListKhuVuc = "";
-                                            string[] arrList = item.KhuVucLamViec.Split(',');
-                                            foreach (var ar in arrList)
-                                            {
-                                                if (ar != "")
-                                                {
-                                                    int IDKV = Convert.ToInt32(ar);
-                                                    var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
-                                                    ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
+                                                        @if (item.GiaHan == "2" || item.GiaHan == "X" || item.GiaHan == "x")
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                        }
+                                                        @if (item.BoSungCong == "3" || item.BoSungCong == "X" || item.BoSungCong == "x")
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                        }
+                                                        @if (item.CapLai == "4" || item.CapLai == "X" || item.CapLai == "x")
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                        }
+                                                        @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">X</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;"></td>
+                                                        }
+                                                        @if (item.DienThoaiDiDong == 1)
+                                                        {
+                                                            <td>X</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                        <td width="180px" style="padding-left: 5px; border: 1px solid black;">@item.ThoiHanThe.ToString("dd-MM-yyyy")</td>
+                                                        @{
+                                                            string ListKhuVuc = "";
+                                                            string[] arrList = item.KhuVucLamViec.Split(',');
+                                                            foreach (var ar in arrList)
+                                                            {
+                                                                if (ar != "")
+                                                                {
+                                                                    int IDKV = Convert.ToInt32(ar);
+                                                                    var NameKhuVuc = db.NT_Workplace.Where(x => x.IDKV == IDKV).FirstOrDefault();
+                                                                    ListKhuVuc = String.Concat(NameKhuVuc.TenKV + " , " + ListKhuVuc);
+                                                                }
+
+                                                            }
+                                                        }
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @ListKhuVuc
+                                                        </td>
+
+                                                        @{
+                                                            string List = "";
+                                                            string[] arrListStr = item.CongLamViec.Split(',');
+                                                            foreach (var ar in arrListStr)
+                                                            {
+                                                                int IDGate = Convert.ToInt32(ar);
+                                                                var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
+                                                                List = String.Concat(Cong.Gate + " , " + List);
+                                                            }
+                                                        }
+                                                        <td style="padding-left: 5px; border: 1px solid black;">
+                                                            @List
+                                                        </td>
+                                                        @*  <td style="padding-left: 5px; border: 1px solid black;">
+                                                @{
+                                                    var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
                                                 }
-
-                                            }
-                                        }
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @ListKhuVuc
-                                        </td>
-
-                                        @{
-                                            string List = "";
-                                            string[] arrListStr = item.CongLamViec.Split(',');
-                                            foreach (var ar in arrListStr)
-                                            {
-                                                int IDGate = Convert.ToInt32(ar);
-                                                var Cong = db.NT_Gate.Where(x => x.IDGate == IDGate).FirstOrDefault();
-                                                List = String.Concat(Cong.Gate + " , " + List);
-                                            }
-                                        }
-                                        <td style="padding-left: 5px; border: 1px solid black;">
-                                            @List
-                                        </td>
-                                        @*  <td style="padding-left: 5px; border: 1px solid black;">
-            @{
-                var IDCong = db.NT_ContractorGroup.Where(x => x.IDGroup == item.NhomNT).FirstOrDefault();
-            }
-            @IDCong.NameContractorGroup
-        </td>*@
-                                        <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
-                                        @if (item.Price == null || item.Price == "")
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
-                                        }
-                                        else
-                                        {
-                                            <td style="padding-left: 5px; border: 1px solid black;">@item.Price</td>
-                                        }
+                                                @IDCong.NameContractorGroup
+                                            </td>*@
+                                                        <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
+                                                        @if (item.Price == null || item.Price == "")
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">@item.GhiChu</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="padding-left: 5px; border: 1px solid black;">@item.Price</td>
+                                                        }
 
 
-                                    </tr>
+                                                    </tr>
                                                 }
 
                                             }
@@ -454,488 +454,93 @@
                     </div>
                     @if (ID_DKTN != null)
                     {
-                        if (ID_DKTN.LoaiNT_ID == 1)
-                        {
-                            // BP trình ký
-                            <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top:1%;">
-                                <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
-                                    <tr>
-                                        <th style="text-align: center !important;" width="20%">Tổ CPT (P.ATMT)</th>
-                                        @{
-                                            var BPLQ_CD_HT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            var BPLQ_CTH_HT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            if (BPLQ_CD_HT == null && BPLQ_CTH_HT == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">BP liên quan</th>
-                                            }
-                                            else if (BPLQ_CD_HT != null && BPLQ_CTH_HT == null)
-                                            {
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_HT.NhanVienID).FirstOrDefault();
+                        // BP trình ký
+                        <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top:1%;">
+                            <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
+                                <tr>
+                                    <th style="text-align: center !important;" width="20%">Tổ CPT (P.ATMT)</th>
+                                    @if (ID_DKTN.LoaiNT_ID != 1)
+                                    {
+                                        <th style="text-align: center !important;" width="20%"> P.ĐN</th>
+                                    }
+                                    @{
+                                        var BPLQ_CD_HT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                        //var BPLQ_CTH_HT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                        var BPLQ_EXT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).ToList();
+                                        var BPLQ_EXT_KTV = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 4 && x.DKTN_ID == ID_DKTN.ID_DKTN).ToList();
+                                        if (BPLQ_CD_HT == null)
+                                        {
+                                            <th style="text-align: center !important;" width="20%">BP liên quan</th>
+                                        }
+                                        else if (BPLQ_CD_HT != null)
+                                        {
+                                            <th style="text-align: center !important;" width="5%">
+                                                @{
+
+                                                    foreach (var item in BPLQ_EXT_KTV)
+                                                    {
+                                                        var NV_CD = db.NhanViens.Where(x => x.ID == item.NhanVienID).FirstOrDefault();
                                                         if (NV_CD != null)
                                                         {
 
                                                             <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
                                                         }
                                                     }
-                                                </th>
-                                                <th style="text-align: center !important;" width="15%">BP liên quan</th>
-                                            }
-                                            else if (BPLQ_CD_HT == null && BPLQ_CTH_HT != null)
-                                            {
-                                                <th style="text-align: center !important;" width="15%">BP liên quan</th>
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_HT != null && BPLQ_CTH_HT != null)
-                                            {
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
 
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="10%">BP liên quan</th>
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-
+                                                }
+                                            </th>
+                                            <th style="text-align: center !important;" width="15%">BP liên quan</th>
                                         }
+                                    }
 
-                                        <th style="text-align: center !important;" width="15%"> BP quản lý</th>
-                                        <th style="text-align: center !important;" width="5%">
-                                            @{
-                                                var KTV_KN = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 1 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (KTV_KN != null)
-                                                {
-                                                    var KTV = db.NhanViens.Where(x => x.ID == KTV_KN.NhanVienID).FirstOrDefault();
-                                                    <label style="padding-left: 5%;">
-                                                        <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(KTV.Chukynhay))" />
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%"> Đại diện Nhà thầu</th>
-                                    </tr>
-                                </thead>
-                            </table>
-
-                            // Chữ ký
-                            <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top:1%;">
-                                <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
-                                    <tr>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var VP1C_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 8 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (VP1C_CK != null)
-                                                {
-                                                    var NV_VP1C = db.NhanViens.Where(x => x.ID == VP1C_CK.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_VP1C.Chukychinh))" />
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
+                                    <th style="text-align: center !important;" width="15%"> BP quản lý</th>
+                                    <th style="text-align: center !important;" width="5%">
                                         @{
-                                            var BPLQ_CD_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            var BPLQ_CTH_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            if (BPLQ_CD_CK == null && BPLQ_CTH_CK == null)
+                                            var KTV_KN = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 1 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                            if (KTV_KN != null)
                                             {
-                                                <th style="text-align: center !important;" width="20%">
-
-                                                </th>
+                                                var KTV = db.NhanViens.Where(x => x.ID == KTV_KN.NhanVienID).FirstOrDefault();
+                                                <label style="padding-left: 5%;">
+                                                    <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(KTV.Chukynhay))" />
+                                                </label>
                                             }
-                                            else if (BPLQ_CD_CK != null && BPLQ_CTH_CK == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            <img style="width: 50%; padding-bottom: 20%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_CK == null && BPLQ_CTH_CK != null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_CK != null && BPLQ_CTH_CK != null)
-                                            {
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-
                                         }
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var BPQL_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 2 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (BPQL_CK != null)
-                                                {
-                                                    var NV_BPQL = db.NhanViens.Where(x => x.ID == BPQL_CK.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_BPQL.Chukychinh))" />
+                                    </th>
+                                    <th style="text-align: center !important;" width="20%"> Đại diện Nhà thầu</th>
+                                </tr>
+                            </thead>
+                        </table>
 
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var NV_NT = db_dk.RegisterPeoples.Where(x => x.ID_DKTN == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                var IDNVNT = dbNT.NT_UserTemp.Where(x => x.ID == NV_NT.NhanVienNT_ID).FirstOrDefault();
+                        // Chữ ký
+                        <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top:1%;">
+                            <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
+                                <tr>
+                                    <th style="text-align: center !important; vertical-align: top;" width="20%">
+                                        @{
+                                            var VP1C_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 8 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                            if (VP1C_CK != null)
+                                            {
+                                                var NV_VP1C = db.NhanViens.Where(x => x.ID == VP1C_CK.NhanVienID).FirstOrDefault();
                                                 <label>
                                                     <b>
-                                                        <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(IDNVNT.ChuKy))" />
+                                                        <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_VP1C.Chukychinh))" />
+                                                        <div> @NV_VP1C.HoTen</div>
                                                     </b>
                                                 </label>
                                             }
-                                        </th>
-                                    </tr>
-                                </thead>
-                            </table>
-                            // Họ và tên
-                            <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top: 1%;">
-                                <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
-                                    <tr>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var VP1C = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 8 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (VP1C != null)
-                                                {
-                                                    var NV_VP1C = db.NhanViens.Where(x => x.ID == VP1C.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            @NV_VP1C.HoTen
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-
-                                        @{
-                                            var BPLQ_CD_T = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            var BPLQ_CTH_T = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            if (BPLQ_CD_T == null && BPLQ_CTH_T == null)
+                                            else
                                             {
-                                                <th style="text-align: center !important;" width="20%">
+                                                <label>
+                                                    <b>
 
-                                                </th>
+                                                    </b>
+                                                </label>
                                             }
-                                            else if (BPLQ_CD_T != null && BPLQ_CTH_T == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            @NV_CD.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_T == null && BPLQ_CTH_T != null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            @NV_CTH.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_T != null && BPLQ_CTH_T != null)
-                                            {
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            @NV_CD.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            @NV_CTH.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-
                                         }
-
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var BPQL = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 2 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (BPQL != null)
-                                                {
-                                                    var NV_BPQL = db.NhanViens.Where(x => x.ID == BPQL.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            @NV_BPQL.HoTen
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%">  Đại diện Nhà thầu</th>
-                                    </tr>
-                                </thead>
-                            </table>
-
-                        }
-                        else
-                        {
-                            // BP trình ký
-                            <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top:1%;">
-                                <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
-                                    <tr>
-                                        <th style="text-align: center !important;" width="20%">Tổ CPT (P.ATMT)</th>
-                                        @{
-                                            var BPLQ_CD_HT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            var BPLQ_CTH_HT = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            if (BPLQ_CD_HT == null && BPLQ_CTH_HT == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">BP liên quan</th>
-                                            }
-                                            else if (BPLQ_CD_HT != null && BPLQ_CTH_HT == null)
-                                            {
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="15%">BP liên quan</th>
-                                            }
-                                            else if (BPLQ_CD_HT == null && BPLQ_CTH_HT != null)
-                                            {
-                                                <th style="text-align: center !important;" width="15%">BP liên quan</th>
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_HT != null && BPLQ_CTH_HT != null)
-                                            {
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="10%">BP liên quan</th>
-                                                <th style="text-align: center !important;" width="5%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_HT.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-                                                            <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-
-                                        }
-                                        <th style="text-align: center !important;" width="20%"> P.ĐN</th>
-                                        <th style="text-align: center !important;" width="15%"> BP quản lý</th>
-                                        <th style="text-align: center !important;" width="5%">
-                                            @{
-                                                var KTV_KN = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 1 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (KTV_KN != null)
-                                                {
-                                                    var KTV = db.NhanViens.Where(x => x.ID == KTV_KN.NhanVienID).FirstOrDefault();
-                                                    <label style="padding-left: 5%;">
-                                                        <img style="width: 100%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(KTV.Chukynhay))" />
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%"> Đại diện Nhà thầu</th>
-                                    </tr>
-                                </thead>
-                            </table>
-
-                            // Chữ ký
-                            <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top:1%;">
-                                <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
-                                    <tr>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var VP1C_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 8 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (VP1C_CK != null)
-                                                {
-                                                    var NV_VP1C = db.NhanViens.Where(x => x.ID == VP1C_CK.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_VP1C.Chukychinh))" />
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        @{
-                                            var BPLQ_CD_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            var BPLQ_CTH_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            if (BPLQ_CD_CK == null && BPLQ_CTH_CK == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_CK != null && BPLQ_CTH_CK == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            <img style="width: 50%; padding-bottom: 20%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_CK == null && BPLQ_CTH_CK != null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_CK != null && BPLQ_CTH_CK != null)
-                                            {
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_CK.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CTH.Chukychinh))" />
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-
-                                        }
-                                        <th style="text-align: center !important;" width="20%">
+                                    </th>
+                                    @if (ID_DKTN.LoaiNT_ID != 1)
+                                    {
+                                        <th style="text-align: center !important; vertical-align: top;" width="20%">
                                             @{
                                                 var HCDN_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 3 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
                                                 if (HCDN_CK != null)
@@ -944,176 +549,72 @@
                                                     <label>
                                                         <b>
                                                             <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_HCDN.Chukychinh))" />
-
+                                                            <div> @NV_HCDN.HoTen</div>
                                                         </b>
                                                     </label>
                                                 }
                                             }
 
                                         </th>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var BPQL_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 2 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (BPQL_CK != null)
-                                                {
-                                                    var NV_BPQL = db.NhanViens.Where(x => x.ID == BPQL_CK.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_BPQL.Chukychinh))" />
+                                    }
+                                    @{
+                                        var BPLQ_CD_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                        //var BPLQ_CTH_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                        if (BPLQ_CD_CK == null)
+                                        {
+                                            <th style="text-align: center !important;" width="20%">
 
-                                                        </b>
-                                                    </label>
+                                            </th>
+                                        }
+                                        else if (BPLQ_CD_CK != null)
+                                        {
+                                            <th style="text-align: center !important; vertical-align: top;" width="20%">
+                                                @{
+
+                                                    foreach (var item in BPLQ_EXT)
+                                                    {
+                                                        var NV_CD = db.NhanViens.Where(x => x.ID == item.NhanVienID).FirstOrDefault();
+                                                        if (NV_CD != null)
+                                                        {
+                                                            <img style="width: 50%; padding-bottom: 20px;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_CD.Chukychinh))" />
+                                                            <div> @NV_CD.HoTen</div>
+                                                        }
+                                                    }
                                                 }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var NV_NT = db_dk.RegisterPeoples.Where(x => x.ID_DKTN == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                var IDNVNT = dbNT.NT_UserTemp.Where(x => x.ID == NV_NT.NhanVienNT_ID).FirstOrDefault();
+                                            </th>
+                                        }
+
+                                    }
+                                    <th style="text-align: center !important; vertical-align: top;" width="20%">
+                                        @{
+                                            var BPQL_CK = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 2 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                            if (BPQL_CK != null)
+                                            {
+                                                var NV_BPQL = db.NhanViens.Where(x => x.ID == BPQL_CK.NhanVienID).FirstOrDefault();
                                                 <label>
                                                     <b>
-                                                        <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(IDNVNT.ChuKy))" />
+                                                        <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(NV_BPQL.Chukychinh))" />
+                                                        <div> @NV_BPQL.HoTen</div>
                                                     </b>
                                                 </label>
                                             }
-                                        </th>
-                                    </tr>
-                                </thead>
-                            </table>
-                            // Họ và tên
-                            <table style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); padding-top: 1%;">
-                                <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
-                                    <tr>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var VP1C = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 8 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (VP1C != null)
-                                                {
-                                                    var NV_VP1C = db.NhanViens.Where(x => x.ID == VP1C.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            @NV_VP1C.HoTen
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-
-                                        @{
-                                            var BPLQ_CD_T = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 5 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            var BPLQ_CTH_T = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 7 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                            if (BPLQ_CD_T == null && BPLQ_CTH_T == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_T != null && BPLQ_CTH_T == null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            @NV_CD.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_T == null && BPLQ_CTH_T != null)
-                                            {
-                                                <th style="text-align: center !important;" width="20%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            @NV_CTH.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-                                            else if (BPLQ_CD_T != null && BPLQ_CTH_T != null)
-                                            {
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CD = db.NhanViens.Where(x => x.ID == BPLQ_CD_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CD != null)
-                                                        {
-                                                            @NV_CD.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                                <th style="text-align: center !important;" width="10%">
-                                                    @{
-                                                        var NV_CTH = db.NhanViens.Where(x => x.ID == BPLQ_CTH_T.NhanVienID).FirstOrDefault();
-                                                        if (NV_CTH != null)
-                                                        {
-
-                                                            @NV_CTH.HoTen
-                                                        }
-                                                    }
-                                                </th>
-                                            }
-
                                         }
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var HCĐN = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 3 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (HCĐN != null)
-                                                {
-                                                    var NV_HCĐN = db.NhanViens.Where(x => x.ID == HCĐN.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            @NV_HCĐN.HoTen
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%">
-                                            @{
-                                                var BPQL = db_dk.SignOff_Flow.Where(x => x.LuongXuLy == 2 && x.DKTN_ID == ID_DKTN.ID_DKTN).FirstOrDefault();
-                                                if (BPQL != null)
-                                                {
-                                                    var NV_BPQL = db.NhanViens.Where(x => x.ID == BPQL.NhanVienID).FirstOrDefault();
-                                                    <label>
-                                                        <b>
-                                                            @NV_BPQL.HoTen
-                                                        </b>
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label>
-                                                        <b>
-
-                                                        </b>
-                                                    </label>
-                                                }
-                                            }
-                                        </th>
-                                        <th style="text-align: center !important;" width="20%">  Đại diện Nhà thầu</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        }
+                                    </th>
+                                    <th style="text-align: center !important; vertical-align: top;" width="20%">
+                                        @{
+                                            var NV_NT = db_dk.RegisterPeoples.Where(x => x.ID_DKTN == ID_DKTN.ID_DKTN).FirstOrDefault();
+                                            var IDNVNT = dbNT.NT_UserTemp.Where(x => x.ID == NV_NT.NhanVienNT_ID).FirstOrDefault();
+                                            <label>
+                                                <b>
+                                                    <img style="width: 50%; padding-bottom: 5%;" src="@Url.Content("~/UploadedFiles/Signature/" + System.IO.Path.GetFileName(IDNVNT.ChuKy))" />
+                                                    <div style="text-align: center !important;" width="20%">  Đại diện Nhà thầu</div>
+                                                </b>
+                                            </label>
+                                        }
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
                     }
 
                     <div class="col-md-12 pt-5" style="width: 100%; padding-top: 3%;">

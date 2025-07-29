@@ -43,4 +43,10 @@ namespace EPORTAL.ModelsTagSign
         public int ID_NV { get; set; }
         public int LuongXuLY { get; set; }
     }
+    public class BPLienQuanEXT
+    {
+        public int IDPhongBan { get; set; }
+        public int? NhanVienIDKTV{ get; set; }
+        public int? NhanVienTPBP { get; set; }
+    }
 }

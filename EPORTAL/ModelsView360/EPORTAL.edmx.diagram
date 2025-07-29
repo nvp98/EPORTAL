@@ -60,9 +60,9 @@
         <EntityTypeShape EntityType="EPORTALModel.Virtual" Width="1.5" PointX="14.375" PointY="19.75" />
         <EntityTypeShape EntityType="EPORTALModel.VirtualGroup" Width="1.5" PointX="19.375" PointY="15.75" />
         <EntityTypeShape EntityType="EPORTALModel.KhaiBao_ConCai" Width="1.5" PointX="19.375" PointY="18.75" />
-        <EntityTypeShape EntityType="EPORTALModel.KhaiBao_NhanVien" Width="1.5" PointX="20.375" PointY="0.75" />
         <EntityTypeShape EntityType="EPORTALModel.KhaiBao_VoChong" Width="1.5" PointX="20.375" PointY="3.75" />
         <EntityTypeShape EntityType="EPORTALModel.NT_Workplace" Width="1.5" PointX="5.375" PointY="19.75" />
+        <EntityTypeShape EntityType="EPORTALModel.KhaiBao_NhanVien" Width="1.5" PointX="20.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
