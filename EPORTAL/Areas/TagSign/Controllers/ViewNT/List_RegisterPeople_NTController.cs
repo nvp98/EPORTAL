@@ -2104,7 +2104,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         [HttpGet]
         public JsonResult GetListBP()
         {
-            var model = db.PhongBans.Where(x=>x.status ==1).Select(x => new { x.IDPhongBan, x.TenPhongBan }).ToList();
+            var dsPhongBan = new List<string> { "BDA Sản xuất ray đường sắt và thép đặc biệt Hòa Phát Dung Quất", "BDA Công ty Chế tạo thiết bị" };
+            var model = db.PhongBans.Where(x=> dsPhongBan.Contains(x.TenPhongBan) && x.status ==1).Select(x => new { x.IDPhongBan, x.TenPhongBan }).ToList();
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }
