@@ -340,10 +340,32 @@ namespace EPORTAL.Areas.TagSign.Controllers
                     {
                         data.Add(check_list.FirstOrDefault());
                     }
-                    //if (check_list == null)
-                    //{
-                    //    data.Add(check_list);
-                    //}
+                    if (check_list.Count() == 0)
+                    {
+                        var Check_ = (from kd in db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
+                                          join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
+                                          select new Follow_RegisterPeopleValidation
+                                          {
+                                              ID_TK_TN = (int)kd.ID_TK_TN,
+                                              DKTN_ID = (int)kd.DKTN_ID,
+                                              NoiDung = ca.NoiDung,
+                                              TrinhKy_ID = (int?)ca.TrinhKy_ID ?? default,
+                                              LoaiNT_ID = (int)ca.LoaiNT_ID,
+                                              NgayTrinh = (DateTime?)ca.NgayTrinhKy ?? default,
+                                              NT_ID = (int?)ca.NhaThau_ID ?? default,
+                                              HopDong = ca.HopDong,
+                                              File_CCAT = ca.File_CCAT,
+                                              CapDuyet = (int)kd.CapDuyet,
+                                              TinhTrangID = (int)kd.TinhTrangID,
+                                              NhanVienID = (int)kd.NhanVienID,
+                                              NgayDuyet = (DateTime?)kd.NgayDuyet ?? default,
+                                              GhiChu = kd.GhiChu
+                                          }).FirstOrDefault();
+                        if (Check_ != null)
+                        {
+                            data.Add(Check_);
+                        }
+                    }
                 }
             }
 
