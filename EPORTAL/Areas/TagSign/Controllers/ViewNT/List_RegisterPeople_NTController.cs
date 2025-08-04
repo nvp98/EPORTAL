@@ -2070,7 +2070,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     }
                 }
 
-                int CapDuyet = 1;
+                //int CapDuyet = 1;
                 List = List.OrderBy(x => x.LuongXuLY).ToList();
                 foreach (var item in List)
                 {
@@ -2084,9 +2084,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     }
                     if(item.LuongXuLY != 4 && item.LuongXuLY != 5)
                     {
-                        db_dk.SignOff_Flow_Insert(id, CapDuyet, item.LuongXuLY, item.ID_NV, null, 0, null);
+                        db_dk.SignOff_Flow_Insert(id, item.LuongXuLY, item.LuongXuLY, item.ID_NV, null, 0, null);
                     }
-                    CapDuyet++;
+                    //CapDuyet++;
 
                 }
                 db_dk.RegisterPeople_UpdateFlow(id, 1);

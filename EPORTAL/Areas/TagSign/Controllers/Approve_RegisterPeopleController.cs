@@ -317,7 +317,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 }
                 else if (item.LuongXuLy == 8) //tổ cấp phát thẻ
                 {
-                    var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet <= 7  && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
+                    var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.LuongXuLy <= 7  && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
                                       join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
