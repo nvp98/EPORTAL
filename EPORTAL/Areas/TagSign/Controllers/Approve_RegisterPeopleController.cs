@@ -234,6 +234,13 @@ namespace EPORTAL.Areas.TagSign.Controllers
                     {
                         data.Add(check_list.FirstOrDefault());
                     }
+                    else if (check_list.Count() == 0)
+                    {
+                        if (firtDuyet != null)
+                        {
+                            data.Add(firtDuyet);
+                        }
+                    }
                     //if (check_list == null)
                     //{
                     //    data.Add(check_list);
