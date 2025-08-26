@@ -1,0 +1,177 @@
+﻿
+@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.CDNT_DonDangKyDetail>
+
+@{
+    ViewBag.Title = "Chi tiết đơn đăng ký";
+    Layout = "~/Views/Shared/PrintView.cshtml";
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@using EPORTAL.ModelsTagSign
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    // var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
+}
+<meta charset="utf-8" />
+<style>
+    .custom-table {
+        border-collapse: collapse !important;
+        width: 100%;
+    }
+
+        .custom-table,
+        .custom-table th,
+        .custom-table td {
+            border: 1px solid black !important;
+        }
+
+            .custom-table th,
+            .custom-table td {
+                text-align: center;
+                vertical-align: middle;
+                padding: 4px;
+            }
+</style>
+<div class="app-main__outer" style="margin-top: 0%;">
+    <div class="app-main__inner" style="display: block; padding-bottom: 0px; background-color:#fff;">
+        <div>
+
+            <div>
+                <div style="flex: 0 0 50%; float: left; max-width: 300px; text-align: center; font-weight: bold; font-size: 1.2rem; text-transform: uppercase;">
+                    <img alt="Hòa Phát Dung Quất" src="https://portal.hoaphatdungquat.vn/Content/assets/images/logo-inverse.png" width="90%" />
+                    <span class="" style="margin-top: 0; margin-bottom: 1rem;">Công ty Cổ phần Thép</span>
+                    <p class="" style="margin-top: 0; margin-bottom: 1rem;">Hòa Phát Dung Quất</p>
+
+                </div>
+                <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
+                    <span>BM.09/QT.20</span>
+                    <p><span style="font-style:italic;">Ngày hiệu lực:</span> 15/07/2024</p>
+                    <p><span style="font-style:italic;">Lần sửa đổi:</span> 01</p>
+                </div>
+                <div style="clear: both;"></div>
+                <div style="width: 100%; text-align: center; padding-bottom: 1rem;">
+                    <p style=" font-size: 1.5rem; font-weight: bold; white-space: nowrap;text-transform: uppercase;">
+                        Đơn đăng ký cấp thẻ dài ngày dành cho xe cơ động
+                    </p>
+                </div>
+
+                @{
+
+                    <div class="col-md-12">
+                        <label style="font-size:15px"> <b>Kính gửi:</b> Công ty Cổ phần Thép Hòa Phát Dung Quất.</label><br />
+                        <label style="font-size:15px">
+                            Để đáp ứng yêu cầu công việc, <b>Nhà thầu</b>
+                            @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].FullName))
+                            {
+                                <b><span>@Model[0].FullName</span></b>
+                            }
+                            else
+                            {
+                                <span>Không có dữ liệu</span>
+                            }đề nghị Quý Công ty cấp thẻ dài ngày dành cho xe cơ động theo danh sách dưới đây:
+                        </label>  <br />
+                    </div>
+                }
+                <div class="card-body" style="margin-top: 2%;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover custom-table" id="table" style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); border: 1px solid black !important; color: #000000 !important; text-indent: initial; border-collapse: collapse; " cellpadding="0">
+                            <thead>
+                                <tr style="background-color: #f8f9fa;">
+                                    <th width="5px" rowspan="2" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">TT</th>
+                                    <th class="text-center" colspan="3" width="100px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Đánh dấu "X" vào những ô cần chọn</th>
+                                    <th class="text-center" rowspan="2" width="60px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Biển số xe</th>
+                                    <th class="text-center" colspan="3" width="100px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Đánh dấu "X" vào những ô cần chọn</th>
+                                    <th class="text-center" rowspan="2" width="50px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Thời hạn thẻ xe cơ động</th>
+                                    <th class="text-center" rowspan="2" width="70px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Ghi chú</th>
+
+                                </tr>
+                                <tr>
+                                    <th width="30px" class="text-center" style="text-align: center !important; border: 1px solid black;">Xe máy</th>
+                                    <th width="30px" class="text-center" style="text-align: center !important; border: 1px solid black;">Xe ô tô</th>
+                                    <th width="30px" class="text-center" style="text-align: center !important; border: 1px solid black;">Xe 3 gác</th>
+
+                                    <th width="30px" class="text-center" style="text-align: center !important; border: 1px solid black;">Cấp mới</th>
+                                    <th width="30px" class="text-center" style="text-align: center !important; border: 1px solid black;">Cấp lại</th>
+                                    <th width="30px" class="text-center" style="text-align: center !important; border: 1px solid black;">Gia hạn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Count; i++)
+                                {
+                                    var item = Model[i];
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td class="text-center">@((item.ID_LoaiPhuongTien == 1) ? "X" : "")</td>
+                                        <td class="text-center">@((item.ID_LoaiPhuongTien == 2) ? "X" : "")</td>
+                                        <td class="text-center">@((item.ID_LoaiPhuongTien == 3) ? "X" : "")</td>
+                                        <td>@item.BienSoXe</td>
+                                        <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
+                                        <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
+                                        <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
+                                        <td>@(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "") – @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
+                                        <td>@item.GhiChu</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label style="font-size: 15px;">Nhà thầu cam kết tuân thủ quy định của Chủ đầu tư, chỉ giao xe cho CBNV đủ điều kiện điều khiển theo quy định pháp luật hiện hành. Nếu có sai phạm, Nhà thầu xin chịu hoàn toàn trách nhiệm trước Chủ đầu tư và pháp luật.</label><br />
+                </div>
+                @{
+
+                    <div class="col-md-12 pt-3 pull-right" style="margin-top: 0.5%;">
+                        <label style="font-size: 20px; font-style: italic; padding-right: 40px;">
+                            Quảng Ngãi, ngày...tháng...năm.....
+                        </label>
+                    </div>
+
+                    <table style="width: 100%; font-size: 20px; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); ">
+                        <thead style="display: table-header-group; vertical-align: middle; border-color: inherit;">
+                            <tr>
+                                <th style="text-align: center !important;" width="25%">Tổ CPT(P.ATMT)</th>
+
+                                <th style="text-align: center !important;" width="25%">
+                                    BP quản lý
+                                </th>
+                                <th style="text-align: center !important;" width="25%">  Đại diện Nhà thầu</th>
+                            </tr>
+                        </thead>
+                    </table>
+                }
+                <div class="col-md-12 pt-5" style="width:100%">
+                    <div style="margin-left: 2%; font-size: 15px; font-style: italic;">
+                        <p>
+                            <b>
+                                Ghi chú:
+                            </b><br />
+                            - Trường hợp đăng ký là xe ô tô, Nhà thầu điền thông tin người lái theo thẻ dài ngày dành cho người (Họ tên, số CCCD/Hộ chiếu) vào cột "Ghi chú" trên BM. <br />
+                            - Hồ sơ kèm theo đơn đăng ký: <br />
+                            + Xe ô tô: đăng ký, đăng kiểm, bảo hiểm, bằng lái. <br />
+                            + Xe máy, 3 gác: đăng ký. <br />
+                            - Trường hợp cấp lại thẻ không thay đổi thông tin thời hạn, chỉ ký Nhà thầu và Tổ CPT (P.ATMT). <br />
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
