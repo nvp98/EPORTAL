@@ -909,7 +909,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 string GiaHan = dt.Rows[i][11].ToString().Trim();
                                 string BoSungCong = dt.Rows[i][12].ToString().Trim();
                                 string CapLai = dt.Rows[i][13].ToString().Trim();
-                                string ChuyenDoiNT = dt.Rows[i][14].ToString().Trim();
+                                string ChuyenDoiNT = ""; // Bỏ Chuyển đổi NT
 
                                 if(CapMoi == "" && GiaHan == "" && BoSungCong == "" && CapLai == "" && ChuyenDoiNT=="")
                                 {
