@@ -153,7 +153,7 @@
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Chức vụ</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Số điện thoại</th>
                                             <th class="text-center" colspan="3" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Thông tin nhà thầu phụ <br /> ( Nếu thuộc NTP )</th>
-                                            <th class="text-center" colspan="5" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">
+                                            <th class="text-center" colspan="4" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">
                                                 Đánh dấu "X" vào
                                                 những ô cần chọn
                                             </th>
@@ -364,14 +364,14 @@
                                                         {
                                                             <td style="padding-left: 5px; border: 1px solid black;"></td>
                                                         }
-                                                        @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                        @*@if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
                                                         {
                                                             <td style="padding-left: 5px; border: 1px solid black;">X</td>
                                                         }
                                                         else
                                                         {
                                                             <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                        }
+                                                        }*@
                                                         @if (item.DienThoaiDiDong == 1)
                                                         {
                                                             <td>X</td>

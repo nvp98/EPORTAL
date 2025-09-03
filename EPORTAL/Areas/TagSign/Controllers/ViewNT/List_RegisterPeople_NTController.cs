@@ -1279,7 +1279,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             var GiaHan = collection["GiaHan_" + key.Split('_')[1]];
                             var BoSungCong = collection["BoSungCong_" + key.Split('_')[1]];
                             var CapLai = collection["CapLai_" + key.Split('_')[1]];
-                            var ChuyenNT = collection["ChuyenNT_" + key.Split('_')[1]];
+                            var ChuyenNT = ""; // bỏ
                             if ( String.IsNullOrEmpty(CapMoi)  && String.IsNullOrEmpty(GiaHan) && String.IsNullOrEmpty(BoSungCong) && String.IsNullOrEmpty(CapLai) && String.IsNullOrEmpty(ChuyenNT))
                             {
 
@@ -1484,33 +1484,33 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                  item.DienThoaiDiDong,
                                  "");
                         }
-                        else if (item.ChuyenNT != null)
-                        {
-                            var insert = db_dk.Detail_RegisterPeople_Insert
-                               (DKTN_ID,
-                                 item.HoVaTen,
-                                  item.NgaySinh,
-                                 item.CCCD,
-                                 item.HoKhau,
-                                 item.CV_ID,
-                                 item.SoDienThoai,
-                                 item.Ten_NTP,
-                                 item.HoTen_QuanLy,
-                                 item.SoDienThoai_QuanLy,
-                                 null,
-                                 null,
-                                 null,
-                                 null,
-                                 LoaiCap,
-                                 item.ThoiHanThe,
-                                 item.KhuVucLamViec,
-                                 item.CongLamViec,
-                                  /*item.NhomNT,*/
-                                  null,
-                                  item.GhiChu,
-                                 item.DienThoaiDiDong,
-                                 "");
-                        }
+                        //else if (item.ChuyenNT != null )
+                        //{
+                        //    var insert = db_dk.Detail_RegisterPeople_Insert
+                        //       (DKTN_ID,
+                        //         item.HoVaTen,
+                        //          item.NgaySinh,
+                        //         item.CCCD,
+                        //         item.HoKhau,
+                        //         item.CV_ID,
+                        //         item.SoDienThoai,
+                        //         item.Ten_NTP,
+                        //         item.HoTen_QuanLy,
+                        //         item.SoDienThoai_QuanLy,
+                        //         null,
+                        //         null,
+                        //         null,
+                        //         null,
+                        //         LoaiCap,
+                        //         item.ThoiHanThe,
+                        //         item.KhuVucLamViec,
+                        //         item.CongLamViec,
+                        //          /*item.NhomNT,*/
+                        //          null,
+                        //          item.GhiChu,
+                        //         item.DienThoaiDiDong,
+                        //         "");
+                        //}
 
                         TempData["msgSuccess"] = "<script>alert('Thêm mới thành công dòng');</script>";
 
