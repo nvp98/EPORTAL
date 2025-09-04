@@ -350,14 +350,14 @@
                                     Đăng ký
                                 </a>
                             </li>
-                           
-                            @*<li>
-                                <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
-                                    <i class="metismenu-icon fa-solid fa-list-ol"></i>
-                                    Khai báo thông tin Vợ/Chồng, Con
-                                </a>
 
-                            </li>*@
+                            @*<li>
+            <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
+                <i class="metismenu-icon fa-solid fa-list-ol"></i>
+                Khai báo thông tin Vợ/Chồng, Con
+            </a>
+
+        </li>*@
                             @if (listControll.Contains("FamilyDeclaration"))
                             {
                                 <li>
@@ -1012,6 +1012,45 @@
 
                                 </ul>
                             </li>
+                            @*đăng kí thẻ xe cơ động nhà thầu*@
+
+                        <li>
+                            <a href="#" id="CDNT">
+                                <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
+                                Đăng ký thẻ xe cơ động
+                                <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                            </a>
+                            <ul id="listatld1">
+
+                                <li>
+                                    <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
+                                        <i class="fa fa-file-archive p-lg-1 "></i>
+                                        Duyệt đơn
+                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                            <ul id="listatld2">
+
+                                <li>
+                                    <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
+                                        <i class="fa fa-file-archive p-lg-1 "></i>
+                                        Bộ phận cấp phát thẻ
+                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                            <ul id="listatld2">
+
+                                <li>
+                                    <a href="@Url.Action("DanhSachXe", "TheXeCoDong_NT", new {area="TagSign"})">
+                                        <i class="fa fa-file-archive p-lg-1 "></i>
+                                        Danh sách xe
+                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                             <li>
                                 <a href="#" id="CTRV">
                                     <i class="metismenu-icon fa fa-rectangle-list"></i>

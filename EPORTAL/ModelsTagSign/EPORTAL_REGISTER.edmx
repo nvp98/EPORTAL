@@ -5,6 +5,88 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="EPORTAL_REGISTERModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CDNT_ChiTietDon">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Ma_Don" Type="nvarchar" MaxLength="50" />
+          <Property Name="ID_LoaiPhuongTien" Type="int" />
+          <Property Name="BienSoXe" Type="nvarchar" MaxLength="15" />
+          <Property Name="CapMoi" Type="bit" />
+          <Property Name="CapLai" Type="bit" />
+          <Property Name="GiaHan" Type="bit" />
+          <Property Name="TuNgay" Type="date" />
+          <Property Name="DenNgay" Type="date" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="500" />
+          <Property Name="HoSoTheoXe" Type="nvarchar(max)" />
+          <Property Name="NguoiDuyet_ID" Type="int" />
+          <Property Name="TrangThaiDuyet_ID" Type="int" />
+        </EntityType>
+        <EntityType Name="CDNT_DonDangKy">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Ma_Don" Type="nvarchar" MaxLength="50" />
+          <Property Name="NoiDung" Type="nvarchar(max)" />
+          <Property Name="BPQL_ID" Type="int" />
+          <Property Name="NhanVienNT_ID" Type="int" />
+          <Property Name="NhaThau_ID" Type="int" />
+          <Property Name="HopDong" Type="nvarchar" MaxLength="150" />
+          <Property Name="NgayTrinhKy" Type="date" />
+          <Property Name="FileHoSoXe" Type="nvarchar(max)" />
+          <Property Name="TrinhKy_ID" Type="int" />
+          <Property Name="TinhTrang_ID" Type="int" />
+          <Property Name="LoaiNT_ID" Type="int" />
+          <Property Name="TinhTrangDuyet_ID" Type="int" />
+          <Property Name="ThoiGianDuyet" Type="datetime" />
+        </EntityType>
+        <EntityType Name="CDNT_LoaiPhuongTien">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LoaiPhuongTien" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="CDNT_TinhTrang">
+          <Key>
+            <PropertyRef Name="TinhTrang_ID" />
+          </Key>
+          <Property Name="TinhTrang_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenTinhTrang" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="CDNT_TrinhKy">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Ma_Don" Type="nvarchar" MaxLength="50" />
+          <Property Name="CapDuyet" Type="int" />
+          <Property Name="NguoiDuyet_ID" Type="int" />
+          <Property Name="NgayDuyet" Type="datetime" />
+          <Property Name="TinhTrang_ID" Type="int" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="CDNT_XeCoDong">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID_NT" Type="int" />
+          <Property Name="BP_ID" Type="int" />
+          <Property Name="TenNhaThau" Type="nvarchar" MaxLength="500" />
+          <Property Name="TenDayDu" Type="nvarchar" MaxLength="255" />
+          <Property Name="HoVaTen" Type="nvarchar" MaxLength="255" />
+          <Property Name="CMND_CCCD" Type="nvarchar" MaxLength="255" />
+          <Property Name="BienSoXe" Type="nvarchar" MaxLength="255" />
+          <Property Name="LoaiPhuongTien" Type="nvarchar" MaxLength="255" />
+          <Property Name="Hang" Type="nvarchar" MaxLength="255" />
+          <Property Name="Dong" Type="nvarchar" MaxLength="255" />
+          <Property Name="MauSac" Type="nvarchar" MaxLength="255" />
+          <Property Name="TuNgay" Type="nvarchar" MaxLength="255" />
+          <Property Name="DenNgay" Type="nvarchar" MaxLength="255" />
+        </EntityType>
         <EntityType Name="Detail_RegisterPeople">
           <Key>
             <PropertyRef Name="ID_CT_DKTN" />
@@ -180,6 +262,68 @@
           <Property Name="NgayDuyet" Type="date" />
           <Property Name="GhiChu" Type="nvarchar(max)" />
         </EntityType>
+        <Function Name="CDNT_ChiTietDon_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_MaDon" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_BienSoXe" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_ID_LoaiPhuongTien" Type="int" Mode="In" />
+          <Parameter Name="p_CapMoi" Type="bit" Mode="In" />
+          <Parameter Name="p_CapLai" Type="bit" Mode="In" />
+          <Parameter Name="p_GiaHan" Type="bit" Mode="In" />
+          <Parameter Name="p_TuNgay" Type="date" Mode="In" />
+          <Parameter Name="p_DenNgay" Type="date" Mode="In" />
+        </Function>
+        <Function Name="CDNT_DonDangKi_UpdateFull_XML" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Ma_Don" Type="nvarchar" Mode="In" />
+          <Parameter Name="NoiDung" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="BPQL_ID" Type="int" Mode="In" />
+          <Parameter Name="NhanVienNT_ID" Type="int" Mode="In" />
+          <Parameter Name="NhaThau_ID" Type="int" Mode="In" />
+          <Parameter Name="HopDong" Type="nvarchar" Mode="In" />
+          <Parameter Name="NgayTrinhKy" Type="date" Mode="In" />
+          <Parameter Name="FileHoSoXe" Type="nvarchar" Mode="In" />
+          <Parameter Name="TrinhKy_ID" Type="int" Mode="In" />
+          <Parameter Name="TinhTrang_ID" Type="int" Mode="In" />
+          <Parameter Name="LoaiNT_ID" Type="int" Mode="In" />
+          <Parameter Name="ChiTiet_XML" Type="xml" Mode="In" />
+        </Function>
+        <Function Name="CDNT_DonDangKy_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_Ma_Don" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_NoiDung" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="p_BPQL_ID" Type="int" Mode="In" />
+          <Parameter Name="p_NhanVienNT_ID" Type="int" Mode="In" />
+          <Parameter Name="p_NhaThau_ID" Type="int" Mode="In" />
+          <Parameter Name="p_HopDong" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_NgayTrinhKy" Type="date" Mode="In" />
+          <Parameter Name="p_FileHoSoXe" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="p_TrinhKy_ID" Type="int" Mode="In" />
+          <Parameter Name="p_TinhTrang_ID" Type="int" Mode="In" />
+          <Parameter Name="p_LoaiNT_ID" Type="int" Mode="In" />
+          <Parameter Name="JsonDanhSachXe" Type="nvarchar(max)" Mode="In" />
+        </Function>
+        <Function Name="CDNT_DonDangKy_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_BeginDate" Type="date" Mode="In" />
+          <Parameter Name="p_EndDate" Type="date" Mode="In" />
+          <Parameter Name="p_MaPhieu" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CDNT_TrinhKy_Detail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MaDon" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CNDT_GetDinhBienPhuongTien" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_NhaThauID" Type="int" Mode="In" />
+          <Parameter Name="p_SoQuanLy" Type="int" Mode="InOut" />
+          <Parameter Name="p_SoCongNhan" Type="int" Mode="InOut" />
+          <Parameter Name="p_XeMay_DaCap" Type="int" Mode="InOut" />
+          <Parameter Name="p_Xe3Gac_DaCap" Type="int" Mode="InOut" />
+          <Parameter Name="p_XeMay_ToiDa" Type="int" Mode="InOut" />
+          <Parameter Name="p_Xe3Gac_ToiDa" Type="int" Mode="InOut" />
+          <Parameter Name="p_XeMay_ConLai" Type="int" Mode="InOut" />
+          <Parameter Name="p_Xe3Gac_ConLai" Type="int" Mode="InOut" />
+        </Function>
+        <Function Name="CNDT_GetNhanSuTheoChucVu" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_NhaThauID" Type="int" Mode="In" />
+          <Parameter Name="p_SoQuanLy" Type="int" Mode="InOut" />
+          <Parameter Name="p_SoCongNhan" Type="int" Mode="InOut" />
+        </Function>
         <Function Name="Detail_RegisterPeople_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="ID_CT_DKTN" Type="int" Mode="In" />
         </Function>
@@ -476,6 +620,12 @@
           <Parameter Name="GhiChu" Type="nvarchar(max)" Mode="In" />
         </Function>
         <EntityContainer Name="EPORTAL_REGISTERModelStoreContainer">
+          <EntitySet Name="CDNT_ChiTietDon" EntityType="Self.CDNT_ChiTietDon" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_DonDangKy" EntityType="Self.CDNT_DonDangKy" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="Self.CDNT_LoaiPhuongTien" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_TinhTrang" EntityType="Self.CDNT_TinhTrang" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_TrinhKy" EntityType="Self.CDNT_TrinhKy" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_XeCoDong" EntityType="Self.CDNT_XeCoDong" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Detail_RegisterPeople" EntityType="Self.Detail_RegisterPeople" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DK_CardExtend" EntityType="Self.DK_CardExtend" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DK_CardRegistrationInfor" EntityType="Self.DK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
@@ -841,6 +991,112 @@
           <FunctionImport Name="TK_CarteTemp_Delete">
           <Parameter Name="id" Mode="In" Type="Int32" />
           </FunctionImport>
+          <EntitySet Name="CDNT_ChiTietDon" EntityType="EPORTAL_REGISTERModel.CDNT_ChiTietDon" />
+          <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="EPORTAL_REGISTERModel.CDNT_LoaiPhuongTien" />
+          <EntitySet Name="CDNT_TinhTrang" EntityType="EPORTAL_REGISTERModel.CDNT_TinhTrang" />
+          <FunctionImport Name="CDNT_ChiTietDon_Search">
+            <Parameter Name="p_MaDon" Mode="In" Type="String" />
+            <Parameter Name="p_BienSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_ID_LoaiPhuongTien" Mode="In" Type="Int32" />
+            <Parameter Name="p_CapMoi" Mode="In" Type="Boolean" />
+            <Parameter Name="p_CapLai" Mode="In" Type="Boolean" />
+            <Parameter Name="p_GiaHan" Mode="In" Type="Boolean" />
+            <Parameter Name="p_TuNgay" Mode="In" Type="DateTime" />
+            <Parameter Name="p_DenNgay" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKi_Delete">
+          <Parameter Name="Ma_Don" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKi_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Detail_Result)">
+          <Parameter Name="Ma_Don" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKi_Insert" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Insert_Result)">
+            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
+            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
+            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_HopDong" Mode="In" Type="String" />
+            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="JsonDanhSachXe" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKi_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Search_Result)">
+            <Parameter Name="p_BeginDate" Mode="In" Type="DateTime" />
+            <Parameter Name="p_EndDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKi_Update" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Update_Result)">
+            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
+            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
+            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_HopDong" Mode="In" Type="String" />
+            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_CDNT_ChiTietDon" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="CDNT_DonDangKy" EntityType="EPORTAL_REGISTERModel.CDNT_DonDangKy" />
+          <FunctionImport Name="CDNT_DonDangKi_UpdateFull_XML">
+            <Parameter Name="Ma_Don" Mode="In" Type="String" />
+            <Parameter Name="NoiDung" Mode="In" Type="String" />
+            <Parameter Name="BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="HopDong" Mode="In" Type="String" />
+            <Parameter Name="NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="ChiTiet_XML" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKy_Insert" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Insert_Result)">
+            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
+            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
+            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_HopDong" Mode="In" Type="String" />
+            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="JsonDanhSachXe" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="CDNT_DonDangKy_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Search_Result)">
+            <Parameter Name="p_BeginDate" Mode="In" Type="DateTime" />
+            <Parameter Name="p_EndDate" Mode="In" Type="DateTime" />
+            <Parameter Name="p_MaPhieu" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="CNDT_GetDinhBienPhuongTien">
+            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+            <Parameter Name="p_SoQuanLy" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_SoCongNhan" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_XeMay_DaCap" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_Xe3Gac_DaCap" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_XeMay_ToiDa" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_Xe3Gac_ToiDa" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_XeMay_ConLai" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_Xe3Gac_ConLai" Mode="InOut" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CNDT_GetNhanSuTheoChucVu">
+            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+            <Parameter Name="p_SoQuanLy" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_SoCongNhan" Mode="InOut" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="CDNT_TrinhKy" EntityType="EPORTAL_REGISTERModel.CDNT_TrinhKy" />
+          <FunctionImport Name="CDNT_TrinhKy_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_TrinhKy_Detail_Result)">
+          <Parameter Name="MaDon" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="CDNT_XeCoDong" EntityType="EPORTAL_REGISTERModel.CDNT_XeCoDong" />
         </EntityContainer>
         <EntityType Name="DK_CardExtend">
           <Key>
@@ -977,6 +1233,155 @@
           <Property Name="NgayDuyet" Type="DateTime" Precision="3" />
           <Property Name="TinhTrangID" Type="Int32" />
           <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_ChiTietDon">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ID_LoaiPhuongTien" Type="Int32" />
+          <Property Name="BienSoXe" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="CapMoi" Type="Boolean" />
+          <Property Name="CapLai" Type="Boolean" />
+          <Property Name="GiaHan" Type="Boolean" />
+          <Property Name="TuNgay" Type="DateTime" Precision="0" />
+          <Property Name="DenNgay" Type="DateTime" Precision="0" />
+          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="HoSoTheoXe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NguoiDuyet_ID" Type="Int32" />
+          <Property Name="TrangThaiDuyet_ID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="CDNT_LoaiPhuongTien">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LoaiPhuongTien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_TinhTrang">
+          <Key>
+            <PropertyRef Name="TinhTrang_ID" />
+          </Key>
+          <Property Name="TinhTrang_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenTinhTrang" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <ComplexType Name="CDNT_DonDangKi_Detail_Result">
+          <Property Type="Int32" Name="DonDangKyID" Nullable="false" />
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="NoiDung" Nullable="true" />
+          <Property Type="Int32" Name="BPQL_ID" Nullable="true" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="250" />
+          <Property Type="Int32" Name="NhanVienNT_ID" Nullable="true" />
+          <Property Type="String" Name="TenNhanVienNT" Nullable="true" MaxLength="150" />
+          <Property Type="Int32" Name="NhaThau_ID" Nullable="true" />
+          <Property Type="String" Name="TenNhaThau" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
+          <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
+          <Property Type="String" Name="FileHoSoXe" Nullable="true" />
+          <Property Type="Int32" Name="TrinhKy_ID" Nullable="true" />
+          <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
+          <Property Type="String" Name="TenTinhTrang" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="LoaiNT_ID" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKi_Insert_Result">
+          <Property Type="Int32" Name="Result" Nullable="false" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="19" />
+          <Property Type="String" Name="MaDon" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKi_Search_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="NoiDung" Nullable="true" />
+          <Property Type="String" Name="TenNhanVienNT" Nullable="false" MaxLength="150" />
+          <Property Type="String" Name="TenBPQL" Nullable="false" MaxLength="250" />
+          <Property Type="String" Name="TenNhaThau" Nullable="false" MaxLength="400" />
+          <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
+          <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
+          <Property Type="String" Name="FileHoSoXe" Nullable="true" />
+          <Property Type="String" Name="TenTinhTrang" Nullable="false" MaxLength="50" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKi_Update_Result">
+          <Property Type="Int32" Name="Result" Nullable="false" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="17" />
+          <Property Type="String" Name="MaDon" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <EntityType Name="CDNT_DonDangKy">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NoiDung" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="BPQL_ID" Type="Int32" />
+          <Property Name="NhanVienNT_ID" Type="Int32" />
+          <Property Name="NhaThau_ID" Type="Int32" />
+          <Property Name="HopDong" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="NgayTrinhKy" Type="DateTime" Precision="0" />
+          <Property Name="FileHoSoXe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TrinhKy_ID" Type="Int32" />
+          <Property Name="TinhTrang_ID" Type="Int32" />
+          <Property Name="LoaiNT_ID" Type="Int32" />
+          <Property Name="TinhTrangDuyet_ID" Type="Int32" />
+          <Property Name="ThoiGianDuyet" Type="DateTime" Precision="3" />
+        </EntityType>
+        <ComplexType Name="CDNT_DonDangKy_Insert_Result">
+          <Property Type="Int32" Name="Result" Nullable="false" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="19" />
+          <Property Type="String" Name="MaDon" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKy_Search_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="NoiDung" Nullable="true" />
+          <Property Type="String" Name="TenNhanVienNT" Nullable="false" MaxLength="150" />
+          <Property Type="String" Name="TenBPQL" Nullable="false" MaxLength="250" />
+          <Property Type="String" Name="TenNhaThau" Nullable="false" MaxLength="400" />
+          <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
+          <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
+          <Property Type="String" Name="FileHoSoXe" Nullable="true" />
+          <Property Type="String" Name="TenTinhTrang" Nullable="false" MaxLength="50" />
+        </ComplexType>
+        <EntityType Name="CDNT_TrinhKy">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CapDuyet" Type="Int32" />
+          <Property Name="NguoiDuyet_ID" Type="Int32" />
+          <Property Name="NgayDuyet" Type="DateTime" Precision="3" />
+          <Property Name="TinhTrang_ID" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <ComplexType Name="CDNT_TrinhKy_Detail_Result">
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="CapDuyet" Nullable="true" />
+          <Property Type="String" Name="NguoiDuyet" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="ChucVu" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="250" />
+          <Property Type="DateTime" Name="NgayDuyet" Nullable="true" Precision="23" />
+          <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
+          <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+        </ComplexType>
+        <EntityType Name="CDNT_XeCoDong">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ID_NT" Type="Int32" />
+          <Property Name="BP_ID" Type="Int32" />
+          <Property Name="TenNhaThau" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="TenDayDu" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="HoVaTen" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CMND_CCCD" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="BienSoXe" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiPhuongTien" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Hang" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Dong" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="MauSac" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="TuNgay" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DenNgay" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -1203,6 +1608,137 @@
           <FunctionImportMapping FunctionImportName="SignOff_Flow_Delete" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Delete" />
           <FunctionImportMapping FunctionImportName="SignOff_Flow_Insert" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Insert" />
           <FunctionImportMapping FunctionImportName="SignOff_Flow_Update" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Update" />
+          <EntitySetMapping Name="CDNT_ChiTietDon">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_ChiTietDon">
+              <MappingFragment StoreEntitySet="CDNT_ChiTietDon">
+                <ScalarProperty Name="TrangThaiDuyet_ID" ColumnName="TrangThaiDuyet_ID" />
+                <ScalarProperty Name="NguoiDuyet_ID" ColumnName="NguoiDuyet_ID" />
+                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="ID_LoaiPhuongTien" ColumnName="ID_LoaiPhuongTien" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_LoaiPhuongTien">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_LoaiPhuongTien">
+              <MappingFragment StoreEntitySet="CDNT_LoaiPhuongTien">
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_TinhTrang">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TinhTrang">
+              <MappingFragment StoreEntitySet="CDNT_TinhTrang">
+                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_ChiTietDon_Search" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_ChiTietDon_Search" />
+          <EntitySetMapping Name="CDNT_DonDangKy">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy">
+              <MappingFragment StoreEntitySet="CDNT_DonDangKy">
+                <ScalarProperty Name="ThoiGianDuyet" ColumnName="ThoiGianDuyet" />
+                <ScalarProperty Name="TinhTrangDuyet_ID" ColumnName="TinhTrangDuyet_ID" />
+                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKi_UpdateFull_XML" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKi_UpdateFull_XML" />
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_Insert" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_Insert">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_Insert_Result">
+                <ScalarProperty Name="Result" ColumnName="Result" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="MaDon" ColumnName="MaDon" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_Search" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_Search">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_Search_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="TenNhanVienNT" ColumnName="TenNhanVienNT" />
+                <ScalarProperty Name="TenBPQL" ColumnName="TenBPQL" />
+                <ScalarProperty Name="TenNhaThau" ColumnName="TenNhaThau" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CNDT_GetDinhBienPhuongTien" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetDinhBienPhuongTien" />
+          <FunctionImportMapping FunctionImportName="CNDT_GetNhanSuTheoChucVu" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetNhanSuTheoChucVu" />
+          <EntitySetMapping Name="CDNT_TrinhKy">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TrinhKy">
+              <MappingFragment StoreEntitySet="CDNT_TrinhKy">
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+                <ScalarProperty Name="NguoiDuyet_ID" ColumnName="NguoiDuyet_ID" />
+                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_TrinhKy_Detail" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_TrinhKy_Detail">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TrinhKy_Detail_Result">
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+                <ScalarProperty Name="NguoiDuyet" ColumnName="NguoiDuyet" />
+                <ScalarProperty Name="ChucVu" ColumnName="ChucVu" />
+                <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="CDNT_XeCoDong">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_XeCoDong">
+              <MappingFragment StoreEntitySet="CDNT_XeCoDong">
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="MauSac" ColumnName="MauSac" />
+                <ScalarProperty Name="Dong" ColumnName="Dong" />
+                <ScalarProperty Name="Hang" ColumnName="Hang" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CMND_CCCD" ColumnName="CMND_CCCD" />
+                <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
+                <ScalarProperty Name="TenDayDu" ColumnName="TenDayDu" />
+                <ScalarProperty Name="TenNhaThau" ColumnName="TenNhaThau" />
+                <ScalarProperty Name="BP_ID" ColumnName="BP_ID" />
+                <ScalarProperty Name="ID_NT" ColumnName="ID_NT" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

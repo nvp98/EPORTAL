@@ -1,0 +1,184 @@
+﻿
+
+@{
+    ViewBag.Title = "HPDQ_Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model PagedList.IPagedList<EPORTAL.ModelsTagSign.TheXeCoDongVM.XeCoDongModel>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsPartner;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    EPORTAL_NTEntities db_nt = new EPORTAL_NTEntities();
+    //   var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách xe cơ động
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-10 col-lg-10">
+                                <div class="row">
+                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        @Html.TextBox("search", ViewBag.Search as string, new { @id = "search", @class = "form-control", @placeholder = "Tìm kiếm..." })
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" width="10px">TT</th>
+                                            <th class="text-center" width="150px">Họ và tên</th>
+                                            <th class="text-center" width="150px">CMND/CCCD</th>
+                                            <th class="text-center" width="200px">Tên nhà thầu</th>
+                                            <th class="text-center" width="150px">Loại phương tiện</th>
+                                            <th class="text-center" width="150px">Biển số</th>
+                                            <th class="text-center" width="150px">Hạn sử dụng</th>
+                                            <th class="text-center" width="100px">Tình trạng</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.ID</td>
+                                                <td class="text-center">@(!string.IsNullOrWhiteSpace(item.HoVaTen) ? item.HoVaTen : "–")</td>
+                                                <td class="text-center">@(!string.IsNullOrWhiteSpace(item.CMND_CCCD) ? item.CMND_CCCD : "–")</td>
+                                                <td class="text-center">@item.TenNhaThau</td>
+                                                <td class="text-center">@item.TenLoaiPhuongTien</td>
+                                                <td class="text-center">@item.BienSoXe</td>
+                                                <td class="text-center">
+                                                    @(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "") – @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (item.TinhTrang == true)
+                                                    {
+                                                        <span class="btn btn-outline-success">Đang hoạt động</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="btn btn-outline-danger">Đã khóa</span>
+                                                    }
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("DanhSachXe", "TheXeCoDong_NT", new
+                                    { area = "TagSign",page, begind = ViewBag.BeginDate,endd = ViewBag.EndDate,search = ViewBag.Search}))
+                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    //$('#btn-add').click(function () {
+    //    var url = $('#myModal').data('url');
+    //    $.get(url, function (data) {
+    //        $("#myModal").html(data);
+    //        $("#ModalTitle").html("Thêm tiêu đề");
+    //        $("#myModal").modal('show');
+    //    });
+    //});
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Add Permission");
+            $("#myModal").modal('show');
+        });
+    });
+    $("#btn-search").on('click', function () {
+    var begind = $('#begind').val();
+        var endd = $('#endd').val();
+        var search = $('#search').val();
+
+        window.location.href = '@Url.Action("DanhSachXe", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&search=' + encodeURIComponent(search);
+
+    });
+
+</script>
+
+
+
+
+
+
+
+

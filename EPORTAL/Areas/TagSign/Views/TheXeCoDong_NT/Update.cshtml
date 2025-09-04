@@ -1,0 +1,483 @@
+﻿@model EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyModel
+@{
+    ViewBag.Title = "Cập nhật đơn đăng ký thẻ xe cơ động";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+@using (Html.BeginForm("Update", "TheXeCoDong_NT", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.ID)
+    @Html.HiddenFor(m => m.Ma_Don)
+
+    <div class="app-main__outer" style="margin-top: -4%;">
+        <div class="app-main__inner" style="display:block;padding-bottom: 0px;">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card">
+                        <div style="height: 600px;">
+                            <div class="row" style="width:100%">
+                                <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
+                                    <h6 style="color: red;"><b>THÔNG TIN TRÌNH KÝ</b></h6>
+                                </div>
+
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="50px">Nội dung trích yếu <span style="color:red;">(*)</span> :  </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                @Html.TextAreaFor(m => m.NoiDung, new { @class = "form-control", style = "width: 100%;" })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
+                                    <span class="text-center" style="margin-top: 8px">Thông tin Nhà thầu <span style="color:red;">(*)</span> : </span>
+                                </div>
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="50px">Nhà thầu &nbsp;&nbsp;<span style="color:red;">(*)</span> : </th>
+                                            <th class="text-center" width="120px">Hồ sơ xe kèm theo &nbsp;&nbsp; <span style="color:red;">(*)</span> :</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                @Html.DropDownListFor(m => m.NhaThau_ID, (SelectList)ViewBag.IDNT, "--Chọn tên nhà thầu--", new { id = "NhaThau_ID", @class = "form-control" })
+                                            </td>
+                                            <td>
+                                                <fieldset id="SubmitForm">
+                                                    <div class="form-group" style="margin-left: 13%;">
+                                                        <input type="file" id="FileHoSoXE" name="FileHoSoXE" class="form-control" onchange="checkfile(this);" />
+                                                        @if (!string.IsNullOrEmpty(Model.FileHoSoXe))
+                                                        {
+                                                            <p>File hiện tại: @System.IO.Path.GetFileName(Model.FileHoSoXe)</p>
+                                                        }
+                                                    </div>
+                                                </fieldset>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="50px">BP Quản lý &nbsp;&nbsp; <span style="color:red;">(*)</span> : </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                @Html.DropDownListFor(m => m.BPQL_ID, (SelectList)ViewBag.IDPhongBan, "--Chọn tên BP/NM quản lý--", new { id = "PhongBan_ID", @class = "form-control marginTB5" })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="col-md-12 col-lg-12" style="padding: 0% 0% 1% 1%;">
+                                    <h6 style="color: red;"><b>NỘI DUNG TRÌNH KÝ</b></h6>
+                                </div>
+
+                                <div class="col-md-3" style="display: flex;">
+                                    <input type="file" id="FileImportExcel" class="form-control" />
+                                    <button type="button" class="btn btn-primary" onclick="submitImport()">Import Excel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body" style="width:80vw;overflow-x:auto">
+                            <div class="table-responsive" style="width: 80vw; overflow-x: auto;">
+                                <table class="table table-bordered table-hover" id="table" style="width:85vw" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" rowspan="2" width="10px" style="vertical-align:middle">TT</th>
+                                            <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
+                                            <th class="text-center" rowspan="2" width="60px" style="vertical-align:middle">Biển số xe</th>
+                                            <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
+                                            <th class="text-center" rowspan="2" width="50px" style="vertical-align:middle">Thời hạn thẻ xe cơ động</th>
+                                            <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Ghi chú</th>
+                                        </tr>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th width="30px" class="text-center">Xe máy</th>
+                                            <th width="30px" class="text-center">Xe ô tô</th>
+                                            <th width="30px" class="text-center">Xe 3 gác</th>
+                                            <th width="30px" class="text-center">Cấp mới</th>
+                                            <th width="30px" class="text-center">Cấp lại</th>
+                                            <th width="30px" class="text-center">Gia hạn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyImportExcel">
+                                        @for (int i = 0; i < Model.DanhSachXe.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>@(i + 1)</td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="1" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 1 ? "checked" : "") /></td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="2" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 2 ? "checked" : "") /></td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="3" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 3 ? "checked" : "") /></td>
+                                                <td><input type="text" class="form-control" name="DanhSachXe[@i].BienSoXe" value="@Model.DanhSachXe[i].BienSoXe" /></td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].CapMoi" value="true" @(Model.DanhSachXe[i].CapMoi ? "checked" : "") /></td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].CapLai" value="true" @(Model.DanhSachXe[i].CapLai ? "checked" : "") /></td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].GiaHan" value="true" @(Model.DanhSachXe[i].GiaHan ? "checked" : "") /></td>
+                                                <td>
+                                                    <input type="date" name="DanhSachXe[@i].TuNgay"
+                                                           value="@(Model.DanhSachXe[i].TuNgay.HasValue ? Model.DanhSachXe[i].TuNgay.Value.ToString("yyyy-MM-dd") : "")"
+                                                           style="width:45%;" />
+                                                    --
+                                                    <input type="date" name="DanhSachXe[@i].DenNgay"
+                                                           value="@(Model.DanhSachXe[i].DenNgay.HasValue ? Model.DanhSachXe[i].DenNgay.Value.ToString("yyyy-MM-dd") : "")"
+                                                           style="width:45%;" />
+                                                </td>
+
+                                                <td><input type="text" class="form-control" name="DanhSachXe[@i].GhiChu" value="@Model.DanhSachXe[i].GhiChu" /></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="padding-top:30px">
+                                <h6 style="color: red; padding: 0% 0% 1% 1%;"><b>LUỒNG TRÌNH KÝ</b></h6>
+
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="25%">Kỹ Thuật Viên (KTV)</th>
+                                            <th class="text-center" width="25%">Trưởng/Phó phòng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn KTV--", new { @class = "form-control", id = "KTV_QL" })
+                                            </td>
+                                            <td>
+                                                @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Trưởng/Phó--", new { @class = "form-control", id = "TP_QL" })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="25%">Tổ cấp phát thẻ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                @Html.DropDownList("VP1C_ID", (SelectList)ViewBag.VP1C_List, "-- Chọn VP1C --", new { @class = "form-control", @value = ViewBag.VP1C_ID })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+
+        <div class="app-wrapper-footer">
+            <div class="app-footer">
+                <div class="app-footer__inner">
+                    <button id="btnSave" type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i> Cập nhật
+                    </button>
+                    <a href="@Url.Action("Index_Test", "TheXeCoDong_NT")" class="btn btn-default">
+                        <i class="fa fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Khởi tạo chosen cho dropdown
+        $("#NhaThau_ID").chosen({ width: "100%" });
+        $("#PhongBan_ID").chosen({ width: "100%" });
+        let danhSachXe = [];
+        // Xử lý import Excel (tương tự view Create)
+        function submitImport() {
+            const fileInput = document.getElementById("FileImportExcel");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Vui lòng chọn file Excel.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("FileANH", file);
+
+            $.ajax({
+                url: '@Url.Action("ImportExcel", "TheXeCoDong_NT")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.success) {
+                        let startIndex = danhSachXe.length; // vị trí index bắt đầu cho dữ liệu mới
+                        res.data.forEach((item, idx) => {
+                            let i = startIndex + idx;
+                            $("#tbodyImportExcel").append(`
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="1" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="2" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="3" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} /></td>
+                    <td><input type="text" class="form-control" name="DanhSachXe[${i}].BienSoXe" value="${item.BienSoXe}" /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].CapMoi" value="true" ${item.CapMoi ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].CapLai" value="true" ${item.CapLai ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].GiaHan" value="true" ${item.GiaHan ? "checked" : ""} /></td>
+                    <td>
+                        <input type="date" name="DanhSachXe[${i}].TuNgay" value="${item.TuNgay ? item.TuNgay.split('T')[0] : ''}" style="width:45%;" />
+                        --
+                        <input type="date" name="DanhSachXe[${i}].DenNgay" value="${item.DenNgay ? item.DenNgay.split('T')[0] : ''}" style="width:45%;" />
+                    </td>
+                    <td><input type="text" class="form-control" name="DanhSachXe[${i}].GhiChu" value="${item.GhiChu}" /></td>
+                </tr>
+            `);
+                        });
+
+                        danhSachXe = danhSachXe.concat(res.data); // cập nhật biến lưu trữ
+                    } else {
+                        alert("Lỗi import: " + res.message);
+                    }
+                }
+
+            });
+        }
+
+        function renderDanhSach(data) {
+            let html = "";
+            data.forEach((item, i) => {
+                html += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="1" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="2" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="3" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} /></td>
+                    <td><input type="text" class="form-control" name="DanhSachXe[${i}].BienSoXe" value="${item.BienSoXe}" /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].CapMoi" value="true" ${item.CapMoi ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].CapLai" value="true" ${item.CapLai ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].GiaHan" value="true" ${item.GiaHan ? "checked" : ""} /></td>
+                    <td>
+                        <input type="date" name="DanhSachXe[${i}].TuNgay" value="${item.TuNgay ? item.TuNgay.split('T')[0] : ''}" style="width:45%;" />
+                        --
+                        <input type="date" name="DanhSachXe[${i}].DenNgay" value="${item.DenNgay ? item.DenNgay.split('T')[0] : ''}" style="width:45%;" />
+                    </td>
+                    <td><input type="text" class="form-control" name="DanhSachXe[${i}].GhiChu" value="${item.GhiChu}" /></td>
+                </tr>`;
+            });
+
+            $("#tbodyImportExcel").html(html);
+        }
+
+        // Gán sự kiện cho nút Import Excel
+        window.submitImport = submitImport;
+
+        // Validate file upload
+        function checkfile(input) {
+            if (input.files && input.files[0]) {
+                var fileSize = input.files[0].size; // in bytes
+                var maxSize = 5 * 1024 * 1024; // 5MB
+
+                if (fileSize > maxSize) {
+                    alert('File không được vượt quá 5MB');
+                    input.value = ''; // Clear the file input
+                    return false;
+                }
+
+                var fileExt = input.files[0].name.split('.').pop().toLowerCase();
+                if (['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'].indexOf(fileExt) === -1) {
+                    alert('Chỉ chấp nhận file PDF, Word hoặc hình ảnh');
+                    input.value = '';
+                    return false;
+                }
+            }
+            return true;
+        }
+    });
+    // Hàm render danh sách xe
+        function renderDanhSach(data) {
+            let html = "";
+            data.forEach((item, i) => {
+                html += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="1" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="2" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="3" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} /></td>
+                    <td><input type="text" class="form-control" name="DanhSachXe[${i}].BienSoXe" value="${item.BienSoXe || ''}" /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].CapMoi" value="true" ${item.CapMoi ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].CapLai" value="true" ${item.CapLai ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%" name="DanhSachXe[${i}].GiaHan" value="true" ${item.GiaHan ? "checked" : ""} /></td>
+                    <td>
+                        <input type="date" name="DanhSachXe[${i}].TuNgay" value="${item.TuNgay ? item.TuNgay.split('T')[0] : ''}" style="width:45%;" />
+                        --
+                        <input type="date" name="DanhSachXe[${i}].DenNgay" value="${item.DenNgay ? item.DenNgay.split('T')[0] : ''}" style="width:45%;" />
+                    </td>
+                    <td><input type="text" class="form-control" name="DanhSachXe[${i}].GhiChu" value="${item.GhiChu || ''}" /></td>
+                </tr>`;
+            });
+            $("#tbodyImportExcel").html(html);
+        }
+
+        // Hàm submit import Excel
+        window.submitImport = function () {
+            const fileInput = document.getElementById("FileImportExcel");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Vui lòng chọn file Excel.");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("FileANH", file);
+            $.ajax({
+                url: '@Url.Action("ImportExcel", "TheXeCoDong_NT")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.success) {
+                        danhSachXe = res.data; // Cập nhật danh sách xe
+                        renderDanhSach(danhSachXe); // Render lại bảng
+                    } else {
+                        alert("Lỗi import: " + res.message);
+                    }
+                },
+                error: function () {
+                    alert("Có lỗi xảy ra khi import.");
+                }
+            });
+        };
+
+        // Hàm submit form
+        window.submitForm = function (event) {
+            event.preventDefault();
+            // Validate required fields
+            if (!$("#NoiDung").val()) {
+                alert("Vui lòng nhập nội dung trích yếu.");
+                return;
+            }
+            if (!$("#PhongBan_ID").val()) {
+                alert("Vui lòng chọn phòng ban quản lý.");
+                return;
+            }
+            if (!$("#NhaThau_ID").val()) {
+                alert("Vui lòng chọn nhà thầu.");
+                return;
+            }
+
+            // Thu thập danh sách xe từ form
+            let listXe = [];
+            $("#tbodyImportExcel tr").each(function (index) {
+                let row = $(this);
+                let xe = {
+                    ID_LoaiPhuongTien: row.find(`input[name='DanhSachXe[${index}].ID_LoaiPhuongTien']:checked`).val() || null,
+                    BienSoXe: row.find(`input[name='DanhSachXe[${index}].BienSoXe']`).val(),
+                    CapMoi: row.find(`input[name='DanhSachXe[${index}].CapMoi']`).is(":checked"),
+                    CapLai: row.find(`input[name='DanhSachXe[${index}].CapLai']`).is(":checked"),
+                    GiaHan: row.find(`input[name='DanhSachXe[${index}].GiaHan']`).is(":checked"),
+                    TuNgay: row.find(`input[name='DanhSachXe[${index}].TuNgay']`).val() || null,
+                    DenNgay: row.find(`input[name='DanhSachXe[${index}].DenNgay']`).val() || null,
+                    GhiChu: row.find(`input[name='DanhSachXe[${index}].GhiChu']`).val() || null
+                };
+                listXe.push(xe);
+            });
+
+            if (listXe.length === 0) {
+                alert("Danh sách xe không được trống.");
+                return;
+            }
+
+            // Tạo FormData
+            let formData = new FormData($("form")[0]);
+            formData.append("KTV_ID", $("#KTV_QL").val());
+            formData.append("TP_ID", $("#TP_QL").val());
+            formData.append("VP1C_ID", $("#VP1C_ID").val());
+
+            $.ajax({
+                url: '@Url.Action("Update", "TheXeCoDong_NT")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.success) {
+                        alert("Cập nhật thành công! Mã đơn: " + res.maDon);
+                        window.location.href = '@Url.Action("Index_Test", "TheXeCoDong_NT")';
+                    } else {
+                        alert("Lỗi: " + res.message);
+                    }
+                },
+                error: function () {
+                    alert("Có lỗi khi gọi server.");
+                }
+            });
+        };
+     $(document).ready(function () {
+         $("#PhongBan_ID").change(function () {
+             var idPhongBan = $(this).val();
+             if (idPhongBan) {
+                 $.ajax({
+                     url: '@Url.Action("GetNguoiKyTheoPhongBan", "TheXeCoDong_NT")', // thay TenController bằng tên thực tế
+                     type: 'GET',
+                     data: { idPhongBan: idPhongBan },
+                     success: function (data) {
+                         if (data.success) {
+                             // Gán danh sách KTV
+                             var ktvSelect = $("#KTV_QL");
+                             ktvSelect.empty().append('<option value="">--Chọn KTV--</option>');
+                             $.each(data.ktvList, function (i, item) {
+                                 ktvSelect.append($('<option>', {
+                                     value: item.ID,
+                                     text: item.HoTen
+                                 }));
+                             });
+
+                             // Gán danh sách TP
+                             var tpSelect = $("#TP_QL");
+                             tpSelect.empty().append('<option value="">--Chọn Trưởng/Phó--</option>');
+                             $.each(data.tpList, function (i, item) {
+                                 tpSelect.append($('<option>', {
+                                     value: item.ID,
+                                     text: item.HoTen
+                                 }));
+                             });
+                         }
+                     },
+                     error: function () {
+                         alert("Lỗi khi tải danh sách người ký");
+                     }
+                 });
+             }
+         });
+     });
+</script>
