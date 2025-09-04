@@ -68,6 +68,25 @@
           <Property Name="TinhTrang_ID" Type="int" />
           <Property Name="GhiChu" Type="nvarchar" MaxLength="500" />
         </EntityType>
+        <EntityType Name="CDNT_XeCoDong">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID_NT" Type="int" />
+          <Property Name="BP_ID" Type="int" />
+          <Property Name="TenNhaThau" Type="nvarchar" MaxLength="500" />
+          <Property Name="TenDayDu" Type="nvarchar" MaxLength="255" />
+          <Property Name="HoVaTen" Type="nvarchar" MaxLength="255" />
+          <Property Name="CMND_CCCD" Type="nvarchar" MaxLength="255" />
+          <Property Name="BienSoXe" Type="nvarchar" MaxLength="255" />
+          <Property Name="LoaiPhuongTien" Type="nvarchar" MaxLength="255" />
+          <Property Name="Hang" Type="nvarchar" MaxLength="255" />
+          <Property Name="Dong" Type="nvarchar" MaxLength="255" />
+          <Property Name="MauSac" Type="nvarchar" MaxLength="255" />
+          <Property Name="TuNgay" Type="nvarchar" MaxLength="255" />
+          <Property Name="DenNgay" Type="nvarchar" MaxLength="255" />
+        </EntityType>
         <EntityType Name="Detail_RegisterPeople">
           <Key>
             <PropertyRef Name="ID_CT_DKTN" />
@@ -284,6 +303,7 @@
         <Function Name="CDNT_DonDangKy_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="p_BeginDate" Type="date" Mode="In" />
           <Parameter Name="p_EndDate" Type="date" Mode="In" />
+          <Parameter Name="p_MaPhieu" Type="nvarchar" Mode="In" />
         </Function>
         <Function Name="CDNT_TrinhKy_Detail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="MaDon" Type="nvarchar" Mode="In" />
@@ -605,6 +625,7 @@
           <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="Self.CDNT_LoaiPhuongTien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_TinhTrang" EntityType="Self.CDNT_TinhTrang" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_TrinhKy" EntityType="Self.CDNT_TrinhKy" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_XeCoDong" EntityType="Self.CDNT_XeCoDong" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Detail_RegisterPeople" EntityType="Self.Detail_RegisterPeople" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DK_CardExtend" EntityType="Self.DK_CardExtend" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DK_CardRegistrationInfor" EntityType="Self.DK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
@@ -1053,6 +1074,7 @@
           <FunctionImport Name="CDNT_DonDangKy_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Search_Result)">
             <Parameter Name="p_BeginDate" Mode="In" Type="DateTime" />
             <Parameter Name="p_EndDate" Mode="In" Type="DateTime" />
+            <Parameter Name="p_MaPhieu" Mode="In" Type="String" />
           </FunctionImport>
           <FunctionImport Name="CNDT_GetDinhBienPhuongTien">
             <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
@@ -1074,6 +1096,7 @@
           <FunctionImport Name="CDNT_TrinhKy_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_TrinhKy_Detail_Result)">
           <Parameter Name="MaDon" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="CDNT_XeCoDong" EntityType="EPORTAL_REGISTERModel.CDNT_XeCoDong" />
         </EntityContainer>
         <EntityType Name="DK_CardExtend">
           <Key>
@@ -1341,6 +1364,25 @@
           <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
           <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
         </ComplexType>
+        <EntityType Name="CDNT_XeCoDong">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ID_NT" Type="Int32" />
+          <Property Name="BP_ID" Type="Int32" />
+          <Property Name="TenNhaThau" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="TenDayDu" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="HoVaTen" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CMND_CCCD" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="BienSoXe" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiPhuongTien" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Hang" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Dong" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="MauSac" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="TuNgay" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DenNgay" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1677,6 +1719,26 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="CDNT_XeCoDong">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_XeCoDong">
+              <MappingFragment StoreEntitySet="CDNT_XeCoDong">
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="MauSac" ColumnName="MauSac" />
+                <ScalarProperty Name="Dong" ColumnName="Dong" />
+                <ScalarProperty Name="Hang" ColumnName="Hang" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CMND_CCCD" ColumnName="CMND_CCCD" />
+                <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
+                <ScalarProperty Name="TenDayDu" ColumnName="TenDayDu" />
+                <ScalarProperty Name="TenNhaThau" ColumnName="TenNhaThau" />
+                <ScalarProperty Name="BP_ID" ColumnName="BP_ID" />
+                <ScalarProperty Name="ID_NT" ColumnName="ID_NT" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

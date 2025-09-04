@@ -235,7 +235,7 @@
 
         if (!confirm("Bạn chắc chắn muốn " + (isApproved ? "DUYỆT" : "TỪ CHỐI") + " đơn này?")) return;
 
-        // Lấy danh sách biển số xe không được chọn (=> từ chối)
+        // Nếu là DUYỆT, lấy danh sách xe bị từ chối (=> không được chọn)
         var bienSoBiTuChoi = [];
         if (isApproved) {
             $('.rowCheckbox').each(function () {
@@ -252,7 +252,7 @@
                 maDon: maDon,
                 isApproved: isApproved,
                 ghiChu: ghiChu,
-                bienSoBiTuChoi: bienSoBiTuChoi.join(',')
+                bienSoBiTuChoi: bienSoBiTuChoi.length > 0 ? bienSoBiTuChoi.join(',') : null
             },
             success: function (res) {
                 alert(res.message);
@@ -264,32 +264,5 @@
                 alert("Có lỗi xảy ra khi gửi yêu cầu duyệt.");
             }
         });
-    });
-
-    //    $(document).on('click', '.btn-duyet, .btn-tuchoi', function () {
-    //    var maDon = $(this).data('madon');
-    //    var isApproved = $(this).hasClass('btn-duyet');
-    //    var ghiChu = prompt("Nhập ghi chú nếu cần:");
-
-    //    if (!confirm("Bạn chắc chắn muốn " + (isApproved ? "DUYỆT" : "TỪ CHỐI") + " đơn này?")) return;
-
-    //    $.ajax({
-    //        url: '/TheXeCoDong_NT/DuyetDon',
-    //    type: 'POST',
-    //    data: {
-    //        maDon: maDon,
-    //        isApproved: isApproved,
-    //        ghiChu: ghiChu
-    //        },
-    //    success: function (res) {
-    //        alert(res.message);
-    //    if (res.success) {
-    //        location.reload();
-    //            }
-    //        },
-    //    error: function () {
-    //        alert("Có lỗi xảy ra khi gửi yêu cầu duyệt.");
-    //        }
-    //    });
-    //});
+    }); 
 </script>

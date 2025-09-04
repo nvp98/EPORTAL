@@ -942,6 +942,9 @@
     <Compile Include="ModelsTagSign\CDNT_TrinhKy_Detail_Result.cs">
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelsTagSign\CDNT_XeCoDong.cs">
+      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelsTagSign\DataInformationValidation.cs" />
     <Compile Include="ModelsTagSign\Detail_HandleValidation.cs" />
     <Compile Include="ModelsTagSign\Detail_RegisterPeople.cs">
@@ -4149,6 +4152,8 @@
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_Index.cshtml" />
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_Detail.cshtml" />
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\Detail_PDF.cshtml" />
+    <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_LuongTrinhKy.cshtml" />
+    <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\DanhSachXe.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

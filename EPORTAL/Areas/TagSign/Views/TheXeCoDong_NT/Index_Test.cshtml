@@ -64,6 +64,9 @@
                                         @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
                                     </div>
                                     <div class="col-md-2">
+                                        @Html.TextBox("maPhieu", ViewBag.MaPhieu as string, new { @class = "form-control", placeholder = "Nhập mã phiếu" })
+                                    </div>
+                                    <div class="col-md-2">
                                         <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
                                     </div>
                                 </div>
@@ -123,14 +126,18 @@
                                                         </a>
 
 
+                                                        @if (item.TinhTrang_ID == 1) // 1 = Chờ xử lý
+                                                        {
+                                                            <a class="btn-action"
+                                                               title="Chỉnh sửa"
+                                                               href="@Url.Action("Update", "TheXeCoDong_NT", new { id = item.Ma_Don })">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                        }
+
                                                         <a class="btn-action"
-                                                            title="Chỉnh sửa"
-                                                            href="@Url.Action("Update", "TheXeCoDong_NT", new { id = item.Ma_Don })">
-                                                            <i class="fa fa-edit"></i>
-                                                        </a>
-                                                        <a class="btn-action"
-                                                            title="Chi tiết danh sách"
-                                                            href="@Url.Action("Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                           title="Chi tiết danh sách"
+                                                           href="@Url.Action("Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
                                                             <i class="fa-solid fa-bars"></i>
                                                         </a>
                                                     </td>
@@ -227,8 +234,10 @@
     $("#btn-search").on('click', function () {
     var begind = $('#begind').val();
     var endd = $('#endd').val();
+        var maPhieu = $('#maPhieu').val();
+        console.log(maPhieu)
 
-    window.location.href =  '@Url.Action("Index_Test", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd);
+        window.location.href = '@Url.Action("Index_Test", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
 
     });
     $(document).ready(function () {

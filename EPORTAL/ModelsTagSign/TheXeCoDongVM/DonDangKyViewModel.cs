@@ -48,12 +48,13 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
                 GhiChu = m.GhiChu
             };
         }
-        public class StoreResult
-        {
-            public int Result { get; set; }
-            public string Message { get; set; }
-            public string MaDon { get; set; }
-        }
+       
+    }
+    public class StoreResult
+    {
+        public int Result { get; set; }
+        public string Message { get; set; }
+        public string MaDon { get; set; }
     }
     public enum TinhTrangDonDangKy
     {
@@ -142,5 +143,22 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int XeMay_ConLai { get; set; }
         public int Xe3Gac_ConLai { get; set; }
     }
+    public class XeCoDongModel
+    {
+        public int ID { get; set; }
+        public int IDNT { get; set; }
+        public int? ID_NVNT { get; set; }
+        public string TenNhaThau { get; set; }
+        public string HoVaTen { get; set; }
+        public string CMND_CCCD { get; set; }
+        public string TenNgan { get; set; }
+        public int? LoaiPhuongTien_ID { get; set; }
+        public string TenLoaiPhuongTien { get; set; }
+        public string BienSoXe { get; set; }
+        public DateTime? TuNgay { get; set; }
+        public DateTime? DenNgay { get; set; }
+        public bool? TinhTrang { get; set; }
+    }
+
 
 }

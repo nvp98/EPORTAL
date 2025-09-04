@@ -43,6 +43,7 @@ namespace EPORTAL.ModelsTagSign
         public virtual DbSet<CDNT_TinhTrang> CDNT_TinhTrang { get; set; }
         public virtual DbSet<CDNT_DonDangKy> CDNT_DonDangKy { get; set; }
         public virtual DbSet<CDNT_TrinhKy> CDNT_TrinhKy { get; set; }
+        public virtual DbSet<CDNT_XeCoDong> CDNT_XeCoDong { get; set; }
     
         public virtual int DK_CardRegistrationInfor_Delete(Nullable<int> iDDKT)
         {
@@ -1402,7 +1403,7 @@ namespace EPORTAL.ModelsTagSign
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Insert_Result>("CDNT_DonDangKy_Insert", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, jsonDanhSachXeParameter);
         }
     
-        public virtual ObjectResult<CDNT_DonDangKy_Search_Result> CDNT_DonDangKy_Search(Nullable<System.DateTime> p_BeginDate, Nullable<System.DateTime> p_EndDate)
+        public virtual ObjectResult<CDNT_DonDangKy_Search_Result> CDNT_DonDangKy_Search(Nullable<System.DateTime> p_BeginDate, Nullable<System.DateTime> p_EndDate, string p_MaPhieu)
         {
             var p_BeginDateParameter = p_BeginDate.HasValue ?
                 new ObjectParameter("p_BeginDate", p_BeginDate) :
@@ -1412,7 +1413,11 @@ namespace EPORTAL.ModelsTagSign
                 new ObjectParameter("p_EndDate", p_EndDate) :
                 new ObjectParameter("p_EndDate", typeof(System.DateTime));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Search_Result>("CDNT_DonDangKy_Search", p_BeginDateParameter, p_EndDateParameter);
+            var p_MaPhieuParameter = p_MaPhieu != null ?
+                new ObjectParameter("p_MaPhieu", p_MaPhieu) :
+                new ObjectParameter("p_MaPhieu", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Search_Result>("CDNT_DonDangKy_Search", p_BeginDateParameter, p_EndDateParameter, p_MaPhieuParameter);
         }
     
         public virtual int CNDT_GetDinhBienPhuongTien(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan, ObjectParameter p_XeMay_DaCap, ObjectParameter p_Xe3Gac_DaCap, ObjectParameter p_XeMay_ToiDa, ObjectParameter p_Xe3Gac_ToiDa, ObjectParameter p_XeMay_ConLai, ObjectParameter p_Xe3Gac_ConLai)
