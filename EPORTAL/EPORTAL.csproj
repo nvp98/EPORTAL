@@ -4154,6 +4154,7 @@
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\Detail_PDF.cshtml" />
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_LuongTrinhKy.cshtml" />
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\DanhSachXe.cshtml" />
+    <Content Include="App_Data\BM_09.QT20 Dondangkyxecodongnhathau.xlsx" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
