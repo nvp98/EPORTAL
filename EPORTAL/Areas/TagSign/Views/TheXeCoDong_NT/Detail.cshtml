@@ -154,6 +154,7 @@
                                         <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
                                         <th class="text-center" rowspan="2" width="50px" style="vertical-align:middle">Thời hạn thẻ xe cơ động</th>
                                         <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Ghi chú</th>
+                                        <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Tình trạng</th>
                                     </tr>
                                     <tr style="background-color: #f8f9fa;">
 
@@ -182,6 +183,21 @@
                                             <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
                                             <td>@(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "") – @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
                                             <td>@item.GhiChu</td>
+                                            <td>
+                                                @if (item.TrangThaiDuyet_ID == 1)
+                                                {
+                                                    <span class="btn btn-outline-success">Đã duyệt</span>
+                                                }
+                                                else if (item.TrangThaiDuyet_ID == 2)
+                                                {
+                                                    <span class="btn btn-outline-danger">Từ chối</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="btn btn-outline-secondary">Chưa xử lý</span>
+                                                }
+
+                                            </td>
                                         </tr>
                                     }
 

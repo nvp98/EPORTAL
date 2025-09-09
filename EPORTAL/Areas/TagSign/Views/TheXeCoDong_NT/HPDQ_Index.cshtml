@@ -56,12 +56,15 @@
                             <div class="col-md-10 col-lg-10">
                                 <div class="row">
                                     <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
                                     </div>
                                     <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-3">
+                                        @Html.TextBox("maPhieu", ViewBag.MaPhieu as string, new { @class = "form-control", placeholder = "Nhập mã phiếu" })
                                     </div>
                                     <div class="col-md-2">
                                         <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
@@ -227,8 +230,9 @@
     $("#btn-search").on('click', function () {
     var begind = $('#begind').val();
     var endd = $('#endd').val();
+    var maPhieu = $('#maPhieu').val();
 
-    window.location.href =  '@Url.Action("Index_Test", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd);
+        window.location.href = '@Url.Action("Index_Test", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
 
     });
     $(document).ready(function () {

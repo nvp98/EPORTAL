@@ -24,6 +24,7 @@ using System.Web.Mvc;
 using System.Xml.Linq;
 using static EPORTAL.ModelsTagSign.TheXeCoDongVM.ChiTietDonVM;
 using System.Text.RegularExpressions;
+using System.Configuration;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -64,7 +65,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(pagedData);
         }
-        public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, int? page)
+        public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu,int? page)
         {
 
             // Phân trang ở Controller
@@ -73,10 +74,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             // Gọi store, chỉ truyền filter ngày
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
-                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate",
+                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
                 new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
-                new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value)
+                new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+                new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
             ).ToList();
+
 
             // Truyền vào PagedList để phân trang
             var pagedData = data.ToPagedList(pageNumber, pageSize);
@@ -84,6 +87,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             // Lưu lại giá trị filter để hiển thị lại trên view
             ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+            ViewBag.MaPhieu = maPhieu;
             ViewBag.Page = pageNumber;
             ViewBag.PageSize = pageSize;
 
@@ -172,8 +176,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 // 3. Tạo mã đơn tự động nếu chưa có
                 if (string.IsNullOrEmpty(model.Ma_Don))
                 {
+                    var Business_Partner = Models.MyAuthentication.Username;
                     var thangNam = DateTime.Now.ToString("yyyyMMdd");
-                    var prefix = $"DON_CDNT{thangNam}-";
+
+                    var prefix = $"{Business_Partner}_XCĐ{thangNam}-";
 
                     var lastMaDon = db_dk.CDNT_DonDangKy
                         .Where(x => x.Ma_Don.StartsWith(prefix))
@@ -189,7 +195,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         stt++;
                     }
 
-                    model.Ma_Don = prefix + stt.ToString("D4");
+                    model.Ma_Don = prefix + stt.ToString("D6");
                 }
 
                 // 4. Gán người tạo đơn là người đang đăng nhập
@@ -377,7 +383,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         using (var workbook = new XLWorkbook(FileANH.InputStream))
                         {
                             var ws = workbook.Worksheet(1);
-                            int row = 5;
+                            int row = 7;
 
                             while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
                             {
@@ -873,7 +879,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         public ActionResult Detail_PDF(string maDon)
         {
             var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
-                "EXEC CDNT_DonDangKy_Detail @Ma_Don",
+                "EXEC CDNT_DonDangKy_PDF @Ma_Don",
                 new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
             ).ToList();
 
@@ -1025,7 +1031,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             // 1. Lấy dữ liệu chi tiết đơn từ DB  
             var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
-                "EXEC CDNT_DonDangKy_Detail @Ma_Don",
+                "EXEC CDNT_DonDangKy_PDF @Ma_Don",
                 new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
             ).ToList();
 
@@ -1116,6 +1122,23 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 return result;
             }
         }
+        public FileResult DownloadExcel()
+        {
+            // Đổi tên file đúng với biểu mẫu thẻ xe cơ động của bạn
+            var fileName = "BM_09.QT20 Dondangkyxecodongnhathau.xlsx";
+            var filePath = Server.MapPath("~/App_Data/" + fileName);
 
+            if (!System.IO.File.Exists(filePath))
+            {
+                // Vì chữ ký trả về FileResult nên ném 404 thay vì HttpNotFound()
+                throw new HttpException(404, "Không tìm thấy biểu mẫu thẻ xe cơ động để tải.");
+            }
+
+            // Lấy MIME theo đuôi file
+            var mime = MimeMapping.GetMimeMapping(fileName);
+
+            // Trả file cho người dùng tải xuống (Content-Disposition: attachment)
+            return File(filePath, mime, fileName);
+        }
     }
 }

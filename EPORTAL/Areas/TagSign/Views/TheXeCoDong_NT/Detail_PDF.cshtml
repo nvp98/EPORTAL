@@ -53,12 +53,20 @@
                     <img alt="Hòa Phát Dung Quất" src="https://portal.hoaphatdungquat.vn/Content/assets/images/logo-inverse.png" width="90%" />
                     <span class="" style="margin-top: 0; margin-bottom: 1rem;">Công ty Cổ phần Thép</span>
                     <p class="" style="margin-top: 0; margin-bottom: 1rem;">Hòa Phát Dung Quất</p>
-
+                   
                 </div>
                 <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                     <span>BM.09/QT.20</span>
                     <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025</p>
                     <p><span style="font-style:italic;">Lần sửa đổi:</span> 02</p>
+                    @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].Ma_Don))
+                    {
+                        <p style="font-size:15px"><span>@Model[0].Ma_Don</span></p>
+                    }
+                    else
+                    {
+                        <span>Không có dữ liệu</span>
+                    }
                 </div>
                 <div style="clear: both;"></div>
                 <div style="width: 100%; text-align: center; padding-bottom: 1rem;">
