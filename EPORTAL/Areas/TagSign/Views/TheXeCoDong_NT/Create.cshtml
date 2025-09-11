@@ -286,6 +286,7 @@
         let html = "";
      // console.log('data', data)
         data.forEach((item, i) => {
+            console.log("DenNgay render:", item.DenNgay); 
             html += `
             <tr>
                 <td>${i + 1}</td>
@@ -302,10 +303,10 @@
                 <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].CapMoi"  style=" width: 100%" value="true" ${item.CapMoi ? "checked" : ""} /></td>
                 <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].CapLai"  style=" width: 100%" value="true" ${item.CapLai ? "checked" : ""} /></td>
                 <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].GiaHan"  style=" width: 100%" value="true" ${item.GiaHan ? "checked" : ""} /></td>
-                <td>
-                    <input type="date" name="Items[${i}].TuNgay" value="${item.TuNgay ? item.TuNgay.split('T')[0] : ""}" style="width:45%;" />
-                    --
-                    <input type="date" name="Items[${i}].DenNgay" value="${item.DenNgay ? item.DenNgay.split('T')[0] : ""}" style="width:45%;" />
+                <td>                  
+                   <input type="date" name="Items[${i}].DenNgay" 
+                   value="${item.DenNgay ? item.DenNgay.split('T')[0] : ''}" 
+                   class="form-control" />
                 </td>
                 <td><input type="text" name="Items[${i}].GhiChu" value="${item.GhiChu}" class="form-control" /></td>
                  <td class="text-center">
@@ -375,8 +376,8 @@
                 CapMoi: row.find("input[name*='CapMoi']").is(":checked"),
                 CapLai: row.find("input[name*='CapLai']").is(":checked"),
                 GiaHan: row.find("input[name*='GiaHan']").is(":checked"),
-                TuNgay: row.find("input[type=date]").eq(0).val(),
-                DenNgay: row.find("input[type=date]").eq(1).val(),
+                TuNgay: null,
+                DenNgay: row.find("input[type=date]").val(),
                 GhiChu: row.find("input[name*='GhiChu']").val()
             };
             listXe.push(xe);

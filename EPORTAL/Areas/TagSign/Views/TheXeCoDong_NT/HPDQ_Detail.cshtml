@@ -186,7 +186,7 @@
                                             <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
                                             <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
                                             <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
-                                            <td>@(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "") – @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
+                                            <td class="text-center">@(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
                                             <td>@item.GhiChu</td>
                                             <td class="text-center">
                                                 @(item.TrangThaiDuyet_ID == 1 ? "Được duyệt" : item.TrangThaiDuyet_ID == 2 ? "Từ chối" : "Chưa duyệt")

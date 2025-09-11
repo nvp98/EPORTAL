@@ -111,6 +111,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string GhiChu { get; set; }
         public string HoSoTheoXe { get; set; }
     }
+    
     public class DonDangKyModel
     {
         public int ID { get; set; }
@@ -159,6 +160,23 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public DateTime? DenNgay { get; set; }
         public bool? TinhTrang { get; set; }
     }
+    public class TrinhKyModel
+    {
+        public int TrinhKy_ID { get; set; }
+        public string Ma_Don { get; set; }
+        public int? CapDuyet { get; set; }
+        public int? NguoiDuyet_ID { get; set; }
+        public DateTime? NgayDuyet { get; set; }
+        public int? TinhTrang_ID { get; set; }
+        public string GhiChu { get; set; }
 
+        public string TenNguoiDuyet { get; set; }
+        public string ChuKyNguoiDuyet { get; set; }
+    }
+    public class DonDangKyPDFViewModel
+    {
+        public List<CDNT_DonDangKyDetail> ChiTietDon { get; set; }
+        public List<TrinhKyModel> TrinhKy { get; set; }
+    }
 
 }
