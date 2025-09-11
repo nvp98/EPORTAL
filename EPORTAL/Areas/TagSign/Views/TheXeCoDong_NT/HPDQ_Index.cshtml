@@ -76,13 +76,13 @@
                                     <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
                                     <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","TheXeCoDong_NT",new {area="TagSign"})' style="margin-top:50px"></div>
                                 </div>*@
-                            <div class="col-md-2">
+                            @*<div class="col-md-2">
                                 <a href="@Url.Action("Create", "TheXeCoDong_NT", new { area = "TagSign" })"
                                    class="btn btn-primary"
                                    style="margin-left:10px;float:right">
                                     <i class="fa fa-plus"></i> Thêm mới
                                 </a>
-                            </div>
+                            </div>*@
 
                         </div>
                     </div>
@@ -126,11 +126,11 @@
                                                         </a>*@
 
 
-                                                        <a class="btn-action"
+                                                        @*<a class="btn-action"
                                                            title="Chỉnh sửa"
                                                            href="@Url.Action("Update", "TheXeCoDong_NT", new { id = item.Ma_Don })">
                                                             <i class="fa fa-edit"></i>
-                                                        </a>
+                                                        </a>*@
                                                         <a class="btn-action"
                                                            title="Chi tiết danh sách"
                                                            href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
@@ -232,7 +232,7 @@
     var endd = $('#endd').val();
     var maPhieu = $('#maPhieu').val();
 
-        window.location.href = '@Url.Action("Index_Test", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
+        window.location.href = '@Url.Action("HPDQ_Index", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
 
     });
     $(document).ready(function () {

@@ -141,11 +141,8 @@
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].CapMoi" value="true" @(Model.DanhSachXe[i].CapMoi ? "checked" : "") /></td>
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].CapLai" value="true" @(Model.DanhSachXe[i].CapLai ? "checked" : "") /></td>
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].GiaHan" value="true" @(Model.DanhSachXe[i].GiaHan ? "checked" : "") /></td>
-                                                <td>
-                                                    <input type="date" name="DanhSachXe[@i].TuNgay"
-                                                           value="@(Model.DanhSachXe[i].TuNgay.HasValue ? Model.DanhSachXe[i].TuNgay.Value.ToString("yyyy-MM-dd") : "")"
-                                                           style="width:45%;" />
-                                                    --
+                                                <td class="text-center">
+
                                                     <input type="date" name="DanhSachXe[@i].DenNgay"
                                                            value="@(Model.DanhSachXe[i].DenNgay.HasValue ? Model.DanhSachXe[i].DenNgay.Value.ToString("yyyy-MM-dd") : "")"
                                                            style="width:45%;" />
@@ -247,8 +244,7 @@
             const capMoi = $tr.find('input[name="DanhSachXe[' + i + '].CapMoi"]').is(':checked');
             const capLai = $tr.find('input[name="DanhSachXe[' + i + '].CapLai"]').is(':checked');
             const giaHan = $tr.find('input[name="DanhSachXe[' + i + '].GiaHan"]').is(':checked');
-            const bienSoXe = $tr.find('input[name="DanhSachXe[' + i + '].BienSoXe"]').val();
-            const tuNgay = $tr.find('input[name="DanhSachXe[' + i + '].TuNgay"]').val();
+            const bienSoXe = $tr.find('input[name="DanhSachXe[' + i + '].BienSoXe"]').val();            
             const denNgay = $tr.find('input[name="DanhSachXe[' + i + '].DenNgay"]').val();
             const ghiChu = $tr.find('input[name="DanhSachXe[' + i + '].GhiChu"]').val();
 
@@ -258,7 +254,6 @@
                 CapLai: capLai,
                 GiaHan: giaHan,
                 BienSoXe: bienSoXe,
-                TuNgay: tuNgay,
                 DenNgay: denNgay,
                 GhiChu: ghiChu
             });
@@ -283,9 +278,7 @@
                     <td><input type="checkbox" style="width:100%" class="cap-opt" data-row="${i}" name="DanhSachXe[${i}].CapMoi" value="true" ${chk(item.CapMoi)} /></td>
                     <td><input type="checkbox" style="width:100%" class="cap-opt" data-row="${i}" name="DanhSachXe[${i}].CapLai" value="true" ${chk(item.CapLai)} /></td>
                     <td><input type="checkbox" style="width:100%" class="cap-opt" data-row="${i}" name="DanhSachXe[${i}].GiaHan" value="true" ${chk(item.GiaHan)} /></td>
-                    <td>
-                        <input type="date" name="DanhSachXe[${i}].TuNgay" value="${toDateVal(item.TuNgay)}" style="width:45%;" />
-                        --
+                    <td class="text-center">
                         <input type="date" name="DanhSachXe[${i}].DenNgay" value="${toDateVal(item.DenNgay)}" style="width:45%;" />
                     </td>
                     <td><input type="text" class="form-control" name="DanhSachXe[${i}].GhiChu" value="${item.GhiChu || ''}" /></td>
@@ -321,7 +314,6 @@
             CapLai: false,
             GiaHan: false,
             BienSoXe: '',
-            TuNgay: '',
             DenNgay: '',
             GhiChu: ''
         });
@@ -414,7 +406,6 @@
             formData.append(`DanhSachXe[${i}].CapMoi`, item.CapMoi);
             formData.append(`DanhSachXe[${i}].CapLai`, item.CapLai);
             formData.append(`DanhSachXe[${i}].GiaHan`, item.GiaHan);
-            formData.append(`DanhSachXe[${i}].TuNgay`, item.TuNgay);
             formData.append(`DanhSachXe[${i}].DenNgay`, item.DenNgay);
             formData.append(`DanhSachXe[${i}].GhiChu`, item.GhiChu);
         });

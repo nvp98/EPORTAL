@@ -229,7 +229,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         CapDuyet = 0,
                         NguoiDuyet_ID = nguoiTaoDon_ID,
                         NgayDuyet = DateTime.Now,
-                        TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
+                        TinhTrang_ID = (int)TinhTrangDonDangKy.DaXuLy,
                         GhiChu = "Trình ký từ nhà thầu"
                     });
 
@@ -387,20 +387,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                             while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
                             {
-                                string thoiHan = ws.Cell(row, 9).GetString().Replace("–", "-").Replace("—", "-");
-                                DateTime? tuNgay = null, denNgay = null;
-
-                                var parts = thoiHan.Split('-');
-                                string format = "dd/MM/yyyy";
+                                DateTime? denNgay = null;
                                 DateTime tempDate;
+                                string format = "dd/MM/yyyy";
 
-                                if (parts.Length == 2)
+                                // Cột I = thời hạn thẻ (ngày bắt đầu)
+                                string cellValue = ws.Cell(row, 9).GetString().Trim();
+
+                                if (DateTime.TryParseExact(cellValue, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
                                 {
-                                    if (DateTime.TryParseExact(parts[0].Trim(), format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
-                                        tuNgay = tempDate;
-
-                                    if (DateTime.TryParseExact(parts[1].Trim(), format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
-                                        denNgay = tempDate;
+                                    denNgay = tempDate;
                                 }
 
                                 var vm = new ChiTietDonVM
@@ -414,7 +410,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
                                     CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
                                     GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
-                                    TuNgay = tuNgay,
+                                    TuNgay = null,
                                     DenNgay = denNgay,
                                     GhiChu = ws.Cell(row, 10).GetString()
                                 };
@@ -672,7 +668,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         CapMoi = xe.CapMoi,
                         CapLai = xe.CapLai,
                         GiaHan = xe.GiaHan,
-                        TuNgay = xe.TuNgay,
+                        TuNgay = xe.TuNgay ?? DateTime.Now,
                         DenNgay = xe.DenNgay,
                         GhiChu = xe.GhiChu
                     });
@@ -878,14 +874,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         }
         public ActionResult Detail_PDF(string maDon)
         {
-            var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
-                "EXEC CDNT_DonDangKy_PDF @Ma_Don",
-                new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
-            ).ToList();
+            var model = GetDonDangKyPdfViewModel(maDon);
+            if (model == null || model.ChiTietDon == null || !model.ChiTietDon.Any())
+                return HttpNotFound("Không có dữ liệu.");
 
-            return View(data);
+            return View(model);
         }
-
         public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? page)
         {
             int pageNumber = page ?? 1;
@@ -924,132 +918,123 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(pagedData);
         }
-        //[HttpPost]
-        //public ActionResult ImportExcelXe(HttpPostedFileBase file)
-        //{
-        //    if (file != null && file.ContentLength > 0)
-        //    {
-        //        try
-        //        {
-        //            using (var workbook = new XLWorkbook(file.InputStream))
-        //            {
-        //                var ws = workbook.Worksheet(1); // sheet đầu tiên
-        //                var rows = ws.RangeUsed().RowsUsed().Skip(1); // bỏ header, bắt đầu từ dòng 2
-
-        //                foreach (var row in rows)
-        //                {
-        //                    // Đọc dữ liệu an toàn
-        //                    string fullName = row.Cell(1).Value == null ? "" : row.Cell(1).Value.ToString().Trim();
-        //                    string bienso = row.Cell(2).Value == null ? "" : row.Cell(2).Value.ToString().Trim();
-        //                    string loaipt = row.Cell(3).Value == null ? "" : row.Cell(3).Value.ToString().Trim();
-        //                    string ngaycapStr = row.Cell(7).Value == null ? "" : row.Cell(7).Value.ToString().Trim();
-        //                    string thoihanStr = row.Cell(8).Value == null ? "" : row.Cell(8).Value.ToString().Trim();
-
-        //                    // Extract mant and tennt from fullName (e.g., "14211 - COMPANY NAME")
-        //                    int mant = 0;
-        //                    string tennt = "";
-        //                    if (!string.IsNullOrEmpty(fullName))
-        //                    {
-        //                        var parts = fullName.Split(new[] { '-' }, 2, StringSplitOptions.RemoveEmptyEntries);
-        //                        if (parts.Length >= 1)
-        //                        {
-        //                            int.TryParse(parts[0].Trim(), out mant);
-        //                        }
-        //                        if (parts.Length >= 2)
-        //                        {
-        //                            tennt = parts[1].Trim();
-        //                        }
-        //                    }
-
-        //                    // Map loại phương tiện
-        //                    int loaiPhuongTienID = 0;
-        //                    if (!string.IsNullOrEmpty(loaipt))
-        //                    {
-        //                        string lp = loaipt.ToUpper();
-        //                        if (lp.Contains("XE MÁY"))
-        //                            loaiPhuongTienID = 1;
-        //                        else if (lp.Contains("XE BA GÁC") || lp.Contains("XE BA BÁNH"))
-        //                            loaiPhuongTienID = 2;
-        //                    }
-
-        //                    // Ngày cấp và thời hạn
-        //                    DateTime? ngaycap = null;
-        //                    DateTime? thoihan = null;
-
-        //                    // Nếu cell là kiểu ngày
-        //                    if (row.Cell(7).DataType == XLDataType.DateTime)
-        //                    {
-        //                        ngaycap = row.Cell(7).GetDateTime();
-        //                    }
-        //                    else if (!string.IsNullOrEmpty(ngaycapStr) && DateTime.TryParseExact(ngaycapStr, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime nc))
-        //                    {
-        //                        ngaycap = nc;
-        //                    }
-
-        //                    if (row.Cell(8).DataType == XLDataType.DateTime)
-        //                    {
-        //                        thoihan = row.Cell(8).GetDateTime();
-        //                    }
-        //                    else if (!string.IsNullOrEmpty(thoihanStr) && DateTime.TryParseExact(thoihanStr, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime th))
-        //                    {
-        //                        thoihan = th;
-        //                    }
-
-        //                    // Tạo entity để insert
-        //                    CDNT_XeCoDong xe = new CDNT_XeCoDong
-        //                    {
-        //                        IDNT = mant,
-        //                        TenNT = tennt,
-        //                        BienSoXe = bienso,
-        //                        LoaiPhuongTien_ID = loaiPhuongTienID,
-        //                        HanBatDau = ngaycap,
-        //                        HanKetThuc = thoihan,
-        //                        TinhTrang = true // mặc định đang hoạt động
-        //                    };
-
-        //                    db_dk.CDNT_XeCoDong.Add(xe);
-        //                }
-
-        //                db_dk.SaveChanges();
-        //            }
-
-        //            TempData["Success"] = "Import dữ liệu thành công!";
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            TempData["Error"] = "Lỗi khi import: " + ex.Message;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        TempData["Error"] = "Chưa chọn file!";
-        //    }
-
-        //    return RedirectToAction("Index");
-        //}
         public ActionResult ExportDonDangKyPdf(string maDon)
         {
-            // 1. Lấy dữ liệu chi tiết đơn từ DB  
-            var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
-                "EXEC CDNT_DonDangKy_PDF @Ma_Don",
-                new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
-            ).ToList();
-
-            if (data == null || !data.Any())
+            var vm = GetDonDangKyPdfViewModel(maDon);
+            if (vm == null || vm.ChiTietDon == null || !vm.ChiTietDon.Any())
                 return HttpNotFound("Không có dữ liệu.");
 
-            // 2. Gọi Render View → Tạo PDF bằng Rotativa (không thêm watermark)
             string tempPdfPath = GenerateTempPdf(maDon);
 
-            // 3. Đọc nội dung file PDF đã render
             byte[] pdfBytes = System.IO.File.ReadAllBytes(tempPdfPath);
-
-            // 4. Xóa file tạm
             System.IO.File.Delete(tempPdfPath);
 
-            // 5. Trả file PDF về người dùng
-            string safeFileName = SanitizeFileName(data.First().FullName) + ".pdf";
-            return File(pdfBytes, "application/pdf", safeFileName);
+            // ưu tiên lấy tên nhà thầu, fallback sang mã đơn
+            var safe = SanitizeFileName(
+                vm.ChiTietDon.FirstOrDefault()?.FullName ?? maDon ?? "don_dang_ky") + ".pdf";
+
+            return File(pdfBytes, "application/pdf", safe);
+        }
+        private DonDangKyPDFViewModel GetDonDangKyPdfViewModel(string maDon)
+        {
+            var vm = new DonDangKyPDFViewModel
+            {
+                ChiTietDon = new List<CDNT_DonDangKyDetail>(),
+                TrinhKy = new List<TrinhKyModel>()
+            };
+
+            // Lưu ý: dùng đúng tên SP của bạn
+            const string spName = "[dbo].[CDNT_DonDangKy_PDF_test]"; // hoặc CDNT_DonDangKy_PDF
+
+            var conn = db_dk.Database.Connection;
+            bool mustClose = false;
+            try
+            {
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                    mustClose = true;
+                }
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = spName;
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var p = cmd.CreateParameter();
+                    p.ParameterName = "@Ma_Don";
+                    p.Value = (object)maDon ?? DBNull.Value;
+                    p.DbType = DbType.String;
+                    cmd.Parameters.Add(p);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        // RS1: ChiTietDon
+                        while (reader.Read())
+                        {
+                            vm.ChiTietDon.Add(new CDNT_DonDangKyDetail
+                            {
+                                // chú ý tên cột khớp SELECT trong SP
+                                ID = reader.GetInt32(reader.GetOrdinal("Don_ID")),
+                                Ma_Don = reader["Ma_Don"] as string,
+                                NoiDung = reader["NoiDung"] as string,
+                                BPQL_ID = reader["BPQL_ID"] as int?,
+                                TenPhongBan = reader["TenPhongBan"] as string,
+                                NhanVienNT_ID = reader["NhanVienNT_ID"] as int?,
+                                HoTen = reader["HoTen"] as string,
+                                NhaThau_ID = reader["NhaThau_ID"] as int?,
+                                FullName = reader["FullName"] as string,
+                                HopDong = reader["HopDong"] as string,
+                                NgayTrinhKy = reader["NgayTrinhKy"] as DateTime?,
+                                FileHoSoXe = reader["FileHoSoXe"] as string,
+                                TrinhKy_ID = reader["TrinhKy_ID"] as int?,
+                                TinhTrang_ID = reader["TinhTrang_ID"] as int?,
+                                TenTinhTrang = reader["TenTinhTrang"] as string,
+                                LoaiNT_ID = reader["LoaiNT_ID"] as int?,
+
+                                ChiTiet_ID = (int)reader["ChiTiet_ID"],
+                                ID_LoaiPhuongTien = reader["ID_LoaiPhuongTien"] as int?,
+                                LoaiPhuongTien = reader["LoaiPhuongTien"] as string,
+                                BienSoXe = reader["BienSoXe"] as string,
+                                CapMoi = reader["CapMoi"] as bool?,
+                                CapLai = reader["CapLai"] as bool?,
+                                GiaHan = reader["GiaHan"] as bool?,
+                                TuNgay = reader["TuNgay"] as DateTime?,
+                                DenNgay = reader["DenNgay"] as DateTime?,
+                                GhiChu = reader["GhiChu"] as string,
+                                HoSoTheoXe = reader["HoSoTheoXe"] as string,
+                                TrangThaiDuyet_ID = reader["TrangThaiDuyet_ID"] as int?
+                            });
+                        }
+
+                        // RS2: TrinhKy
+                        if (reader.NextResult())
+                        {
+                            while (reader.Read())
+                            {
+                                vm.TrinhKy.Add(new TrinhKyModel
+                                {
+                                    TrinhKy_ID = (int)reader["TrinhKy_ID"],
+                                    Ma_Don = reader["Ma_Don"] as string,
+                                    CapDuyet = reader["CapDuyet"] as int?,
+                                    NguoiDuyet_ID = reader["NguoiDuyet_ID"] as int?,
+                                    NgayDuyet = reader["NgayDuyet"] as DateTime?,
+                                    TinhTrang_ID = reader["TinhTrang_ID"] as int?,
+                                    GhiChu = reader["GhiChu"] as string,
+                                    TenNguoiDuyet = reader["TenNguoiDuyet"] as string,
+                                    ChuKyNguoiDuyet = reader["ChuKyNguoiDuyet"] as string
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (mustClose) conn.Close();
+            }
+
+            return vm;
         }
 
         private string GenerateTempPdf(string maDon)

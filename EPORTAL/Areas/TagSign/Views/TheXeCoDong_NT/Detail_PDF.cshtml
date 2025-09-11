@@ -1,6 +1,5 @@
-﻿
-@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.CDNT_DonDangKyDetail>
-
+﻿@*@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.CDNT_DonDangKyDetail>*@
+@model EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyPDFViewModel
 @{
     ViewBag.Title = "Chi tiết đơn đăng ký";
     Layout = "~/Views/Shared/PrintView.cshtml";
@@ -18,11 +17,6 @@
 @if (TempData["msgError"] != null)
 {
     @Html.Raw(TempData["msgError"])
-}
-@{
-    EPORTALEntities db = new EPORTALEntities();
-    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
-    // var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
 }
 <meta charset="utf-8" />
 <style>
@@ -53,15 +47,15 @@
                     <img alt="Hòa Phát Dung Quất" src="https://portal.hoaphatdungquat.vn/Content/assets/images/logo-inverse.png" width="90%" />
                     <span class="" style="margin-top: 0; margin-bottom: 1rem;">Công ty Cổ phần Thép</span>
                     <p class="" style="margin-top: 0; margin-bottom: 1rem;">Hòa Phát Dung Quất</p>
-                   
+
                 </div>
                 <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                     <span>BM.09/QT.20</span>
                     <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025</p>
                     <p><span style="font-style:italic;">Lần sửa đổi:</span> 02</p>
-                    @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].Ma_Don))
+                    @if (Model.ChiTietDon != null && Model.ChiTietDon.Any())
                     {
-                        <p style="font-size:15px"><span>@Model[0].Ma_Don</span></p>
+                        <p style="font-size:15px"><span>@Model.ChiTietDon[0].Ma_Don</span></p>
                     }
                     else
                     {
@@ -81,14 +75,15 @@
                         <label style="font-size:15px"> <b>Kính gửi:</b> Công ty Cổ phần Thép Hòa Phát Dung Quất.</label><br />
                         <label style="font-size:15px">
                             Để đáp ứng yêu cầu công việc, <b>Nhà thầu</b>
-                            @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].FullName))
+                            @if (Model.ChiTietDon != null && Model.ChiTietDon.Any() && !string.IsNullOrEmpty(Model.ChiTietDon[0].FullName))
                             {
-                                <b><span>@Model[0].FullName</span></b>
+                                <b><span>@Model.ChiTietDon[0].FullName</span></b>
                             }
                             else
                             {
                                 <span>Không có dữ liệu</span>
-                            }đề nghị Quý Công ty cấp thẻ dài ngày dành cho xe cơ động theo danh sách dưới đây:
+                            }
+                            đề nghị Quý Công ty cấp thẻ dài ngày dành cho xe cơ động theo danh sách dưới đây:
                         </label>  <br />
                     </div>
                 }
@@ -116,21 +111,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (int i = 0; i < Model.Count; i++)
+                                @if (Model.ChiTietDon != null)
                                 {
-                                    var item = Model[i];
-                                    <tr>
-                                        <td>@(i + 1)</td>
-                                        <td class="text-center">@((item.ID_LoaiPhuongTien == 1) ? "X" : "")</td>
-                                        <td class="text-center">@((item.ID_LoaiPhuongTien == 2) ? "X" : "")</td>
-                                        <td class="text-center">@((item.ID_LoaiPhuongTien == 3) ? "X" : "")</td>
-                                        <td>@item.BienSoXe</td>
-                                        <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
-                                        <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
-                                        <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
-                                        <td>@(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "") – @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
-                                        <td>@item.GhiChu</td>
-                                    </tr>
+                                    for (int i = 0; i < Model.ChiTietDon.Count; i++)
+                                    {
+                                        var item = Model.ChiTietDon[i];
+                                        <tr>
+                                            <td>@(i + 1)</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 1) ? "X" : "")</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 2) ? "X" : "")</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 3) ? "X" : "")</td>
+                                            <td>@item.BienSoXe</td>
+                                            <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
+                                            <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
+                                            <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
+                                            <td>@(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
+                                            <td>@item.GhiChu</td>
+                                        </tr>
+                                    }
                                 }
                             </tbody>
                         </table>
@@ -139,32 +137,69 @@
                 <div class="col-md-12">
                     <label style="font-size: 15px;">Nhà thầu cam kết tuân thủ quy định của Chủ đầu tư, chỉ giao xe cho CBNV đủ điều kiện điều khiển theo quy định pháp luật hiện hành. Nếu có sai phạm, Nhà thầu xin chịu hoàn toàn trách nhiệm trước Chủ đầu tư và pháp luật.</label><br />
                 </div>
+                <div class="col-md-12 pt-3 pull-right" style="margin-top: 0.5%; padding-bottom:5px">
+                    <label style="font-size: 20px; font-style: italic; padding-right: 40px;">
+                        Quảng Ngãi, ngày...tháng...năm.....
+                    </label>
+                </div>
+
+
                 @{
-
-                    <div class="col-md-12 pt-3 pull-right" style="margin-top: 0.5%; padding-bottom:5px">
-                        <label style="font-size: 20px; font-style: italic; padding-right: 40px;">
-                            Quảng Ngãi, ngày...tháng...năm.....
-                        </label>
-                    </div>
-
-                    <table style="width: 100%; font-size: 20px; text-align: center; margin-top: 30px; border-collapse: collapse;">
-                        <tr>
-                            <td><strong>Tổ CPT (P.ATMT)</strong></td>
-                            <td><strong>BP quản lý</strong></td>
-                            <td><strong>Đại diện Nhà thầu</strong></td>
-                        </tr>
-                        <tr>
-                            <td style="padding-top: 60px;"></td>
-                            <td style="padding-top: 60px;"></td>
-                            <td style="padding-top: 60px;"></td>
-                        </tr>
-                        <tr>
-                            <td>Trần Văn A</td>
-                            <td>Trần Văn A</td>
-                            <td>Trần Văn A</td>
-                        </tr>
-                    </table>
+                    // Ví dụ: CapDuyet = 1: CPT, 2: BP quản lý, 3: Nhà thầu
+                    var cpt = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 2);
+                    var bpql = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 1);
+                    var nhathau = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 0);
                 }
+                <table style="width: 100%; font-size: 20px; text-align: center; margin-top: 30px; border-collapse: collapse;">
+                    <tr>
+                        <td><strong>Tổ CPT (P.ATMT)</strong></td>
+                        <td><strong>BP quản lý</strong></td>
+                        <td><strong>Đại diện Nhà thầu</strong></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @if (cpt != null && !string.IsNullOrWhiteSpace(cpt.ChuKyNguoiDuyet))
+                            {
+                                @*<img src="@Url.Content(cpt.ChuKyNguoiDuyet)" style="height:60px;" />*@
+                                <img src="https://portal.hoaphatdungquat.vn/UploadedFiles/Signature/To_CPT_1202509031102_Chukychinh.png"
+                                     alt="Chữ ký"
+                                     style="height:200px; width:auto;" />
+                            }
+                            else
+                            {
+                                <div style="height: 60px; width: 100%; overflow: hidden; border: none;"></div>
+
+                            }
+                        </td>
+                        <td>
+                            @if (bpql != null && !string.IsNullOrWhiteSpace(bpql.ChuKyNguoiDuyet))
+                            {
+                                <img src="@Url.Content(bpql.ChuKyNguoiDuyet)" style="height:60px;" />
+                            }
+                            else
+                            {
+                                <div style="height: 60px; width: 100%; overflow: hidden; border: none;"></div>
+
+                            }
+                        </td>
+                        <td>
+                            @if (nhathau != null && !string.IsNullOrWhiteSpace(nhathau.ChuKyNguoiDuyet))
+                            {
+                                <img src="@Url.Content(nhathau.ChuKyNguoiDuyet)" style="height:60px;" />
+                            }
+                            else
+                            {
+                                <div style="height: 60px; width: 100%; overflow: hidden; border: none;"></div>
+
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        @*<td>@(cpt?.TenNguoiDuyet ?? "")</td>
+                        <td>@(bpql?.TenNguoiDuyet ?? "")</td>
+                        <td>@(nhathau?.TenNguoiDuyet ?? "")</td>*@
+                    </tr>
+                </table>
                 <div class="col-md-12 pt-5" style="width:100%">
                     <div style="margin-left: 2%; font-size: 15px; font-style: italic;">
                         <p>
