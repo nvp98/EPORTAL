@@ -46,3 +46,6 @@ dist/
 *.tar.gz
 *.7z
 *.rar
+
+# Bỏ theo dõi thư mục package
+packages/

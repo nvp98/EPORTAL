@@ -22,187 +22,201 @@
 @{
     EPORTALEntities db = new EPORTALEntities();
     EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
-   // var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
+    // var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
 }
 
 <link href="~/Content/PagedList.css" rel="stylesheet" />
 @using (Html.BeginForm("Create", "TheXeCoDong_NT", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "submitForm(event)" }))
 {
     @Html.AntiForgeryToken()
-<div class="app-main__outer" style="margin-top: -4%;">
-    <div class="app-main__inner" style="display:block;padding-bottom: 0px;">
-        <div class="tab-content">
-            <div class="row">
-                <div class="card">
-                    <div style="height: 600px;">
-                        <div class="row" style="width:100%">
-                            <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
-                                <h6 style="color: red;"><b>THÔNG TIN TRÌNH KÝ</b></h6>
-                            </div>
-                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                                <thead>
-                                    <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" width="50%">Nội dung trích yếu  <span style="color:red;">(*)</span>:</th>
-                                        <th class="text-center" width="50%"> </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <textarea style="width: 100%;" type="text" id="NoiDung" name="NoiDung"></textarea>
-                                        </td>
-                                        <td id="tdDinhBienPhuongTien" style="width: 100%;">
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+    <div class="app-main__outer" style="margin-top: -4%;">
+        <div class="app-main__inner" style="display:block;padding-bottom: 0px;">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card">
+                        <div style="height: 600px;">
+                            <div class="row" style="width:100%">
+                                <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
+                                    <h6 style="color: red;"><b>THÔNG TIN TRÌNH KÝ</b></h6>
+                                </div>
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="50%">Nội dung trích yếu  <span style="color:red;">(*)</span>:</th>
+                                            <th class="text-center" width="50%"> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <textarea style="width: 100%;" type="text" id="NoiDung" name="NoiDung"></textarea>
+                                            </td>
+                                            <td id="tdDinhBienPhuongTien" style="width: 100%;">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
 
-                            <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
-                                <span class="text-center" style="margin-top: 8px">Thông tin Nhà thầu <span style="color:red;">(*)</span> : </span>
-                            </div>
-                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                                <thead>
-                                    <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" width="50px">Nhà thầu &nbsp;&nbsp;<span style="color:red;">(*)</span> : </th>
-                                        <th class="text-center" width="120px">Hồ sơ xe kèm theo &nbsp;&nbsp; <span style="color:red;">(*)</span> :</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 50%;">
-                                            @Html.DropDownList("IDNT", null, "--Chọn tên nhà thầu--", new { id = "NhaThau_ID", name = "NhaThau_ID", @class = "form-control", @readonly = "readonly" })
-                                        </td>
-                                        <td>
-                                            <fieldset id="SubmitForm">
-                                                <div class="form-group" style="margin-left: 13%;">
-                                                    <input type="file" id="FileHoSoXE" name="FileHoSoXE" class="form-control" onchange="checkfile(this);" />
-                                                </div>
-                                            </fieldset>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
+                                    <span class="text-center" style="margin-top: 8px">Thông tin Nhà thầu <span style="color:red;">(*)</span> : </span>
+                                </div>
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="50px">Nhà thầu &nbsp;&nbsp;<span style="color:red;">(*)</span> : </th>
+                                            <th class="text-center" width="120px">Hồ sơ xe kèm theo &nbsp;&nbsp; <span style="color:red;">(*)</span> :</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                @Html.DropDownList("IDNT", null, "--Chọn tên nhà thầu--", new { id = "NhaThau_ID", name = "NhaThau_ID", @class = "form-control", @readonly = "readonly" })
+                                            </td>
+                                            <td>
+                                                <fieldset id="SubmitForm">
+                                                    <div class="form-group" style="margin-left: 13%;">
+                                                        <input type="file" id="FileHoSoXE" name="FileHoSoXE" class="form-control" onchange="checkfile(this);" />
+                                                    </div>
+                                                </fieldset>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
-                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                                <thead>
-                                    <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" width="50px">BP Quản lý &nbsp;&nbsp; <span style="color:red;">(*)</span> : </th>
-                                        @*<th class="text-center" width="120px">Loại đăng ký &nbsp;&nbsp;<span style="color:red;">(*)</span> :</th>*@
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 50%;">
-                                            @Html.DropDownList("IDPhongBan", null, "--Chọn tên BP/NM quản lý--", new { id = "PhongBan_ID", name = "PhongBan_ID", @class = "marginTB5", })
-                                        </td>
-                                        <td>
-                                            @*@Html.DropDownList("IDLTK", null, "--Chọn loại đăng ký--", new { id = "IDLTK", name = "IDLTK", @class = "marginTB5", })*@
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" width="50px">BP Quản lý &nbsp;&nbsp; <span style="color:red;">(*)</span> : </th>
+                                            @*<th class="text-center" width="120px">Loại đăng ký &nbsp;&nbsp;<span style="color:red;">(*)</span> :</th>*@
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                @Html.DropDownList("IDPhongBan", null, "--Chọn tên BP/NM quản lý--", new { id = "PhongBan_ID", name = "PhongBan_ID", @class = "marginTB5", })
+                                            </td>
+                                            <td>
+                                                @*@Html.DropDownList("IDLTK", null, "--Chọn loại đăng ký--", new { id = "IDLTK", name = "IDLTK", @class = "marginTB5", })*@
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
 
 
-                            <div class="col-md-12 col-lg-12" style="padding: 0% 0% 1% 1%;">
-                                <h6 style="color: red;"><b>NỘI DUNG TRÌNH KÝ</b></h6>
-                            </div>
+                                <div class="col-md-12 col-lg-12" style="padding: 0% 0% 1% 1%;">
+                                    <h6 style="color: red;"><b>NỘI DUNG TRÌNH KÝ</b></h6>
+                                </div>
 
-                            <div class="col-md-3" style="display: flex;">
-                                <input type="file" id="FileImportExcel" class="form-control" />
-                                <button type="button" class="btn btn-primary" onclick="submitImport()">Import Excel</button>
+                                <div class="col-md-6" style="display: flex;">
+                                    <input type="file" id="FileImportExcel" class="form-control" />
+                                    <button type="button" class="btn btn-primary" onclick="submitImport()">Import Excel</button>
+                                </div>
+                                <div class="col-md-6" style="display:flex;">
+                                    @*<input type="file" id="FileImportExcel" class="form-control" />
+                                        <button type="button" class="btn btn-primary" style="margin-left:8px;" onclick="submitImport()">Import Excel</button>*@
+
+                                    <!-- Nút tải biểu mẫu -->
+                                    <a class="btn btn-success" style="margin-left:8px;"
+                                       href="@Url.Action("DownloadExcel","TheXeCoDong_NT")">
+                                        Download biểu mẫu
+                                    </a>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card-body" style="width:80vw;overflow-x:auto">
-                        <div class="table-responsive" style="width: 80vw; overflow-x: auto;">
-                            <table class="table table-bordered table-hover" id="table" style="width:85vw" cellpadding="0">
-                                <thead>
-                                    <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" rowspan="2" width="10px" rowspan="2" style="vertical-align:middle">TT</th>
-                                        <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
-                                        <th class="text-center" rowspan="2" width="60px" style="vertical-align:middle">Biển số xe</th>
-                                        <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
-                                        <th class="text-center" rowspan="2" width="50px" style="vertical-align:middle">Thời hạn thẻ xe cơ động</th>
-                                        <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Ghi chú</th>
-                                    </tr>
-                                    <tr style="background-color: #f8f9fa;">
+                        <div class="card-body" style="width:80vw;overflow-x:auto">
+                            <div class="table-responsive" style="width: 80vw; overflow-x: auto;">
+                                <table class="table table-bordered table-hover" id="table" style="width:85vw" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th class="text-center" rowspan="2" width="10px" rowspan="2" style="vertical-align:middle">TT</th>
+                                            <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
+                                            <th class="text-center" rowspan="2" width="60px" style="vertical-align:middle">Biển số xe</th>
+                                            <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
+                                            <th class="text-center" rowspan="2" width="50px" style="vertical-align:middle">Thời hạn thẻ xe cơ động</th>
+                                            <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Ghi chú</th>
+                                            <th class="text-center" rowspan="2" width="40px" style="vertical-align:middle">Thao tác</th>
+                                        </tr>
+                                        <tr style="background-color: #f8f9fa;">
 
-                                        <th width="30px" class="text-center">Xe máy</th>
-                                        <th width="30px" class="text-center">Xe ô tô</th>
-                                        <th width="30px" class="text-center">Xe 3 gác</th>
+                                            <th width="30px" class="text-center">Xe máy</th>
+                                            <th width="30px" class="text-center">Xe ô tô</th>
+                                            <th width="30px" class="text-center">Xe 3 gác</th>
 
-                                        <th width="30px" class="text-center">Cấp mới</th>
-                                        <th width="30px" class="text-center">Cấp lại</th>
-                                        <th width="30px" class="text-center">Gia hạn</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbodyImportExcel">
-                                </tbody>
+                                            <th width="30px" class="text-center">Cấp mới</th>
+                                            <th width="30px" class="text-center">Cấp lại</th>
+                                            <th width="30px" class="text-center">Gia hạn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyImportExcel">
+                                    </tbody>
 
-                            </table>
+                                </table>
+                                <div style="margin-top: 10px;">
+                                    <button id="btnAddRow" class="btn btn-success" type="button">Thêm dòng</button>
+                                </div>
+                            </div>
 
                         </div>
+                        <div style="padding-top:30px">
+                            <h6 style="color: red; padding: 0% 0% 1% 1%;"><b>LUỒNG TRÌNH KÝ</b></h6>
 
-                    </div> 
-                    <div style="padding-top:30px">
-                        <h6 style="color: red; padding: 0% 0% 1% 1%;"><b>LUỒNG TRÌNH KÝ</b></h6>
-
-                        <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                            <thead>
-                                <tr style="background-color: #f8f9fa;">
-                                    <th class="text-center" width="25%">Kỹ Thuật Viên (KTV)</th>
-                                    <th class="text-center" width="25%">Trưởng/Phó phòng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn KTV--", new { @class = "form-control", id = "KTV_QL" })
-                                    </td>
-                                    <td>
-                                        @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Trưởng/Phó--", new { @class = "form-control", id = "TP_QL" })
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                            <thead>
-                                <tr style="background-color: #f8f9fa;">
-                                    <th class="text-center" width="25%">Tổ cấp phát thẻ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        @Html.DropDownList("VP1C", (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn VP1C--", new { @class = "form-control", id = "VP1C" })
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th class="text-center" width="25%">Kỹ Thuật Viên (KTV)</th>
+                                        <th class="text-center" width="25%">Trưởng/Phó phòng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn KTV--", new { @class = "form-control", id = "KTV_QL" })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Trưởng/Phó--", new { @class = "form-control", id = "TP_QL" })
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th class="text-center" width="25%">Tổ cấp phát thẻ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            @Html.DropDownList("VP1C", (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn VP1C--", new { @class = "form-control", id = "VP1C" })
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="app-wrapper-footer">
+            <div class="app-footer">
+                <div class="app-footer__inner">
+
                 </div>
             </div>
         </div>
 
+        <button id="btnSave" type="button" class="btn btn-primary">
+            <i class="fa fa-save"></i> Lưu
+        </button>
+
     </div>
-
-
-    <div class="app-wrapper-footer">
-        <div class="app-footer">
-            <div class="app-footer__inner">
-
-            </div>
-        </div>
-    </div>
-
-    <button id="btnSave" type="button" class="btn btn-primary">
-        <i class="fa fa-save"></i> Lưu
-    </button>
-
-</div>
 
 }
 <script type="text/javascript">
@@ -233,6 +247,7 @@
             $("#myModal_Download").html(data);
         });
     });
+
      function submitImport() {
         const fileInput = document.getElementById("FileImportExcel");
         const file = fileInput.files[0];
@@ -253,6 +268,7 @@
             processData: false,
             success: function (res) {
                 if (res.success) {
+                    danhSachData = res.data;
                     renderDanhSach(res.data);
                 } else {
                     alert("Lỗi import: " + res.message);
@@ -264,33 +280,72 @@
         });
     }
 
+    let danhSachData = [];
     function renderDanhSach(data) {
+
         let html = "";
-        console.log('data', data)
+     // console.log('data', data)
         data.forEach((item, i) => {
+            console.log("DenNgay render:", item.DenNgay); 
             html += `
             <tr>
                 <td>${i + 1}</td>
-                <td><input type="checkbox"  style=" width: 100%" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""}  /></td>
-                <td><input type="checkbox"  style=" width: 100%" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""}  /></td>
-                <td><input type="checkbox"  style=" width: 100%" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""}  /></td>
-                <td><input type="text" name="Items[${i}].BienSoXe"  style=" width: 100%" value="${item.BienSoXe}" class="form-control" /></td>
-                <td><input type="checkbox" name="Items[${i}].CapMoi"  style=" width: 100%" value="true" ${item.CapMoi ? "checked" : ""} /></td>
-                <td><input type="checkbox" name="Items[${i}].CapLai"  style=" width: 100%" value="true" ${item.CapLai ? "checked" : ""} /></td>
-                <td><input type="checkbox" name="Items[${i}].GiaHan"  style=" width: 100%" value="true" ${item.GiaHan ? "checked" : ""} /></td>
+                 <td>
+                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} />
+                </td>
                 <td>
-                    <input type="date" name="Items[${i}].TuNgay" value="${item.TuNgay ? item.TuNgay.split('T')[0] : ""}" style="width:45%;" />
-                    --
-                    <input type="date" name="Items[${i}].DenNgay" value="${item.DenNgay ? item.DenNgay.split('T')[0] : ""}" style="width:45%;" />
+                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} />
+                </td>
+                <td>
+                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} />
+                </td>
+                <td><input type="text" name="Items[${i}].BienSoXe"  style=" width: 100%" value="${item.BienSoXe}" class="form-control" /></td>
+                <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].CapMoi"  style=" width: 100%" value="true" ${item.CapMoi ? "checked" : ""} /></td>
+                <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].CapLai"  style=" width: 100%" value="true" ${item.CapLai ? "checked" : ""} /></td>
+                <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].GiaHan"  style=" width: 100%" value="true" ${item.GiaHan ? "checked" : ""} /></td>
+                <td>                  
+                   <input type="date" name="Items[${i}].DenNgay" 
+                   value="${item.DenNgay ? item.DenNgay.split('T')[0] : ''}" 
+                   class="form-control" />
                 </td>
                 <td><input type="text" name="Items[${i}].GhiChu" value="${item.GhiChu}" class="form-control" /></td>
+                 <td class="text-center">
+                <button type="button" class="btn btn-danger btn-sm btnRemoveRow" data-index="${i}">X</button>
+                 </td>
             </tr>`;
         });
 
         $("#tbodyImportExcel").html(html);
+        setupSingleSelectCheckboxes("cb-loai");
+        setupSingleSelectCheckboxes("cb-cap");
     }
-
-
+    $("#btnAddRow").on("click", function () {
+        const newItem = {
+            ID_LoaiPhuongTien: null,
+            BienSoXe: "",
+            CapMoi: false,
+            CapLai: false,
+            GiaHan: false,
+            TuNgay: "",
+            DenNgay: "",
+            GhiChu: ""
+        };
+        danhSachData.push(newItem);  // danhSachData là mảng dữ liệu hiện có
+        renderDanhSach(danhSachData); // Gọi lại render để vẽ dòng mới
+    });
+    $("#tbodyImportExcel").on("click", ".btnRemoveRow", function () {
+        const index = $(this).data("index");
+        if (index !== undefined) {
+            danhSachData.splice(index, 1);
+            renderDanhSach(danhSachData);
+        }
+    });
+ function setupSingleSelectCheckboxes(className) {
+    $("." + className).off("change").on("change", function () {
+        const group = $(this).data("group");
+        $("." + className + "[data-group='" + group + "']").not(this).prop("checked", false);
+    });
+}
     // submit form
     function submitForm(event) {
         event.preventDefault();
@@ -321,8 +376,8 @@
                 CapMoi: row.find("input[name*='CapMoi']").is(":checked"),
                 CapLai: row.find("input[name*='CapLai']").is(":checked"),
                 GiaHan: row.find("input[name*='GiaHan']").is(":checked"),
-                TuNgay: row.find("input[type=date]").eq(0).val(),
-                DenNgay: row.find("input[type=date]").eq(1).val(),
+                TuNgay: null,
+                DenNgay: row.find("input[type=date]").val(),
                 GhiChu: row.find("input[name*='GhiChu']").val()
             };
             listXe.push(xe);
