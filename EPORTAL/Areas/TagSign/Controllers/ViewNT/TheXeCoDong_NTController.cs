@@ -347,7 +347,125 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             {
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
-        }      
+        }
+        //[HttpPost]
+        //public JsonResult ImportExcel(HttpPostedFileBase FileANH)
+        //{
+        //    var danhSach = new List<ChiTietDonVM>();
+
+        //    try
+        //    {
+        //        int nhanVienNT_ID = Models.MyAuthentication.ID;
+
+        //        using (var db_nt = new EPORTAL_NTEntities())
+        //        using (var db = new EPORTALEntities())
+        //        {
+        //            // Lấy thông tin nhân viên theo nhanVienNT_ID
+        //            var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
+        //            if (nhanVien == null || !nhanVien.IDNT.HasValue)
+        //            {
+        //                return Json(new
+        //                {
+        //                    success = false,
+        //                    message = "Không tìm thấy thông tin Nhà thầu tương ứng với nhân viên đăng nhập."
+        //                }, JsonRequestBehavior.AllowGet);
+        //            }
+
+        //            int nhaThauID = nhanVien.IDNT.Value;
+
+        //            // (Bạn có thể lấy tên nhà thầu nếu cần)
+        //            var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID);
+        //            string tenNhaThau = nhaThau?.FullName ?? "";
+
+        //            // Bắt đầu đọc file Excel
+        //            if (FileANH != null && FileANH.ContentLength > 0)
+        //            {
+        //                using (var workbook = new XLWorkbook(FileANH.InputStream))
+        //                {
+        //                    var ws = workbook.Worksheet(1);
+        //                    int row = 7;
+
+        //                    while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
+        //                    {
+        //                        DateTime? denNgay = null;
+        //                        DateTime tempDate;
+        //                        string format = "dd/MM/yyyy";
+
+        //                        // Cột I = thời hạn thẻ (ngày bắt đầu)
+        //                        string cellValue = ws.Cell(row, 9).GetString().Trim();
+
+        //                        if (DateTime.TryParseExact(cellValue, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
+        //                        {
+        //                            denNgay = tempDate;
+        //                        }
+
+        //                        var vm = new ChiTietDonVM
+        //                        {
+        //                            ID_LoaiPhuongTien =
+        //                                ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
+        //                                ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
+        //                                ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
+
+        //                            BienSoXe = ws.Cell(row, 5).GetString(),
+        //                            CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
+        //                            CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
+        //                            GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
+        //                            TuNgay = null,
+        //                            DenNgay = denNgay,
+        //                            GhiChu = ws.Cell(row, 10).GetString()
+        //                        };
+
+        //                        danhSach.Add(vm);
+        //                        row++;
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                return Json(new { success = false, message = "Vui lòng chọn file Excel hợp lệ." }, JsonRequestBehavior.AllowGet);
+        //            }
+
+        //            var dinhBien = DinhBienPhuongTienService.LayDinhBienTheoNhaThau(nhaThauID);
+
+        //            // Đếm số xe máy và 3 gác đăng ký cấp mới trong file import
+        //            int soXeMayMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 1 && x.CapMoi);
+        //            int soXe3GacMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 3 && x.CapMoi);
+
+        //            // Kiểm tra vượt định biên
+        //            if (soXeMayMoi > dinhBien.XeMay_ConLai || soXe3GacMoi > dinhBien.Xe3Gac_ConLai)
+        //            {
+        //                return Json(new
+        //                {
+        //                    success = false,
+        //                    message = $"Vượt định biên: Xe máy (còn lại {dinhBien.XeMay_ConLai}, đang đăng ký {soXeMayMoi}), " +
+        //                            $"Xe 3 gác (còn lại {dinhBien.Xe3Gac_ConLai}, đang đăng ký {soXe3GacMoi})"
+        //                }, JsonRequestBehavior.AllowGet);
+        //            }
+
+        //            // Nếu OK, trả dữ liệu về client
+        //            return Json(new
+        //            {
+        //                success = true,
+        //                tenNhaThau = tenNhaThau,
+        //                data = danhSach.Select(x => new
+        //                {
+        //                    x.ID_LoaiPhuongTien,
+        //                    x.BienSoXe,
+        //                    x.CapMoi,
+        //                    x.CapLai,
+        //                    x.GiaHan,
+        //                    TuNgay = x.TuNgay?.ToString("yyyy-MM-dd"),
+        //                    DenNgay = x.DenNgay?.ToString("yyyy-MM-dd"),
+        //                    x.GhiChu
+        //                })
+        //            }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
         [HttpPost]
         public JsonResult ImportExcel(HttpPostedFileBase FileANH)
         {
@@ -360,7 +478,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 using (var db_nt = new EPORTAL_NTEntities())
                 using (var db = new EPORTALEntities())
                 {
-                    // Lấy thông tin nhân viên theo nhanVienNT_ID
                     var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
                     if (nhanVien == null || !nhanVien.IDNT.HasValue)
                     {
@@ -372,77 +489,59 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     }
 
                     int nhaThauID = nhanVien.IDNT.Value;
-
-                    // (Bạn có thể lấy tên nhà thầu nếu cần)
                     var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID);
                     string tenNhaThau = nhaThau?.FullName ?? "";
 
-                    // Bắt đầu đọc file Excel
-                    if (FileANH != null && FileANH.ContentLength > 0)
-                    {
-                        using (var workbook = new XLWorkbook(FileANH.InputStream))
-                        {
-                            var ws = workbook.Worksheet(1);
-                            int row = 7;
-
-                            while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
-                            {
-                                DateTime? denNgay = null;
-                                DateTime tempDate;
-                                string format = "dd/MM/yyyy";
-
-                                // Cột I = thời hạn thẻ (ngày bắt đầu)
-                                string cellValue = ws.Cell(row, 9).GetString().Trim();
-
-                                if (DateTime.TryParseExact(cellValue, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
-                                {
-                                    denNgay = tempDate;
-                                }
-
-                                var vm = new ChiTietDonVM
-                                {
-                                    ID_LoaiPhuongTien =
-                                        ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
-                                        ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
-                                        ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
-
-                                    BienSoXe = ws.Cell(row, 5).GetString(),
-                                    CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
-                                    CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
-                                    GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
-                                    TuNgay = null,
-                                    DenNgay = denNgay,
-                                    GhiChu = ws.Cell(row, 10).GetString()
-                                };
-
-                                danhSach.Add(vm);
-                                row++;
-                            }
-                        }
-                    }
-                    else
+                    if (FileANH == null || FileANH.ContentLength == 0)
                     {
                         return Json(new { success = false, message = "Vui lòng chọn file Excel hợp lệ." }, JsonRequestBehavior.AllowGet);
                     }
 
+                    using (var workbook = new XLWorkbook(FileANH.InputStream))
+                    {
+                        var ws = workbook.Worksheet(1);
+                        int row = 7;
+
+                        while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
+                        {
+                            DateTime? denNgay = ParseExcelDate(ws.Cell(row, 9));
+
+                            var vm = new ChiTietDonVM
+                            {
+                                ID_LoaiPhuongTien =
+                                    ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
+                                    ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
+                                    ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
+
+                                BienSoXe = ws.Cell(row, 5).GetString().Trim(),
+                                CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
+                                CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
+                                GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
+                                TuNgay = null,
+                                DenNgay = denNgay,
+                                GhiChu = ws.Cell(row, 10).GetString().Trim()
+                            };
+
+                            danhSach.Add(vm);
+                            row++;
+                        }
+                    }
+
                     var dinhBien = DinhBienPhuongTienService.LayDinhBienTheoNhaThau(nhaThauID);
 
-                    // Đếm số xe máy và 3 gác đăng ký cấp mới trong file import
                     int soXeMayMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 1 && x.CapMoi);
                     int soXe3GacMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 3 && x.CapMoi);
 
-                    // Kiểm tra vượt định biên
                     if (soXeMayMoi > dinhBien.XeMay_ConLai || soXe3GacMoi > dinhBien.Xe3Gac_ConLai)
                     {
                         return Json(new
                         {
                             success = false,
-                            message = $"Vượt định biên: Xe máy (còn lại {dinhBien.XeMay_ConLai}, đang đăng ký {soXeMayMoi}), " +
-                                    $"Xe 3 gác (còn lại {dinhBien.Xe3Gac_ConLai}, đang đăng ký {soXe3GacMoi})"
+                            message = $"Vượt định biên: Xe máy (còn lại {dinhBien.XeMay_ConLai}, đăng ký {soXeMayMoi}), " +
+                                      $"Xe 3 gác (còn lại {dinhBien.Xe3Gac_ConLai}, đăng ký {soXe3GacMoi})"
                         }, JsonRequestBehavior.AllowGet);
                     }
 
-                    // Nếu OK, trả dữ liệu về client
                     return Json(new
                     {
                         success = true,
@@ -463,9 +562,50 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = "Lỗi: " + ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+        private DateTime? ParseExcelDate(IXLCell cell)
+        {
+            if (cell == null || cell.IsEmpty()) return null;
+
+            try
+            {
+                // Nếu là kiểu ngày gốc
+                if (cell.DataType == XLDataType.DateTime)
+                {
+                    return cell.GetDateTime();
+                }
+
+                // Nếu là số serial của Excel
+                if (cell.DataType == XLDataType.Number)
+                {
+                    return DateTime.FromOADate(cell.GetDouble());
+                }
+
+                // Nếu là chuỗi - thử parse nhiều định dạng
+                string raw = cell.GetString().Trim();
+                string[] formats = { "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd", "MM/dd/yyyy" };
+
+                if (DateTime.TryParseExact(raw, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    return parsedDate;
+                }
+
+                // Nếu vẫn chưa được, thử parse tự do
+                if (DateTime.TryParse(raw, out parsedDate))
+                {
+                    return parsedDate;
+                }
+            }
+            catch
+            {
+                // Log nếu cần
+            }
+
+            return null;
+        }
+
         public ActionResult Update(string id)
         {
             if (string.IsNullOrEmpty(id))
