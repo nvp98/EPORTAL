@@ -683,8 +683,8 @@
                                         </a>
                                         <ul id="Approve">
                                             @{
-                                                var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == EPORTAL.Models.MyAuthentication.ID).SingleOrDefault();
-                                                var idnv = db.NhanViens.Where(x => x.ID == nd.IDNhanVien).FirstOrDefault();
+                                                //var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == EPORTAL.Models.MyAuthentication.ID).SingleOrDefault();
+                                                //var idnv = db.NhanViens.Where(x => x.ID == nd.IDNhanVien).FirstOrDefault();
 
                                             }
                                             @*<li>
@@ -717,12 +717,12 @@
                                                     List<int> Sum_TheNguoi = new List<int>();
                                                     foreach (var thenguoi in TheNguoi_)
                                                     {
-                                                        var TheNguoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).ToList();
+                                                        var TheNguoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).ToList();
                                                         foreach (var item in TheNguoi)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_TheNguoi.Add(Count);
@@ -734,7 +734,7 @@
                                                                 var Check = db_dk.SignOff_Flow.Where(x => x.CapDuyet <= Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == item.DKTN_ID).FirstOrDefault();
                                                                 if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_TheNguoi.Add(Count);
@@ -757,12 +757,12 @@
                                                     List<int> Sum_CapMoi = new List<int>();
                                                     foreach (var capmoi in CapMoi_)
                                                     {
-                                                        var CapMoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).ToList();
+                                                        var CapMoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).ToList();
                                                         foreach (var item in CapMoi)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_CapMoi.Add(Count);
@@ -774,7 +774,7 @@
                                                                 var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == item.DKTN_ID).FirstOrDefault();
                                                                 if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_CapMoi.Add(Count);
@@ -799,12 +799,12 @@
                                                     List<int> Sum_GiaHan = new List<int>();
                                                     foreach (var giahan in GiaHan_)
                                                     {
-                                                        var GiaHan = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == giahan.ID_DKTN).ToList();
+                                                        var GiaHan = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).ToList();
                                                         foreach (var item in GiaHan)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == giahan.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_GiaHan.Add(Count);
@@ -816,7 +816,7 @@
                                                                 var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == giahan.ID_DKTN).FirstOrDefault();
                                                                 if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == giahan.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_GiaHan.Add(Count);
@@ -840,12 +840,12 @@
                                                     List<int> Sum_BoSung = new List<int>();
                                                     foreach (var bosung in BoSung_)
                                                     {
-                                                        var BoSung = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == bosung.ID_DKTN).ToList();
+                                                        var BoSung = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).ToList();
                                                         foreach (var item in BoSung)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == bosung.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_BoSung.Add(Count);
@@ -857,7 +857,7 @@
                                                                 var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == bosung.ID_DKTN).FirstOrDefault();
                                                                 if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == bosung.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_BoSung.Add(Count);
@@ -883,12 +883,12 @@
                                                     List<int> Sum_CapLai = new List<int>();
                                                     foreach (var caplai in CapLai_)
                                                     {
-                                                        var CapLai = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == caplai.ID_DKTN).ToList();
+                                                        var CapLai = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).ToList();
                                                         foreach (var item in CapLai)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == caplai.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_CapLai.Add(Count);
@@ -900,7 +900,7 @@
                                                                 var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == caplai.ID_DKTN).FirstOrDefault();
                                                                 if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == caplai.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_CapLai.Add(Count);
