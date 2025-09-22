@@ -150,6 +150,9 @@
                     var bpql = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 1);
                     var nhathau = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 0);
                 }
+                @{
+                    string baseUrl = "https://portal.hoaphatdungquat.vn";
+                }
                 <table style="width: 100%; font-size: 20px; text-align: center; margin-top: 30px; border-collapse: collapse;">
                     <tr>
                         <td><strong>Tổ CPT (P.ATMT)</strong></td>
@@ -160,44 +163,41 @@
                         <td>
                             @if (cpt != null && !string.IsNullOrWhiteSpace(cpt.ChuKyNguoiDuyet))
                             {
-                                @*<img src="@Url.Content(cpt.ChuKyNguoiDuyet)" style="height:60px;" />*@
-                                <img src="https://portal.hoaphatdungquat.vn/UploadedFiles/Signature/To_CPT_1202509031102_Chukychinh.png"
-                                     alt="Chữ ký"
-                                     style="height:200px; width:auto;" />
+                                var imgUrl = baseUrl + cpt.ChuKyNguoiDuyet.Replace("~", "");
+                                <img src="@imgUrl" alt="Chữ ký" style="height:80px; width:auto;" />
                             }
                             else
                             {
-                                <div style="height: 60px; width: 100%; overflow: hidden; border: none;"></div>
-
+                                <div style="height:80px; width:100%; overflow:hidden; border:none;"></div>
                             }
                         </td>
                         <td>
                             @if (bpql != null && !string.IsNullOrWhiteSpace(bpql.ChuKyNguoiDuyet))
                             {
-                                <img src="@Url.Content(bpql.ChuKyNguoiDuyet)" style="height:60px;" />
+                                var imgUrl = baseUrl + bpql.ChuKyNguoiDuyet.Replace("~", "");
+                                <img src="@imgUrl" alt="Chữ ký" style="height:80px; width:auto;" />
                             }
                             else
                             {
-                                <div style="height: 60px; width: 100%; overflow: hidden; border: none;"></div>
-
+                                <div style="height:80px; width:100%; overflow:hidden; border:none;"></div>
                             }
                         </td>
                         <td>
                             @if (nhathau != null && !string.IsNullOrWhiteSpace(nhathau.ChuKyNguoiDuyet))
                             {
-                                <img src="@Url.Content(nhathau.ChuKyNguoiDuyet)" style="height:60px;" />
+                                var imgUrl = baseUrl + nhathau.ChuKyNguoiDuyet.Replace("~", "");
+                                <img src="@imgUrl" alt="Chữ ký" style="height:80px; width:auto;" />
                             }
                             else
                             {
-                                <div style="height: 60px; width: 100%; overflow: hidden; border: none;"></div>
-
+                                <div style="height:80px; width:100%; overflow:hidden; border:none;"></div>
                             }
                         </td>
                     </tr>
                     <tr>
                         @*<td>@(cpt?.TenNguoiDuyet ?? "")</td>
-                        <td>@(bpql?.TenNguoiDuyet ?? "")</td>
-                        <td>@(nhathau?.TenNguoiDuyet ?? "")</td>*@
+                <td>@(bpql?.TenNguoiDuyet ?? "")</td>
+                <td>@(nhathau?.TenNguoiDuyet ?? "")</td>*@
                     </tr>
                 </table>
                 <div class="col-md-12 pt-5" style="width:100%">
