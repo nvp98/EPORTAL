@@ -65,14 +65,13 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(pagedData);
         }
-        public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu,int? page)
+        public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu, int? page)
         {
-
-            // Phân trang ở Controller
             int pageNumber = page ?? 1;
             int pageSize = 10;
+            var userId = Models.MyAuthentication.ID;
 
-            // Gọi store, chỉ truyền filter ngày
+            // Lấy dữ liệu từ store
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
                 "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
                 new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
@@ -80,11 +79,37 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
             ).ToList();
 
+            // Lấy các phân công của user hiện tại
+            var phanCongUser = db_dk.CDNT_TrinhKy
+                .Where(x => x.NguoiDuyet_ID == userId)
+                .ToList();
 
-            // Truyền vào PagedList để phân trang
-            var pagedData = data.ToPagedList(pageNumber, pageSize);
+            // Lọc dữ liệu theo cấp duyệt
+            var dsHienThi = new List<DonDangKyViewModel>();
+            foreach (var don in data)
+            {
+                var phanCong = phanCongUser.FirstOrDefault(x => x.Ma_Don == don.Ma_Don);
+                if (phanCong == null) continue;
 
-            // Lưu lại giá trị filter để hiển thị lại trên view
+                if (phanCong.CapDuyet == 1)
+                {
+                    dsHienThi.Add(don);
+                }
+                else if (phanCong.CapDuyet == 2)
+                {
+                    var cap1 = db_dk.CDNT_TrinhKy
+                        .FirstOrDefault(x => x.Ma_Don == don.Ma_Don && x.CapDuyet == 1);
+
+                    if (cap1 == null || cap1.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy)
+                    {
+                        dsHienThi.Add(don);
+                    }
+                }
+            }
+
+            var pagedData = dsHienThi.ToPagedList(pageNumber, pageSize);
+
+            // Giữ filter
             ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
             ViewBag.MaPhieu = maPhieu;
@@ -93,6 +118,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(pagedData);
         }
+
         public ActionResult HPDQ_Detail(string maDon)
         {
             var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
@@ -986,7 +1012,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 var bienSoBiTuChoi = string.IsNullOrWhiteSpace(bienSoBiTuChoiRaw)
                     ? new List<string>()  // Không có giá trị => không từ chối xe nào
                     : bienSoBiTuChoiRaw.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToList();
-
+                // Nếu tất cả xe đều bị từ chối -> coi như không hợp lệ
+                if (bienSoBiTuChoi.Count == dsXe.Count)
+                {
+                    return Json(new { success = false, message = "Bạn phải chọn ít nhất một xe để duyệt." });
+                }
 
                 foreach (var xe in dsXe)
                 {
