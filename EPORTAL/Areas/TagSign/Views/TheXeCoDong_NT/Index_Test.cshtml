@@ -122,8 +122,8 @@
                                                         @*<a title="trình ký" class="btn-action"><i class="fa fa-paper-plane"></i></a>*@
 
                                                         @*<a title="Trình ký" href="javascript:void(0);" class="btn-action btn-trinhky" data-madon="@item.Ma_Don" data-noidung="@item.NoiDung">
-                                                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
-                                                        </a>*@
+            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </a>*@
 
 
                                                         @if (item.TinhTrang_ID == 1) // 1 = Chờ xử lý
@@ -140,6 +140,18 @@
                                                            href="@Url.Action("Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
                                                             <i class="fa-solid fa-bars"></i>
                                                         </a>
+                                                        @if (item.TinhTrang_ID == 2)
+                                                        {
+                                                            <!-- Nếu đã duyệt thì cho phép tải PDF -->
+                                                            <a href="@Url.Action("ExportDonDangKyPdf", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                                <i class="fa fa-download text-success"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <!-- Nếu chưa duyệt hoặc từ chối thì hiển thị icon cấm -->
+                                                            <i class="fa-solid fa-ban text-primary" title="Đơn chưa được duyệt, không thể tải PDF"></i>
+                                                        }
                                                     </td>
                                                     <td>@item.Ma_Don</td>
                                                     <td>@item.NoiDung</td>

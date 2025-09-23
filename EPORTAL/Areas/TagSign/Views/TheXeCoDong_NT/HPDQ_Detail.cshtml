@@ -232,27 +232,32 @@
         var maDon = $(this).data('madon');
         var isApproved = $(this).hasClass('btn-duyet');
         var ghiChu = prompt("Nhập ghi chú nếu cần:");
+        if (ghiChu === null) return;
 
-        if (!confirm("Bạn chắc chắn muốn " + (isApproved ? "DUYỆT" : "TỪ CHỐI") + " đơn này?")) return;
+        if (!confirm("Bạn chắc chắn muốn " + (isApproved ? "DUYỆT" : "TỪ CHỐI") + " đơn này?"))
+            return;
 
-        // Nếu là DUYỆT, lấy danh sách xe bị từ chối (=> không được chọn)
         var bienSoBiTuChoi = [];
+
         if (isApproved) {
             var checkedXe = $('.rowCheckbox:checked');
             if (checkedXe.length === 0) {
                 alert("Vui lòng chọn ít nhất một xe để duyệt.");
-
-                // Highlight đỏ nguyên dòng có checkbox
                 $('#table tbody tr').has('.rowCheckbox').addClass('table-danger');
-
-                // Sau 4 giây tự bỏ highlight
                 setTimeout(function () {
                     $('#table tbody tr').removeClass('table-danger');
                 }, 4000);
-
-                return; // Không gửi Ajax
+                return;
             }
+
+            // Tìm các xe KHÔNG được chọn => bị từ chối
+            $('.rowCheckbox').each(function () {
+                if (!$(this).is(':checked')) {
+                    bienSoBiTuChoi.push($(this).val());
+                }
+            });
         }
+
         $.ajax({
             url: '/TheXeCoDong_NT/DuyetDon',
             type: 'POST',
@@ -264,9 +269,7 @@
             },
             success: function (res) {
                 alert(res.message);
-                if (res.success) {
-                    location.reload();
-                }
+                if (res.success) location.reload();
             },
             error: function () {
                 alert("Có lỗi xảy ra khi gửi yêu cầu duyệt.");
