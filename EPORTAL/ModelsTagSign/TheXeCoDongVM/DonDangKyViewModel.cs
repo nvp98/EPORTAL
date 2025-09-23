@@ -78,6 +78,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int? TrinhKy_ID { get; set; }
         public int? TinhTrang_ID { get; set; }
         public int? LoaiNT_ID { get; set; }
+        public string UserNameLogin { get; set; }
         public string JsonDanhSachXe { get; set; }
     }
     public class CDNT_DonDangKyDetail

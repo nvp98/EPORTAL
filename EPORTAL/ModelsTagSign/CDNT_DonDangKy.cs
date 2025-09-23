@@ -28,5 +28,6 @@ namespace EPORTAL.ModelsTagSign
         public Nullable<int> LoaiNT_ID { get; set; }
         public Nullable<int> TinhTrangDuyet_ID { get; set; }
         public Nullable<System.DateTime> ThoiGianDuyet { get; set; }
+        public string UserNameLogin { get; set; }
     }
 }

@@ -44,13 +44,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             // Phân trang ở Controller
             int pageNumber = page ?? 1;
             int pageSize = 10;
+            var userNameLogin = Models.MyAuthentication.Username;
+           
 
             // Gọi store, chỉ truyền filter ngày
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
-                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
+                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu,@p_UserNameLogin",
                 new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
                 new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
-                new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+                new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value),
+                new SqlParameter("@p_UserNameLogin", (object)userNameLogin ?? DBNull.Value)
             ).ToList();
 
             // Truyền vào PagedList để phân trang
@@ -226,7 +229,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                 // 4. Gán người tạo đơn là người đang đăng nhập
                 model.NhanVienNT_ID = Models.MyAuthentication.ID;
-
+                model.UserNameLogin = Models.MyAuthentication.Username;
                 // 5. Insert đơn vào DB (thông qua stored procedure hoặc EF)
                 var result = db_dk.CDNT_DonDangKy_Insert(
                     model.Ma_Don,
@@ -240,6 +243,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     model.TrinhKy_ID,
                     model.TinhTrang_ID,
                     model.LoaiNT_ID,
+                    model.UserNameLogin,
                     model.JsonDanhSachXe
                 ).FirstOrDefault();
 
@@ -1050,44 +1054,44 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(model);
         }
-        public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? page)
-        {
-            int pageNumber = page ?? 1;
-            int pageSize = 10;
+        //public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? page)
+        //{
+        //    int pageNumber = page ?? 1;
+        //    int pageSize = 10;
 
-            var data = db_dk.Database.SqlQuery<XeCoDongModel>(
-            @"CDNT_XeCoDong_Search 
-            @p_ID_NT, 
-            @p_BP_ID, 
-            @p_TenNhaThau, 
-            @p_TenDayDu, 
-            @p_LoaiPhuongTien_ID, 
-            @p_BienSoXe, 
-            @p_TinhTrang, 
-            @p_TuNgay, 
-            @p_DenNgay",
+        //    var data = db_dk.Database.SqlQuery<XeCoDongModel>(
+        //    @"CDNT_XeCoDong_Search 
+        //    @p_ID_NT, 
+        //    @p_BP_ID, 
+        //    @p_TenNhaThau, 
+        //    @p_TenDayDu, 
+        //    @p_LoaiPhuongTien_ID, 
+        //    @p_BienSoXe, 
+        //    @p_TinhTrang, 
+        //    @p_TuNgay, 
+        //    @p_DenNgay",
 
-                new SqlParameter("@p_ID_NT", DBNull.Value),
-                new SqlParameter("@p_BP_ID", DBNull.Value),
-                new SqlParameter("@p_TenNhaThau", DBNull.Value),
-                new SqlParameter("@p_TenDayDu", DBNull.Value),
-                new SqlParameter("@p_LoaiPhuongTien_ID", DBNull.Value),
-                new SqlParameter("@p_BienSoXe", (object)search ?? DBNull.Value),
-                new SqlParameter("@p_TinhTrang", DBNull.Value),
-                new SqlParameter("@p_TuNgay", (object)begind ?? DBNull.Value),
-                new SqlParameter("@p_DenNgay", (object)endd ?? DBNull.Value)
-            ).ToList();
+        //        new SqlParameter("@p_ID_NT", DBNull.Value),
+        //        new SqlParameter("@p_BP_ID", DBNull.Value),
+        //        new SqlParameter("@p_TenNhaThau", DBNull.Value),
+        //        new SqlParameter("@p_TenDayDu", DBNull.Value),
+        //        new SqlParameter("@p_LoaiPhuongTien_ID", DBNull.Value),
+        //        new SqlParameter("@p_BienSoXe", (object)search ?? DBNull.Value),
+        //        new SqlParameter("@p_TinhTrang", DBNull.Value),
+        //        new SqlParameter("@p_TuNgay", (object)begind ?? DBNull.Value),
+        //        new SqlParameter("@p_DenNgay", (object)endd ?? DBNull.Value)
+        //    ).ToList();
 
-            var pagedData = data.ToPagedList(pageNumber, pageSize);
+        //    var pagedData = data.ToPagedList(pageNumber, pageSize);
 
-            ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
-            ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
-            ViewBag.Search = search;
-            ViewBag.Page = pageNumber;
-            ViewBag.PageSize = pageSize;
+        //    ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
+        //    ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+        //    ViewBag.Search = search;
+        //    ViewBag.Page = pageNumber;
+        //    ViewBag.PageSize = pageSize;
 
-            return View(pagedData);
-        }
+        //    return View(pagedData);
+        //}
         public ActionResult ExportDonDangKyPdf(string maDon)
         {
             var vm = GetDonDangKyPdfViewModel(maDon);
