@@ -43,7 +43,6 @@ namespace EPORTAL.ModelsTagSign
         public virtual DbSet<CDNT_TinhTrang> CDNT_TinhTrang { get; set; }
         public virtual DbSet<CDNT_DonDangKy> CDNT_DonDangKy { get; set; }
         public virtual DbSet<CDNT_TrinhKy> CDNT_TrinhKy { get; set; }
-        public virtual DbSet<CDNT_XeCoDong> CDNT_XeCoDong { get; set; }
     
         public virtual int DK_CardRegistrationInfor_Delete(Nullable<int> iDDKT)
         {
@@ -1350,7 +1349,7 @@ namespace EPORTAL.ModelsTagSign
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CDNT_DonDangKi_UpdateFull_XML", ma_DonParameter, noiDungParameter, bPQL_IDParameter, nhanVienNT_IDParameter, nhaThau_IDParameter, hopDongParameter, ngayTrinhKyParameter, fileHoSoXeParameter, trinhKy_IDParameter, tinhTrang_IDParameter, loaiNT_IDParameter, chiTiet_XMLParameter);
         }
     
-        public virtual ObjectResult<CDNT_DonDangKy_Insert_Result> CDNT_DonDangKy_Insert(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string jsonDanhSachXe)
+        public virtual ObjectResult<CDNT_DonDangKy_Insert_Result> CDNT_DonDangKy_Insert(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string p_UserNameLogin, string jsonDanhSachXe)
         {
             var p_Ma_DonParameter = p_Ma_Don != null ?
                 new ObjectParameter("p_Ma_Don", p_Ma_Don) :
@@ -1396,11 +1395,15 @@ namespace EPORTAL.ModelsTagSign
                 new ObjectParameter("p_LoaiNT_ID", p_LoaiNT_ID) :
                 new ObjectParameter("p_LoaiNT_ID", typeof(int));
     
+            var p_UserNameLoginParameter = p_UserNameLogin != null ?
+                new ObjectParameter("p_UserNameLogin", p_UserNameLogin) :
+                new ObjectParameter("p_UserNameLogin", typeof(string));
+    
             var jsonDanhSachXeParameter = jsonDanhSachXe != null ?
                 new ObjectParameter("JsonDanhSachXe", jsonDanhSachXe) :
                 new ObjectParameter("JsonDanhSachXe", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Insert_Result>("CDNT_DonDangKy_Insert", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, jsonDanhSachXeParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Insert_Result>("CDNT_DonDangKy_Insert", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, p_UserNameLoginParameter, jsonDanhSachXeParameter);
         }
     
         public virtual ObjectResult<CDNT_DonDangKy_Search_Result> CDNT_DonDangKy_Search(Nullable<System.DateTime> p_BeginDate, Nullable<System.DateTime> p_EndDate, string p_MaPhieu)
