@@ -27,703 +27,347 @@ namespace EPORTAL.ModelsTagSign
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<DK_CardRegistrationInfor> DK_CardRegistrationInfor { get; set; }
-        public virtual DbSet<DK_DetailCardRegistrationInfor> DK_DetailCardRegistrationInfor { get; set; }
-        public virtual DbSet<DK_CardExtend> DK_CardExtend { get; set; }
-        public virtual DbSet<DK_DetailCardExtend> DK_DetailCardExtend { get; set; }
-        public virtual DbSet<TK_CardExtend> TK_CardExtend { get; set; }
-        public virtual DbSet<TK_CardRegistrationInfor> TK_CardRegistrationInfor { get; set; }
+        public virtual DbSet<CDNT_ChiTietDon> CDNT_ChiTietDon { get; set; }
+        public virtual DbSet<CDNT_DonDangKy> CDNT_DonDangKy { get; set; }
+        public virtual DbSet<CDNT_LoaiPhuongTien> CDNT_LoaiPhuongTien { get; set; }
+        public virtual DbSet<CDNT_TinhTrang> CDNT_TinhTrang { get; set; }
+        public virtual DbSet<CDNT_TrinhKy> CDNT_TrinhKy { get; set; }
+        public virtual DbSet<CDNT_XeCoDong> CDNT_XeCoDong { get; set; }
         public virtual DbSet<Detail_RegisterPeople> Detail_RegisterPeople { get; set; }
+        public virtual DbSet<DK_CardExtend> DK_CardExtend { get; set; }
+        public virtual DbSet<DK_CardRegistrationInfor> DK_CardRegistrationInfor { get; set; }
+        public virtual DbSet<DK_DetailCardExtend> DK_DetailCardExtend { get; set; }
+        public virtual DbSet<DK_DetailCardRegistrationInfor> DK_DetailCardRegistrationInfor { get; set; }
         public virtual DbSet<Flow> Flows { get; set; }
         public virtual DbSet<RegisterPeople> RegisterPeoples { get; set; }
         public virtual DbSet<SignerType> SignerTypes { get; set; }
         public virtual DbSet<SignOff_Flow> SignOff_Flow { get; set; }
-        public virtual DbSet<CDNT_ChiTietDon> CDNT_ChiTietDon { get; set; }
-        public virtual DbSet<CDNT_LoaiPhuongTien> CDNT_LoaiPhuongTien { get; set; }
-        public virtual DbSet<CDNT_TinhTrang> CDNT_TinhTrang { get; set; }
-        public virtual DbSet<CDNT_DonDangKy> CDNT_DonDangKy { get; set; }
-        public virtual DbSet<CDNT_TrinhKy> CDNT_TrinhKy { get; set; }
+        public virtual DbSet<TK_CardExtend> TK_CardExtend { get; set; }
+        public virtual DbSet<TK_CardRegistrationInfor> TK_CardRegistrationInfor { get; set; }
     
-        public virtual int DK_CardRegistrationInfor_Delete(Nullable<int> iDDKT)
+        public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(string p_MaDon, string p_BienSoXe, Nullable<int> p_ID_LoaiPhuongTien, Nullable<bool> p_CapMoi, Nullable<bool> p_CapLai, Nullable<bool> p_GiaHan, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay)
         {
-            var iDDKTParameter = iDDKT.HasValue ?
-                new ObjectParameter("IDDKT", iDDKT) :
-                new ObjectParameter("IDDKT", typeof(int));
+            var p_MaDonParameter = p_MaDon != null ?
+                new ObjectParameter("p_MaDon", p_MaDon) :
+                new ObjectParameter("p_MaDon", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Delete", iDDKTParameter);
+            var p_BienSoXeParameter = p_BienSoXe != null ?
+                new ObjectParameter("p_BienSoXe", p_BienSoXe) :
+                new ObjectParameter("p_BienSoXe", typeof(string));
+    
+            var p_ID_LoaiPhuongTienParameter = p_ID_LoaiPhuongTien.HasValue ?
+                new ObjectParameter("p_ID_LoaiPhuongTien", p_ID_LoaiPhuongTien) :
+                new ObjectParameter("p_ID_LoaiPhuongTien", typeof(int));
+    
+            var p_CapMoiParameter = p_CapMoi.HasValue ?
+                new ObjectParameter("p_CapMoi", p_CapMoi) :
+                new ObjectParameter("p_CapMoi", typeof(bool));
+    
+            var p_CapLaiParameter = p_CapLai.HasValue ?
+                new ObjectParameter("p_CapLai", p_CapLai) :
+                new ObjectParameter("p_CapLai", typeof(bool));
+    
+            var p_GiaHanParameter = p_GiaHan.HasValue ?
+                new ObjectParameter("p_GiaHan", p_GiaHan) :
+                new ObjectParameter("p_GiaHan", typeof(bool));
+    
+            var p_TuNgayParameter = p_TuNgay.HasValue ?
+                new ObjectParameter("p_TuNgay", p_TuNgay) :
+                new ObjectParameter("p_TuNgay", typeof(System.DateTime));
+    
+            var p_DenNgayParameter = p_DenNgay.HasValue ?
+                new ObjectParameter("p_DenNgay", p_DenNgay) :
+                new ObjectParameter("p_DenNgay", typeof(System.DateTime));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_ChiTietDon_Search_Result>("CDNT_ChiTietDon_Search", p_MaDonParameter, p_BienSoXeParameter, p_ID_LoaiPhuongTienParameter, p_CapMoiParameter, p_CapLaiParameter, p_GiaHanParameter, p_TuNgayParameter, p_DenNgayParameter);
         }
     
-        public virtual int DK_CardRegistrationInfor_Insert(string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, Nullable<int> nhanVienID, Nullable<int> tinhTrangID, string fileUpload, string ghiChu, Nullable<int> loaiNT, string fileComplete, ObjectParameter iDDKT)
+        public virtual int CDNT_DonDangKi_UpdateFull_XML(string ma_Don, string noiDung, Nullable<int> bPQL_ID, Nullable<int> nhanVienNT_ID, Nullable<int> nhaThau_ID, string hopDong, Nullable<System.DateTime> ngayTrinhKy, string fileHoSoXe, Nullable<int> trinhKy_ID, Nullable<int> tinhTrang_ID, Nullable<int> loaiNT_ID, string chiTiet_XML)
         {
-            var noiDungParameter = noiDung != null ?
-                new ObjectParameter("NoiDung", noiDung) :
-                new ObjectParameter("NoiDung", typeof(string));
-    
-            var nTIDParameter = nTID.HasValue ?
-                new ObjectParameter("NTID", nTID) :
-                new ObjectParameter("NTID", typeof(int));
-    
-            var hDIDParameter = hDID.HasValue ?
-                new ObjectParameter("HDID", hDID) :
-                new ObjectParameter("HDID", typeof(int));
-    
-            var phongBanIDParameter = phongBanID.HasValue ?
-                new ObjectParameter("PhongBanID", phongBanID) :
-                new ObjectParameter("PhongBanID", typeof(int));
-    
-            var ngayDangKyParameter = ngayDangKy.HasValue ?
-                new ObjectParameter("NgayDangKy", ngayDangKy) :
-                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
-    
-            var nhanVienIDParameter = nhanVienID.HasValue ?
-                new ObjectParameter("NhanVienID", nhanVienID) :
-                new ObjectParameter("NhanVienID", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            var fileUploadParameter = fileUpload != null ?
-                new ObjectParameter("FileUpload", fileUpload) :
-                new ObjectParameter("FileUpload", typeof(string));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var loaiNTParameter = loaiNT.HasValue ?
-                new ObjectParameter("LoaiNT", loaiNT) :
-                new ObjectParameter("LoaiNT", typeof(int));
-    
-            var fileCompleteParameter = fileComplete != null ?
-                new ObjectParameter("FileComplete", fileComplete) :
-                new ObjectParameter("FileComplete", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Insert", noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, nhanVienIDParameter, tinhTrangIDParameter, fileUploadParameter, ghiChuParameter, loaiNTParameter, fileCompleteParameter, iDDKT);
-        }
-    
-        public virtual int DK_CardRegistrationInfor_Update(Nullable<int> iDDKT, string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, string fileUpload, string ghiChu, Nullable<int> loaiNT)
-        {
-            var iDDKTParameter = iDDKT.HasValue ?
-                new ObjectParameter("IDDKT", iDDKT) :
-                new ObjectParameter("IDDKT", typeof(int));
+            var ma_DonParameter = ma_Don != null ?
+                new ObjectParameter("Ma_Don", ma_Don) :
+                new ObjectParameter("Ma_Don", typeof(string));
     
             var noiDungParameter = noiDung != null ?
                 new ObjectParameter("NoiDung", noiDung) :
                 new ObjectParameter("NoiDung", typeof(string));
     
-            var nTIDParameter = nTID.HasValue ?
-                new ObjectParameter("NTID", nTID) :
-                new ObjectParameter("NTID", typeof(int));
+            var bPQL_IDParameter = bPQL_ID.HasValue ?
+                new ObjectParameter("BPQL_ID", bPQL_ID) :
+                new ObjectParameter("BPQL_ID", typeof(int));
     
-            var hDIDParameter = hDID.HasValue ?
-                new ObjectParameter("HDID", hDID) :
-                new ObjectParameter("HDID", typeof(int));
+            var nhanVienNT_IDParameter = nhanVienNT_ID.HasValue ?
+                new ObjectParameter("NhanVienNT_ID", nhanVienNT_ID) :
+                new ObjectParameter("NhanVienNT_ID", typeof(int));
     
-            var phongBanIDParameter = phongBanID.HasValue ?
-                new ObjectParameter("PhongBanID", phongBanID) :
-                new ObjectParameter("PhongBanID", typeof(int));
+            var nhaThau_IDParameter = nhaThau_ID.HasValue ?
+                new ObjectParameter("NhaThau_ID", nhaThau_ID) :
+                new ObjectParameter("NhaThau_ID", typeof(int));
     
-            var ngayDangKyParameter = ngayDangKy.HasValue ?
-                new ObjectParameter("NgayDangKy", ngayDangKy) :
-                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
+            var hopDongParameter = hopDong != null ?
+                new ObjectParameter("HopDong", hopDong) :
+                new ObjectParameter("HopDong", typeof(string));
     
-            var fileUploadParameter = fileUpload != null ?
-                new ObjectParameter("FileUpload", fileUpload) :
-                new ObjectParameter("FileUpload", typeof(string));
+            var ngayTrinhKyParameter = ngayTrinhKy.HasValue ?
+                new ObjectParameter("NgayTrinhKy", ngayTrinhKy) :
+                new ObjectParameter("NgayTrinhKy", typeof(System.DateTime));
     
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
+            var fileHoSoXeParameter = fileHoSoXe != null ?
+                new ObjectParameter("FileHoSoXe", fileHoSoXe) :
+                new ObjectParameter("FileHoSoXe", typeof(string));
     
-            var loaiNTParameter = loaiNT.HasValue ?
-                new ObjectParameter("LoaiNT", loaiNT) :
-                new ObjectParameter("LoaiNT", typeof(int));
+            var trinhKy_IDParameter = trinhKy_ID.HasValue ?
+                new ObjectParameter("TrinhKy_ID", trinhKy_ID) :
+                new ObjectParameter("TrinhKy_ID", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Update", iDDKTParameter, noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, fileUploadParameter, ghiChuParameter, loaiNTParameter);
+            var tinhTrang_IDParameter = tinhTrang_ID.HasValue ?
+                new ObjectParameter("TinhTrang_ID", tinhTrang_ID) :
+                new ObjectParameter("TinhTrang_ID", typeof(int));
+    
+            var loaiNT_IDParameter = loaiNT_ID.HasValue ?
+                new ObjectParameter("LoaiNT_ID", loaiNT_ID) :
+                new ObjectParameter("LoaiNT_ID", typeof(int));
+    
+            var chiTiet_XMLParameter = chiTiet_XML != null ?
+                new ObjectParameter("ChiTiet_XML", chiTiet_XML) :
+                new ObjectParameter("ChiTiet_XML", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CDNT_DonDangKi_UpdateFull_XML", ma_DonParameter, noiDungParameter, bPQL_IDParameter, nhanVienNT_IDParameter, nhaThau_IDParameter, hopDongParameter, ngayTrinhKyParameter, fileHoSoXeParameter, trinhKy_IDParameter, tinhTrang_IDParameter, loaiNT_IDParameter, chiTiet_XMLParameter);
         }
     
-        public virtual int DK_DetailCardRegistrationInfor_Delete(Nullable<int> iDCTDK)
+        public virtual ObjectResult<CDNT_DonDangKy_Delete_Result> CDNT_DonDangKy_Delete(string ma_Don)
         {
-            var iDCTDKParameter = iDCTDK.HasValue ?
-                new ObjectParameter("IDCTDK", iDCTDK) :
-                new ObjectParameter("IDCTDK", typeof(int));
+            var ma_DonParameter = ma_Don != null ?
+                new ObjectParameter("Ma_Don", ma_Don) :
+                new ObjectParameter("Ma_Don", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardRegistrationInfor_Delete", iDCTDKParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Delete_Result>("CDNT_DonDangKy_Delete", ma_DonParameter);
         }
     
-        public virtual int DK_DetailCardRegistrationInfor_Insert(string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string theLuuTru, string theRaVaoKLH, string dienThoaiTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDDKT)
+        public virtual ObjectResult<CDNT_DonDangKy_Detail_Result> CDNT_DonDangKy_Detail(string ma_Don)
         {
-            var hoTenParameter = hoTen != null ?
-                new ObjectParameter("HoTen", hoTen) :
-                new ObjectParameter("HoTen", typeof(string));
+            var ma_DonParameter = ma_Don != null ?
+                new ObjectParameter("Ma_Don", ma_Don) :
+                new ObjectParameter("Ma_Don", typeof(string));
     
-            var cCCDParameter = cCCD != null ?
-                new ObjectParameter("CCCD", cCCD) :
-                new ObjectParameter("CCCD", typeof(string));
-    
-            var ngaySinhParameter = ngaySinh.HasValue ?
-                new ObjectParameter("NgaySinh", ngaySinh) :
-                new ObjectParameter("NgaySinh", typeof(System.DateTime));
-    
-            var hoKhauParameter = hoKhau != null ?
-                new ObjectParameter("HoKhau", hoKhau) :
-                new ObjectParameter("HoKhau", typeof(string));
-    
-            var chucVuParameter = chucVu.HasValue ?
-                new ObjectParameter("ChucVu", chucVu) :
-                new ObjectParameter("ChucVu", typeof(int));
-    
-            var soDienThoaiParameter = soDienThoai != null ?
-                new ObjectParameter("SoDienThoai", soDienThoai) :
-                new ObjectParameter("SoDienThoai", typeof(string));
-    
-            var theLuuTruParameter = theLuuTru != null ?
-                new ObjectParameter("TheLuuTru", theLuuTru) :
-                new ObjectParameter("TheLuuTru", typeof(string));
-    
-            var theRaVaoKLHParameter = theRaVaoKLH != null ?
-                new ObjectParameter("TheRaVaoKLH", theRaVaoKLH) :
-                new ObjectParameter("TheRaVaoKLH", typeof(string));
-    
-            var dienThoaiTMParameter = dienThoaiTM != null ?
-                new ObjectParameter("DienThoaiTM", dienThoaiTM) :
-                new ObjectParameter("DienThoaiTM", typeof(string));
-    
-            var raVaoCangParameter = raVaoCang != null ?
-                new ObjectParameter("RaVaoCang", raVaoCang) :
-                new ObjectParameter("RaVaoCang", typeof(string));
-    
-            var thoiHanTheParameter = thoiHanThe.HasValue ?
-                new ObjectParameter("ThoiHanThe", thoiHanThe) :
-                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
-    
-            var khuVucLamViecParameter = khuVucLamViec != null ?
-                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
-                new ObjectParameter("KhuVucLamViec", typeof(string));
-    
-            var congParameter = cong != null ?
-                new ObjectParameter("Cong", cong) :
-                new ObjectParameter("Cong", typeof(string));
-    
-            var nhomNTParameter = nhomNT.HasValue ?
-                new ObjectParameter("NhomNT", nhomNT) :
-                new ObjectParameter("NhomNT", typeof(int));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var iDDKTParameter = iDDKT.HasValue ?
-                new ObjectParameter("IDDKT", iDDKT) :
-                new ObjectParameter("IDDKT", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardRegistrationInfor_Insert", hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, theLuuTruParameter, theRaVaoKLHParameter, dienThoaiTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDDKTParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Detail_Result>("CDNT_DonDangKy_Detail", ma_DonParameter);
         }
     
-        public virtual int DK_DetailCardRegistrationInfor_Update(Nullable<int> iDCTDK, string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string theLuuTru, string theRaVaoKLH, string dienThoaiTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDDKT)
+        public virtual ObjectResult<CDNT_DonDangKy_Insert_Result> CDNT_DonDangKy_Insert(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string p_UserNameLogin, string jsonDanhSachXe)
         {
-            var iDCTDKParameter = iDCTDK.HasValue ?
-                new ObjectParameter("IDCTDK", iDCTDK) :
-                new ObjectParameter("IDCTDK", typeof(int));
+            var p_Ma_DonParameter = p_Ma_Don != null ?
+                new ObjectParameter("p_Ma_Don", p_Ma_Don) :
+                new ObjectParameter("p_Ma_Don", typeof(string));
     
-            var hoTenParameter = hoTen != null ?
-                new ObjectParameter("HoTen", hoTen) :
-                new ObjectParameter("HoTen", typeof(string));
+            var p_NoiDungParameter = p_NoiDung != null ?
+                new ObjectParameter("p_NoiDung", p_NoiDung) :
+                new ObjectParameter("p_NoiDung", typeof(string));
     
-            var cCCDParameter = cCCD != null ?
-                new ObjectParameter("CCCD", cCCD) :
-                new ObjectParameter("CCCD", typeof(string));
+            var p_BPQL_IDParameter = p_BPQL_ID.HasValue ?
+                new ObjectParameter("p_BPQL_ID", p_BPQL_ID) :
+                new ObjectParameter("p_BPQL_ID", typeof(int));
     
-            var ngaySinhParameter = ngaySinh.HasValue ?
-                new ObjectParameter("NgaySinh", ngaySinh) :
-                new ObjectParameter("NgaySinh", typeof(System.DateTime));
+            var p_NhanVienNT_IDParameter = p_NhanVienNT_ID.HasValue ?
+                new ObjectParameter("p_NhanVienNT_ID", p_NhanVienNT_ID) :
+                new ObjectParameter("p_NhanVienNT_ID", typeof(int));
     
-            var hoKhauParameter = hoKhau != null ?
-                new ObjectParameter("HoKhau", hoKhau) :
-                new ObjectParameter("HoKhau", typeof(string));
+            var p_NhaThau_IDParameter = p_NhaThau_ID.HasValue ?
+                new ObjectParameter("p_NhaThau_ID", p_NhaThau_ID) :
+                new ObjectParameter("p_NhaThau_ID", typeof(int));
     
-            var chucVuParameter = chucVu.HasValue ?
-                new ObjectParameter("ChucVu", chucVu) :
-                new ObjectParameter("ChucVu", typeof(int));
+            var p_HopDongParameter = p_HopDong != null ?
+                new ObjectParameter("p_HopDong", p_HopDong) :
+                new ObjectParameter("p_HopDong", typeof(string));
     
-            var soDienThoaiParameter = soDienThoai != null ?
-                new ObjectParameter("SoDienThoai", soDienThoai) :
-                new ObjectParameter("SoDienThoai", typeof(string));
+            var p_NgayTrinhKyParameter = p_NgayTrinhKy.HasValue ?
+                new ObjectParameter("p_NgayTrinhKy", p_NgayTrinhKy) :
+                new ObjectParameter("p_NgayTrinhKy", typeof(System.DateTime));
     
-            var theLuuTruParameter = theLuuTru != null ?
-                new ObjectParameter("TheLuuTru", theLuuTru) :
-                new ObjectParameter("TheLuuTru", typeof(string));
+            var p_FileHoSoXeParameter = p_FileHoSoXe != null ?
+                new ObjectParameter("p_FileHoSoXe", p_FileHoSoXe) :
+                new ObjectParameter("p_FileHoSoXe", typeof(string));
     
-            var theRaVaoKLHParameter = theRaVaoKLH != null ?
-                new ObjectParameter("TheRaVaoKLH", theRaVaoKLH) :
-                new ObjectParameter("TheRaVaoKLH", typeof(string));
+            var p_TrinhKy_IDParameter = p_TrinhKy_ID.HasValue ?
+                new ObjectParameter("p_TrinhKy_ID", p_TrinhKy_ID) :
+                new ObjectParameter("p_TrinhKy_ID", typeof(int));
     
-            var dienThoaiTMParameter = dienThoaiTM != null ?
-                new ObjectParameter("DienThoaiTM", dienThoaiTM) :
-                new ObjectParameter("DienThoaiTM", typeof(string));
+            var p_TinhTrang_IDParameter = p_TinhTrang_ID.HasValue ?
+                new ObjectParameter("p_TinhTrang_ID", p_TinhTrang_ID) :
+                new ObjectParameter("p_TinhTrang_ID", typeof(int));
     
-            var raVaoCangParameter = raVaoCang != null ?
-                new ObjectParameter("RaVaoCang", raVaoCang) :
-                new ObjectParameter("RaVaoCang", typeof(string));
+            var p_LoaiNT_IDParameter = p_LoaiNT_ID.HasValue ?
+                new ObjectParameter("p_LoaiNT_ID", p_LoaiNT_ID) :
+                new ObjectParameter("p_LoaiNT_ID", typeof(int));
     
-            var thoiHanTheParameter = thoiHanThe.HasValue ?
-                new ObjectParameter("ThoiHanThe", thoiHanThe) :
-                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
+            var p_UserNameLoginParameter = p_UserNameLogin != null ?
+                new ObjectParameter("p_UserNameLogin", p_UserNameLogin) :
+                new ObjectParameter("p_UserNameLogin", typeof(string));
     
-            var khuVucLamViecParameter = khuVucLamViec != null ?
-                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
-                new ObjectParameter("KhuVucLamViec", typeof(string));
+            var jsonDanhSachXeParameter = jsonDanhSachXe != null ?
+                new ObjectParameter("JsonDanhSachXe", jsonDanhSachXe) :
+                new ObjectParameter("JsonDanhSachXe", typeof(string));
     
-            var congParameter = cong != null ?
-                new ObjectParameter("Cong", cong) :
-                new ObjectParameter("Cong", typeof(string));
-    
-            var nhomNTParameter = nhomNT.HasValue ?
-                new ObjectParameter("NhomNT", nhomNT) :
-                new ObjectParameter("NhomNT", typeof(int));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var iDDKTParameter = iDDKT.HasValue ?
-                new ObjectParameter("IDDKT", iDDKT) :
-                new ObjectParameter("IDDKT", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardRegistrationInfor_Update", iDCTDKParameter, hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, theLuuTruParameter, theRaVaoKLHParameter, dienThoaiTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDDKTParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Insert_Result>("CDNT_DonDangKy_Insert", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, p_UserNameLoginParameter, jsonDanhSachXeParameter);
         }
     
-        public virtual int DK_CardExtend_Delete(Nullable<int> iDGHT)
+        public virtual ObjectResult<CDNT_DonDangKy_PDF_Result> CDNT_DonDangKy_PDF(string ma_Don)
         {
-            var iDGHTParameter = iDGHT.HasValue ?
-                new ObjectParameter("IDGHT", iDGHT) :
-                new ObjectParameter("IDGHT", typeof(int));
+            var ma_DonParameter = ma_Don != null ?
+                new ObjectParameter("Ma_Don", ma_Don) :
+                new ObjectParameter("Ma_Don", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Delete", iDGHTParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_PDF_Result>("CDNT_DonDangKy_PDF", ma_DonParameter);
         }
     
-        public virtual int DK_CardExtend_Insert(string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, Nullable<int> nhanVienID, Nullable<int> tinhTrangID, string ghiChu, Nullable<int> loaiNT, string fileComplete, ObjectParameter iDGHT)
+        public virtual ObjectResult<CDNT_DonDangKy_PDF_test_Result> CDNT_DonDangKy_PDF_test(string ma_Don)
         {
-            var noiDungParameter = noiDung != null ?
-                new ObjectParameter("NoiDung", noiDung) :
-                new ObjectParameter("NoiDung", typeof(string));
+            var ma_DonParameter = ma_Don != null ?
+                new ObjectParameter("Ma_Don", ma_Don) :
+                new ObjectParameter("Ma_Don", typeof(string));
     
-            var nTIDParameter = nTID.HasValue ?
-                new ObjectParameter("NTID", nTID) :
-                new ObjectParameter("NTID", typeof(int));
-    
-            var hDIDParameter = hDID.HasValue ?
-                new ObjectParameter("HDID", hDID) :
-                new ObjectParameter("HDID", typeof(int));
-    
-            var phongBanIDParameter = phongBanID.HasValue ?
-                new ObjectParameter("PhongBanID", phongBanID) :
-                new ObjectParameter("PhongBanID", typeof(int));
-    
-            var ngayDangKyParameter = ngayDangKy.HasValue ?
-                new ObjectParameter("NgayDangKy", ngayDangKy) :
-                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
-    
-            var nhanVienIDParameter = nhanVienID.HasValue ?
-                new ObjectParameter("NhanVienID", nhanVienID) :
-                new ObjectParameter("NhanVienID", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var loaiNTParameter = loaiNT.HasValue ?
-                new ObjectParameter("LoaiNT", loaiNT) :
-                new ObjectParameter("LoaiNT", typeof(int));
-    
-            var fileCompleteParameter = fileComplete != null ?
-                new ObjectParameter("FileComplete", fileComplete) :
-                new ObjectParameter("FileComplete", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Insert", noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, nhanVienIDParameter, tinhTrangIDParameter, ghiChuParameter, loaiNTParameter, fileCompleteParameter, iDGHT);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_PDF_test_Result>("CDNT_DonDangKy_PDF_test", ma_DonParameter);
         }
     
-        public virtual int DK_CardExtend_Update(Nullable<int> iDGHT, string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, string ghiChu, Nullable<int> loaiNT)
+        public virtual ObjectResult<CDNT_DonDangKy_Search_Result> CDNT_DonDangKy_Search(Nullable<System.DateTime> p_BeginDate, Nullable<System.DateTime> p_EndDate, string p_MaPhieu, string p_UserNameLogin)
         {
-            var iDGHTParameter = iDGHT.HasValue ?
-                new ObjectParameter("IDGHT", iDGHT) :
-                new ObjectParameter("IDGHT", typeof(int));
+            var p_BeginDateParameter = p_BeginDate.HasValue ?
+                new ObjectParameter("p_BeginDate", p_BeginDate) :
+                new ObjectParameter("p_BeginDate", typeof(System.DateTime));
     
-            var noiDungParameter = noiDung != null ?
-                new ObjectParameter("NoiDung", noiDung) :
-                new ObjectParameter("NoiDung", typeof(string));
+            var p_EndDateParameter = p_EndDate.HasValue ?
+                new ObjectParameter("p_EndDate", p_EndDate) :
+                new ObjectParameter("p_EndDate", typeof(System.DateTime));
     
-            var nTIDParameter = nTID.HasValue ?
-                new ObjectParameter("NTID", nTID) :
-                new ObjectParameter("NTID", typeof(int));
+            var p_MaPhieuParameter = p_MaPhieu != null ?
+                new ObjectParameter("p_MaPhieu", p_MaPhieu) :
+                new ObjectParameter("p_MaPhieu", typeof(string));
     
-            var hDIDParameter = hDID.HasValue ?
-                new ObjectParameter("HDID", hDID) :
-                new ObjectParameter("HDID", typeof(int));
+            var p_UserNameLoginParameter = p_UserNameLogin != null ?
+                new ObjectParameter("p_UserNameLogin", p_UserNameLogin) :
+                new ObjectParameter("p_UserNameLogin", typeof(string));
     
-            var phongBanIDParameter = phongBanID.HasValue ?
-                new ObjectParameter("PhongBanID", phongBanID) :
-                new ObjectParameter("PhongBanID", typeof(int));
-    
-            var ngayDangKyParameter = ngayDangKy.HasValue ?
-                new ObjectParameter("NgayDangKy", ngayDangKy) :
-                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var loaiNTParameter = loaiNT.HasValue ?
-                new ObjectParameter("LoaiNT", loaiNT) :
-                new ObjectParameter("LoaiNT", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Update", iDGHTParameter, noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, ghiChuParameter, loaiNTParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Search_Result>("CDNT_DonDangKy_Search", p_BeginDateParameter, p_EndDateParameter, p_MaPhieuParameter, p_UserNameLoginParameter);
         }
     
-        public virtual int DK_DetailCardExtend_Delete(Nullable<int> iDCTGH)
+        public virtual int CDNT_DonDangKy_Update(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string p_CDNT_ChiTietDon)
         {
-            var iDCTGHParameter = iDCTGH.HasValue ?
-                new ObjectParameter("IDCTGH", iDCTGH) :
-                new ObjectParameter("IDCTGH", typeof(int));
+            var p_Ma_DonParameter = p_Ma_Don != null ?
+                new ObjectParameter("p_Ma_Don", p_Ma_Don) :
+                new ObjectParameter("p_Ma_Don", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardExtend_Delete", iDCTGHParameter);
+            var p_NoiDungParameter = p_NoiDung != null ?
+                new ObjectParameter("p_NoiDung", p_NoiDung) :
+                new ObjectParameter("p_NoiDung", typeof(string));
+    
+            var p_BPQL_IDParameter = p_BPQL_ID.HasValue ?
+                new ObjectParameter("p_BPQL_ID", p_BPQL_ID) :
+                new ObjectParameter("p_BPQL_ID", typeof(int));
+    
+            var p_NhanVienNT_IDParameter = p_NhanVienNT_ID.HasValue ?
+                new ObjectParameter("p_NhanVienNT_ID", p_NhanVienNT_ID) :
+                new ObjectParameter("p_NhanVienNT_ID", typeof(int));
+    
+            var p_NhaThau_IDParameter = p_NhaThau_ID.HasValue ?
+                new ObjectParameter("p_NhaThau_ID", p_NhaThau_ID) :
+                new ObjectParameter("p_NhaThau_ID", typeof(int));
+    
+            var p_HopDongParameter = p_HopDong != null ?
+                new ObjectParameter("p_HopDong", p_HopDong) :
+                new ObjectParameter("p_HopDong", typeof(string));
+    
+            var p_NgayTrinhKyParameter = p_NgayTrinhKy.HasValue ?
+                new ObjectParameter("p_NgayTrinhKy", p_NgayTrinhKy) :
+                new ObjectParameter("p_NgayTrinhKy", typeof(System.DateTime));
+    
+            var p_FileHoSoXeParameter = p_FileHoSoXe != null ?
+                new ObjectParameter("p_FileHoSoXe", p_FileHoSoXe) :
+                new ObjectParameter("p_FileHoSoXe", typeof(string));
+    
+            var p_TrinhKy_IDParameter = p_TrinhKy_ID.HasValue ?
+                new ObjectParameter("p_TrinhKy_ID", p_TrinhKy_ID) :
+                new ObjectParameter("p_TrinhKy_ID", typeof(int));
+    
+            var p_TinhTrang_IDParameter = p_TinhTrang_ID.HasValue ?
+                new ObjectParameter("p_TinhTrang_ID", p_TinhTrang_ID) :
+                new ObjectParameter("p_TinhTrang_ID", typeof(int));
+    
+            var p_LoaiNT_IDParameter = p_LoaiNT_ID.HasValue ?
+                new ObjectParameter("p_LoaiNT_ID", p_LoaiNT_ID) :
+                new ObjectParameter("p_LoaiNT_ID", typeof(int));
+    
+            var p_CDNT_ChiTietDonParameter = p_CDNT_ChiTietDon != null ?
+                new ObjectParameter("p_CDNT_ChiTietDon", p_CDNT_ChiTietDon) :
+                new ObjectParameter("p_CDNT_ChiTietDon", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CDNT_DonDangKy_Update", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, p_CDNT_ChiTietDonParameter);
         }
     
-        public virtual int DK_DetailCardExtend_Insert(string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string capLai, string giaHan, string thongTinLuuTru, string dTTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDGHT)
+        public virtual ObjectResult<CDNT_TrinhKy_Detail_Result> CDNT_TrinhKy_Detail(string maDon)
         {
-            var hoTenParameter = hoTen != null ?
-                new ObjectParameter("HoTen", hoTen) :
-                new ObjectParameter("HoTen", typeof(string));
+            var maDonParameter = maDon != null ?
+                new ObjectParameter("MaDon", maDon) :
+                new ObjectParameter("MaDon", typeof(string));
     
-            var cCCDParameter = cCCD != null ?
-                new ObjectParameter("CCCD", cCCD) :
-                new ObjectParameter("CCCD", typeof(string));
-    
-            var ngaySinhParameter = ngaySinh.HasValue ?
-                new ObjectParameter("NgaySinh", ngaySinh) :
-                new ObjectParameter("NgaySinh", typeof(System.DateTime));
-    
-            var hoKhauParameter = hoKhau != null ?
-                new ObjectParameter("HoKhau", hoKhau) :
-                new ObjectParameter("HoKhau", typeof(string));
-    
-            var chucVuParameter = chucVu.HasValue ?
-                new ObjectParameter("ChucVu", chucVu) :
-                new ObjectParameter("ChucVu", typeof(int));
-    
-            var soDienThoaiParameter = soDienThoai != null ?
-                new ObjectParameter("SoDienThoai", soDienThoai) :
-                new ObjectParameter("SoDienThoai", typeof(string));
-    
-            var capLaiParameter = capLai != null ?
-                new ObjectParameter("CapLai", capLai) :
-                new ObjectParameter("CapLai", typeof(string));
-    
-            var giaHanParameter = giaHan != null ?
-                new ObjectParameter("GiaHan", giaHan) :
-                new ObjectParameter("GiaHan", typeof(string));
-    
-            var thongTinLuuTruParameter = thongTinLuuTru != null ?
-                new ObjectParameter("ThongTinLuuTru", thongTinLuuTru) :
-                new ObjectParameter("ThongTinLuuTru", typeof(string));
-    
-            var dTTMParameter = dTTM != null ?
-                new ObjectParameter("DTTM", dTTM) :
-                new ObjectParameter("DTTM", typeof(string));
-    
-            var raVaoCangParameter = raVaoCang != null ?
-                new ObjectParameter("RaVaoCang", raVaoCang) :
-                new ObjectParameter("RaVaoCang", typeof(string));
-    
-            var thoiHanTheParameter = thoiHanThe.HasValue ?
-                new ObjectParameter("ThoiHanThe", thoiHanThe) :
-                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
-    
-            var khuVucLamViecParameter = khuVucLamViec != null ?
-                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
-                new ObjectParameter("KhuVucLamViec", typeof(string));
-    
-            var congParameter = cong != null ?
-                new ObjectParameter("Cong", cong) :
-                new ObjectParameter("Cong", typeof(string));
-    
-            var nhomNTParameter = nhomNT.HasValue ?
-                new ObjectParameter("NhomNT", nhomNT) :
-                new ObjectParameter("NhomNT", typeof(int));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var iDGHTParameter = iDGHT.HasValue ?
-                new ObjectParameter("IDGHT", iDGHT) :
-                new ObjectParameter("IDGHT", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardExtend_Insert", hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, capLaiParameter, giaHanParameter, thongTinLuuTruParameter, dTTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDGHTParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_TrinhKy_Detail_Result>("CDNT_TrinhKy_Detail", maDonParameter);
         }
     
-        public virtual int DK_DetailCardExtend_Update(Nullable<int> iDCTGH, string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string capLai, string giaHan, string thongTinLuuTru, string dTTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDGHT)
+        public virtual ObjectResult<CDNT_XeCoDong_Search_Result> CDNT_XeCoDong_Search(Nullable<int> p_ID_NT, Nullable<int> p_BP_ID, string p_TenDayDu, string p_TenNhaThau, Nullable<int> p_LoaiPhuongTien_ID, string p_BienSoXe, Nullable<int> p_TinhTrang, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay)
         {
-            var iDCTGHParameter = iDCTGH.HasValue ?
-                new ObjectParameter("IDCTGH", iDCTGH) :
-                new ObjectParameter("IDCTGH", typeof(int));
+            var p_ID_NTParameter = p_ID_NT.HasValue ?
+                new ObjectParameter("p_ID_NT", p_ID_NT) :
+                new ObjectParameter("p_ID_NT", typeof(int));
     
-            var hoTenParameter = hoTen != null ?
-                new ObjectParameter("HoTen", hoTen) :
-                new ObjectParameter("HoTen", typeof(string));
+            var p_BP_IDParameter = p_BP_ID.HasValue ?
+                new ObjectParameter("p_BP_ID", p_BP_ID) :
+                new ObjectParameter("p_BP_ID", typeof(int));
     
-            var cCCDParameter = cCCD != null ?
-                new ObjectParameter("CCCD", cCCD) :
-                new ObjectParameter("CCCD", typeof(string));
+            var p_TenDayDuParameter = p_TenDayDu != null ?
+                new ObjectParameter("p_TenDayDu", p_TenDayDu) :
+                new ObjectParameter("p_TenDayDu", typeof(string));
     
-            var ngaySinhParameter = ngaySinh.HasValue ?
-                new ObjectParameter("NgaySinh", ngaySinh) :
-                new ObjectParameter("NgaySinh", typeof(System.DateTime));
+            var p_TenNhaThauParameter = p_TenNhaThau != null ?
+                new ObjectParameter("p_TenNhaThau", p_TenNhaThau) :
+                new ObjectParameter("p_TenNhaThau", typeof(string));
     
-            var hoKhauParameter = hoKhau != null ?
-                new ObjectParameter("HoKhau", hoKhau) :
-                new ObjectParameter("HoKhau", typeof(string));
+            var p_LoaiPhuongTien_IDParameter = p_LoaiPhuongTien_ID.HasValue ?
+                new ObjectParameter("p_LoaiPhuongTien_ID", p_LoaiPhuongTien_ID) :
+                new ObjectParameter("p_LoaiPhuongTien_ID", typeof(int));
     
-            var chucVuParameter = chucVu.HasValue ?
-                new ObjectParameter("ChucVu", chucVu) :
-                new ObjectParameter("ChucVu", typeof(int));
+            var p_BienSoXeParameter = p_BienSoXe != null ?
+                new ObjectParameter("p_BienSoXe", p_BienSoXe) :
+                new ObjectParameter("p_BienSoXe", typeof(string));
     
-            var soDienThoaiParameter = soDienThoai != null ?
-                new ObjectParameter("SoDienThoai", soDienThoai) :
-                new ObjectParameter("SoDienThoai", typeof(string));
+            var p_TinhTrangParameter = p_TinhTrang.HasValue ?
+                new ObjectParameter("p_TinhTrang", p_TinhTrang) :
+                new ObjectParameter("p_TinhTrang", typeof(int));
     
-            var capLaiParameter = capLai != null ?
-                new ObjectParameter("CapLai", capLai) :
-                new ObjectParameter("CapLai", typeof(string));
+            var p_TuNgayParameter = p_TuNgay.HasValue ?
+                new ObjectParameter("p_TuNgay", p_TuNgay) :
+                new ObjectParameter("p_TuNgay", typeof(System.DateTime));
     
-            var giaHanParameter = giaHan != null ?
-                new ObjectParameter("GiaHan", giaHan) :
-                new ObjectParameter("GiaHan", typeof(string));
+            var p_DenNgayParameter = p_DenNgay.HasValue ?
+                new ObjectParameter("p_DenNgay", p_DenNgay) :
+                new ObjectParameter("p_DenNgay", typeof(System.DateTime));
     
-            var thongTinLuuTruParameter = thongTinLuuTru != null ?
-                new ObjectParameter("ThongTinLuuTru", thongTinLuuTru) :
-                new ObjectParameter("ThongTinLuuTru", typeof(string));
-    
-            var dTTMParameter = dTTM != null ?
-                new ObjectParameter("DTTM", dTTM) :
-                new ObjectParameter("DTTM", typeof(string));
-    
-            var raVaoCangParameter = raVaoCang != null ?
-                new ObjectParameter("RaVaoCang", raVaoCang) :
-                new ObjectParameter("RaVaoCang", typeof(string));
-    
-            var thoiHanTheParameter = thoiHanThe.HasValue ?
-                new ObjectParameter("ThoiHanThe", thoiHanThe) :
-                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
-    
-            var khuVucLamViecParameter = khuVucLamViec != null ?
-                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
-                new ObjectParameter("KhuVucLamViec", typeof(string));
-    
-            var congParameter = cong != null ?
-                new ObjectParameter("Cong", cong) :
-                new ObjectParameter("Cong", typeof(string));
-    
-            var nhomNTParameter = nhomNT.HasValue ?
-                new ObjectParameter("NhomNT", nhomNT) :
-                new ObjectParameter("NhomNT", typeof(int));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            var iDGHTParameter = iDGHT.HasValue ?
-                new ObjectParameter("IDGHT", iDGHT) :
-                new ObjectParameter("IDGHT", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardExtend_Update", iDCTGHParameter, hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, capLaiParameter, giaHanParameter, thongTinLuuTruParameter, dTTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDGHTParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_XeCoDong_Search_Result>("CDNT_XeCoDong_Search", p_ID_NTParameter, p_BP_IDParameter, p_TenDayDuParameter, p_TenNhaThauParameter, p_LoaiPhuongTien_IDParameter, p_BienSoXeParameter, p_TinhTrangParameter, p_TuNgayParameter, p_DenNgayParameter);
         }
     
-        public virtual int TK_CardRegistrationInfor_Insert(Nullable<int> dKTID, Nullable<int> capDuyet, Nullable<int> tinhTrangID, Nullable<int> nhanVienID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
+        public virtual int CNDT_GetDinhBienPhuongTien(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan, ObjectParameter p_XeMay_DaCap, ObjectParameter p_Xe3Gac_DaCap, ObjectParameter p_XeMay_ToiDa, ObjectParameter p_Xe3Gac_ToiDa, ObjectParameter p_XeMay_ConLai, ObjectParameter p_Xe3Gac_ConLai)
         {
-            var dKTIDParameter = dKTID.HasValue ?
-                new ObjectParameter("DKTID", dKTID) :
-                new ObjectParameter("DKTID", typeof(int));
+            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
+                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
+                new ObjectParameter("p_NhaThauID", typeof(int));
     
-            var capDuyetParameter = capDuyet.HasValue ?
-                new ObjectParameter("CapDuyet", capDuyet) :
-                new ObjectParameter("CapDuyet", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            var nhanVienIDParameter = nhanVienID.HasValue ?
-                new ObjectParameter("NhanVienID", nhanVienID) :
-                new ObjectParameter("NhanVienID", typeof(int));
-    
-            var ngayDuyetParameter = ngayDuyet.HasValue ?
-                new ObjectParameter("NgayDuyet", ngayDuyet) :
-                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_Insert", dKTIDParameter, capDuyetParameter, tinhTrangIDParameter, nhanVienIDParameter, ngayDuyetParameter, ghiChuParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CNDT_GetDinhBienPhuongTien", p_NhaThauIDParameter, p_SoQuanLy, p_SoCongNhan, p_XeMay_DaCap, p_Xe3Gac_DaCap, p_XeMay_ToiDa, p_Xe3Gac_ToiDa, p_XeMay_ConLai, p_Xe3Gac_ConLai);
         }
     
-        public virtual int DK_CardRegistrationInfor_UpdateTK(Nullable<int> iDDKT, Nullable<int> tinhTrangID)
+        public virtual int CNDT_GetNhanSuTheoChucVu(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan)
         {
-            var iDDKTParameter = iDDKT.HasValue ?
-                new ObjectParameter("IDDKT", iDDKT) :
-                new ObjectParameter("IDDKT", typeof(int));
+            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
+                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
+                new ObjectParameter("p_NhaThauID", typeof(int));
     
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_UpdateTK", iDDKTParameter, tinhTrangIDParameter);
-        }
-    
-        public virtual int TK_CardRegistrationInfor_UpdateTK(Nullable<int> iDTKDKT, Nullable<int> tinhTrangID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
-        {
-            var iDTKDKTParameter = iDTKDKT.HasValue ?
-                new ObjectParameter("IDTKDKT", iDTKDKT) :
-                new ObjectParameter("IDTKDKT", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            var ngayDuyetParameter = ngayDuyet.HasValue ?
-                new ObjectParameter("NgayDuyet", ngayDuyet) :
-                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_UpdateTK", iDTKDKTParameter, tinhTrangIDParameter, ngayDuyetParameter, ghiChuParameter);
-        }
-    
-        public virtual int TK_CardRegistrationInfor_Cancel(Nullable<int> dKTID)
-        {
-            var dKTIDParameter = dKTID.HasValue ?
-                new ObjectParameter("DKTID", dKTID) :
-                new ObjectParameter("DKTID", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_Cancel", dKTIDParameter);
-        }
-    
-        public virtual int DK_CardExtend_UpdateTK(Nullable<int> iDGHT, Nullable<int> tinhTrangID)
-        {
-            var iDGHTParameter = iDGHT.HasValue ?
-                new ObjectParameter("IDGHT", iDGHT) :
-                new ObjectParameter("IDGHT", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_UpdateTK", iDGHTParameter, tinhTrangIDParameter);
-        }
-    
-        public virtual int TK_CardExtend_Cancel(Nullable<int> gHTID)
-        {
-            var gHTIDParameter = gHTID.HasValue ?
-                new ObjectParameter("GHTID", gHTID) :
-                new ObjectParameter("GHTID", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardExtend_Cancel", gHTIDParameter);
-        }
-    
-        public virtual int TK_CardExtend_Insert(Nullable<int> gHTID, Nullable<int> capDuyet, Nullable<int> tinhTrangID, Nullable<int> nhanVienID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
-        {
-            var gHTIDParameter = gHTID.HasValue ?
-                new ObjectParameter("GHTID", gHTID) :
-                new ObjectParameter("GHTID", typeof(int));
-    
-            var capDuyetParameter = capDuyet.HasValue ?
-                new ObjectParameter("CapDuyet", capDuyet) :
-                new ObjectParameter("CapDuyet", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            var nhanVienIDParameter = nhanVienID.HasValue ?
-                new ObjectParameter("NhanVienID", nhanVienID) :
-                new ObjectParameter("NhanVienID", typeof(int));
-    
-            var ngayDuyetParameter = ngayDuyet.HasValue ?
-                new ObjectParameter("NgayDuyet", ngayDuyet) :
-                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardExtend_Insert", gHTIDParameter, capDuyetParameter, tinhTrangIDParameter, nhanVienIDParameter, ngayDuyetParameter, ghiChuParameter);
-        }
-    
-        public virtual int TK_CardExtend_UpdateTK(Nullable<int> iDTKGHT, Nullable<int> tinhTrangID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
-        {
-            var iDTKGHTParameter = iDTKGHT.HasValue ?
-                new ObjectParameter("IDTKGHT", iDTKGHT) :
-                new ObjectParameter("IDTKGHT", typeof(int));
-    
-            var tinhTrangIDParameter = tinhTrangID.HasValue ?
-                new ObjectParameter("TinhTrangID", tinhTrangID) :
-                new ObjectParameter("TinhTrangID", typeof(int));
-    
-            var ngayDuyetParameter = ngayDuyet.HasValue ?
-                new ObjectParameter("NgayDuyet", ngayDuyet) :
-                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
-    
-            var ghiChuParameter = ghiChu != null ?
-                new ObjectParameter("GhiChu", ghiChu) :
-                new ObjectParameter("GhiChu", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardExtend_UpdateTK", iDTKGHTParameter, tinhTrangIDParameter, ngayDuyetParameter, ghiChuParameter);
-        }
-    
-        public virtual int DK_CardExtend_Up(Nullable<int> iDGHT, Nullable<int> nhanVienID, string fileComplete)
-        {
-            var iDGHTParameter = iDGHT.HasValue ?
-                new ObjectParameter("IDGHT", iDGHT) :
-                new ObjectParameter("IDGHT", typeof(int));
-    
-            var nhanVienIDParameter = nhanVienID.HasValue ?
-                new ObjectParameter("NhanVienID", nhanVienID) :
-                new ObjectParameter("NhanVienID", typeof(int));
-    
-            var fileCompleteParameter = fileComplete != null ?
-                new ObjectParameter("FileComplete", fileComplete) :
-                new ObjectParameter("FileComplete", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Up", iDGHTParameter, nhanVienIDParameter, fileCompleteParameter);
-        }
-    
-        public virtual int DK_CardRegistrationInfor_Up(Nullable<int> iDDKT, Nullable<int> nhanVienID, string fileUpload, string fileComplete)
-        {
-            var iDDKTParameter = iDDKT.HasValue ?
-                new ObjectParameter("IDDKT", iDDKT) :
-                new ObjectParameter("IDDKT", typeof(int));
-    
-            var nhanVienIDParameter = nhanVienID.HasValue ?
-                new ObjectParameter("NhanVienID", nhanVienID) :
-                new ObjectParameter("NhanVienID", typeof(int));
-    
-            var fileUploadParameter = fileUpload != null ?
-                new ObjectParameter("FileUpload", fileUpload) :
-                new ObjectParameter("FileUpload", typeof(string));
-    
-            var fileCompleteParameter = fileComplete != null ?
-                new ObjectParameter("FileComplete", fileComplete) :
-                new ObjectParameter("FileComplete", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Up", iDDKTParameter, nhanVienIDParameter, fileUploadParameter, fileCompleteParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CNDT_GetNhanSuTheoChucVu", p_NhaThauIDParameter, p_SoQuanLy, p_SoCongNhan);
         }
     
         public virtual int Detail_RegisterPeople_Delete(Nullable<int> iD_CT_DKTN)
@@ -934,6 +578,570 @@ namespace EPORTAL.ModelsTagSign
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Detail_RegisterPeople_Update", iD_CT_DKTNParameter, hoVaTenParameter, ngaySinhParameter, cCCDParameter, hoKhauParameter, cV_IDParameter, soDienThoaiParameter, ten_NTPParameter, hoTen_QuanLyParameter, soDienThoai_QuanLyParameter, capMoiParameter, giaHanParameter, boSungCongParameter, capLaiParameter, chuyenNTParameter, thoiHanTheParameter, khuVucLamViecParameter, congLamViecParameter, nhomNTParameter, ghiChuParameter, dienThoaiThongMinhParameter, ghiChuHPDQParameter);
         }
     
+        public virtual int DK_CardExtend_Delete(Nullable<int> iDGHT)
+        {
+            var iDGHTParameter = iDGHT.HasValue ?
+                new ObjectParameter("IDGHT", iDGHT) :
+                new ObjectParameter("IDGHT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Delete", iDGHTParameter);
+        }
+    
+        public virtual int DK_CardExtend_Insert(string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, Nullable<int> nhanVienID, Nullable<int> tinhTrangID, string ghiChu, Nullable<int> loaiNT, string fileComplete, ObjectParameter iDGHT)
+        {
+            var noiDungParameter = noiDung != null ?
+                new ObjectParameter("NoiDung", noiDung) :
+                new ObjectParameter("NoiDung", typeof(string));
+    
+            var nTIDParameter = nTID.HasValue ?
+                new ObjectParameter("NTID", nTID) :
+                new ObjectParameter("NTID", typeof(int));
+    
+            var hDIDParameter = hDID.HasValue ?
+                new ObjectParameter("HDID", hDID) :
+                new ObjectParameter("HDID", typeof(int));
+    
+            var phongBanIDParameter = phongBanID.HasValue ?
+                new ObjectParameter("PhongBanID", phongBanID) :
+                new ObjectParameter("PhongBanID", typeof(int));
+    
+            var ngayDangKyParameter = ngayDangKy.HasValue ?
+                new ObjectParameter("NgayDangKy", ngayDangKy) :
+                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
+    
+            var nhanVienIDParameter = nhanVienID.HasValue ?
+                new ObjectParameter("NhanVienID", nhanVienID) :
+                new ObjectParameter("NhanVienID", typeof(int));
+    
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var loaiNTParameter = loaiNT.HasValue ?
+                new ObjectParameter("LoaiNT", loaiNT) :
+                new ObjectParameter("LoaiNT", typeof(int));
+    
+            var fileCompleteParameter = fileComplete != null ?
+                new ObjectParameter("FileComplete", fileComplete) :
+                new ObjectParameter("FileComplete", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Insert", noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, nhanVienIDParameter, tinhTrangIDParameter, ghiChuParameter, loaiNTParameter, fileCompleteParameter, iDGHT);
+        }
+    
+        public virtual int DK_CardExtend_Up(Nullable<int> iDGHT, Nullable<int> nhanVienID, string fileComplete)
+        {
+            var iDGHTParameter = iDGHT.HasValue ?
+                new ObjectParameter("IDGHT", iDGHT) :
+                new ObjectParameter("IDGHT", typeof(int));
+    
+            var nhanVienIDParameter = nhanVienID.HasValue ?
+                new ObjectParameter("NhanVienID", nhanVienID) :
+                new ObjectParameter("NhanVienID", typeof(int));
+    
+            var fileCompleteParameter = fileComplete != null ?
+                new ObjectParameter("FileComplete", fileComplete) :
+                new ObjectParameter("FileComplete", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Up", iDGHTParameter, nhanVienIDParameter, fileCompleteParameter);
+        }
+    
+        public virtual int DK_CardExtend_Update(Nullable<int> iDGHT, string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, string ghiChu, Nullable<int> loaiNT)
+        {
+            var iDGHTParameter = iDGHT.HasValue ?
+                new ObjectParameter("IDGHT", iDGHT) :
+                new ObjectParameter("IDGHT", typeof(int));
+    
+            var noiDungParameter = noiDung != null ?
+                new ObjectParameter("NoiDung", noiDung) :
+                new ObjectParameter("NoiDung", typeof(string));
+    
+            var nTIDParameter = nTID.HasValue ?
+                new ObjectParameter("NTID", nTID) :
+                new ObjectParameter("NTID", typeof(int));
+    
+            var hDIDParameter = hDID.HasValue ?
+                new ObjectParameter("HDID", hDID) :
+                new ObjectParameter("HDID", typeof(int));
+    
+            var phongBanIDParameter = phongBanID.HasValue ?
+                new ObjectParameter("PhongBanID", phongBanID) :
+                new ObjectParameter("PhongBanID", typeof(int));
+    
+            var ngayDangKyParameter = ngayDangKy.HasValue ?
+                new ObjectParameter("NgayDangKy", ngayDangKy) :
+                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var loaiNTParameter = loaiNT.HasValue ?
+                new ObjectParameter("LoaiNT", loaiNT) :
+                new ObjectParameter("LoaiNT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_Update", iDGHTParameter, noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, ghiChuParameter, loaiNTParameter);
+        }
+    
+        public virtual int DK_CardExtend_UpdateTK(Nullable<int> iDGHT, Nullable<int> tinhTrangID)
+        {
+            var iDGHTParameter = iDGHT.HasValue ?
+                new ObjectParameter("IDGHT", iDGHT) :
+                new ObjectParameter("IDGHT", typeof(int));
+    
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardExtend_UpdateTK", iDGHTParameter, tinhTrangIDParameter);
+        }
+    
+        public virtual int DK_CardRegistrationInfor_Delete(Nullable<int> iDDKT)
+        {
+            var iDDKTParameter = iDDKT.HasValue ?
+                new ObjectParameter("IDDKT", iDDKT) :
+                new ObjectParameter("IDDKT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Delete", iDDKTParameter);
+        }
+    
+        public virtual int DK_CardRegistrationInfor_Insert(string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, Nullable<int> nhanVienID, Nullable<int> tinhTrangID, string fileUpload, string ghiChu, Nullable<int> loaiNT, string fileComplete, ObjectParameter iDDKT)
+        {
+            var noiDungParameter = noiDung != null ?
+                new ObjectParameter("NoiDung", noiDung) :
+                new ObjectParameter("NoiDung", typeof(string));
+    
+            var nTIDParameter = nTID.HasValue ?
+                new ObjectParameter("NTID", nTID) :
+                new ObjectParameter("NTID", typeof(int));
+    
+            var hDIDParameter = hDID.HasValue ?
+                new ObjectParameter("HDID", hDID) :
+                new ObjectParameter("HDID", typeof(int));
+    
+            var phongBanIDParameter = phongBanID.HasValue ?
+                new ObjectParameter("PhongBanID", phongBanID) :
+                new ObjectParameter("PhongBanID", typeof(int));
+    
+            var ngayDangKyParameter = ngayDangKy.HasValue ?
+                new ObjectParameter("NgayDangKy", ngayDangKy) :
+                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
+    
+            var nhanVienIDParameter = nhanVienID.HasValue ?
+                new ObjectParameter("NhanVienID", nhanVienID) :
+                new ObjectParameter("NhanVienID", typeof(int));
+    
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
+    
+            var fileUploadParameter = fileUpload != null ?
+                new ObjectParameter("FileUpload", fileUpload) :
+                new ObjectParameter("FileUpload", typeof(string));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var loaiNTParameter = loaiNT.HasValue ?
+                new ObjectParameter("LoaiNT", loaiNT) :
+                new ObjectParameter("LoaiNT", typeof(int));
+    
+            var fileCompleteParameter = fileComplete != null ?
+                new ObjectParameter("FileComplete", fileComplete) :
+                new ObjectParameter("FileComplete", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Insert", noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, nhanVienIDParameter, tinhTrangIDParameter, fileUploadParameter, ghiChuParameter, loaiNTParameter, fileCompleteParameter, iDDKT);
+        }
+    
+        public virtual int DK_CardRegistrationInfor_Up(Nullable<int> iDDKT, Nullable<int> nhanVienID, string fileUpload, string fileComplete)
+        {
+            var iDDKTParameter = iDDKT.HasValue ?
+                new ObjectParameter("IDDKT", iDDKT) :
+                new ObjectParameter("IDDKT", typeof(int));
+    
+            var nhanVienIDParameter = nhanVienID.HasValue ?
+                new ObjectParameter("NhanVienID", nhanVienID) :
+                new ObjectParameter("NhanVienID", typeof(int));
+    
+            var fileUploadParameter = fileUpload != null ?
+                new ObjectParameter("FileUpload", fileUpload) :
+                new ObjectParameter("FileUpload", typeof(string));
+    
+            var fileCompleteParameter = fileComplete != null ?
+                new ObjectParameter("FileComplete", fileComplete) :
+                new ObjectParameter("FileComplete", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Up", iDDKTParameter, nhanVienIDParameter, fileUploadParameter, fileCompleteParameter);
+        }
+    
+        public virtual int DK_CardRegistrationInfor_Update(Nullable<int> iDDKT, string noiDung, Nullable<int> nTID, Nullable<int> hDID, Nullable<int> phongBanID, Nullable<System.DateTime> ngayDangKy, string fileUpload, string ghiChu, Nullable<int> loaiNT)
+        {
+            var iDDKTParameter = iDDKT.HasValue ?
+                new ObjectParameter("IDDKT", iDDKT) :
+                new ObjectParameter("IDDKT", typeof(int));
+    
+            var noiDungParameter = noiDung != null ?
+                new ObjectParameter("NoiDung", noiDung) :
+                new ObjectParameter("NoiDung", typeof(string));
+    
+            var nTIDParameter = nTID.HasValue ?
+                new ObjectParameter("NTID", nTID) :
+                new ObjectParameter("NTID", typeof(int));
+    
+            var hDIDParameter = hDID.HasValue ?
+                new ObjectParameter("HDID", hDID) :
+                new ObjectParameter("HDID", typeof(int));
+    
+            var phongBanIDParameter = phongBanID.HasValue ?
+                new ObjectParameter("PhongBanID", phongBanID) :
+                new ObjectParameter("PhongBanID", typeof(int));
+    
+            var ngayDangKyParameter = ngayDangKy.HasValue ?
+                new ObjectParameter("NgayDangKy", ngayDangKy) :
+                new ObjectParameter("NgayDangKy", typeof(System.DateTime));
+    
+            var fileUploadParameter = fileUpload != null ?
+                new ObjectParameter("FileUpload", fileUpload) :
+                new ObjectParameter("FileUpload", typeof(string));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var loaiNTParameter = loaiNT.HasValue ?
+                new ObjectParameter("LoaiNT", loaiNT) :
+                new ObjectParameter("LoaiNT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_Update", iDDKTParameter, noiDungParameter, nTIDParameter, hDIDParameter, phongBanIDParameter, ngayDangKyParameter, fileUploadParameter, ghiChuParameter, loaiNTParameter);
+        }
+    
+        public virtual int DK_CardRegistrationInfor_UpdateTK(Nullable<int> iDDKT, Nullable<int> tinhTrangID)
+        {
+            var iDDKTParameter = iDDKT.HasValue ?
+                new ObjectParameter("IDDKT", iDDKT) :
+                new ObjectParameter("IDDKT", typeof(int));
+    
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_CardRegistrationInfor_UpdateTK", iDDKTParameter, tinhTrangIDParameter);
+        }
+    
+        public virtual int DK_DetailCardExtend_Delete(Nullable<int> iDCTGH)
+        {
+            var iDCTGHParameter = iDCTGH.HasValue ?
+                new ObjectParameter("IDCTGH", iDCTGH) :
+                new ObjectParameter("IDCTGH", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardExtend_Delete", iDCTGHParameter);
+        }
+    
+        public virtual int DK_DetailCardExtend_Insert(string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string capLai, string giaHan, string thongTinLuuTru, string dTTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDGHT)
+        {
+            var hoTenParameter = hoTen != null ?
+                new ObjectParameter("HoTen", hoTen) :
+                new ObjectParameter("HoTen", typeof(string));
+    
+            var cCCDParameter = cCCD != null ?
+                new ObjectParameter("CCCD", cCCD) :
+                new ObjectParameter("CCCD", typeof(string));
+    
+            var ngaySinhParameter = ngaySinh.HasValue ?
+                new ObjectParameter("NgaySinh", ngaySinh) :
+                new ObjectParameter("NgaySinh", typeof(System.DateTime));
+    
+            var hoKhauParameter = hoKhau != null ?
+                new ObjectParameter("HoKhau", hoKhau) :
+                new ObjectParameter("HoKhau", typeof(string));
+    
+            var chucVuParameter = chucVu.HasValue ?
+                new ObjectParameter("ChucVu", chucVu) :
+                new ObjectParameter("ChucVu", typeof(int));
+    
+            var soDienThoaiParameter = soDienThoai != null ?
+                new ObjectParameter("SoDienThoai", soDienThoai) :
+                new ObjectParameter("SoDienThoai", typeof(string));
+    
+            var capLaiParameter = capLai != null ?
+                new ObjectParameter("CapLai", capLai) :
+                new ObjectParameter("CapLai", typeof(string));
+    
+            var giaHanParameter = giaHan != null ?
+                new ObjectParameter("GiaHan", giaHan) :
+                new ObjectParameter("GiaHan", typeof(string));
+    
+            var thongTinLuuTruParameter = thongTinLuuTru != null ?
+                new ObjectParameter("ThongTinLuuTru", thongTinLuuTru) :
+                new ObjectParameter("ThongTinLuuTru", typeof(string));
+    
+            var dTTMParameter = dTTM != null ?
+                new ObjectParameter("DTTM", dTTM) :
+                new ObjectParameter("DTTM", typeof(string));
+    
+            var raVaoCangParameter = raVaoCang != null ?
+                new ObjectParameter("RaVaoCang", raVaoCang) :
+                new ObjectParameter("RaVaoCang", typeof(string));
+    
+            var thoiHanTheParameter = thoiHanThe.HasValue ?
+                new ObjectParameter("ThoiHanThe", thoiHanThe) :
+                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
+    
+            var khuVucLamViecParameter = khuVucLamViec != null ?
+                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
+                new ObjectParameter("KhuVucLamViec", typeof(string));
+    
+            var congParameter = cong != null ?
+                new ObjectParameter("Cong", cong) :
+                new ObjectParameter("Cong", typeof(string));
+    
+            var nhomNTParameter = nhomNT.HasValue ?
+                new ObjectParameter("NhomNT", nhomNT) :
+                new ObjectParameter("NhomNT", typeof(int));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var iDGHTParameter = iDGHT.HasValue ?
+                new ObjectParameter("IDGHT", iDGHT) :
+                new ObjectParameter("IDGHT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardExtend_Insert", hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, capLaiParameter, giaHanParameter, thongTinLuuTruParameter, dTTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDGHTParameter);
+        }
+    
+        public virtual int DK_DetailCardExtend_Update(Nullable<int> iDCTGH, string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string capLai, string giaHan, string thongTinLuuTru, string dTTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDGHT)
+        {
+            var iDCTGHParameter = iDCTGH.HasValue ?
+                new ObjectParameter("IDCTGH", iDCTGH) :
+                new ObjectParameter("IDCTGH", typeof(int));
+    
+            var hoTenParameter = hoTen != null ?
+                new ObjectParameter("HoTen", hoTen) :
+                new ObjectParameter("HoTen", typeof(string));
+    
+            var cCCDParameter = cCCD != null ?
+                new ObjectParameter("CCCD", cCCD) :
+                new ObjectParameter("CCCD", typeof(string));
+    
+            var ngaySinhParameter = ngaySinh.HasValue ?
+                new ObjectParameter("NgaySinh", ngaySinh) :
+                new ObjectParameter("NgaySinh", typeof(System.DateTime));
+    
+            var hoKhauParameter = hoKhau != null ?
+                new ObjectParameter("HoKhau", hoKhau) :
+                new ObjectParameter("HoKhau", typeof(string));
+    
+            var chucVuParameter = chucVu.HasValue ?
+                new ObjectParameter("ChucVu", chucVu) :
+                new ObjectParameter("ChucVu", typeof(int));
+    
+            var soDienThoaiParameter = soDienThoai != null ?
+                new ObjectParameter("SoDienThoai", soDienThoai) :
+                new ObjectParameter("SoDienThoai", typeof(string));
+    
+            var capLaiParameter = capLai != null ?
+                new ObjectParameter("CapLai", capLai) :
+                new ObjectParameter("CapLai", typeof(string));
+    
+            var giaHanParameter = giaHan != null ?
+                new ObjectParameter("GiaHan", giaHan) :
+                new ObjectParameter("GiaHan", typeof(string));
+    
+            var thongTinLuuTruParameter = thongTinLuuTru != null ?
+                new ObjectParameter("ThongTinLuuTru", thongTinLuuTru) :
+                new ObjectParameter("ThongTinLuuTru", typeof(string));
+    
+            var dTTMParameter = dTTM != null ?
+                new ObjectParameter("DTTM", dTTM) :
+                new ObjectParameter("DTTM", typeof(string));
+    
+            var raVaoCangParameter = raVaoCang != null ?
+                new ObjectParameter("RaVaoCang", raVaoCang) :
+                new ObjectParameter("RaVaoCang", typeof(string));
+    
+            var thoiHanTheParameter = thoiHanThe.HasValue ?
+                new ObjectParameter("ThoiHanThe", thoiHanThe) :
+                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
+    
+            var khuVucLamViecParameter = khuVucLamViec != null ?
+                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
+                new ObjectParameter("KhuVucLamViec", typeof(string));
+    
+            var congParameter = cong != null ?
+                new ObjectParameter("Cong", cong) :
+                new ObjectParameter("Cong", typeof(string));
+    
+            var nhomNTParameter = nhomNT.HasValue ?
+                new ObjectParameter("NhomNT", nhomNT) :
+                new ObjectParameter("NhomNT", typeof(int));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var iDGHTParameter = iDGHT.HasValue ?
+                new ObjectParameter("IDGHT", iDGHT) :
+                new ObjectParameter("IDGHT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardExtend_Update", iDCTGHParameter, hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, capLaiParameter, giaHanParameter, thongTinLuuTruParameter, dTTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDGHTParameter);
+        }
+    
+        public virtual int DK_DetailCardRegistrationInfor_Delete(Nullable<int> iDCTDK)
+        {
+            var iDCTDKParameter = iDCTDK.HasValue ?
+                new ObjectParameter("IDCTDK", iDCTDK) :
+                new ObjectParameter("IDCTDK", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardRegistrationInfor_Delete", iDCTDKParameter);
+        }
+    
+        public virtual int DK_DetailCardRegistrationInfor_Insert(string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string theLuuTru, string theRaVaoKLH, string dienThoaiTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDDKT)
+        {
+            var hoTenParameter = hoTen != null ?
+                new ObjectParameter("HoTen", hoTen) :
+                new ObjectParameter("HoTen", typeof(string));
+    
+            var cCCDParameter = cCCD != null ?
+                new ObjectParameter("CCCD", cCCD) :
+                new ObjectParameter("CCCD", typeof(string));
+    
+            var ngaySinhParameter = ngaySinh.HasValue ?
+                new ObjectParameter("NgaySinh", ngaySinh) :
+                new ObjectParameter("NgaySinh", typeof(System.DateTime));
+    
+            var hoKhauParameter = hoKhau != null ?
+                new ObjectParameter("HoKhau", hoKhau) :
+                new ObjectParameter("HoKhau", typeof(string));
+    
+            var chucVuParameter = chucVu.HasValue ?
+                new ObjectParameter("ChucVu", chucVu) :
+                new ObjectParameter("ChucVu", typeof(int));
+    
+            var soDienThoaiParameter = soDienThoai != null ?
+                new ObjectParameter("SoDienThoai", soDienThoai) :
+                new ObjectParameter("SoDienThoai", typeof(string));
+    
+            var theLuuTruParameter = theLuuTru != null ?
+                new ObjectParameter("TheLuuTru", theLuuTru) :
+                new ObjectParameter("TheLuuTru", typeof(string));
+    
+            var theRaVaoKLHParameter = theRaVaoKLH != null ?
+                new ObjectParameter("TheRaVaoKLH", theRaVaoKLH) :
+                new ObjectParameter("TheRaVaoKLH", typeof(string));
+    
+            var dienThoaiTMParameter = dienThoaiTM != null ?
+                new ObjectParameter("DienThoaiTM", dienThoaiTM) :
+                new ObjectParameter("DienThoaiTM", typeof(string));
+    
+            var raVaoCangParameter = raVaoCang != null ?
+                new ObjectParameter("RaVaoCang", raVaoCang) :
+                new ObjectParameter("RaVaoCang", typeof(string));
+    
+            var thoiHanTheParameter = thoiHanThe.HasValue ?
+                new ObjectParameter("ThoiHanThe", thoiHanThe) :
+                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
+    
+            var khuVucLamViecParameter = khuVucLamViec != null ?
+                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
+                new ObjectParameter("KhuVucLamViec", typeof(string));
+    
+            var congParameter = cong != null ?
+                new ObjectParameter("Cong", cong) :
+                new ObjectParameter("Cong", typeof(string));
+    
+            var nhomNTParameter = nhomNT.HasValue ?
+                new ObjectParameter("NhomNT", nhomNT) :
+                new ObjectParameter("NhomNT", typeof(int));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var iDDKTParameter = iDDKT.HasValue ?
+                new ObjectParameter("IDDKT", iDDKT) :
+                new ObjectParameter("IDDKT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardRegistrationInfor_Insert", hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, theLuuTruParameter, theRaVaoKLHParameter, dienThoaiTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDDKTParameter);
+        }
+    
+        public virtual int DK_DetailCardRegistrationInfor_Update(Nullable<int> iDCTDK, string hoTen, string cCCD, Nullable<System.DateTime> ngaySinh, string hoKhau, Nullable<int> chucVu, string soDienThoai, string theLuuTru, string theRaVaoKLH, string dienThoaiTM, string raVaoCang, Nullable<System.DateTime> thoiHanThe, string khuVucLamViec, string cong, Nullable<int> nhomNT, string ghiChu, Nullable<int> iDDKT)
+        {
+            var iDCTDKParameter = iDCTDK.HasValue ?
+                new ObjectParameter("IDCTDK", iDCTDK) :
+                new ObjectParameter("IDCTDK", typeof(int));
+    
+            var hoTenParameter = hoTen != null ?
+                new ObjectParameter("HoTen", hoTen) :
+                new ObjectParameter("HoTen", typeof(string));
+    
+            var cCCDParameter = cCCD != null ?
+                new ObjectParameter("CCCD", cCCD) :
+                new ObjectParameter("CCCD", typeof(string));
+    
+            var ngaySinhParameter = ngaySinh.HasValue ?
+                new ObjectParameter("NgaySinh", ngaySinh) :
+                new ObjectParameter("NgaySinh", typeof(System.DateTime));
+    
+            var hoKhauParameter = hoKhau != null ?
+                new ObjectParameter("HoKhau", hoKhau) :
+                new ObjectParameter("HoKhau", typeof(string));
+    
+            var chucVuParameter = chucVu.HasValue ?
+                new ObjectParameter("ChucVu", chucVu) :
+                new ObjectParameter("ChucVu", typeof(int));
+    
+            var soDienThoaiParameter = soDienThoai != null ?
+                new ObjectParameter("SoDienThoai", soDienThoai) :
+                new ObjectParameter("SoDienThoai", typeof(string));
+    
+            var theLuuTruParameter = theLuuTru != null ?
+                new ObjectParameter("TheLuuTru", theLuuTru) :
+                new ObjectParameter("TheLuuTru", typeof(string));
+    
+            var theRaVaoKLHParameter = theRaVaoKLH != null ?
+                new ObjectParameter("TheRaVaoKLH", theRaVaoKLH) :
+                new ObjectParameter("TheRaVaoKLH", typeof(string));
+    
+            var dienThoaiTMParameter = dienThoaiTM != null ?
+                new ObjectParameter("DienThoaiTM", dienThoaiTM) :
+                new ObjectParameter("DienThoaiTM", typeof(string));
+    
+            var raVaoCangParameter = raVaoCang != null ?
+                new ObjectParameter("RaVaoCang", raVaoCang) :
+                new ObjectParameter("RaVaoCang", typeof(string));
+    
+            var thoiHanTheParameter = thoiHanThe.HasValue ?
+                new ObjectParameter("ThoiHanThe", thoiHanThe) :
+                new ObjectParameter("ThoiHanThe", typeof(System.DateTime));
+    
+            var khuVucLamViecParameter = khuVucLamViec != null ?
+                new ObjectParameter("KhuVucLamViec", khuVucLamViec) :
+                new ObjectParameter("KhuVucLamViec", typeof(string));
+    
+            var congParameter = cong != null ?
+                new ObjectParameter("Cong", cong) :
+                new ObjectParameter("Cong", typeof(string));
+    
+            var nhomNTParameter = nhomNT.HasValue ?
+                new ObjectParameter("NhomNT", nhomNT) :
+                new ObjectParameter("NhomNT", typeof(int));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            var iDDKTParameter = iDDKT.HasValue ?
+                new ObjectParameter("IDDKT", iDDKT) :
+                new ObjectParameter("IDDKT", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DK_DetailCardRegistrationInfor_Update", iDCTDKParameter, hoTenParameter, cCCDParameter, ngaySinhParameter, hoKhauParameter, chucVuParameter, soDienThoaiParameter, theLuuTruParameter, theRaVaoKLHParameter, dienThoaiTMParameter, raVaoCangParameter, thoiHanTheParameter, khuVucLamViecParameter, congParameter, nhomNTParameter, ghiChuParameter, iDDKTParameter);
+        }
+    
         public virtual int RegisterPeople_Delete(Nullable<int> iD_DKTN)
         {
             var iD_DKTNParameter = iD_DKTN.HasValue ?
@@ -1113,341 +1321,122 @@ namespace EPORTAL.ModelsTagSign
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("SignOff_Flow_Update", iD_TK_TNParameter, ngayDuyetParameter, tinhTrangIDParameter, ghiChuParameter);
         }
     
-        public virtual int TK_CarteTemp_Delete(Nullable<int> id)
+        public virtual int TK_CardExtend_Cancel(Nullable<int> gHTID)
         {
-            var idParameter = id.HasValue ?
-                new ObjectParameter("id", id) :
-                new ObjectParameter("id", typeof(int));
+            var gHTIDParameter = gHTID.HasValue ?
+                new ObjectParameter("GHTID", gHTID) :
+                new ObjectParameter("GHTID", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CarteTemp_Delete", idParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardExtend_Cancel", gHTIDParameter);
         }
     
-        public virtual int CDNT_ChiTietDon_Search(string p_MaDon, string p_BienSoXe, Nullable<int> p_ID_LoaiPhuongTien, Nullable<bool> p_CapMoi, Nullable<bool> p_CapLai, Nullable<bool> p_GiaHan, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay)
+        public virtual int TK_CardExtend_Insert(Nullable<int> gHTID, Nullable<int> capDuyet, Nullable<int> tinhTrangID, Nullable<int> nhanVienID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
         {
-            var p_MaDonParameter = p_MaDon != null ?
-                new ObjectParameter("p_MaDon", p_MaDon) :
-                new ObjectParameter("p_MaDon", typeof(string));
+            var gHTIDParameter = gHTID.HasValue ?
+                new ObjectParameter("GHTID", gHTID) :
+                new ObjectParameter("GHTID", typeof(int));
     
-            var p_BienSoXeParameter = p_BienSoXe != null ?
-                new ObjectParameter("p_BienSoXe", p_BienSoXe) :
-                new ObjectParameter("p_BienSoXe", typeof(string));
+            var capDuyetParameter = capDuyet.HasValue ?
+                new ObjectParameter("CapDuyet", capDuyet) :
+                new ObjectParameter("CapDuyet", typeof(int));
     
-            var p_ID_LoaiPhuongTienParameter = p_ID_LoaiPhuongTien.HasValue ?
-                new ObjectParameter("p_ID_LoaiPhuongTien", p_ID_LoaiPhuongTien) :
-                new ObjectParameter("p_ID_LoaiPhuongTien", typeof(int));
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
     
-            var p_CapMoiParameter = p_CapMoi.HasValue ?
-                new ObjectParameter("p_CapMoi", p_CapMoi) :
-                new ObjectParameter("p_CapMoi", typeof(bool));
+            var nhanVienIDParameter = nhanVienID.HasValue ?
+                new ObjectParameter("NhanVienID", nhanVienID) :
+                new ObjectParameter("NhanVienID", typeof(int));
     
-            var p_CapLaiParameter = p_CapLai.HasValue ?
-                new ObjectParameter("p_CapLai", p_CapLai) :
-                new ObjectParameter("p_CapLai", typeof(bool));
+            var ngayDuyetParameter = ngayDuyet.HasValue ?
+                new ObjectParameter("NgayDuyet", ngayDuyet) :
+                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
     
-            var p_GiaHanParameter = p_GiaHan.HasValue ?
-                new ObjectParameter("p_GiaHan", p_GiaHan) :
-                new ObjectParameter("p_GiaHan", typeof(bool));
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
     
-            var p_TuNgayParameter = p_TuNgay.HasValue ?
-                new ObjectParameter("p_TuNgay", p_TuNgay) :
-                new ObjectParameter("p_TuNgay", typeof(System.DateTime));
-    
-            var p_DenNgayParameter = p_DenNgay.HasValue ?
-                new ObjectParameter("p_DenNgay", p_DenNgay) :
-                new ObjectParameter("p_DenNgay", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CDNT_ChiTietDon_Search", p_MaDonParameter, p_BienSoXeParameter, p_ID_LoaiPhuongTienParameter, p_CapMoiParameter, p_CapLaiParameter, p_GiaHanParameter, p_TuNgayParameter, p_DenNgayParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardExtend_Insert", gHTIDParameter, capDuyetParameter, tinhTrangIDParameter, nhanVienIDParameter, ngayDuyetParameter, ghiChuParameter);
         }
     
-        public virtual int CDNT_DonDangKi_Delete(string ma_Don)
+        public virtual int TK_CardExtend_UpdateTK(Nullable<int> iDTKGHT, Nullable<int> tinhTrangID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
         {
-            var ma_DonParameter = ma_Don != null ?
-                new ObjectParameter("Ma_Don", ma_Don) :
-                new ObjectParameter("Ma_Don", typeof(string));
+            var iDTKGHTParameter = iDTKGHT.HasValue ?
+                new ObjectParameter("IDTKGHT", iDTKGHT) :
+                new ObjectParameter("IDTKGHT", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CDNT_DonDangKi_Delete", ma_DonParameter);
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
+    
+            var ngayDuyetParameter = ngayDuyet.HasValue ?
+                new ObjectParameter("NgayDuyet", ngayDuyet) :
+                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
+    
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardExtend_UpdateTK", iDTKGHTParameter, tinhTrangIDParameter, ngayDuyetParameter, ghiChuParameter);
         }
     
-        public virtual ObjectResult<CDNT_DonDangKi_Detail_Result> CDNT_DonDangKi_Detail(string ma_Don)
+        public virtual int TK_CardRegistrationInfor_Cancel(Nullable<int> dKTID)
         {
-            var ma_DonParameter = ma_Don != null ?
-                new ObjectParameter("Ma_Don", ma_Don) :
-                new ObjectParameter("Ma_Don", typeof(string));
+            var dKTIDParameter = dKTID.HasValue ?
+                new ObjectParameter("DKTID", dKTID) :
+                new ObjectParameter("DKTID", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKi_Detail_Result>("CDNT_DonDangKi_Detail", ma_DonParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_Cancel", dKTIDParameter);
         }
     
-        public virtual ObjectResult<CDNT_DonDangKi_Insert_Result> CDNT_DonDangKi_Insert(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string jsonDanhSachXe)
+        public virtual int TK_CardRegistrationInfor_Insert(Nullable<int> dKTID, Nullable<int> capDuyet, Nullable<int> tinhTrangID, Nullable<int> nhanVienID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
         {
-            var p_Ma_DonParameter = p_Ma_Don != null ?
-                new ObjectParameter("p_Ma_Don", p_Ma_Don) :
-                new ObjectParameter("p_Ma_Don", typeof(string));
+            var dKTIDParameter = dKTID.HasValue ?
+                new ObjectParameter("DKTID", dKTID) :
+                new ObjectParameter("DKTID", typeof(int));
     
-            var p_NoiDungParameter = p_NoiDung != null ?
-                new ObjectParameter("p_NoiDung", p_NoiDung) :
-                new ObjectParameter("p_NoiDung", typeof(string));
+            var capDuyetParameter = capDuyet.HasValue ?
+                new ObjectParameter("CapDuyet", capDuyet) :
+                new ObjectParameter("CapDuyet", typeof(int));
     
-            var p_BPQL_IDParameter = p_BPQL_ID.HasValue ?
-                new ObjectParameter("p_BPQL_ID", p_BPQL_ID) :
-                new ObjectParameter("p_BPQL_ID", typeof(int));
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
     
-            var p_NhanVienNT_IDParameter = p_NhanVienNT_ID.HasValue ?
-                new ObjectParameter("p_NhanVienNT_ID", p_NhanVienNT_ID) :
-                new ObjectParameter("p_NhanVienNT_ID", typeof(int));
+            var nhanVienIDParameter = nhanVienID.HasValue ?
+                new ObjectParameter("NhanVienID", nhanVienID) :
+                new ObjectParameter("NhanVienID", typeof(int));
     
-            var p_NhaThau_IDParameter = p_NhaThau_ID.HasValue ?
-                new ObjectParameter("p_NhaThau_ID", p_NhaThau_ID) :
-                new ObjectParameter("p_NhaThau_ID", typeof(int));
+            var ngayDuyetParameter = ngayDuyet.HasValue ?
+                new ObjectParameter("NgayDuyet", ngayDuyet) :
+                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
     
-            var p_HopDongParameter = p_HopDong != null ?
-                new ObjectParameter("p_HopDong", p_HopDong) :
-                new ObjectParameter("p_HopDong", typeof(string));
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
     
-            var p_NgayTrinhKyParameter = p_NgayTrinhKy.HasValue ?
-                new ObjectParameter("p_NgayTrinhKy", p_NgayTrinhKy) :
-                new ObjectParameter("p_NgayTrinhKy", typeof(System.DateTime));
-    
-            var p_FileHoSoXeParameter = p_FileHoSoXe != null ?
-                new ObjectParameter("p_FileHoSoXe", p_FileHoSoXe) :
-                new ObjectParameter("p_FileHoSoXe", typeof(string));
-    
-            var p_TrinhKy_IDParameter = p_TrinhKy_ID.HasValue ?
-                new ObjectParameter("p_TrinhKy_ID", p_TrinhKy_ID) :
-                new ObjectParameter("p_TrinhKy_ID", typeof(int));
-    
-            var p_TinhTrang_IDParameter = p_TinhTrang_ID.HasValue ?
-                new ObjectParameter("p_TinhTrang_ID", p_TinhTrang_ID) :
-                new ObjectParameter("p_TinhTrang_ID", typeof(int));
-    
-            var p_LoaiNT_IDParameter = p_LoaiNT_ID.HasValue ?
-                new ObjectParameter("p_LoaiNT_ID", p_LoaiNT_ID) :
-                new ObjectParameter("p_LoaiNT_ID", typeof(int));
-    
-            var jsonDanhSachXeParameter = jsonDanhSachXe != null ?
-                new ObjectParameter("JsonDanhSachXe", jsonDanhSachXe) :
-                new ObjectParameter("JsonDanhSachXe", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKi_Insert_Result>("CDNT_DonDangKi_Insert", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, jsonDanhSachXeParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_Insert", dKTIDParameter, capDuyetParameter, tinhTrangIDParameter, nhanVienIDParameter, ngayDuyetParameter, ghiChuParameter);
         }
     
-        public virtual ObjectResult<CDNT_DonDangKi_Search_Result> CDNT_DonDangKi_Search(Nullable<System.DateTime> p_BeginDate, Nullable<System.DateTime> p_EndDate)
+        public virtual int TK_CardRegistrationInfor_UpdateTK(Nullable<int> iDTKDKT, Nullable<int> tinhTrangID, Nullable<System.DateTime> ngayDuyet, string ghiChu)
         {
-            var p_BeginDateParameter = p_BeginDate.HasValue ?
-                new ObjectParameter("p_BeginDate", p_BeginDate) :
-                new ObjectParameter("p_BeginDate", typeof(System.DateTime));
+            var iDTKDKTParameter = iDTKDKT.HasValue ?
+                new ObjectParameter("IDTKDKT", iDTKDKT) :
+                new ObjectParameter("IDTKDKT", typeof(int));
     
-            var p_EndDateParameter = p_EndDate.HasValue ?
-                new ObjectParameter("p_EndDate", p_EndDate) :
-                new ObjectParameter("p_EndDate", typeof(System.DateTime));
+            var tinhTrangIDParameter = tinhTrangID.HasValue ?
+                new ObjectParameter("TinhTrangID", tinhTrangID) :
+                new ObjectParameter("TinhTrangID", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKi_Search_Result>("CDNT_DonDangKi_Search", p_BeginDateParameter, p_EndDateParameter);
-        }
+            var ngayDuyetParameter = ngayDuyet.HasValue ?
+                new ObjectParameter("NgayDuyet", ngayDuyet) :
+                new ObjectParameter("NgayDuyet", typeof(System.DateTime));
     
-        public virtual ObjectResult<CDNT_DonDangKi_Update_Result> CDNT_DonDangKi_Update(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string p_CDNT_ChiTietDon)
-        {
-            var p_Ma_DonParameter = p_Ma_Don != null ?
-                new ObjectParameter("p_Ma_Don", p_Ma_Don) :
-                new ObjectParameter("p_Ma_Don", typeof(string));
+            var ghiChuParameter = ghiChu != null ?
+                new ObjectParameter("GhiChu", ghiChu) :
+                new ObjectParameter("GhiChu", typeof(string));
     
-            var p_NoiDungParameter = p_NoiDung != null ?
-                new ObjectParameter("p_NoiDung", p_NoiDung) :
-                new ObjectParameter("p_NoiDung", typeof(string));
-    
-            var p_BPQL_IDParameter = p_BPQL_ID.HasValue ?
-                new ObjectParameter("p_BPQL_ID", p_BPQL_ID) :
-                new ObjectParameter("p_BPQL_ID", typeof(int));
-    
-            var p_NhanVienNT_IDParameter = p_NhanVienNT_ID.HasValue ?
-                new ObjectParameter("p_NhanVienNT_ID", p_NhanVienNT_ID) :
-                new ObjectParameter("p_NhanVienNT_ID", typeof(int));
-    
-            var p_NhaThau_IDParameter = p_NhaThau_ID.HasValue ?
-                new ObjectParameter("p_NhaThau_ID", p_NhaThau_ID) :
-                new ObjectParameter("p_NhaThau_ID", typeof(int));
-    
-            var p_HopDongParameter = p_HopDong != null ?
-                new ObjectParameter("p_HopDong", p_HopDong) :
-                new ObjectParameter("p_HopDong", typeof(string));
-    
-            var p_NgayTrinhKyParameter = p_NgayTrinhKy.HasValue ?
-                new ObjectParameter("p_NgayTrinhKy", p_NgayTrinhKy) :
-                new ObjectParameter("p_NgayTrinhKy", typeof(System.DateTime));
-    
-            var p_FileHoSoXeParameter = p_FileHoSoXe != null ?
-                new ObjectParameter("p_FileHoSoXe", p_FileHoSoXe) :
-                new ObjectParameter("p_FileHoSoXe", typeof(string));
-    
-            var p_TrinhKy_IDParameter = p_TrinhKy_ID.HasValue ?
-                new ObjectParameter("p_TrinhKy_ID", p_TrinhKy_ID) :
-                new ObjectParameter("p_TrinhKy_ID", typeof(int));
-    
-            var p_TinhTrang_IDParameter = p_TinhTrang_ID.HasValue ?
-                new ObjectParameter("p_TinhTrang_ID", p_TinhTrang_ID) :
-                new ObjectParameter("p_TinhTrang_ID", typeof(int));
-    
-            var p_LoaiNT_IDParameter = p_LoaiNT_ID.HasValue ?
-                new ObjectParameter("p_LoaiNT_ID", p_LoaiNT_ID) :
-                new ObjectParameter("p_LoaiNT_ID", typeof(int));
-    
-            var p_CDNT_ChiTietDonParameter = p_CDNT_ChiTietDon != null ?
-                new ObjectParameter("p_CDNT_ChiTietDon", p_CDNT_ChiTietDon) :
-                new ObjectParameter("p_CDNT_ChiTietDon", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKi_Update_Result>("CDNT_DonDangKi_Update", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, p_CDNT_ChiTietDonParameter);
-        }
-    
-        public virtual int CDNT_DonDangKi_UpdateFull_XML(string ma_Don, string noiDung, Nullable<int> bPQL_ID, Nullable<int> nhanVienNT_ID, Nullable<int> nhaThau_ID, string hopDong, Nullable<System.DateTime> ngayTrinhKy, string fileHoSoXe, Nullable<int> trinhKy_ID, Nullable<int> tinhTrang_ID, Nullable<int> loaiNT_ID, string chiTiet_XML)
-        {
-            var ma_DonParameter = ma_Don != null ?
-                new ObjectParameter("Ma_Don", ma_Don) :
-                new ObjectParameter("Ma_Don", typeof(string));
-    
-            var noiDungParameter = noiDung != null ?
-                new ObjectParameter("NoiDung", noiDung) :
-                new ObjectParameter("NoiDung", typeof(string));
-    
-            var bPQL_IDParameter = bPQL_ID.HasValue ?
-                new ObjectParameter("BPQL_ID", bPQL_ID) :
-                new ObjectParameter("BPQL_ID", typeof(int));
-    
-            var nhanVienNT_IDParameter = nhanVienNT_ID.HasValue ?
-                new ObjectParameter("NhanVienNT_ID", nhanVienNT_ID) :
-                new ObjectParameter("NhanVienNT_ID", typeof(int));
-    
-            var nhaThau_IDParameter = nhaThau_ID.HasValue ?
-                new ObjectParameter("NhaThau_ID", nhaThau_ID) :
-                new ObjectParameter("NhaThau_ID", typeof(int));
-    
-            var hopDongParameter = hopDong != null ?
-                new ObjectParameter("HopDong", hopDong) :
-                new ObjectParameter("HopDong", typeof(string));
-    
-            var ngayTrinhKyParameter = ngayTrinhKy.HasValue ?
-                new ObjectParameter("NgayTrinhKy", ngayTrinhKy) :
-                new ObjectParameter("NgayTrinhKy", typeof(System.DateTime));
-    
-            var fileHoSoXeParameter = fileHoSoXe != null ?
-                new ObjectParameter("FileHoSoXe", fileHoSoXe) :
-                new ObjectParameter("FileHoSoXe", typeof(string));
-    
-            var trinhKy_IDParameter = trinhKy_ID.HasValue ?
-                new ObjectParameter("TrinhKy_ID", trinhKy_ID) :
-                new ObjectParameter("TrinhKy_ID", typeof(int));
-    
-            var tinhTrang_IDParameter = tinhTrang_ID.HasValue ?
-                new ObjectParameter("TinhTrang_ID", tinhTrang_ID) :
-                new ObjectParameter("TinhTrang_ID", typeof(int));
-    
-            var loaiNT_IDParameter = loaiNT_ID.HasValue ?
-                new ObjectParameter("LoaiNT_ID", loaiNT_ID) :
-                new ObjectParameter("LoaiNT_ID", typeof(int));
-    
-            var chiTiet_XMLParameter = chiTiet_XML != null ?
-                new ObjectParameter("ChiTiet_XML", chiTiet_XML) :
-                new ObjectParameter("ChiTiet_XML", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CDNT_DonDangKi_UpdateFull_XML", ma_DonParameter, noiDungParameter, bPQL_IDParameter, nhanVienNT_IDParameter, nhaThau_IDParameter, hopDongParameter, ngayTrinhKyParameter, fileHoSoXeParameter, trinhKy_IDParameter, tinhTrang_IDParameter, loaiNT_IDParameter, chiTiet_XMLParameter);
-        }
-    
-        public virtual ObjectResult<CDNT_DonDangKy_Insert_Result> CDNT_DonDangKy_Insert(string p_Ma_Don, string p_NoiDung, Nullable<int> p_BPQL_ID, Nullable<int> p_NhanVienNT_ID, Nullable<int> p_NhaThau_ID, string p_HopDong, Nullable<System.DateTime> p_NgayTrinhKy, string p_FileHoSoXe, Nullable<int> p_TrinhKy_ID, Nullable<int> p_TinhTrang_ID, Nullable<int> p_LoaiNT_ID, string p_UserNameLogin, string jsonDanhSachXe)
-        {
-            var p_Ma_DonParameter = p_Ma_Don != null ?
-                new ObjectParameter("p_Ma_Don", p_Ma_Don) :
-                new ObjectParameter("p_Ma_Don", typeof(string));
-    
-            var p_NoiDungParameter = p_NoiDung != null ?
-                new ObjectParameter("p_NoiDung", p_NoiDung) :
-                new ObjectParameter("p_NoiDung", typeof(string));
-    
-            var p_BPQL_IDParameter = p_BPQL_ID.HasValue ?
-                new ObjectParameter("p_BPQL_ID", p_BPQL_ID) :
-                new ObjectParameter("p_BPQL_ID", typeof(int));
-    
-            var p_NhanVienNT_IDParameter = p_NhanVienNT_ID.HasValue ?
-                new ObjectParameter("p_NhanVienNT_ID", p_NhanVienNT_ID) :
-                new ObjectParameter("p_NhanVienNT_ID", typeof(int));
-    
-            var p_NhaThau_IDParameter = p_NhaThau_ID.HasValue ?
-                new ObjectParameter("p_NhaThau_ID", p_NhaThau_ID) :
-                new ObjectParameter("p_NhaThau_ID", typeof(int));
-    
-            var p_HopDongParameter = p_HopDong != null ?
-                new ObjectParameter("p_HopDong", p_HopDong) :
-                new ObjectParameter("p_HopDong", typeof(string));
-    
-            var p_NgayTrinhKyParameter = p_NgayTrinhKy.HasValue ?
-                new ObjectParameter("p_NgayTrinhKy", p_NgayTrinhKy) :
-                new ObjectParameter("p_NgayTrinhKy", typeof(System.DateTime));
-    
-            var p_FileHoSoXeParameter = p_FileHoSoXe != null ?
-                new ObjectParameter("p_FileHoSoXe", p_FileHoSoXe) :
-                new ObjectParameter("p_FileHoSoXe", typeof(string));
-    
-            var p_TrinhKy_IDParameter = p_TrinhKy_ID.HasValue ?
-                new ObjectParameter("p_TrinhKy_ID", p_TrinhKy_ID) :
-                new ObjectParameter("p_TrinhKy_ID", typeof(int));
-    
-            var p_TinhTrang_IDParameter = p_TinhTrang_ID.HasValue ?
-                new ObjectParameter("p_TinhTrang_ID", p_TinhTrang_ID) :
-                new ObjectParameter("p_TinhTrang_ID", typeof(int));
-    
-            var p_LoaiNT_IDParameter = p_LoaiNT_ID.HasValue ?
-                new ObjectParameter("p_LoaiNT_ID", p_LoaiNT_ID) :
-                new ObjectParameter("p_LoaiNT_ID", typeof(int));
-    
-            var p_UserNameLoginParameter = p_UserNameLogin != null ?
-                new ObjectParameter("p_UserNameLogin", p_UserNameLogin) :
-                new ObjectParameter("p_UserNameLogin", typeof(string));
-    
-            var jsonDanhSachXeParameter = jsonDanhSachXe != null ?
-                new ObjectParameter("JsonDanhSachXe", jsonDanhSachXe) :
-                new ObjectParameter("JsonDanhSachXe", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Insert_Result>("CDNT_DonDangKy_Insert", p_Ma_DonParameter, p_NoiDungParameter, p_BPQL_IDParameter, p_NhanVienNT_IDParameter, p_NhaThau_IDParameter, p_HopDongParameter, p_NgayTrinhKyParameter, p_FileHoSoXeParameter, p_TrinhKy_IDParameter, p_TinhTrang_IDParameter, p_LoaiNT_IDParameter, p_UserNameLoginParameter, jsonDanhSachXeParameter);
-        }
-    
-        public virtual ObjectResult<CDNT_DonDangKy_Search_Result> CDNT_DonDangKy_Search(Nullable<System.DateTime> p_BeginDate, Nullable<System.DateTime> p_EndDate, string p_MaPhieu)
-        {
-            var p_BeginDateParameter = p_BeginDate.HasValue ?
-                new ObjectParameter("p_BeginDate", p_BeginDate) :
-                new ObjectParameter("p_BeginDate", typeof(System.DateTime));
-    
-            var p_EndDateParameter = p_EndDate.HasValue ?
-                new ObjectParameter("p_EndDate", p_EndDate) :
-                new ObjectParameter("p_EndDate", typeof(System.DateTime));
-    
-            var p_MaPhieuParameter = p_MaPhieu != null ?
-                new ObjectParameter("p_MaPhieu", p_MaPhieu) :
-                new ObjectParameter("p_MaPhieu", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_DonDangKy_Search_Result>("CDNT_DonDangKy_Search", p_BeginDateParameter, p_EndDateParameter, p_MaPhieuParameter);
-        }
-    
-        public virtual int CNDT_GetDinhBienPhuongTien(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan, ObjectParameter p_XeMay_DaCap, ObjectParameter p_Xe3Gac_DaCap, ObjectParameter p_XeMay_ToiDa, ObjectParameter p_Xe3Gac_ToiDa, ObjectParameter p_XeMay_ConLai, ObjectParameter p_Xe3Gac_ConLai)
-        {
-            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
-                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
-                new ObjectParameter("p_NhaThauID", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CNDT_GetDinhBienPhuongTien", p_NhaThauIDParameter, p_SoQuanLy, p_SoCongNhan, p_XeMay_DaCap, p_Xe3Gac_DaCap, p_XeMay_ToiDa, p_Xe3Gac_ToiDa, p_XeMay_ConLai, p_Xe3Gac_ConLai);
-        }
-    
-        public virtual int CNDT_GetNhanSuTheoChucVu(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan)
-        {
-            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
-                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
-                new ObjectParameter("p_NhaThauID", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CNDT_GetNhanSuTheoChucVu", p_NhaThauIDParameter, p_SoQuanLy, p_SoCongNhan);
-        }
-    
-        public virtual ObjectResult<CDNT_TrinhKy_Detail_Result> CDNT_TrinhKy_Detail(string maDon)
-        {
-            var maDonParameter = maDon != null ?
-                new ObjectParameter("MaDon", maDon) :
-                new ObjectParameter("MaDon", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_TrinhKy_Detail_Result>("CDNT_TrinhKy_Detail", maDonParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_UpdateTK", iDTKDKTParameter, tinhTrangIDParameter, ngayDuyetParameter, ghiChuParameter);
         }
     }
 }

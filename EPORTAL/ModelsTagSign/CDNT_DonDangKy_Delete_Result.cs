@@ -11,10 +11,9 @@ namespace EPORTAL.ModelsTagSign
 {
     using System;
     
-    public partial class CDNT_DonDangKi_Update_Result
+    public partial class CDNT_DonDangKy_Delete_Result
     {
         public int Result { get; set; }
         public string Message { get; set; }
-        public string MaDon { get; set; }
     }
 }

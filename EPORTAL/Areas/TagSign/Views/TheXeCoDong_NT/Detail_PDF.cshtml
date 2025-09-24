@@ -18,6 +18,14 @@
 {
     @Html.Raw(TempData["msgError"])
 }
+@using System.Linq
+@{
+    var hasTrinhKy = (Model != null && Model.TrinhKy != null);
+
+    var cpt = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 2) : null;
+    var bpql = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 1) : null;
+    var nhathau = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 0) : null;
+}
 <meta charset="utf-8" />
 <style>
     .custom-table {
@@ -144,12 +152,12 @@
                 </div>
 
 
-                @{
+                @*@{
                     // Ví dụ: CapDuyet = 1: CPT, 2: BP quản lý, 3: Nhà thầu
                     var cpt = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 2);
                     var bpql = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 1);
                     var nhathau = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 0);
-                }
+                }*@
                 @{
                     string baseUrl = "https://portal.hoaphatdungquat.vn";
                 }
@@ -196,8 +204,8 @@
                     </tr>
                     <tr>
                         @*<td>@(cpt?.TenNguoiDuyet ?? "")</td>
-                <td>@(bpql?.TenNguoiDuyet ?? "")</td>
-                <td>@(nhathau?.TenNguoiDuyet ?? "")</td>*@
+                            <td>@(bpql?.TenNguoiDuyet ?? "")</td>
+                            <td>@(nhathau?.TenNguoiDuyet ?? "")</td>*@
                     </tr>
                 </table>
                 <div class="col-md-12 pt-5" style="width:100%">

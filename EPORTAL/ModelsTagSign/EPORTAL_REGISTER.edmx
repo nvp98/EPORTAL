@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="EPORTAL_REGISTERModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="EPORTAL_REGISTERModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="CDNT_ChiTietDon">
           <Key>
             <PropertyRef Name="ID" />
@@ -68,6 +68,27 @@
           <Property Name="NgayDuyet" Type="datetime" />
           <Property Name="TinhTrang_ID" Type="int" />
           <Property Name="GhiChu" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="CDNT_XeCoDong">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID_NT" Type="int" />
+          <Property Name="BP_ID" Type="int" />
+          <Property Name="TenNhaThau" Type="nvarchar" MaxLength="255" />
+          <Property Name="TenDayDu" Type="nvarchar" MaxLength="255" />
+          <Property Name="HoVaTen" Type="nvarchar" MaxLength="255" />
+          <Property Name="CMND_CCCD" Type="nvarchar" MaxLength="50" />
+          <Property Name="BienSoXe" Type="nvarchar" MaxLength="15" />
+          <Property Name="LoaiPhuongTien" Type="nvarchar" MaxLength="100" />
+          <Property Name="LoaiPhuongTien_ID" Type="int" />
+          <Property Name="Hang" Type="nvarchar" MaxLength="100" />
+          <Property Name="Dong" Type="nvarchar" MaxLength="100" />
+          <Property Name="MauSac" Type="nvarchar" MaxLength="100" />
+          <Property Name="TuNgay" Type="datetime" />
+          <Property Name="DenNgay" Type="datetime" />
+          <Property Name="TinhTrang" Type="bit" />
         </EntityType>
         <EntityType Name="Detail_RegisterPeople">
           <Key>
@@ -268,6 +289,12 @@
           <Parameter Name="LoaiNT_ID" Type="int" Mode="In" />
           <Parameter Name="ChiTiet_XML" Type="xml" Mode="In" />
         </Function>
+        <Function Name="CDNT_DonDangKy_Delete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Ma_Don" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CDNT_DonDangKy_Detail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Ma_Don" Type="nvarchar" Mode="In" />
+        </Function>
         <Function Name="CDNT_DonDangKy_Insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="p_Ma_Don" Type="nvarchar" Mode="In" />
           <Parameter Name="p_NoiDung" Type="nvarchar(max)" Mode="In" />
@@ -283,13 +310,45 @@
           <Parameter Name="p_UserNameLogin" Type="nvarchar" Mode="In" />
           <Parameter Name="JsonDanhSachXe" Type="nvarchar(max)" Mode="In" />
         </Function>
+        <Function Name="CDNT_DonDangKy_PDF" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Ma_Don" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CDNT_DonDangKy_PDF_test" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Ma_Don" Type="nvarchar" Mode="In" />
+        </Function>
         <Function Name="CDNT_DonDangKy_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="p_BeginDate" Type="date" Mode="In" />
           <Parameter Name="p_EndDate" Type="date" Mode="In" />
           <Parameter Name="p_MaPhieu" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_UserNameLogin" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CDNT_DonDangKy_Update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_Ma_Don" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_NoiDung" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="p_BPQL_ID" Type="int" Mode="In" />
+          <Parameter Name="p_NhanVienNT_ID" Type="int" Mode="In" />
+          <Parameter Name="p_NhaThau_ID" Type="int" Mode="In" />
+          <Parameter Name="p_HopDong" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_NgayTrinhKy" Type="date" Mode="In" />
+          <Parameter Name="p_FileHoSoXe" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="p_TrinhKy_ID" Type="int" Mode="In" />
+          <Parameter Name="p_TinhTrang_ID" Type="int" Mode="In" />
+          <Parameter Name="p_LoaiNT_ID" Type="int" Mode="In" />
+          <Parameter Name="p_CDNT_ChiTietDon" Type="xml" Mode="In" />
         </Function>
         <Function Name="CDNT_TrinhKy_Detail" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="MaDon" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="CDNT_XeCoDong_Search" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_ID_NT" Type="int" Mode="In" />
+          <Parameter Name="p_BP_ID" Type="int" Mode="In" />
+          <Parameter Name="p_TenDayDu" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_TenNhaThau" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_LoaiPhuongTien_ID" Type="int" Mode="In" />
+          <Parameter Name="p_BienSoXe" Type="nvarchar" Mode="In" />
+          <Parameter Name="p_TinhTrang" Type="int" Mode="In" />
+          <Parameter Name="p_TuNgay" Type="date" Mode="In" />
+          <Parameter Name="p_DenNgay" Type="date" Mode="In" />
         </Function>
         <Function Name="CNDT_GetDinhBienPhuongTien" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="p_NhaThauID" Type="int" Mode="In" />
@@ -608,6 +667,7 @@
           <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="Self.CDNT_LoaiPhuongTien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_TinhTrang" EntityType="Self.CDNT_TinhTrang" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_TrinhKy" EntityType="Self.CDNT_TrinhKy" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_XeCoDong" EntityType="Self.CDNT_XeCoDong" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Detail_RegisterPeople" EntityType="Self.Detail_RegisterPeople" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DK_CardExtend" EntityType="Self.DK_CardExtend" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DK_CardRegistrationInfor" EntityType="Self.DK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
@@ -620,10 +680,141 @@
           <EntitySet Name="TK_CardExtend" EntityType="Self.TK_CardExtend" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TK_CardRegistrationInfor" EntityType="Self.TK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="EPORTAL_REGISTERModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="CDNT_ChiTietDon">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ID_LoaiPhuongTien" Type="Int32" />
+          <Property Name="BienSoXe" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="CapMoi" Type="Boolean" />
+          <Property Name="CapLai" Type="Boolean" />
+          <Property Name="GiaHan" Type="Boolean" />
+          <Property Name="TuNgay" Type="DateTime" Precision="0" />
+          <Property Name="DenNgay" Type="DateTime" Precision="0" />
+          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="HoSoTheoXe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NguoiDuyet_ID" Type="Int32" />
+          <Property Name="TrangThaiDuyet_ID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="CDNT_DonDangKy">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NoiDung" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="BPQL_ID" Type="Int32" />
+          <Property Name="NhanVienNT_ID" Type="Int32" />
+          <Property Name="NhaThau_ID" Type="Int32" />
+          <Property Name="HopDong" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="NgayTrinhKy" Type="DateTime" Precision="0" />
+          <Property Name="FileHoSoXe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TrinhKy_ID" Type="Int32" />
+          <Property Name="TinhTrang_ID" Type="Int32" />
+          <Property Name="LoaiNT_ID" Type="Int32" />
+          <Property Name="TinhTrangDuyet_ID" Type="Int32" />
+          <Property Name="ThoiGianDuyet" Type="DateTime" Precision="3" />
+          <Property Name="UserNameLogin" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_LoaiPhuongTien">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LoaiPhuongTien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_TinhTrang">
+          <Key>
+            <PropertyRef Name="TinhTrang_ID" />
+          </Key>
+          <Property Name="TinhTrang_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenTinhTrang" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_TrinhKy">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CapDuyet" Type="Int32" />
+          <Property Name="NguoiDuyet_ID" Type="Int32" />
+          <Property Name="NgayDuyet" Type="DateTime" Precision="3" />
+          <Property Name="TinhTrang_ID" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_XeCoDong">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ID_NT" Type="Int32" />
+          <Property Name="BP_ID" Type="Int32" />
+          <Property Name="TenNhaThau" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="TenDayDu" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="HoVaTen" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CMND_CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="BienSoXe" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiPhuongTien" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiPhuongTien_ID" Type="Int32" />
+          <Property Name="Hang" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Dong" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MauSac" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="TuNgay" Type="DateTime" Precision="3" />
+          <Property Name="DenNgay" Type="DateTime" Precision="3" />
+          <Property Name="TinhTrang" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="Detail_RegisterPeople">
+          <Key>
+            <PropertyRef Name="ID_CT_DKTN" />
+          </Key>
+          <Property Name="ID_CT_DKTN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DKTN_ID" Type="Int32" />
+          <Property Name="HoVaTen" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="NgaySinh" Type="DateTime" Precision="0" />
+          <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="HoKhau" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CV_ID" Type="Int32" />
+          <Property Name="SoDienThoai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Ten_NTP" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="HoTen_QuanLy" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="SoDienThoai_QuanLy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CapMoi" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GiaHan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="BoSungCong" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CapLai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ChuyenNT" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ThoiHanThe" Type="DateTime" Precision="0" />
+          <Property Name="KhuVucLamViec" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CongLamViec" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NhomNT" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Price" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DienThoaiThongMinh" Type="Int32" />
+          <Property Name="GhiChuHPDQ" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="DK_CardExtend">
+          <Key>
+            <PropertyRef Name="IDGHT" />
+          </Key>
+          <Property Name="IDGHT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NoiDung" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="NTID" Type="Int32" />
+          <Property Name="HDID" Type="Int32" />
+          <Property Name="PhongBanID" Type="Int32" />
+          <Property Name="NgayDangKy" Type="DateTime" Precision="0" />
+          <Property Name="NhanVienID" Type="Int32" />
+          <Property Name="TinhTrangID" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="LoaiNT" Type="Int32" />
+          <Property Name="FileComplete" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
         <EntityType Name="DK_CardRegistrationInfor">
           <Key>
             <PropertyRef Name="IDDKT" />
@@ -640,6 +831,29 @@
           <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="LoaiNT" Type="Int32" />
           <Property Name="FileComplete" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="DK_DetailCardExtend">
+          <Key>
+            <PropertyRef Name="IDCTGH" />
+          </Key>
+          <Property Name="IDCTGH" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="HoTen" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="NgaySinh" Type="DateTime" Precision="0" />
+          <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="HoKhau" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ChucVu" Type="Int32" />
+          <Property Name="SoDienThoai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CapLai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GiaHan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ThongTinLuuTru" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DTTM" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="RaVaoCang" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ThoiHanThe" Type="DateTime" Precision="0" />
+          <Property Name="KhuVucLamViec" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Cong" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="NhomNT" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IDGHT" Type="Int32" />
         </EntityType>
         <EntityType Name="DK_DetailCardRegistrationInfor">
           <Key>
@@ -663,209 +877,195 @@
           <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="IDDKT" Type="Int32" />
         </EntityType>
+        <EntityType Name="Flow">
+          <Key>
+            <PropertyRef Name="ID_XL" />
+          </Key>
+          <Property Name="ID_XL" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenXuLy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RegisterPeople">
+          <Key>
+            <PropertyRef Name="ID_DKTN" />
+          </Key>
+          <Property Name="ID_DKTN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NoiDung" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="BPQL_ID" Type="Int32" />
+          <Property Name="NhanVienNT_ID" Type="Int32" />
+          <Property Name="NhaThau_ID" Type="Int32" />
+          <Property Name="HopDong" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="NgayTrinhKy" Type="DateTime" Precision="0" />
+          <Property Name="File_CCAT" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="File_IMG" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TrinhKy_ID" Type="Int32" />
+          <Property Name="TinhTrang_ID" Type="Int32" />
+          <Property Name="LoaiNT_ID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="SignerType">
+          <Key>
+            <PropertyRef Name="ID_LTK" />
+          </Key>
+          <Property Name="ID_LTK" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TenLoai" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="SignOff_Flow">
+          <Key>
+            <PropertyRef Name="ID_TK_TN" />
+          </Key>
+          <Property Name="ID_TK_TN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DKTN_ID" Type="Int32" />
+          <Property Name="CapDuyet" Type="Int32" />
+          <Property Name="LuongXuLy" Type="Int32" />
+          <Property Name="NhanVienID" Type="Int32" />
+          <Property Name="NgayDuyet" Type="DateTime" Precision="3" />
+          <Property Name="TinhTrangID" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="TK_CardExtend">
+          <Key>
+            <PropertyRef Name="IDTKGHT" />
+          </Key>
+          <Property Name="IDTKGHT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GHTID" Type="Int32" />
+          <Property Name="CapDuyet" Type="Int32" />
+          <Property Name="TinhTrangID" Type="Int32" />
+          <Property Name="NhanVienID" Type="Int32" />
+          <Property Name="NgayDuyet" Type="DateTime" Precision="0" />
+          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="TK_CardRegistrationInfor">
+          <Key>
+            <PropertyRef Name="IDTKDKT" />
+          </Key>
+          <Property Name="IDTKDKT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DKTID" Type="Int32" />
+          <Property Name="CapDuyet" Type="Int32" />
+          <Property Name="TinhTrangID" Type="Int32" />
+          <Property Name="NhanVienID" Type="Int32" />
+          <Property Name="NgayDuyet" Type="DateTime" Precision="0" />
+          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
         <EntityContainer Name="EPORTAL_REGISTEREntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CDNT_ChiTietDon" EntityType="Self.CDNT_ChiTietDon" />
+          <EntitySet Name="CDNT_DonDangKy" EntityType="Self.CDNT_DonDangKy" />
+          <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="Self.CDNT_LoaiPhuongTien" />
+          <EntitySet Name="CDNT_TinhTrang" EntityType="Self.CDNT_TinhTrang" />
+          <EntitySet Name="CDNT_TrinhKy" EntityType="Self.CDNT_TrinhKy" />
+          <EntitySet Name="CDNT_XeCoDong" EntityType="Self.CDNT_XeCoDong" />
+          <EntitySet Name="Detail_RegisterPeople" EntityType="Self.Detail_RegisterPeople" />
+          <EntitySet Name="DK_CardExtend" EntityType="Self.DK_CardExtend" />
           <EntitySet Name="DK_CardRegistrationInfor" EntityType="Self.DK_CardRegistrationInfor" />
+          <EntitySet Name="DK_DetailCardExtend" EntityType="Self.DK_DetailCardExtend" />
           <EntitySet Name="DK_DetailCardRegistrationInfor" EntityType="Self.DK_DetailCardRegistrationInfor" />
-          <FunctionImport Name="DK_CardRegistrationInfor_Delete">
-          <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+          <EntitySet Name="Flows" EntityType="Self.Flow" />
+          <EntitySet Name="RegisterPeoples" EntityType="Self.RegisterPeople" />
+          <EntitySet Name="SignerTypes" EntityType="Self.SignerType" />
+          <EntitySet Name="SignOff_Flow" EntityType="Self.SignOff_Flow" />
+          <EntitySet Name="TK_CardExtend" EntityType="Self.TK_CardExtend" />
+          <EntitySet Name="TK_CardRegistrationInfor" EntityType="Self.TK_CardRegistrationInfor" />
+          <FunctionImport Name="CDNT_ChiTietDon_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_ChiTietDon_Search_Result)">
+            <Parameter Name="p_MaDon" Mode="In" Type="String" />
+            <Parameter Name="p_BienSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_ID_LoaiPhuongTien" Mode="In" Type="Int32" />
+            <Parameter Name="p_CapMoi" Mode="In" Type="Boolean" />
+            <Parameter Name="p_CapLai" Mode="In" Type="Boolean" />
+            <Parameter Name="p_GiaHan" Mode="In" Type="Boolean" />
+            <Parameter Name="p_TuNgay" Mode="In" Type="DateTime" />
+            <Parameter Name="p_DenNgay" Mode="In" Type="DateTime" />
           </FunctionImport>
-          <FunctionImport Name="DK_CardRegistrationInfor_Insert">
+          <FunctionImport Name="CDNT_DonDangKi_UpdateFull_XML">
+            <Parameter Name="Ma_Don" Mode="In" Type="String" />
             <Parameter Name="NoiDung" Mode="In" Type="String" />
-            <Parameter Name="NTID" Mode="In" Type="Int32" />
-            <Parameter Name="HDID" Mode="In" Type="Int32" />
-            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-            <Parameter Name="FileUpload" Mode="In" Type="String" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
-            <Parameter Name="FileComplete" Mode="In" Type="String" />
-            <Parameter Name="IDDKT" Mode="InOut" Type="Int32" />
+            <Parameter Name="BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="HopDong" Mode="In" Type="String" />
+            <Parameter Name="NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="ChiTiet_XML" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_CardRegistrationInfor_Update">
-            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
-            <Parameter Name="NoiDung" Mode="In" Type="String" />
-            <Parameter Name="NTID" Mode="In" Type="Int32" />
-            <Parameter Name="HDID" Mode="In" Type="Int32" />
-            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
-            <Parameter Name="FileUpload" Mode="In" Type="String" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_Delete" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Delete_Result)">
+            <Parameter Name="Ma_Don" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_DetailCardRegistrationInfor_Delete">
-          <Parameter Name="IDCTDK" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Detail_Result)">
+            <Parameter Name="Ma_Don" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_DetailCardRegistrationInfor_Insert">
-            <Parameter Name="HoTen" Mode="In" Type="String" />
-            <Parameter Name="CCCD" Mode="In" Type="String" />
-            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
-            <Parameter Name="HoKhau" Mode="In" Type="String" />
-            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
-            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
-            <Parameter Name="TheLuuTru" Mode="In" Type="String" />
-            <Parameter Name="TheRaVaoKLH" Mode="In" Type="String" />
-            <Parameter Name="DienThoaiTM" Mode="In" Type="String" />
-            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
-            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
-            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
-            <Parameter Name="Cong" Mode="In" Type="String" />
-            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_Insert" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Insert_Result)">
+            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
+            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
+            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_HopDong" Mode="In" Type="String" />
+            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_UserNameLogin" Mode="In" Type="String" />
+            <Parameter Name="JsonDanhSachXe" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_DetailCardRegistrationInfor_Update">
-            <Parameter Name="IDCTDK" Mode="In" Type="Int32" />
-            <Parameter Name="HoTen" Mode="In" Type="String" />
-            <Parameter Name="CCCD" Mode="In" Type="String" />
-            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
-            <Parameter Name="HoKhau" Mode="In" Type="String" />
-            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
-            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
-            <Parameter Name="TheLuuTru" Mode="In" Type="String" />
-            <Parameter Name="TheRaVaoKLH" Mode="In" Type="String" />
-            <Parameter Name="DienThoaiTM" Mode="In" Type="String" />
-            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
-            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
-            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
-            <Parameter Name="Cong" Mode="In" Type="String" />
-            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_PDF" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_PDF_Result)">
+            <Parameter Name="Ma_Don" Mode="In" Type="String" />
           </FunctionImport>
-          <EntitySet Name="DK_CardExtend" EntityType="EPORTAL_REGISTERModel.DK_CardExtend" />
-          <EntitySet Name="DK_DetailCardExtend" EntityType="EPORTAL_REGISTERModel.DK_DetailCardExtend" />
-          <FunctionImport Name="DK_CardExtend_Delete">
-          <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_PDF_test" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_PDF_test_Result)">
+            <Parameter Name="Ma_Don" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_CardExtend_Insert">
-            <Parameter Name="NoiDung" Mode="In" Type="String" />
-            <Parameter Name="NTID" Mode="In" Type="Int32" />
-            <Parameter Name="HDID" Mode="In" Type="Int32" />
-            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
-            <Parameter Name="FileComplete" Mode="In" Type="String" />
-            <Parameter Name="IDGHT" Mode="InOut" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Search_Result)">
+            <Parameter Name="p_BeginDate" Mode="In" Type="DateTime" />
+            <Parameter Name="p_EndDate" Mode="In" Type="DateTime" />
+            <Parameter Name="p_MaPhieu" Mode="In" Type="String" />
+            <Parameter Name="p_UserNameLogin" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_CardExtend_Update">
-            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
-            <Parameter Name="NoiDung" Mode="In" Type="String" />
-            <Parameter Name="NTID" Mode="In" Type="Int32" />
-            <Parameter Name="HDID" Mode="In" Type="Int32" />
-            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_DonDangKy_Update">
+            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
+            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
+            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_HopDong" Mode="In" Type="String" />
+            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
+            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_CDNT_ChiTietDon" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_DetailCardExtend_Delete">
-          <Parameter Name="IDCTGH" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_TrinhKy_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_TrinhKy_Detail_Result)">
+            <Parameter Name="MaDon" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="DK_DetailCardExtend_Insert">
-            <Parameter Name="HoTen" Mode="In" Type="String" />
-            <Parameter Name="CCCD" Mode="In" Type="String" />
-            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
-            <Parameter Name="HoKhau" Mode="In" Type="String" />
-            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
-            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
-            <Parameter Name="CapLai" Mode="In" Type="String" />
-            <Parameter Name="GiaHan" Mode="In" Type="String" />
-            <Parameter Name="ThongTinLuuTru" Mode="In" Type="String" />
-            <Parameter Name="DTTM" Mode="In" Type="String" />
-            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
-            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
-            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
-            <Parameter Name="Cong" Mode="In" Type="String" />
-            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CDNT_XeCoDong_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_XeCoDong_Search_Result)">
+            <Parameter Name="p_ID_NT" Mode="In" Type="Int32" />
+            <Parameter Name="p_BP_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_TenDayDu" Mode="In" Type="String" />
+            <Parameter Name="p_TenNhaThau" Mode="In" Type="String" />
+            <Parameter Name="p_LoaiPhuongTien_ID" Mode="In" Type="Int32" />
+            <Parameter Name="p_BienSoXe" Mode="In" Type="String" />
+            <Parameter Name="p_TinhTrang" Mode="In" Type="Int32" />
+            <Parameter Name="p_TuNgay" Mode="In" Type="DateTime" />
+            <Parameter Name="p_DenNgay" Mode="In" Type="DateTime" />
           </FunctionImport>
-          <FunctionImport Name="DK_DetailCardExtend_Update">
-            <Parameter Name="IDCTGH" Mode="In" Type="Int32" />
-            <Parameter Name="HoTen" Mode="In" Type="String" />
-            <Parameter Name="CCCD" Mode="In" Type="String" />
-            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
-            <Parameter Name="HoKhau" Mode="In" Type="String" />
-            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
-            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
-            <Parameter Name="CapLai" Mode="In" Type="String" />
-            <Parameter Name="GiaHan" Mode="In" Type="String" />
-            <Parameter Name="ThongTinLuuTru" Mode="In" Type="String" />
-            <Parameter Name="DTTM" Mode="In" Type="String" />
-            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
-            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
-            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
-            <Parameter Name="Cong" Mode="In" Type="String" />
-            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+          <FunctionImport Name="CNDT_GetDinhBienPhuongTien">
+            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+            <Parameter Name="p_SoQuanLy" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_SoCongNhan" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_XeMay_DaCap" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_Xe3Gac_DaCap" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_XeMay_ToiDa" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_Xe3Gac_ToiDa" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_XeMay_ConLai" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_Xe3Gac_ConLai" Mode="InOut" Type="Int32" />
           </FunctionImport>
-          <EntitySet Name="TK_CardExtend" EntityType="EPORTAL_REGISTERModel.TK_CardExtend" />
-          <EntitySet Name="TK_CardRegistrationInfor" EntityType="EPORTAL_REGISTERModel.TK_CardRegistrationInfor" />
-          <FunctionImport Name="TK_CardRegistrationInfor_Insert">
-            <Parameter Name="DKTID" Mode="In" Type="Int32" />
-            <Parameter Name="CapDuyet" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
+          <FunctionImport Name="CNDT_GetNhanSuTheoChucVu">
+            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+            <Parameter Name="p_SoQuanLy" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_SoCongNhan" Mode="InOut" Type="Int32" />
           </FunctionImport>
-          <FunctionImport Name="DK_CardRegistrationInfor_UpdateTK">
-            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="TK_CardRegistrationInfor_UpdateTK">
-            <Parameter Name="IDTKDKT" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="TK_CardRegistrationInfor_Cancel">
-          <Parameter Name="DKTID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="DK_CardExtend_UpdateTK">
-            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="TK_CardExtend_Cancel">
-          <Parameter Name="GHTID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="TK_CardExtend_Insert">
-            <Parameter Name="GHTID" Mode="In" Type="Int32" />
-            <Parameter Name="CapDuyet" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="TK_CardExtend_UpdateTK">
-            <Parameter Name="IDTKGHT" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
-            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
-            <Parameter Name="GhiChu" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="DK_CardExtend_Up">
-            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
-            <Parameter Name="FileComplete" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="DK_CardRegistrationInfor_Up">
-            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
-            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
-            <Parameter Name="FileUpload" Mode="In" Type="String" />
-            <Parameter Name="FileComplete" Mode="In" Type="String" />
-          </FunctionImport>
-          <EntitySet Name="Detail_RegisterPeople" EntityType="EPORTAL_REGISTERModel.Detail_RegisterPeople" />
-          <EntitySet Name="Flows" EntityType="EPORTAL_REGISTERModel.Flow" />
-          <EntitySet Name="RegisterPeoples" EntityType="EPORTAL_REGISTERModel.RegisterPeople" />
-          <EntitySet Name="SignerTypes" EntityType="EPORTAL_REGISTERModel.SignerType" />
-          <EntitySet Name="SignOff_Flow" EntityType="EPORTAL_REGISTERModel.SignOff_Flow" />
           <FunctionImport Name="Detail_RegisterPeople_Delete">
-          <Parameter Name="ID_CT_DKTN" Mode="In" Type="Int32" />
+            <Parameter Name="ID_CT_DKTN" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="Detail_RegisterPeople_Insert">
             <Parameter Name="DKTN_ID" Mode="In" Type="Int32" />
@@ -919,8 +1119,163 @@
             <Parameter Name="DienThoaiThongMinh" Mode="In" Type="Int32" />
             <Parameter Name="GhiChuHPDQ" Mode="In" Type="String" />
           </FunctionImport>
+          <FunctionImport Name="DK_CardExtend_Delete">
+            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardExtend_Insert">
+            <Parameter Name="NoiDung" Mode="In" Type="String" />
+            <Parameter Name="NTID" Mode="In" Type="Int32" />
+            <Parameter Name="HDID" Mode="In" Type="Int32" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
+            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
+            <Parameter Name="FileComplete" Mode="In" Type="String" />
+            <Parameter Name="IDGHT" Mode="InOut" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardExtend_Up">
+            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+            <Parameter Name="FileComplete" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardExtend_Update">
+            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+            <Parameter Name="NoiDung" Mode="In" Type="String" />
+            <Parameter Name="NTID" Mode="In" Type="Int32" />
+            <Parameter Name="HDID" Mode="In" Type="Int32" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardExtend_UpdateTK">
+            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardRegistrationInfor_Delete">
+            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardRegistrationInfor_Insert">
+            <Parameter Name="NoiDung" Mode="In" Type="String" />
+            <Parameter Name="NTID" Mode="In" Type="Int32" />
+            <Parameter Name="HDID" Mode="In" Type="Int32" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
+            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+            <Parameter Name="FileUpload" Mode="In" Type="String" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
+            <Parameter Name="FileComplete" Mode="In" Type="String" />
+            <Parameter Name="IDDKT" Mode="InOut" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardRegistrationInfor_Up">
+            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+            <Parameter Name="FileUpload" Mode="In" Type="String" />
+            <Parameter Name="FileComplete" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardRegistrationInfor_Update">
+            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+            <Parameter Name="NoiDung" Mode="In" Type="String" />
+            <Parameter Name="NTID" Mode="In" Type="Int32" />
+            <Parameter Name="HDID" Mode="In" Type="Int32" />
+            <Parameter Name="PhongBanID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDangKy" Mode="In" Type="DateTime" />
+            <Parameter Name="FileUpload" Mode="In" Type="String" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="LoaiNT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_CardRegistrationInfor_UpdateTK">
+            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_DetailCardExtend_Delete">
+            <Parameter Name="IDCTGH" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_DetailCardExtend_Insert">
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="CCCD" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="HoKhau" Mode="In" Type="String" />
+            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
+            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
+            <Parameter Name="CapLai" Mode="In" Type="String" />
+            <Parameter Name="GiaHan" Mode="In" Type="String" />
+            <Parameter Name="ThongTinLuuTru" Mode="In" Type="String" />
+            <Parameter Name="DTTM" Mode="In" Type="String" />
+            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
+            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
+            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
+            <Parameter Name="Cong" Mode="In" Type="String" />
+            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_DetailCardExtend_Update">
+            <Parameter Name="IDCTGH" Mode="In" Type="Int32" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="CCCD" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="HoKhau" Mode="In" Type="String" />
+            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
+            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
+            <Parameter Name="CapLai" Mode="In" Type="String" />
+            <Parameter Name="GiaHan" Mode="In" Type="String" />
+            <Parameter Name="ThongTinLuuTru" Mode="In" Type="String" />
+            <Parameter Name="DTTM" Mode="In" Type="String" />
+            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
+            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
+            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
+            <Parameter Name="Cong" Mode="In" Type="String" />
+            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="IDGHT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_DetailCardRegistrationInfor_Delete">
+            <Parameter Name="IDCTDK" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_DetailCardRegistrationInfor_Insert">
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="CCCD" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="HoKhau" Mode="In" Type="String" />
+            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
+            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
+            <Parameter Name="TheLuuTru" Mode="In" Type="String" />
+            <Parameter Name="TheRaVaoKLH" Mode="In" Type="String" />
+            <Parameter Name="DienThoaiTM" Mode="In" Type="String" />
+            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
+            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
+            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
+            <Parameter Name="Cong" Mode="In" Type="String" />
+            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="DK_DetailCardRegistrationInfor_Update">
+            <Parameter Name="IDCTDK" Mode="In" Type="Int32" />
+            <Parameter Name="HoTen" Mode="In" Type="String" />
+            <Parameter Name="CCCD" Mode="In" Type="String" />
+            <Parameter Name="NgaySinh" Mode="In" Type="DateTime" />
+            <Parameter Name="HoKhau" Mode="In" Type="String" />
+            <Parameter Name="ChucVu" Mode="In" Type="Int32" />
+            <Parameter Name="SoDienThoai" Mode="In" Type="String" />
+            <Parameter Name="TheLuuTru" Mode="In" Type="String" />
+            <Parameter Name="TheRaVaoKLH" Mode="In" Type="String" />
+            <Parameter Name="DienThoaiTM" Mode="In" Type="String" />
+            <Parameter Name="RaVaoCang" Mode="In" Type="String" />
+            <Parameter Name="ThoiHanThe" Mode="In" Type="DateTime" />
+            <Parameter Name="KhuVucLamViec" Mode="In" Type="String" />
+            <Parameter Name="Cong" Mode="In" Type="String" />
+            <Parameter Name="NhomNT" Mode="In" Type="Int32" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
+            <Parameter Name="IDDKT" Mode="In" Type="Int32" />
+          </FunctionImport>
           <FunctionImport Name="RegisterPeople_Delete">
-          <Parameter Name="ID_DKTN" Mode="In" Type="Int32" />
+            <Parameter Name="ID_DKTN" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="RegisterPeople_Insert">
             <Parameter Name="NoiDung" Mode="In" Type="String" />
@@ -953,7 +1308,7 @@
             <Parameter Name="TinhTrang_ID" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="SignOff_Flow_Delete">
-          <Parameter Name="DKTN_ID" Mode="In" Type="Int32" />
+            <Parameter Name="DKTN_ID" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="SignOff_Flow_Insert">
             <Parameter Name="DKTN_ID" Mode="In" Type="Int32" />
@@ -970,294 +1325,68 @@
             <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
             <Parameter Name="GhiChu" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="TK_CarteTemp_Delete">
-          <Parameter Name="id" Mode="In" Type="Int32" />
+          <FunctionImport Name="TK_CardExtend_Cancel">
+            <Parameter Name="GHTID" Mode="In" Type="Int32" />
           </FunctionImport>
-          <EntitySet Name="CDNT_ChiTietDon" EntityType="EPORTAL_REGISTERModel.CDNT_ChiTietDon" />
-          <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="EPORTAL_REGISTERModel.CDNT_LoaiPhuongTien" />
-          <EntitySet Name="CDNT_TinhTrang" EntityType="EPORTAL_REGISTERModel.CDNT_TinhTrang" />
-          <FunctionImport Name="CDNT_ChiTietDon_Search">
-            <Parameter Name="p_MaDon" Mode="In" Type="String" />
-            <Parameter Name="p_BienSoXe" Mode="In" Type="String" />
-            <Parameter Name="p_ID_LoaiPhuongTien" Mode="In" Type="Int32" />
-            <Parameter Name="p_CapMoi" Mode="In" Type="Boolean" />
-            <Parameter Name="p_CapLai" Mode="In" Type="Boolean" />
-            <Parameter Name="p_GiaHan" Mode="In" Type="Boolean" />
-            <Parameter Name="p_TuNgay" Mode="In" Type="DateTime" />
-            <Parameter Name="p_DenNgay" Mode="In" Type="DateTime" />
+          <FunctionImport Name="TK_CardExtend_Insert">
+            <Parameter Name="GHTID" Mode="In" Type="Int32" />
+            <Parameter Name="CapDuyet" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKi_Delete">
-          <Parameter Name="Ma_Don" Mode="In" Type="String" />
+          <FunctionImport Name="TK_CardExtend_UpdateTK">
+            <Parameter Name="IDTKGHT" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKi_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Detail_Result)">
-          <Parameter Name="Ma_Don" Mode="In" Type="String" />
+          <FunctionImport Name="TK_CardRegistrationInfor_Cancel">
+            <Parameter Name="DKTID" Mode="In" Type="Int32" />
           </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKi_Insert" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Insert_Result)">
-            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
-            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
-            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_HopDong" Mode="In" Type="String" />
-            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
-            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
-            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="JsonDanhSachXe" Mode="In" Type="String" />
+          <FunctionImport Name="TK_CardRegistrationInfor_Insert">
+            <Parameter Name="DKTID" Mode="In" Type="Int32" />
+            <Parameter Name="CapDuyet" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+            <Parameter Name="NhanVienID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKi_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Search_Result)">
-            <Parameter Name="p_BeginDate" Mode="In" Type="DateTime" />
-            <Parameter Name="p_EndDate" Mode="In" Type="DateTime" />
-          </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKi_Update" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKi_Update_Result)">
-            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
-            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
-            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_HopDong" Mode="In" Type="String" />
-            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
-            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
-            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_CDNT_ChiTietDon" Mode="In" Type="String" />
-          </FunctionImport>
-          <EntitySet Name="CDNT_DonDangKy" EntityType="EPORTAL_REGISTERModel.CDNT_DonDangKy" />
-          <FunctionImport Name="CDNT_DonDangKi_UpdateFull_XML">
-            <Parameter Name="Ma_Don" Mode="In" Type="String" />
-            <Parameter Name="NoiDung" Mode="In" Type="String" />
-            <Parameter Name="BPQL_ID" Mode="In" Type="Int32" />
-            <Parameter Name="NhanVienNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="NhaThau_ID" Mode="In" Type="Int32" />
-            <Parameter Name="HopDong" Mode="In" Type="String" />
-            <Parameter Name="NgayTrinhKy" Mode="In" Type="DateTime" />
-            <Parameter Name="FileHoSoXe" Mode="In" Type="String" />
-            <Parameter Name="TrinhKy_ID" Mode="In" Type="Int32" />
-            <Parameter Name="TinhTrang_ID" Mode="In" Type="Int32" />
-            <Parameter Name="LoaiNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="ChiTiet_XML" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKy_Insert" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Insert_Result)">
-            <Parameter Name="p_Ma_Don" Mode="In" Type="String" />
-            <Parameter Name="p_NoiDung" Mode="In" Type="String" />
-            <Parameter Name="p_BPQL_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_NhanVienNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_NhaThau_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_HopDong" Mode="In" Type="String" />
-            <Parameter Name="p_NgayTrinhKy" Mode="In" Type="DateTime" />
-            <Parameter Name="p_FileHoSoXe" Mode="In" Type="String" />
-            <Parameter Name="p_TrinhKy_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_TinhTrang_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_LoaiNT_ID" Mode="In" Type="Int32" />
-            <Parameter Name="p_UserNameLogin" Mode="In" Type="String" />
-            <Parameter Name="JsonDanhSachXe" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="CDNT_DonDangKy_Search" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_DonDangKy_Search_Result)">
-            <Parameter Name="p_BeginDate" Mode="In" Type="DateTime" />
-            <Parameter Name="p_EndDate" Mode="In" Type="DateTime" />
-            <Parameter Name="p_MaPhieu" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="CNDT_GetDinhBienPhuongTien">
-            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
-            <Parameter Name="p_SoQuanLy" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_SoCongNhan" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_XeMay_DaCap" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_Xe3Gac_DaCap" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_XeMay_ToiDa" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_Xe3Gac_ToiDa" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_XeMay_ConLai" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_Xe3Gac_ConLai" Mode="InOut" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="CNDT_GetNhanSuTheoChucVu">
-            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
-            <Parameter Name="p_SoQuanLy" Mode="InOut" Type="Int32" />
-            <Parameter Name="p_SoCongNhan" Mode="InOut" Type="Int32" />
-          </FunctionImport>
-          <EntitySet Name="CDNT_TrinhKy" EntityType="EPORTAL_REGISTERModel.CDNT_TrinhKy" />
-          <FunctionImport Name="CDNT_TrinhKy_Detail" ReturnType="Collection(EPORTAL_REGISTERModel.CDNT_TrinhKy_Detail_Result)">
-          <Parameter Name="MaDon" Mode="In" Type="String" />
+          <FunctionImport Name="TK_CardRegistrationInfor_UpdateTK">
+            <Parameter Name="IDTKDKT" Mode="In" Type="Int32" />
+            <Parameter Name="TinhTrangID" Mode="In" Type="Int32" />
+            <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
+            <Parameter Name="GhiChu" Mode="In" Type="String" />
           </FunctionImport>
         </EntityContainer>
-        <EntityType Name="DK_CardExtend">
-          <Key>
-            <PropertyRef Name="IDGHT" />
-          </Key>
-          <Property Name="IDGHT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="NoiDung" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="NTID" Type="Int32" />
-          <Property Name="HDID" Type="Int32" />
-          <Property Name="PhongBanID" Type="Int32" />
-          <Property Name="NgayDangKy" Type="DateTime" Precision="0" />
-          <Property Name="NhanVienID" Type="Int32" />
-          <Property Name="TinhTrangID" Type="Int32" />
-          <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="LoaiNT" Type="Int32" />
-          <Property Name="FileComplete" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="DK_DetailCardExtend">
-          <Key>
-            <PropertyRef Name="IDCTGH" />
-          </Key>
-          <Property Name="IDCTGH" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="HoTen" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="NgaySinh" Type="DateTime" Precision="0" />
-          <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="HoKhau" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ChucVu" Type="Int32" />
-          <Property Name="SoDienThoai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CapLai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="GiaHan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ThongTinLuuTru" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DTTM" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="RaVaoCang" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ThoiHanThe" Type="DateTime" Precision="0" />
-          <Property Name="KhuVucLamViec" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="Cong" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="NhomNT" Type="Int32" />
-          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="IDGHT" Type="Int32" />
-        </EntityType>
-        <EntityType Name="TK_CardExtend">
-          <Key>
-            <PropertyRef Name="IDTKGHT" />
-          </Key>
-          <Property Name="IDTKGHT" Type="Int32" Nullable="false" />
-          <Property Name="GHTID" Type="Int32" />
-          <Property Name="CapDuyet" Type="Int32" />
-          <Property Name="TinhTrangID" Type="Int32" />
-          <Property Name="NhanVienID" Type="Int32" />
-          <Property Name="NgayDuyet" Type="DateTime" Precision="0" />
-          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="TK_CardRegistrationInfor">
-          <Key>
-            <PropertyRef Name="IDTKDKT" />
-          </Key>
-          <Property Name="IDTKDKT" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DKTID" Type="Int32" />
-          <Property Name="CapDuyet" Type="Int32" />
-          <Property Name="TinhTrangID" Type="Int32" />
-          <Property Name="NhanVienID" Type="Int32" />
-          <Property Name="NgayDuyet" Type="DateTime" Precision="0" />
-          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="Detail_RegisterPeople">
-          <Key>
-            <PropertyRef Name="ID_CT_DKTN" />
-          </Key>
-          <Property Name="ID_CT_DKTN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DKTN_ID" Type="Int32" />
-          <Property Name="HoVaTen" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
-          <Property Name="NgaySinh" Type="DateTime" Precision="0" />
-          <Property Name="CCCD" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="HoKhau" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CV_ID" Type="Int32" />
-          <Property Name="SoDienThoai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Ten_NTP" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="HoTen_QuanLy" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="SoDienThoai_QuanLy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CapMoi" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="GiaHan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="BoSungCong" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CapLai" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ChuyenNT" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ThoiHanThe" Type="DateTime" Precision="0" />
-          <Property Name="KhuVucLamViec" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CongLamViec" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="NhomNT" Type="Int32" />
-          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Price" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="DienThoaiThongMinh" Type="Int32" />
-          <Property Name="GhiChuHPDQ" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="Flow">
-          <Key>
-            <PropertyRef Name="ID_XL" />
-          </Key>
-          <Property Name="ID_XL" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TenXuLy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="RegisterPeople">
-          <Key>
-            <PropertyRef Name="ID_DKTN" />
-          </Key>
-          <Property Name="ID_DKTN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="NoiDung" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="BPQL_ID" Type="Int32" />
-          <Property Name="NhanVienNT_ID" Type="Int32" />
-          <Property Name="NhaThau_ID" Type="Int32" />
-          <Property Name="HopDong" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
-          <Property Name="NgayTrinhKy" Type="DateTime" Precision="0" />
-          <Property Name="File_CCAT" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="File_IMG" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="TrinhKy_ID" Type="Int32" />
-          <Property Name="TinhTrang_ID" Type="Int32" />
-          <Property Name="LoaiNT_ID" Type="Int32" />
-        </EntityType>
-        <EntityType Name="SignerType">
-          <Key>
-            <PropertyRef Name="ID_LTK" />
-          </Key>
-          <Property Name="ID_LTK" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TenLoai" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="SignOff_Flow">
-          <Key>
-            <PropertyRef Name="ID_TK_TN" />
-          </Key>
-          <Property Name="ID_TK_TN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DKTN_ID" Type="Int32" />
-          <Property Name="CapDuyet" Type="Int32" />
-          <Property Name="LuongXuLy" Type="Int32" />
-          <Property Name="NhanVienID" Type="Int32" />
-          <Property Name="NgayDuyet" Type="DateTime" Precision="3" />
-          <Property Name="TinhTrangID" Type="Int32" />
-          <Property Name="GhiChu" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="CDNT_ChiTietDon">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ID_LoaiPhuongTien" Type="Int32" />
-          <Property Name="BienSoXe" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
-          <Property Name="CapMoi" Type="Boolean" />
-          <Property Name="CapLai" Type="Boolean" />
-          <Property Name="GiaHan" Type="Boolean" />
-          <Property Name="TuNgay" Type="DateTime" Precision="0" />
-          <Property Name="DenNgay" Type="DateTime" Precision="0" />
-          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="HoSoTheoXe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="NguoiDuyet_ID" Type="Int32" />
-          <Property Name="TrangThaiDuyet_ID" Type="Int32" />
-        </EntityType>
-        <EntityType Name="CDNT_LoaiPhuongTien">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="LoaiPhuongTien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="CDNT_TinhTrang">
-          <Key>
-            <PropertyRef Name="TinhTrang_ID" />
-          </Key>
-          <Property Name="TinhTrang_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TenTinhTrang" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <ComplexType Name="CDNT_DonDangKi_Detail_Result">
-          <Property Type="Int32" Name="DonDangKyID" Nullable="false" />
+        <ComplexType Name="CDNT_ChiTietDon_Search_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="ID_LoaiPhuongTien" Nullable="true" />
+          <Property Type="String" Name="BienSoXe" Nullable="true" MaxLength="15" />
+          <Property Type="Boolean" Name="CapMoi" Nullable="true" />
+          <Property Type="Boolean" Name="CapLai" Nullable="true" />
+          <Property Type="Boolean" Name="GiaHan" Nullable="true" />
+          <Property Type="DateTime" Name="TuNgay" Nullable="true" />
+          <Property Type="DateTime" Name="DenNgay" Nullable="true" />
+          <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="HoSoTheoXe" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKy_Delete_Result">
+          <Property Type="Int32" Name="Result" Nullable="false" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="14" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKy_Detail_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
           <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
           <Property Type="String" Name="NoiDung" Nullable="true" />
           <Property Type="Int32" Name="BPQL_ID" Nullable="true" />
-          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="250" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="100" />
           <Property Type="Int32" Name="NhanVienNT_ID" Nullable="true" />
-          <Property Type="String" Name="TenNhanVienNT" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="150" />
           <Property Type="Int32" Name="NhaThau_ID" Nullable="true" />
-          <Property Type="String" Name="TenNhaThau" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
           <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
           <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
           <Property Type="String" Name="FileHoSoXe" Nullable="true" />
@@ -1265,87 +1394,121 @@
           <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
           <Property Type="String" Name="TenTinhTrang" Nullable="true" MaxLength="50" />
           <Property Type="Int32" Name="LoaiNT_ID" Nullable="true" />
+          <Property Type="Int32" Name="ID1" Nullable="false" />
+          <Property Type="Int32" Name="ID_LoaiPhuongTien" Nullable="true" />
+          <Property Type="String" Name="LoaiPhuongTien" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="BienSoXe" Nullable="true" MaxLength="15" />
+          <Property Type="Boolean" Name="CapMoi" Nullable="true" />
+          <Property Type="Boolean" Name="CapLai" Nullable="true" />
+          <Property Type="Boolean" Name="GiaHan" Nullable="true" />
+          <Property Type="DateTime" Name="TuNgay" Nullable="true" />
+          <Property Type="DateTime" Name="DenNgay" Nullable="true" />
+          <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="HoSoTheoXe" Nullable="true" />
+          <Property Type="Int32" Name="TrangThaiDuyet_ID" Nullable="true" />
         </ComplexType>
-        <ComplexType Name="CDNT_DonDangKi_Insert_Result">
-          <Property Type="Int32" Name="Result" Nullable="false" />
-          <Property Type="String" Name="Message" Nullable="false" MaxLength="19" />
-          <Property Type="String" Name="MaDon" Nullable="true" MaxLength="50" />
-        </ComplexType>
-        <ComplexType Name="CDNT_DonDangKi_Search_Result">
-          <Property Type="Int32" Name="ID" Nullable="false" />
-          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="NoiDung" Nullable="true" />
-          <Property Type="String" Name="TenNhanVienNT" Nullable="false" MaxLength="150" />
-          <Property Type="String" Name="TenBPQL" Nullable="false" MaxLength="250" />
-          <Property Type="String" Name="TenNhaThau" Nullable="false" MaxLength="400" />
-          <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
-          <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
-          <Property Type="String" Name="FileHoSoXe" Nullable="true" />
-          <Property Type="String" Name="TenTinhTrang" Nullable="false" MaxLength="50" />
-        </ComplexType>
-        <ComplexType Name="CDNT_DonDangKi_Update_Result">
-          <Property Type="Int32" Name="Result" Nullable="false" />
-          <Property Type="String" Name="Message" Nullable="false" MaxLength="17" />
-          <Property Type="String" Name="MaDon" Nullable="true" MaxLength="50" />
-        </ComplexType>
-        <EntityType Name="CDNT_DonDangKy">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="NoiDung" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="BPQL_ID" Type="Int32" />
-          <Property Name="NhanVienNT_ID" Type="Int32" />
-          <Property Name="NhaThau_ID" Type="Int32" />
-          <Property Name="HopDong" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
-          <Property Name="NgayTrinhKy" Type="DateTime" Precision="0" />
-          <Property Name="FileHoSoXe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="TrinhKy_ID" Type="Int32" />
-          <Property Name="TinhTrang_ID" Type="Int32" />
-          <Property Name="LoaiNT_ID" Type="Int32" />
-          <Property Name="TinhTrangDuyet_ID" Type="Int32" />
-          <Property Name="ThoiGianDuyet" Type="DateTime" Precision="3" />
-          <Property Name="UserNameLogin" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
         <ComplexType Name="CDNT_DonDangKy_Insert_Result">
           <Property Type="Int32" Name="Result" Nullable="false" />
           <Property Type="String" Name="Message" Nullable="false" MaxLength="19" />
           <Property Type="String" Name="MaDon" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKy_PDF_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="NoiDung" Nullable="true" />
+          <Property Type="Int32" Name="BPQL_ID" Nullable="true" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="100" />
+          <Property Type="Int32" Name="NhanVienNT_ID" Nullable="true" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="150" />
+          <Property Type="Int32" Name="NhaThau_ID" Nullable="true" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
+          <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
+          <Property Type="String" Name="FileHoSoXe" Nullable="true" />
+          <Property Type="Int32" Name="TrinhKy_ID" Nullable="true" />
+          <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
+          <Property Type="String" Name="TenTinhTrang" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="LoaiNT_ID" Nullable="true" />
+          <Property Type="Int32" Name="ID1" Nullable="false" />
+          <Property Type="Int32" Name="ID_LoaiPhuongTien" Nullable="true" />
+          <Property Type="String" Name="LoaiPhuongTien" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="BienSoXe" Nullable="true" MaxLength="15" />
+          <Property Type="Boolean" Name="CapMoi" Nullable="true" />
+          <Property Type="Boolean" Name="CapLai" Nullable="true" />
+          <Property Type="Boolean" Name="GiaHan" Nullable="true" />
+          <Property Type="DateTime" Name="TuNgay" Nullable="true" />
+          <Property Type="DateTime" Name="DenNgay" Nullable="true" />
+          <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="HoSoTheoXe" Nullable="true" />
+          <Property Type="Int32" Name="TrangThaiDuyet_ID" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="CDNT_DonDangKy_PDF_test_Result">
+          <Property Type="Int32" Name="Don_ID" Nullable="false" />
+          <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="NoiDung" Nullable="true" />
+          <Property Type="Int32" Name="BPQL_ID" Nullable="true" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="100" />
+          <Property Type="Int32" Name="NhanVienNT_ID" Nullable="true" />
+          <Property Type="String" Name="HoTen" Nullable="true" MaxLength="150" />
+          <Property Type="Int32" Name="NhaThau_ID" Nullable="true" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
+          <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
+          <Property Type="String" Name="FileHoSoXe" Nullable="true" />
+          <Property Type="Int32" Name="TrinhKy_ID" Nullable="true" />
+          <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
+          <Property Type="String" Name="TenTinhTrang" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="LoaiNT_ID" Nullable="true" />
+          <Property Type="Int32" Name="ChiTiet_ID" Nullable="false" />
+          <Property Type="Int32" Name="ID_LoaiPhuongTien" Nullable="true" />
+          <Property Type="String" Name="LoaiPhuongTien" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="BienSoXe" Nullable="true" MaxLength="15" />
+          <Property Type="Boolean" Name="CapMoi" Nullable="true" />
+          <Property Type="Boolean" Name="CapLai" Nullable="true" />
+          <Property Type="Boolean" Name="GiaHan" Nullable="true" />
+          <Property Type="DateTime" Name="TuNgay" Nullable="true" />
+          <Property Type="DateTime" Name="DenNgay" Nullable="true" />
+          <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="HoSoTheoXe" Nullable="true" />
+          <Property Type="Int32" Name="TrangThaiDuyet_ID" Nullable="true" />
         </ComplexType>
         <ComplexType Name="CDNT_DonDangKy_Search_Result">
           <Property Type="Int32" Name="ID" Nullable="false" />
           <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
           <Property Type="String" Name="NoiDung" Nullable="true" />
           <Property Type="String" Name="TenNhanVienNT" Nullable="false" MaxLength="150" />
-          <Property Type="String" Name="TenBPQL" Nullable="false" MaxLength="250" />
+          <Property Type="String" Name="TenBPQL" Nullable="false" MaxLength="100" />
           <Property Type="String" Name="TenNhaThau" Nullable="false" MaxLength="400" />
           <Property Type="String" Name="HopDong" Nullable="true" MaxLength="150" />
           <Property Type="DateTime" Name="NgayTrinhKy" Nullable="true" />
           <Property Type="String" Name="FileHoSoXe" Nullable="true" />
+          <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
           <Property Type="String" Name="TenTinhTrang" Nullable="false" MaxLength="50" />
         </ComplexType>
-        <EntityType Name="CDNT_TrinhKy">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Ma_Don" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CapDuyet" Type="Int32" />
-          <Property Name="NguoiDuyet_ID" Type="Int32" />
-          <Property Name="NgayDuyet" Type="DateTime" Precision="3" />
-          <Property Name="TinhTrang_ID" Type="Int32" />
-          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-        </EntityType>
         <ComplexType Name="CDNT_TrinhKy_Detail_Result">
           <Property Type="String" Name="Ma_Don" Nullable="true" MaxLength="50" />
           <Property Type="Int32" Name="CapDuyet" Nullable="true" />
           <Property Type="String" Name="NguoiDuyet" Nullable="true" MaxLength="150" />
           <Property Type="String" Name="ChucVu" Nullable="true" MaxLength="150" />
-          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="250" />
+          <Property Type="String" Name="TenPhongBan" Nullable="true" MaxLength="100" />
           <Property Type="DateTime" Name="NgayDuyet" Nullable="true" Precision="23" />
           <Property Type="Int32" Name="TinhTrang_ID" Nullable="true" />
           <Property Type="String" Name="GhiChu" Nullable="true" MaxLength="500" />
+        </ComplexType>
+        <ComplexType Name="CDNT_XeCoDong_Search_Result">
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="Int32" Name="ID_NT" Nullable="true" />
+          <Property Type="Int32" Name="BP_ID" Nullable="true" />
+          <Property Type="String" Name="HoVaTen" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="CMND_CCCD" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="TenNhaThau" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="TenDayDu" Nullable="true" MaxLength="255" />
+          <Property Type="Int32" Name="LoaiPhuongTien_ID" Nullable="true" />
+          <Property Type="String" Name="TenLoaiPhuongTien" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="BienSoXe" Nullable="true" MaxLength="15" />
+          <Property Type="DateTime" Name="TuNgay" Nullable="true" Precision="23" />
+          <Property Type="DateTime" Name="DenNgay" Nullable="true" Precision="23" />
+          <Property Type="Boolean" Name="TinhTrang" Nullable="true" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -1353,6 +1516,144 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="EPORTAL_REGISTERModelStoreContainer" CdmEntityContainer="EPORTAL_REGISTEREntities">
+          <EntitySetMapping Name="CDNT_ChiTietDon">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_ChiTietDon">
+              <MappingFragment StoreEntitySet="CDNT_ChiTietDon">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="ID_LoaiPhuongTien" ColumnName="ID_LoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+                <ScalarProperty Name="NguoiDuyet_ID" ColumnName="NguoiDuyet_ID" />
+                <ScalarProperty Name="TrangThaiDuyet_ID" ColumnName="TrangThaiDuyet_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_DonDangKy">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy">
+              <MappingFragment StoreEntitySet="CDNT_DonDangKy">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
+                <ScalarProperty Name="TinhTrangDuyet_ID" ColumnName="TinhTrangDuyet_ID" />
+                <ScalarProperty Name="ThoiGianDuyet" ColumnName="ThoiGianDuyet" />
+                <ScalarProperty Name="UserNameLogin" ColumnName="UserNameLogin" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_LoaiPhuongTien">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_LoaiPhuongTien">
+              <MappingFragment StoreEntitySet="CDNT_LoaiPhuongTien">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_TinhTrang">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TinhTrang">
+              <MappingFragment StoreEntitySet="CDNT_TinhTrang">
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_TrinhKy">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TrinhKy">
+              <MappingFragment StoreEntitySet="CDNT_TrinhKy">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+                <ScalarProperty Name="NguoiDuyet_ID" ColumnName="NguoiDuyet_ID" />
+                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_XeCoDong">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_XeCoDong">
+              <MappingFragment StoreEntitySet="CDNT_XeCoDong">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ID_NT" ColumnName="ID_NT" />
+                <ScalarProperty Name="BP_ID" ColumnName="BP_ID" />
+                <ScalarProperty Name="TenNhaThau" ColumnName="TenNhaThau" />
+                <ScalarProperty Name="TenDayDu" ColumnName="TenDayDu" />
+                <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
+                <ScalarProperty Name="CMND_CCCD" ColumnName="CMND_CCCD" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="LoaiPhuongTien_ID" ColumnName="LoaiPhuongTien_ID" />
+                <ScalarProperty Name="Hang" ColumnName="Hang" />
+                <ScalarProperty Name="Dong" ColumnName="Dong" />
+                <ScalarProperty Name="MauSac" ColumnName="MauSac" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Detail_RegisterPeople">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.Detail_RegisterPeople">
+              <MappingFragment StoreEntitySet="Detail_RegisterPeople">
+                <ScalarProperty Name="ID_CT_DKTN" ColumnName="ID_CT_DKTN" />
+                <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
+                <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
+                <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+                <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
+                <ScalarProperty Name="CV_ID" ColumnName="CV_ID" />
+                <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
+                <ScalarProperty Name="Ten_NTP" ColumnName="Ten_NTP" />
+                <ScalarProperty Name="HoTen_QuanLy" ColumnName="HoTen_QuanLy" />
+                <ScalarProperty Name="SoDienThoai_QuanLy" ColumnName="SoDienThoai_QuanLy" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="BoSungCong" ColumnName="BoSungCong" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="ChuyenNT" ColumnName="ChuyenNT" />
+                <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
+                <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
+                <ScalarProperty Name="CongLamViec" ColumnName="CongLamViec" />
+                <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="DienThoaiThongMinh" ColumnName="DienThoaiThongMinh" />
+                <ScalarProperty Name="GhiChuHPDQ" ColumnName="GhiChuHPDQ" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DK_CardExtend">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_CardExtend">
+              <MappingFragment StoreEntitySet="DK_CardExtend">
+                <ScalarProperty Name="IDGHT" ColumnName="IDGHT" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="NTID" ColumnName="NTID" />
+                <ScalarProperty Name="HDID" ColumnName="HDID" />
+                <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
+                <ScalarProperty Name="NgayDangKy" ColumnName="NgayDangKy" />
+                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="LoaiNT" ColumnName="LoaiNT" />
+                <ScalarProperty Name="FileComplete" ColumnName="FileComplete" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="DK_CardRegistrationInfor">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_CardRegistrationInfor">
               <MappingFragment StoreEntitySet="DK_CardRegistrationInfor">
@@ -1368,6 +1669,30 @@
                 <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
                 <ScalarProperty Name="LoaiNT" ColumnName="LoaiNT" />
                 <ScalarProperty Name="FileComplete" ColumnName="FileComplete" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DK_DetailCardExtend">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_DetailCardExtend">
+              <MappingFragment StoreEntitySet="DK_DetailCardExtend">
+                <ScalarProperty Name="IDCTGH" ColumnName="IDCTGH" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
+                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
+                <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
+                <ScalarProperty Name="ChucVu" ColumnName="ChucVu" />
+                <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="ThongTinLuuTru" ColumnName="ThongTinLuuTru" />
+                <ScalarProperty Name="DTTM" ColumnName="DTTM" />
+                <ScalarProperty Name="RaVaoCang" ColumnName="RaVaoCang" />
+                <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
+                <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
+                <ScalarProperty Name="Cong" ColumnName="Cong" />
+                <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="IDGHT" ColumnName="IDGHT" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1394,248 +1719,214 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Delete" />
-          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Insert" />
-          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Update" />
-          <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Delete" />
-          <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Insert" />
-          <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Update" />
-          <EntitySetMapping Name="DK_CardExtend">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_CardExtend">
-              <MappingFragment StoreEntitySet="DK_CardExtend">
-                <ScalarProperty Name="FileComplete" ColumnName="FileComplete" />
-                <ScalarProperty Name="LoaiNT" ColumnName="LoaiNT" />
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
-                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
-                <ScalarProperty Name="NgayDangKy" ColumnName="NgayDangKy" />
-                <ScalarProperty Name="PhongBanID" ColumnName="PhongBanID" />
-                <ScalarProperty Name="HDID" ColumnName="HDID" />
-                <ScalarProperty Name="NTID" ColumnName="NTID" />
-                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
-                <ScalarProperty Name="IDGHT" ColumnName="IDGHT" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="DK_DetailCardExtend">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.DK_DetailCardExtend">
-              <MappingFragment StoreEntitySet="DK_DetailCardExtend">
-                <ScalarProperty Name="IDGHT" ColumnName="IDGHT" />
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
-                <ScalarProperty Name="Cong" ColumnName="Cong" />
-                <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
-                <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
-                <ScalarProperty Name="RaVaoCang" ColumnName="RaVaoCang" />
-                <ScalarProperty Name="DTTM" ColumnName="DTTM" />
-                <ScalarProperty Name="ThongTinLuuTru" ColumnName="ThongTinLuuTru" />
-                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
-                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
-                <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
-                <ScalarProperty Name="ChucVu" ColumnName="ChucVu" />
-                <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
-                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
-                <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
-                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
-                <ScalarProperty Name="IDCTGH" ColumnName="IDCTGH" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="DK_CardExtend_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Delete" />
-          <FunctionImportMapping FunctionImportName="DK_CardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Insert" />
-          <FunctionImportMapping FunctionImportName="DK_CardExtend_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Update" />
-          <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Delete" />
-          <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Insert" />
-          <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Update" />
-          <EntitySetMapping Name="TK_CardExtend">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.TK_CardExtend">
-              <MappingFragment StoreEntitySet="TK_CardExtend">
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
-                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
-                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
-                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
-                <ScalarProperty Name="GHTID" ColumnName="GHTID" />
-                <ScalarProperty Name="IDTKGHT" ColumnName="IDTKGHT" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="TK_CardRegistrationInfor">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.TK_CardRegistrationInfor">
-              <MappingFragment StoreEntitySet="TK_CardRegistrationInfor">
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
-                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
-                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
-                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
-                <ScalarProperty Name="DKTID" ColumnName="DKTID" />
-                <ScalarProperty Name="IDTKDKT" ColumnName="IDTKDKT" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Insert" />
-          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_UpdateTK" />
-          <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_UpdateTK" />
-          <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Cancel" />
-          <FunctionImportMapping FunctionImportName="DK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_UpdateTK" />
-          <FunctionImportMapping FunctionImportName="TK_CardExtend_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_Cancel" />
-          <FunctionImportMapping FunctionImportName="TK_CardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_Insert" />
-          <FunctionImportMapping FunctionImportName="TK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_UpdateTK" />
-          <FunctionImportMapping FunctionImportName="DK_CardExtend_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Up" />
-          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Up" />
-          <EntitySetMapping Name="Detail_RegisterPeople">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.Detail_RegisterPeople">
-              <MappingFragment StoreEntitySet="Detail_RegisterPeople">
-                <ScalarProperty Name="GhiChuHPDQ" ColumnName="GhiChuHPDQ" />
-                <ScalarProperty Name="DienThoaiThongMinh" ColumnName="DienThoaiThongMinh" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="NhomNT" ColumnName="NhomNT" />
-                <ScalarProperty Name="CongLamViec" ColumnName="CongLamViec" />
-                <ScalarProperty Name="KhuVucLamViec" ColumnName="KhuVucLamViec" />
-                <ScalarProperty Name="ThoiHanThe" ColumnName="ThoiHanThe" />
-                <ScalarProperty Name="ChuyenNT" ColumnName="ChuyenNT" />
-                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
-                <ScalarProperty Name="BoSungCong" ColumnName="BoSungCong" />
-                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
-                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
-                <ScalarProperty Name="SoDienThoai_QuanLy" ColumnName="SoDienThoai_QuanLy" />
-                <ScalarProperty Name="HoTen_QuanLy" ColumnName="HoTen_QuanLy" />
-                <ScalarProperty Name="Ten_NTP" ColumnName="Ten_NTP" />
-                <ScalarProperty Name="SoDienThoai" ColumnName="SoDienThoai" />
-                <ScalarProperty Name="CV_ID" ColumnName="CV_ID" />
-                <ScalarProperty Name="HoKhau" ColumnName="HoKhau" />
-                <ScalarProperty Name="CCCD" ColumnName="CCCD" />
-                <ScalarProperty Name="NgaySinh" ColumnName="NgaySinh" />
-                <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
-                <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
-                <ScalarProperty Name="ID_CT_DKTN" ColumnName="ID_CT_DKTN" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Flows">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.Flow">
               <MappingFragment StoreEntitySet="Flow">
-                <ScalarProperty Name="TenXuLy" ColumnName="TenXuLy" />
                 <ScalarProperty Name="ID_XL" ColumnName="ID_XL" />
+                <ScalarProperty Name="TenXuLy" ColumnName="TenXuLy" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="RegisterPeoples">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.RegisterPeople">
               <MappingFragment StoreEntitySet="RegisterPeople">
-                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
-                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
-                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
-                <ScalarProperty Name="File_IMG" ColumnName="File_IMG" />
-                <ScalarProperty Name="File_CCAT" ColumnName="File_CCAT" />
-                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
-                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
-                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
-                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
-                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
-                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
                 <ScalarProperty Name="ID_DKTN" ColumnName="ID_DKTN" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="File_CCAT" ColumnName="File_CCAT" />
+                <ScalarProperty Name="File_IMG" ColumnName="File_IMG" />
+                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="SignerTypes">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.SignerType">
               <MappingFragment StoreEntitySet="SignerType">
-                <ScalarProperty Name="TenLoai" ColumnName="TenLoai" />
                 <ScalarProperty Name="ID_LTK" ColumnName="ID_LTK" />
+                <ScalarProperty Name="TenLoai" ColumnName="TenLoai" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="SignOff_Flow">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.SignOff_Flow">
               <MappingFragment StoreEntitySet="SignOff_Flow">
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
-                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
-                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
-                <ScalarProperty Name="LuongXuLy" ColumnName="LuongXuLy" />
-                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
-                <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
                 <ScalarProperty Name="ID_TK_TN" ColumnName="ID_TK_TN" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Delete" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Delete" />
-          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Insert" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Insert" />
-          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Price" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Price" />
-          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Update" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Update" />
-          <FunctionImportMapping FunctionImportName="RegisterPeople_Delete" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Delete" />
-          <FunctionImportMapping FunctionImportName="RegisterPeople_Insert" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Insert" />
-          <FunctionImportMapping FunctionImportName="RegisterPeople_Update" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Update" />
-          <FunctionImportMapping FunctionImportName="RegisterPeople_UpdateFlow" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_UpdateFlow" />
-          <FunctionImportMapping FunctionImportName="SignOff_Flow_Delete" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Delete" />
-          <FunctionImportMapping FunctionImportName="SignOff_Flow_Insert" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Insert" />
-          <FunctionImportMapping FunctionImportName="SignOff_Flow_Update" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Update" />
-          <EntitySetMapping Name="CDNT_ChiTietDon">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_ChiTietDon">
-              <MappingFragment StoreEntitySet="CDNT_ChiTietDon">
-                <ScalarProperty Name="TrangThaiDuyet_ID" ColumnName="TrangThaiDuyet_ID" />
-                <ScalarProperty Name="NguoiDuyet_ID" ColumnName="NguoiDuyet_ID" />
-                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+                <ScalarProperty Name="DKTN_ID" ColumnName="DKTN_ID" />
+                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+                <ScalarProperty Name="LuongXuLy" ColumnName="LuongXuLy" />
+                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
                 <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
-                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
-                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
-                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
-                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
-                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TK_CardExtend">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.TK_CardExtend">
+              <MappingFragment StoreEntitySet="TK_CardExtend">
+                <ScalarProperty Name="IDTKGHT" ColumnName="IDTKGHT" />
+                <ScalarProperty Name="GHTID" ColumnName="GHTID" />
+                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TK_CardRegistrationInfor">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.TK_CardRegistrationInfor">
+              <MappingFragment StoreEntitySet="TK_CardRegistrationInfor">
+                <ScalarProperty Name="IDTKDKT" ColumnName="IDTKDKT" />
+                <ScalarProperty Name="DKTID" ColumnName="DKTID" />
+                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
+                <ScalarProperty Name="TinhTrangID" ColumnName="TinhTrangID" />
+                <ScalarProperty Name="NhanVienID" ColumnName="NhanVienID" />
+                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_ChiTietDon_Search" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_ChiTietDon_Search">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_ChiTietDon_Search_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
                 <ScalarProperty Name="ID_LoaiPhuongTien" ColumnName="ID_LoaiPhuongTien" />
-                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="CDNT_LoaiPhuongTien">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_LoaiPhuongTien">
-              <MappingFragment StoreEntitySet="CDNT_LoaiPhuongTien">
-                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="CDNT_TinhTrang">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TinhTrang">
-              <MappingFragment StoreEntitySet="CDNT_TinhTrang">
-                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
-                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="CDNT_ChiTietDon_Search" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_ChiTietDon_Search" />
-          <EntitySetMapping Name="CDNT_DonDangKy">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy">
-              <MappingFragment StoreEntitySet="CDNT_DonDangKy">
-                <ScalarProperty Name="UserNameLogin" ColumnName="UserNameLogin" />
-                <ScalarProperty Name="ThoiGianDuyet" ColumnName="ThoiGianDuyet" />
-                <ScalarProperty Name="TinhTrangDuyet_ID" ColumnName="TinhTrangDuyet_ID" />
-                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
-                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
-                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
-                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
-                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
-                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
-                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
-                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
-                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
-                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
-                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="CDNT_DonDangKi_UpdateFull_XML" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKi_UpdateFull_XML" />
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_Delete" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_Delete">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_Delete_Result">
+                <ScalarProperty Name="Result" ColumnName="Result" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_Detail" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_Detail">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_Detail_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+                <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
+                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
+                <ScalarProperty Name="ID1" ColumnName="ID1" />
+                <ScalarProperty Name="ID_LoaiPhuongTien" ColumnName="ID_LoaiPhuongTien" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+                <ScalarProperty Name="TrangThaiDuyet_ID" ColumnName="TrangThaiDuyet_ID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_Insert" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_Insert">
             <ResultMapping>
               <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_Insert_Result">
                 <ScalarProperty Name="Result" ColumnName="Result" />
                 <ScalarProperty Name="Message" ColumnName="Message" />
                 <ScalarProperty Name="MaDon" ColumnName="MaDon" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_PDF" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_PDF">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_PDF_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+                <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
+                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
+                <ScalarProperty Name="ID1" ColumnName="ID1" />
+                <ScalarProperty Name="ID_LoaiPhuongTien" ColumnName="ID_LoaiPhuongTien" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+                <ScalarProperty Name="TrangThaiDuyet_ID" ColumnName="TrangThaiDuyet_ID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_PDF_test" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_PDF_test">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DonDangKy_PDF_test_Result">
+                <ScalarProperty Name="Don_ID" ColumnName="Don_ID" />
+                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
+                <ScalarProperty Name="TenPhongBan" ColumnName="TenPhongBan" />
+                <ScalarProperty Name="NhanVienNT_ID" ColumnName="NhanVienNT_ID" />
+                <ScalarProperty Name="HoTen" ColumnName="HoTen" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="HopDong" ColumnName="HopDong" />
+                <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
+                <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="TrinhKy_ID" ColumnName="TrinhKy_ID" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
+                <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
+                <ScalarProperty Name="LoaiNT_ID" ColumnName="LoaiNT_ID" />
+                <ScalarProperty Name="ChiTiet_ID" ColumnName="ChiTiet_ID" />
+                <ScalarProperty Name="ID_LoaiPhuongTien" ColumnName="ID_LoaiPhuongTien" />
+                <ScalarProperty Name="LoaiPhuongTien" ColumnName="LoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="CapMoi" ColumnName="CapMoi" />
+                <ScalarProperty Name="CapLai" ColumnName="CapLai" />
+                <ScalarProperty Name="GiaHan" ColumnName="GiaHan" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="HoSoTheoXe" ColumnName="HoSoTheoXe" />
+                <ScalarProperty Name="TrangThaiDuyet_ID" ColumnName="TrangThaiDuyet_ID" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
@@ -1651,25 +1942,12 @@
                 <ScalarProperty Name="HopDong" ColumnName="HopDong" />
                 <ScalarProperty Name="NgayTrinhKy" ColumnName="NgayTrinhKy" />
                 <ScalarProperty Name="FileHoSoXe" ColumnName="FileHoSoXe" />
+                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
                 <ScalarProperty Name="TenTinhTrang" ColumnName="TenTinhTrang" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="CNDT_GetDinhBienPhuongTien" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetDinhBienPhuongTien" />
-          <FunctionImportMapping FunctionImportName="CNDT_GetNhanSuTheoChucVu" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetNhanSuTheoChucVu" />
-          <EntitySetMapping Name="CDNT_TrinhKy">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TrinhKy">
-              <MappingFragment StoreEntitySet="CDNT_TrinhKy">
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="TinhTrang_ID" ColumnName="TinhTrang_ID" />
-                <ScalarProperty Name="NgayDuyet" ColumnName="NgayDuyet" />
-                <ScalarProperty Name="NguoiDuyet_ID" ColumnName="NguoiDuyet_ID" />
-                <ScalarProperty Name="CapDuyet" ColumnName="CapDuyet" />
-                <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_DonDangKy_Update" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_DonDangKy_Update" />
           <FunctionImportMapping FunctionImportName="CDNT_TrinhKy_Detail" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_TrinhKy_Detail">
             <ResultMapping>
               <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_TrinhKy_Detail_Result">
@@ -1684,6 +1962,60 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CDNT_XeCoDong_Search" FunctionName="EPORTAL_REGISTERModel.Store.CDNT_XeCoDong_Search">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_XeCoDong_Search_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ID_NT" ColumnName="ID_NT" />
+                <ScalarProperty Name="BP_ID" ColumnName="BP_ID" />
+                <ScalarProperty Name="HoVaTen" ColumnName="HoVaTen" />
+                <ScalarProperty Name="CMND_CCCD" ColumnName="CMND_CCCD" />
+                <ScalarProperty Name="TenNhaThau" ColumnName="TenNhaThau" />
+                <ScalarProperty Name="TenDayDu" ColumnName="TenDayDu" />
+                <ScalarProperty Name="LoaiPhuongTien_ID" ColumnName="LoaiPhuongTien_ID" />
+                <ScalarProperty Name="TenLoaiPhuongTien" ColumnName="TenLoaiPhuongTien" />
+                <ScalarProperty Name="BienSoXe" ColumnName="BienSoXe" />
+                <ScalarProperty Name="TuNgay" ColumnName="TuNgay" />
+                <ScalarProperty Name="DenNgay" ColumnName="DenNgay" />
+                <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="CNDT_GetDinhBienPhuongTien" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetDinhBienPhuongTien" />
+          <FunctionImportMapping FunctionImportName="CNDT_GetNhanSuTheoChucVu" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetNhanSuTheoChucVu" />
+          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Delete" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Delete" />
+          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Insert" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Insert" />
+          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Price" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Price" />
+          <FunctionImportMapping FunctionImportName="Detail_RegisterPeople_Update" FunctionName="EPORTAL_REGISTERModel.Store.Detail_RegisterPeople_Update" />
+          <FunctionImportMapping FunctionImportName="DK_CardExtend_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Delete" />
+          <FunctionImportMapping FunctionImportName="DK_CardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Insert" />
+          <FunctionImportMapping FunctionImportName="DK_CardExtend_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Up" />
+          <FunctionImportMapping FunctionImportName="DK_CardExtend_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_Update" />
+          <FunctionImportMapping FunctionImportName="DK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardExtend_UpdateTK" />
+          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Delete" />
+          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Insert" />
+          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Up" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Up" />
+          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_Update" />
+          <FunctionImportMapping FunctionImportName="DK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.DK_CardRegistrationInfor_UpdateTK" />
+          <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Delete" />
+          <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Insert" />
+          <FunctionImportMapping FunctionImportName="DK_DetailCardExtend_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardExtend_Update" />
+          <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Delete" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Delete" />
+          <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Insert" />
+          <FunctionImportMapping FunctionImportName="DK_DetailCardRegistrationInfor_Update" FunctionName="EPORTAL_REGISTERModel.Store.DK_DetailCardRegistrationInfor_Update" />
+          <FunctionImportMapping FunctionImportName="RegisterPeople_Delete" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Delete" />
+          <FunctionImportMapping FunctionImportName="RegisterPeople_Insert" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Insert" />
+          <FunctionImportMapping FunctionImportName="RegisterPeople_Update" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_Update" />
+          <FunctionImportMapping FunctionImportName="RegisterPeople_UpdateFlow" FunctionName="EPORTAL_REGISTERModel.Store.RegisterPeople_UpdateFlow" />
+          <FunctionImportMapping FunctionImportName="SignOff_Flow_Delete" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Delete" />
+          <FunctionImportMapping FunctionImportName="SignOff_Flow_Insert" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Insert" />
+          <FunctionImportMapping FunctionImportName="SignOff_Flow_Update" FunctionName="EPORTAL_REGISTERModel.Store.SignOff_Flow_Update" />
+          <FunctionImportMapping FunctionImportName="TK_CardExtend_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_Cancel" />
+          <FunctionImportMapping FunctionImportName="TK_CardExtend_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_Insert" />
+          <FunctionImportMapping FunctionImportName="TK_CardExtend_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardExtend_UpdateTK" />
+          <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Cancel" />
+          <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Insert" />
+          <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_UpdateTK" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

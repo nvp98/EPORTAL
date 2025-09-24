@@ -22,6 +22,7 @@ namespace EPORTAL.ModelsTagSign
         public string HopDong { get; set; }
         public Nullable<System.DateTime> NgayTrinhKy { get; set; }
         public string FileHoSoXe { get; set; }
+        public Nullable<int> TinhTrang_ID { get; set; }
         public string TenTinhTrang { get; set; }
     }
 }

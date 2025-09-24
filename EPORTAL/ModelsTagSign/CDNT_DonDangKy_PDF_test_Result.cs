@@ -11,17 +11,17 @@ namespace EPORTAL.ModelsTagSign
 {
     using System;
     
-    public partial class CDNT_DonDangKi_Detail_Result
+    public partial class CDNT_DonDangKy_PDF_test_Result
     {
-        public int DonDangKyID { get; set; }
+        public int Don_ID { get; set; }
         public string Ma_Don { get; set; }
         public string NoiDung { get; set; }
         public Nullable<int> BPQL_ID { get; set; }
         public string TenPhongBan { get; set; }
         public Nullable<int> NhanVienNT_ID { get; set; }
-        public string TenNhanVienNT { get; set; }
+        public string HoTen { get; set; }
         public Nullable<int> NhaThau_ID { get; set; }
-        public string TenNhaThau { get; set; }
+        public string FullName { get; set; }
         public string HopDong { get; set; }
         public Nullable<System.DateTime> NgayTrinhKy { get; set; }
         public string FileHoSoXe { get; set; }
@@ -29,5 +29,17 @@ namespace EPORTAL.ModelsTagSign
         public Nullable<int> TinhTrang_ID { get; set; }
         public string TenTinhTrang { get; set; }
         public Nullable<int> LoaiNT_ID { get; set; }
+        public int ChiTiet_ID { get; set; }
+        public Nullable<int> ID_LoaiPhuongTien { get; set; }
+        public string LoaiPhuongTien { get; set; }
+        public string BienSoXe { get; set; }
+        public Nullable<bool> CapMoi { get; set; }
+        public Nullable<bool> CapLai { get; set; }
+        public Nullable<bool> GiaHan { get; set; }
+        public Nullable<System.DateTime> TuNgay { get; set; }
+        public Nullable<System.DateTime> DenNgay { get; set; }
+        public string GhiChu { get; set; }
+        public string HoSoTheoXe { get; set; }
+        public Nullable<int> TrangThaiDuyet_ID { get; set; }
     }
 }

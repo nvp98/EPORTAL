@@ -11,17 +11,18 @@ namespace EPORTAL.ModelsTagSign
 {
     using System;
     
-    public partial class CDNT_DonDangKi_Search_Result
+    public partial class CDNT_ChiTietDon_Search_Result
     {
         public int ID { get; set; }
         public string Ma_Don { get; set; }
-        public string NoiDung { get; set; }
-        public string TenNhanVienNT { get; set; }
-        public string TenBPQL { get; set; }
-        public string TenNhaThau { get; set; }
-        public string HopDong { get; set; }
-        public Nullable<System.DateTime> NgayTrinhKy { get; set; }
-        public string FileHoSoXe { get; set; }
-        public string TenTinhTrang { get; set; }
+        public Nullable<int> ID_LoaiPhuongTien { get; set; }
+        public string BienSoXe { get; set; }
+        public Nullable<bool> CapMoi { get; set; }
+        public Nullable<bool> CapLai { get; set; }
+        public Nullable<bool> GiaHan { get; set; }
+        public Nullable<System.DateTime> TuNgay { get; set; }
+        public Nullable<System.DateTime> DenNgay { get; set; }
+        public string GhiChu { get; set; }
+        public string HoSoTheoXe { get; set; }
     }
 }
