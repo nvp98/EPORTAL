@@ -96,7 +96,7 @@ namespace EPORTAL.Controllers
                                 var rsnv = LNV.Where(x => x.MaNV == MaNV).FirstOrDefault();
                                 if (rsnv == null)
                                 {
-                                    if (sMaNV == "HPDQ" || sMaNVPY == "CBGPY")
+                                    if (sMaNV == "HPDQ" || sMaNVPY == "CBGPY" || sMaNVPY == "KCNHT")
                                     {
                                         ObjectParameter IDPhongBanout = new ObjectParameter("IDPhongBan", typeof(int));
                                         ObjectParameter IDViTriout = new ObjectParameter("IDViTri", typeof(int));
