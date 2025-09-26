@@ -25,7 +25,17 @@
     var cpt = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 2) : null;
     var bpql = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 1) : null;
     var nhathau = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 0) : null;
+      DateTime? ngayNT = (nhathau != null) ? nhathau.NgayDuyet : (DateTime?)null;
+
+    // Hiển thị dd/MM/yyyy
+    var ngayNTText = ngayNT.HasValue ? ngayNT.Value.ToString("dd/MM/yyyy") : "";
+
+    // Hoặc chuỗi: Quảng Ngãi, ngày d tháng M năm yyyy
+    var chuKyNgay = ngayNT.HasValue
+        ? string.Format("Quảng Ngãi, ngày {0} tháng {1} năm {2}", ngayNT.Value.Day, ngayNT.Value.Month, ngayNT.Value.Year)
+        : "Quảng Ngãi, ngày...tháng...năm.....";
 }
+
 <meta charset="utf-8" />
 <style>
     .custom-table {
@@ -147,7 +157,7 @@
                 </div>
                 <div class="col-md-12 pt-3 pull-right" style="margin-top: 0.5%; padding-bottom:5px">
                     <label style="font-size: 20px; font-style: italic; padding-right: 40px;">
-                        Quảng Ngãi, ngày...tháng...năm.....
+                        @chuKyNgay
                     </label>
                 </div>
 

@@ -58,9 +58,9 @@
                                 </table>
 
 
-                                <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
+                                @*<div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
                                     <span class="text-center" style="margin-top: 8px">Thông tin Nhà thầu <span style="color:red;">(*)</span> : </span>
-                                </div>
+                                </div>*@
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
                                         <tr style="background-color: #f8f9fa;">
@@ -71,7 +71,8 @@
                                     <tbody>
                                         <tr>
                                             <td style="width: 50%;">
-                                                @Html.DropDownList("IDNT", null, "--Chọn tên nhà thầu--", new { id = "NhaThau_ID", name = "NhaThau_ID", @class = "form-control", @readonly = "readonly" })
+                                                <input type="hidden" id="NhaThau_ID" name="NhaThau_ID" value="@(ViewBag.NhaThau_ID ?? "")" />
+                                                <input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly />
                                             </td>
                                             <td>
                                                 <fieldset id="SubmitForm">
@@ -87,7 +88,7 @@
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
                                         <tr style="background-color: #f8f9fa;">
-                                            <th class="text-center" width="50px">BP Quản lý &nbsp;&nbsp; <span style="color:red;">(*)</span> : </th>
+                                            <th class="text-center" width="50px">Bộ Phận Quản Lý &nbsp;&nbsp; <span style="color:red;">(*)</span> : </th>
                                             @*<th class="text-center" width="120px">Loại đăng ký &nbsp;&nbsp;<span style="color:red;">(*)</span> :</th>*@
                                         </tr>
                                     </thead>
@@ -167,8 +168,11 @@
                             <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                 <thead>
                                     <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" width="25%">Kỹ Thuật Viên (KTV)</th>
-                                        <th class="text-center" width="25%">Trưởng/Phó phòng</th>
+                                       <th colspan="2" class="text-center" style="font-size: 20px">Bộ Phận Quản Lý</th>
+                                    </tr>
+                                    <tr style="background-color: #f8f9fa; font-size:15px">
+                                        <th class="text-center" width="25%">Nhân viên</th>
+                                        <th class="text-center" width="25%">T/P Bộ Phận</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -185,7 +189,7 @@
                             <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                 <thead>
                                     <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" width="25%">Tổ cấp phát thẻ</th>
+                                        <th class="text-center"  style="font-size: 20px" width="25%">Tổ cấp phát thẻ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -220,9 +224,9 @@
 
 }
 <script type="text/javascript">
-    $("#NhaThau_ID").chosen({
-        width: "100%",
-    });
+    //$("#NhaThau_ID").chosen({
+    //    width: "100%",
+    //});
     $("#IDTK").chosen({
         width: "100%"
     });
@@ -384,7 +388,7 @@
         });
 
         formData.append("JsonDanhSachXe", JSON.stringify(listXe));
-        console.log('formData', formData)
+        //console.log('formData', formData)
         $.ajax({
             url: '@Url.Action("Create", "TheXeCoDong_NT")',
             type: 'POST',

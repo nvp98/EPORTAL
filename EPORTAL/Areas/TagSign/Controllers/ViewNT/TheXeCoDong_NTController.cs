@@ -45,7 +45,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             int pageNumber = page ?? 1;
             int pageSize = 10;
             var userNameLogin = Models.MyAuthentication.Username;
-           
+
 
             // Gọi store, chỉ truyền filter ngày
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
@@ -91,6 +91,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             var dsHienThi = new List<DonDangKyViewModel>();
             foreach (var don in data)
             {
+                if (don.TinhTrang_ID == (int)TinhTrangDonDangKy.Nhap) continue;
                 var phanCong = phanCongUser.FirstOrDefault(x => x.Ma_Don == don.Ma_Don);
                 if (phanCong == null) continue;
 
@@ -135,33 +136,27 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         public ActionResult Create(List<ChiTietDonVM> danhSach = null)
         {
             string tenNhaThau = "";
-            int nhanVienNT_ID = Models.MyAuthentication.ID;
+            int? nhaThauID = null;
 
+            int nhanVienNT_ID = Models.MyAuthentication.ID;
             var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
 
             if (nhanVien != null && nhanVien.IDNT.HasValue)
             {
-                int nhaThauID = nhanVien.IDNT.Value;
+                nhaThauID = nhanVien.IDNT.Value;
 
-                var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID);
-
+                var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID.Value);
                 if (nhaThau != null)
                 {
                     tenNhaThau = nhaThau.FullName;
-
-                    // Gán dropdown mặc định chọn nhà thầu hiện tại
-                    ViewBag.IDNT = new SelectList(db.NT_Partner.ToList(), "ID", "FullName", nhaThauID);
-                }
-                else
-                {
-                    ViewBag.IDNT = new SelectList(db.NT_Partner.ToList(), "ID", "FullName");
                 }
             }
-            else
-            {
-                ViewBag.IDNT = new SelectList(db.NT_Partner.ToList(), "ID", "FullName");
-            }
 
+            // Truyền ID và Tên nhà thầu ra View (để hiển thị + submit)
+            ViewBag.NhaThau_ID = nhaThauID;
+            ViewBag.TenNhaThau = tenNhaThau;
+
+            // Các ViewBag khác bạn đang dùng
             var VP1C = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 3)
                         join a in db.NhanViens on au.IDNhanVien equals a.ID
                         select new CheckInforUser
@@ -171,12 +166,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         }).ToList();
             ViewBag.VP1C_List = new SelectList(VP1C, "IDNhanVien", "HoTen");
 
-           
-            ViewBag.TenNhaThau = tenNhaThau;
-
             ViewBag.IDLTK = new SelectList(db_dk.SignerTypes.ToList(), "ID_LTK", "TenLoai");
             ViewBag.IDPhongBan = new SelectList(db.PhongBans.Where(x => x.status == 1).ToList(), "IDPhongBan", "TenPhongBan");
-            
+
             return View(danhSach ?? new List<ChiTietDonVM>());
         }
 
@@ -190,7 +182,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     return Json(new { success = false, message = "Danh sách xe không được trống" });
                 }
-
+                // 2. Kiểm tra nội dung trình ký
+                if (string.IsNullOrWhiteSpace(model.NoiDung))
+                {
+                    return Json(new { success = false, message = "Nội dung trình ký không được để trống!" });
+                }
+                // 3. Kiểm tra file hồ sơ xe
+                if (FileHoSoXe == null || FileHoSoXe.ContentLength == 0)
+                {
+                    return Json(new { success = false, message = "Bạn phải chọn file hồ sơ xe!" });
+                }
                 // 2. Xử lý file upload (nếu có)
                 if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
                 {
@@ -230,6 +231,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 // 4. Gán người tạo đơn là người đang đăng nhập
                 model.NhanVienNT_ID = Models.MyAuthentication.ID;
                 model.UserNameLogin = Models.MyAuthentication.Username;
+
                 // 5. Insert đơn vào DB (thông qua stored procedure hoặc EF)
                 var result = db_dk.CDNT_DonDangKy_Insert(
                     model.Ma_Don,
@@ -241,7 +243,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     model.NgayTrinhKy,
                     model.FileHoSoXe,
                     model.TrinhKy_ID,
-                    model.TinhTrang_ID,
+                    model.TinhTrang_ID = 5,
                     model.LoaiNT_ID,
                     model.UserNameLogin,
                     model.JsonDanhSachXe
@@ -259,7 +261,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         CapDuyet = 0,
                         NguoiDuyet_ID = nguoiTaoDon_ID,
                         NgayDuyet = DateTime.Now,
-                        TinhTrang_ID = (int)TinhTrangDonDangKy.DaXuLy,
+                        TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                         GhiChu = "Trình ký từ nhà thầu"
                     });
 
@@ -271,7 +273,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             Ma_Don = maDon,
                             CapDuyet = 1,
                             NguoiDuyet_ID = KTV_ID.Value,
-                            TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
+                            TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                             GhiChu = "Chờ duyệt - Kỹ thuật viên"
                         });
                     }
@@ -284,7 +286,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             Ma_Don = maDon,
                             CapDuyet = 1,
                             NguoiDuyet_ID = TP_ID.Value,
-                            TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
+                            TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                             GhiChu = "Chờ duyệt cấp - Trưởng/Phó phòng"
                         });
                     }
@@ -297,7 +299,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             Ma_Don = maDon,
                             CapDuyet = 2,
                             NguoiDuyet_ID = VP1C_ID.Value,
-                            TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
+                            TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                             GhiChu = "Chờ cấp phát thẻ từ CPT"
                         });
                     }
@@ -321,6 +323,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+
 
         public ActionResult Detail(string maDon)
         {
@@ -352,7 +355,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Không tìm thấy đơn." });
                 }
                 var daKy = db_dk.CDNT_TrinhKy
-                 .Any(x => x.Ma_Don == maDon && x.TinhTrang_ID != (int)TinhTrangDonDangKy.ChoXuLy);
+                 .Any(x => x.Ma_Don == maDon && x.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap);
 
                 if (daKy)
                 {
@@ -658,35 +661,23 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             }
 
             // Kiểm tra trạng thái đơn
-            if (donDangKy.TinhTrang_ID != (int)TinhTrangDonDangKy.ChoXuLy)
+            if (donDangKy.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap)
             {
                 TempData["msgError"] = "Đơn đã được duyệt, không thể chỉnh sửa";
                 return RedirectToAction("Index_Test");
             }
 
-            // Lấy thông tin nhà thầu
+            // Lấy tên nhà thầu từ đơn
+            int? nhaThauID = donDangKy.NhaThau_ID;
             string tenNhaThau = "";
-            int nhanVienNT_ID = Models.MyAuthentication.ID;
-            var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
-
-            if (nhanVien != null && nhanVien.IDNT.HasValue)
+            if (nhaThauID.HasValue)
             {
-                int nhaThauID = nhanVien.IDNT.Value;
-                var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID);
-                if (nhaThau != null)
-                {
-                    tenNhaThau = nhaThau.FullName;
-                    ViewBag.IDNT = new SelectList(db.NT_Partner.ToList(), "ID", "FullName", nhaThauID);
-                }
-                else
-                {
-                    ViewBag.IDNT = new SelectList(db.NT_Partner.ToList(), "ID", "FullName");
-                }
+                var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID.Value);
+                tenNhaThau = nhaThau?.FullName ?? "";
             }
-            else
-            {
-                ViewBag.IDNT = new SelectList(db.NT_Partner.ToList(), "ID", "FullName");
-            }
+            // Truyền ra View để hiển thị+submit
+            ViewBag.NhaThau_ID = nhaThauID;
+            ViewBag.TenNhaThau = tenNhaThau;
 
             // Lấy danh sách phòng ban
             ViewBag.IDPhongBan = new SelectList(db.PhongBans.Where(x => x.status == 1).ToList(), "IDPhongBan", "TenPhongBan", donDangKy.BPQL_ID);
@@ -795,7 +786,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 }
 
                 // Kiểm tra trạng thái đơn
-                if (donDangKy.TinhTrang_ID != (int)TinhTrangDonDangKy.ChoXuLy)
+                if (donDangKy.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap)
                 {
                     return Json(new { success = false, message = "Đơn đã được duyệt, không thể chỉnh sửa" });
                 }
@@ -858,7 +849,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     CapDuyet = 0,
                     NguoiDuyet_ID = model.NhanVienNT_ID ?? Models.MyAuthentication.ID,
                     NgayDuyet = DateTime.Now,
-                    TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
+                    TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                     GhiChu = "Trình ký từ nhà thầu"
                 });
 
@@ -869,8 +860,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         Ma_Don = model.Ma_Don,
                         CapDuyet = 1,
                         NguoiDuyet_ID = KTV_ID.Value,
-                        TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
-                        GhiChu = "Chờ duyệt - Kỹ thuật viên"
+                        TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
+                        GhiChu = "Kỹ thuật viên"
                     });
                 }
 
@@ -881,8 +872,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         Ma_Don = model.Ma_Don,
                         CapDuyet = 1,
                         NguoiDuyet_ID = TP_ID.Value,
-                        TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
-                        GhiChu = "Chờ duyệt cấp - Trưởng/Phó phòng"
+                        TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
+                        GhiChu = "Trưởng/Phó phòng"
                     });
                 }
 
@@ -893,7 +884,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         Ma_Don = model.Ma_Don,
                         CapDuyet = 2,
                         NguoiDuyet_ID = VP1C_ID.Value,
-                        TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy,
+                        TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                         GhiChu = "Chờ cấp phát thẻ từ CPT"
                     });
                 }
@@ -985,7 +976,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 tpList
             }, JsonRequestBehavior.AllowGet);
         }
-      
+
         [HttpPost]
         public ActionResult DuyetDon(string maDon, bool isApproved, string ghiChu = "")
         {
@@ -1223,14 +1214,14 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             {
                 PageSize = Rotativa.Options.Size.A4,
                 PageMargins = new Rotativa.Options.Margins(13, 5, 10, 5),
-               // CustomSwitches = $"--footer-html \"{footerHtml}\" --footer-spacing 5 --footer-font-size 9 --footer-line --encoding utf-8"
+                // CustomSwitches = $"--footer-html \"{footerHtml}\" --footer-spacing 5 --footer-font-size 9 --footer-line --encoding utf-8"
             };
             byte[] pdfBytes = actionPdf.BuildPdf(this.ControllerContext);
             System.IO.File.WriteAllBytes(tempPdf, pdfBytes);
 
             return tempPdf;
         }
-       
+
         private string SanitizeFileName(string input)
         {
             string invalidChars = new string(Path.GetInvalidFileNameChars());
@@ -1298,6 +1289,176 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             // Trả file cho người dùng tải xuống (Content-Disposition: attachment)
             return File(filePath, mime, fileName);
+        }
+        public ActionResult TrinhKy(string maDon)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(maDon))
+                    return Json(new { success = false, message = "Thiếu mã đơn." });
+
+                var don = db_dk.CDNT_DonDangKy.FirstOrDefault(x => x.Ma_Don == maDon);
+                if (don == null)
+                    return Json(new { success = false, message = "Không tìm thấy đơn." });
+
+                if (don.NhanVienNT_ID != Models.MyAuthentication.ID)
+                    return Json(new { success = false, message = "Bạn không có quyền trình ký đơn này." });
+
+
+
+                if (don.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap)
+                    return Json(new { success = false, message = "Đơn không ở trạng thái nháp." });
+
+                // 1. Cập nhật trạng thái đơn
+                don.TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy;
+                don.NgayTrinhKy = DateTime.Now;
+                // don.TrangThaiTrinhKy = 1; // nếu có cờ riêng
+
+                // 2. Lấy toàn bộ luồng ký hiện có
+                var steps = db_dk.CDNT_TrinhKy
+                    .Where(x => x.Ma_Don == maDon)
+                    .ToList();
+
+                // 3. Cập nhật cấp 0 (nếu tồn tại) – KHÔNG tạo mới
+                var cap0 = steps.FirstOrDefault(x => x.CapDuyet == 0);
+                if (cap0 != null)
+                {
+                    if (cap0.TinhTrang_ID != (int)TinhTrangDonDangKy.DaXuLy)
+                    {
+                        cap0.TinhTrang_ID = (int)TinhTrangDonDangKy.DaXuLy;
+                        cap0.NgayDuyet = DateTime.Now;
+                    }
+                    if (string.IsNullOrWhiteSpace(cap0.GhiChu))
+                        cap0.GhiChu = "Trình ký từ nhà thầu";
+                }
+                // Nếu không có cap0 -> theo yêu cầu: KHÔNG tạo mới, bỏ qua.
+
+                // 4. Chuyển các bước cấp > 0 từ Nháp -> Chờ xử lý
+                var draftApprovals = steps
+                    .Where(x => x.CapDuyet > 0 && x.TinhTrang_ID == (int)TinhTrangDonDangKy.Nhap)
+                    .ToList();
+
+                foreach (var step in draftApprovals)
+                {
+                    step.TinhTrang_ID = (int)TinhTrangDonDangKy.ChoXuLy;
+
+                    // Chuẩn hóa GhiChu nếu bạn muốn đồng nhất hiển thị (không cần phân biệt thêm):
+                    if (string.IsNullOrWhiteSpace(step.GhiChu) || step.GhiChu.ToLower().StartsWith("nháp"))
+                    {
+                        // Nếu bạn vẫn muốn giữ ý nghĩa cũ dựa trên CapDuyet, có thể switch:
+                        switch (step.CapDuyet)
+                        {
+                            case 1:
+                                // Nếu muốn giữ nguyên ghi chú cũ (ví dụ đã là 'Nháp - Kỹ thuật viên') thì tùy
+                                step.GhiChu = "Chờ duyệt";
+                                break;
+                            case 2:
+                                step.GhiChu = "Chờ duyệt";
+                                break;
+                            default:
+                                step.GhiChu = $"Chờ duyệt - Cấp {step.CapDuyet}";
+                                break;
+                        }
+                    }
+                }
+
+                db_dk.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Trình ký thành công. Trạng thái luồng đã được cập nhật."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        public ActionResult HuyTrinhKy(string maDon)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(maDon))
+                    return Json(new { success = false, message = "Thiếu mã đơn." });
+
+                var don = db_dk.CDNT_DonDangKy.FirstOrDefault(x => x.Ma_Don == maDon);
+                if (don == null)
+                    return Json(new { success = false, message = "Không tìm thấy đơn." });
+
+                if (don.NhanVienNT_ID != Models.MyAuthentication.ID)
+                    return Json(new { success = false, message = "Bạn không có quyền hủy trình ký đơn này." });
+
+                // Chỉ hủy khi đơn đang ở trạng thái Chờ xử lý
+                if (don.TinhTrang_ID != (int)TinhTrangDonDangKy.ChoXuLy)
+                    return Json(new { success = false, message = "Chỉ được hủy khi đơn đang ở trạng thái Chờ xử lý." });
+
+                // Chặn hủy nếu đã có cấp > 0 xử lý (DaXuLy hoặc KhongDatYeuCau)
+                bool daCoXuLy = db_dk.CDNT_TrinhKy.Any(x =>
+                    x.Ma_Don == maDon &&
+                    x.CapDuyet > 0 &&
+                    (x.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy ||
+                     x.TinhTrang_ID == (int)TinhTrangDonDangKy.KhongDatYeuCau));
+
+                if (daCoXuLy)
+                    return Json(new { success = false, message = "Không thể hủy: đã có cấp duyệt xử lý." });
+
+                // Lấy tất cả các bước
+                var steps = db_dk.CDNT_TrinhKy.Where(x => x.Ma_Don == maDon).ToList();
+
+                // 1. CẤP 0 về Nháp
+                var cap0 = steps.FirstOrDefault(x => x.CapDuyet == 0);
+                if (cap0 != null)
+                {
+                    cap0.TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap;
+                    cap0.NgayDuyet = null;
+                    cap0.GhiChu = "Nhà thầu"; 
+                }
+
+                // 2. Các bước cấp > 0 đang Chờ xử lý (1) → Nháp (5)
+                var waitingSteps = steps
+                    .Where(x => x.CapDuyet > 0 && x.TinhTrang_ID == (int)TinhTrangDonDangKy.ChoXuLy)
+                    .ToList();
+
+                foreach (var s in waitingSteps)
+                {
+                    s.TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap;
+                    var raw = (s.GhiChu ?? "").Trim().ToLower();
+
+                    if (s.CapDuyet == 1)
+                    {
+                        if (raw.Contains("kỹ thuật"))
+                            s.GhiChu = "Kỹ thuật viên";
+                        else if (raw.Contains("trưởng") || raw.Contains("phó"))
+                            s.GhiChu = "Trưởng/Phó phòng";
+                        else
+                            s.GhiChu = "Cấp 1";
+                    }
+                    else if (s.CapDuyet == 2)
+                    {
+                        s.GhiChu = "VP1C (CPT)";
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(s.GhiChu) || raw.StartsWith("chờ") || raw.StartsWith("nháp"))
+                            s.GhiChu = $"Cấp {s.CapDuyet}";
+                    }
+                }
+
+                // 3. Đơn về Nháp
+                don.TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap;
+                // Nếu muốn reset thời điểm trình ký:
+                // don.NgayTrinhKy = null;
+
+                db_dk.SaveChanges();
+
+                return Json(new { success = true, message = "Hủy trình ký thành công. Toàn bộ (kể cả cấp 0) đã về Nháp." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
     }
 }

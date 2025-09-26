@@ -58,10 +58,11 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
     }
     public enum TinhTrangDonDangKy
     {
-        ChoXuLy = 1,         // Nhà thầu trình ký -> Chờ BPQL xử lý
-        DaXuLy = 2,          // BPQL đã duyệt -> chờ CPT xác nhận
-        HoanThanh = 3,       // CPT đã xác nhận cấp thẻ
-        KhongDatYeuCau = 4   // BPQL từ chối
+        ChoXuLy = 1,
+        DaXuLy = 2,
+        HoanThanh = 3,
+        KhongDatYeuCau = 4,
+        Nhap = 5
     }
 
     public class DonDangKyInsertModel
