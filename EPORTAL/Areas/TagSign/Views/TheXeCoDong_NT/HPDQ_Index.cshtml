@@ -77,12 +77,12 @@
                                     <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","TheXeCoDong_NT",new {area="TagSign"})' style="margin-top:50px"></div>
                                 </div>*@
                             @*<div class="col-md-2">
-                                <a href="@Url.Action("Create", "TheXeCoDong_NT", new { area = "TagSign" })"
-                                   class="btn btn-primary"
-                                   style="margin-left:10px;float:right">
-                                    <i class="fa fa-plus"></i> Thêm mới
-                                </a>
-                            </div>*@
+                                    <a href="@Url.Action("Create", "TheXeCoDong_NT", new { area = "TagSign" })"
+                                       class="btn btn-primary"
+                                       style="margin-left:10px;float:right">
+                                        <i class="fa fa-plus"></i> Thêm mới
+                                    </a>
+                                </div>*@
 
                         </div>
                     </div>
@@ -133,15 +133,15 @@
                                                         @*<a title="trình ký" class="btn-action"><i class="fa fa-paper-plane"></i></a>*@
 
                                                         @*<a title="Trình ký" href="javascript:void(0);" class="btn-action btn-trinhky" data-madon="@item.Ma_Don" data-noidung="@item.NoiDung">
-            <i class="fa fa-paper-plane" aria-hidden="true"></i>
-        </a>*@
+                                                                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                                            </a>*@
 
 
                                                         @*<a class="btn-action"
-           title="Chỉnh sửa"
-           href="@Url.Action("Update", "TheXeCoDong_NT", new { id = item.Ma_Don })">
-            <i class="fa fa-edit"></i>
-        </a>*@
+                                                               title="Chỉnh sửa"
+                                                               href="@Url.Action("Update", "TheXeCoDong_NT", new { id = item.Ma_Don })">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>*@
                                                         <a class="btn-action"
                                                            title="Chi tiết danh sách"
                                                            href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
@@ -163,33 +163,53 @@
                                                             </a>
                                                         }
                                                     </td>
-                                                    <td>
-                                                        @{
-                                                            string btnClass;
-                                                            switch (item.TinhTrang_ID)
-                                                            {
-                                                                case 1:
-                                                                    btnClass = "btn-warning";
-                                                                    break;
-                                                                case 2:
-                                                                    btnClass = "btn-info";
-                                                                    break;
-                                                                case 3:
-                                                                    btnClass = "btn-success";
-                                                                    break;
-                                                                case 4:
-                                                                    btnClass = "btn-danger";
-                                                                    break;
-                                                                default:
-                                                                    btnClass = "btn-secondary";
-                                                                    break;
+                                                    @*<td>
+                                                            @{
+                                                                string btnClass;
+                                                                switch (item.TinhTrang_ID)
+                                                                {
+                                                                    case 1:
+                                                                        btnClass = "btn-warning";
+                                                                        break;
+                                                                    case 2:
+                                                                        btnClass = "btn-info";
+                                                                        break;
+                                                                    case 3:
+                                                                        btnClass = "btn-success";
+                                                                        break;
+                                                                    case 4:
+                                                                        btnClass = "btn-danger";
+                                                                        break;
+                                                                    default:
+                                                                        btnClass = "btn-secondary";
+                                                                        break;
+                                                                }
                                                             }
+                                                            <a href="@Url.Action("HPDQ_LuongTrinhKy", "TheXeCoDong_NT", new { Ma_Don = item.Ma_Don })" style="text-decoration:none;">
+                                                                <span class="btn @btnClass" style="width:120px;">@item.TenTinhTrang</span>
+                                                            </a>
+                                                        </td>*@
+                                                    <td class="text-center">
+                                                        @{
+                                                            // Map màu cho PerUserStatusCode (góc nhìn)
+                                                            string perUserCls;
+                                                            switch (item.PerUserStatusCode)
+                                                            {
+                                                                case 1: perUserCls = "btn-warning"; break;   // Chờ bạn xử lý
+                                                                case 2: perUserCls = "btn-info"; break;      // Bạn đã duyệt – chờ cấp sau
+                                                                case 3: perUserCls = "btn-primary"; break;   // Đã xử lý toàn bộ
+                                                                case 4: perUserCls = "btn-danger"; break;    // Không đạt
+                                                                case 5: perUserCls = "btn-success"; break;   // Bạn là cấp cuối
+                                                                default: perUserCls = "btn-secondary"; break;
+                                                            }
+                                                      
                                                         }
-                                                        <a href="@Url.Action("HPDQ_LuongTrinhKy", "TheXeCoDong_NT", new { Ma_Don = item.Ma_Don })" style="text-decoration:none;">
-                                                            <span class="btn @btnClass" style="width:120px;">@item.TenTinhTrang</span>
-                                                        </a>
+                                                            <a href="@Url.Action("HPDQ_LuongTrinhKy", "TheXeCoDong_NT", new { Ma_Don = item.Ma_Don })"
+                                                               class="btn btn-sm @perUserCls"
+                                                               style="min-width:160px; text-decoration:none;">
+                                                                @item.PerUserStatusText
+                                                            </a>
                                                     </td>
-
                                                 </tr>
                                                 stt++;
                                             }

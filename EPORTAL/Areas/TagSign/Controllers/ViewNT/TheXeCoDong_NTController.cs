@@ -68,69 +68,275 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(pagedData);
         }
+        //public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu, int? page)
+        //{
+        //    int pageNumber = page ?? 1;
+        //    int pageSize = 10;
+        //    var userId = Models.MyAuthentication.ID;
+
+        //    // Lấy dữ liệu từ store
+        //    var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
+        //        "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
+        //        new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
+        //        new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+        //        new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+        //    ).ToList();
+
+        //    // Lấy các phân công của user hiện tại
+        //    var phanCongUser = db_dk.CDNT_TrinhKy
+        //        .Where(x => x.NguoiDuyet_ID == userId)
+        //        .ToList();
+
+        //    // Lọc dữ liệu theo cấp duyệt
+        //    var dsHienThi = new List<DonDangKyViewModel>();
+        //    foreach (var don in data)
+        //    {
+        //        if (don.TinhTrang_ID == (int)TinhTrangDonDangKy.Nhap) continue;
+        //        var phanCong = phanCongUser.FirstOrDefault(x => x.Ma_Don == don.Ma_Don);
+        //        if (phanCong == null) continue;
+
+        //        if (phanCong.CapDuyet == 1)
+        //        {
+        //            dsHienThi.Add(don);
+        //        }
+        //        else if (phanCong.CapDuyet == 2)
+        //        {
+        //            var cap1 = db_dk.CDNT_TrinhKy
+        //                .FirstOrDefault(x => x.Ma_Don == don.Ma_Don && x.CapDuyet == 1);
+
+        //            if (cap1 == null || cap1.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy)
+        //            {
+        //                dsHienThi.Add(don);
+        //            }
+        //        }
+        //    }
+
+        //    var pagedData = dsHienThi.ToPagedList(pageNumber, pageSize);
+
+        //    // Giữ filter
+        //    ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
+        //    ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+        //    ViewBag.MaPhieu = maPhieu;
+        //    ViewBag.Page = pageNumber;
+        //    ViewBag.PageSize = pageSize;
+
+        //    return View(pagedData);
+        //}
         public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu, int? page)
         {
             int pageNumber = page ?? 1;
             int pageSize = 10;
-            var userId = Models.MyAuthentication.ID;
+            int userId = Models.MyAuthentication.ID;
 
-            // Lấy dữ liệu từ store
+            // 1. Lấy đơn (trừ Nháp)
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
-                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
+                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate, @p_MaPhieu",
                 new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
                 new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
                 new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
-            ).ToList();
+            )
+            .Where(d => d.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap)
+            .ToList();
 
-            // Lấy các phân công của user hiện tại
-            var phanCongUser = db_dk.CDNT_TrinhKy
-                .Where(x => x.NguoiDuyet_ID == userId)
-                .ToList();
-
-            // Lọc dữ liệu theo cấp duyệt
-            var dsHienThi = new List<DonDangKyViewModel>();
-            foreach (var don in data)
+            if (!data.Any())
             {
-                if (don.TinhTrang_ID == (int)TinhTrangDonDangKy.Nhap) continue;
-                var phanCong = phanCongUser.FirstOrDefault(x => x.Ma_Don == don.Ma_Don);
-                if (phanCong == null) continue;
-
-                if (phanCong.CapDuyet == 1)
-                {
-                    dsHienThi.Add(don);
-                }
-                else if (phanCong.CapDuyet == 2)
-                {
-                    var cap1 = db_dk.CDNT_TrinhKy
-                        .FirstOrDefault(x => x.Ma_Don == don.Ma_Don && x.CapDuyet == 1);
-
-                    if (cap1 == null || cap1.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy)
-                    {
-                        dsHienThi.Add(don);
-                    }
-                }
+                SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+                return View(new List<DonDangKyViewModel>().ToPagedList(pageNumber, pageSize));
             }
 
-            var pagedData = dsHienThi.ToPagedList(pageNumber, pageSize);
+            // 2. Phân công user
+            var userAssignRaw = db_dk.CDNT_TrinhKy
+                .Where(x => x.NguoiDuyet_ID == userId && x.CapDuyet > 0)
+                .Select(x => new { x.Ma_Don, x.CapDuyet })
+                .ToList();
 
-            // Giữ filter
+            var userAssign = userAssignRaw
+                .GroupBy(a => a.Ma_Don)
+                .ToDictionary(g => g.Key, g => g.Select(z => z.CapDuyet ?? 0).OrderBy(c => c).ToList());
+
+            // 3. Các bước duyệt
+            var maDonList = data.Select(d => d.Ma_Don).Distinct().ToList();
+            var stepsRaw = db_dk.CDNT_TrinhKy
+                .Where(x => maDonList.Contains(x.Ma_Don) && x.CapDuyet > 0)
+                .Select(x => new StepInfo
+                {
+                    Ma_Don = x.Ma_Don,
+                    CapDuyet = x.CapDuyet,
+                    TinhTrang_ID = x.TinhTrang_ID
+                })
+                .ToList();
+
+            var stepsByDon = stepsRaw
+                .GroupBy(s => s.Ma_Don)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var result = new List<DonDangKyViewModel>();
+
+            foreach (var don in data)
+            {
+                // Không phải người duyệt
+                if (!userAssign.TryGetValue(don.Ma_Don, out var userCaps) || userCaps.Count == 0)
+                    continue;
+
+                int userCap = userCaps.First();
+                if (!stepsByDon.TryGetValue(don.Ma_Don, out var stepList))
+                    stepList = new List<StepInfo>();
+
+                // Kiểm tra các cấp trước đã duyệt hết chưa (điều kiện "tới lượt")
+                bool lowerAllApproved = stepList
+                    .Where(s => (s.CapDuyet ?? 0) < userCap)
+                    .All(s => s.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy);
+
+                if (!lowerAllApproved) continue;
+
+                var myStep = stepList.FirstOrDefault(s => s.CapDuyet == userCap);
+                int highestCap = stepList.Select(s => s.CapDuyet ?? 0).DefaultIfEmpty(0).Max();
+                bool hasReject = stepList.Any(s => s.TinhTrang_ID == (int)TinhTrangDonDangKy.KhongDatYeuCau);
+                bool allApproved = stepList.Any() && stepList.All(s => s.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy);
+
+                // Gán TenTinhTrang theo TinhTrang_ID (KHÔNG tự tính lại)
+                don.TenTinhTrang = TranslateTinhTrang(don.TinhTrang_ID);
+
+                // Góc nhìn user
+                if (hasReject)
+                {
+                    don.PerUserStatusCode = 4;
+                    don.PerUserStatusText = "Không đạt yêu cầu";
+                }
+                else if (allApproved)
+                {
+                    don.PerUserStatusCode = 3;
+                    don.PerUserStatusText = "Đã xử lý";
+                }
+                else if (myStep == null)
+                {
+                    don.PerUserStatusCode = 0;
+                    don.PerUserStatusText = "Chưa vào lượt";
+                }
+                else if (myStep.TinhTrang_ID == (int)TinhTrangDonDangKy.ChoXuLy)
+                {
+                    don.PerUserStatusCode = 1;
+                    don.PerUserStatusText = "Chờ xử lý";
+                }
+                else if (myStep.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy)
+                {
+                    if (userCap == highestCap)
+                    {
+                        don.PerUserStatusCode = 5;
+                        don.PerUserStatusText = "Đã xử lý";
+                    }
+                    else
+                    {
+                        don.PerUserStatusCode = 2;
+                        don.PerUserStatusText = "Đã xử lý";
+                    }
+                }
+                else
+                {
+                    don.PerUserStatusCode = 0;
+                    don.PerUserStatusText = "Chờ xử lý";
+                }
+
+                result.Add(don);
+            }
+
+            var ordered = result
+                .OrderBy(r => r.PerUserStatusCode == 1 ? 0 : 1)
+                .ThenByDescending(r => r.NgayTrinhKy ?? DateTime.MinValue)
+                .ToPagedList(pageNumber, pageSize);
+
+            SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+            return View(ordered);
+        }
+
+        private void SetFilters(DateTime? begind, DateTime? endd, string maPhieu, int page, int size)
+        {
             ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
             ViewBag.MaPhieu = maPhieu;
-            ViewBag.Page = pageNumber;
-            ViewBag.PageSize = pageSize;
-
-            return View(pagedData);
+            ViewBag.Page = page;
+            ViewBag.PageSize = size;
         }
 
+        private string TranslateTinhTrang(int? stt)
+        {
+            if (!stt.HasValue) return "Không xác định";
+            switch (stt.Value)
+            {
+                case 1: return "Chờ xử lý";
+                case 2: return "Đã xử lý";
+                case 3: return "Hoàn thành";
+                case 4: return "Không đạt yêu cầu";
+                case 5: return "Nháp";
+                default: return "Không xác định";
+            }
+        }
+        //public ActionResult HPDQ_Detail(string maDon)
+        //{
+        //    var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
+        //        "EXEC CDNT_DonDangKy_Detail @Ma_Don",
+        //        new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
+        //    ).ToList();
+
+        //    return View(data);
+        //}
         public ActionResult HPDQ_Detail(string maDon)
         {
+            if (string.IsNullOrWhiteSpace(maDon))
+            {
+                TempData["msgError"] = "<div class='alert alert-danger'>Thiếu mã đơn.</div>";
+                return RedirectToAction("HPDQ_Index");
+            }
+
+            var userId = Models.MyAuthentication.ID;
+
+            // Lấy chi tiết (SP bạn đã có)
             var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
                 "EXEC CDNT_DonDangKy_Detail @Ma_Don",
-                new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
+                new SqlParameter("@Ma_Don", (object)maDon ?? DBNull.Value)
             ).ToList();
 
-            return View(data);
+            if (!data.Any())
+            {
+                TempData["msgError"] = "<div class='alert alert-warning'>Không tìm thấy dữ liệu đơn.</div>";
+                return RedirectToAction("HPDQ_Index");
+            }
+
+            // Tìm step của user
+            var myStep = db_dk.CDNT_TrinhKy
+                .FirstOrDefault(x => x.Ma_Don == maDon
+                                  && x.NguoiDuyet_ID == userId
+                                  && x.CapDuyet > 0);
+
+            bool canAct = false;
+            int? myStepStatus = null;
+            int? myStepId = null;
+            int? myCap = null;
+
+            if (myStep != null)
+            {
+                myStepStatus = myStep.TinhTrang_ID;
+                myStepId = myStep.ID;
+                myCap = myStep.CapDuyet;
+
+                if (myStep.TinhTrang_ID == (int)TinhTrangDonDangKy.ChoXuLy)
+                {
+                    // Các cấp trước phải đã duyệt
+                    bool lowerAllApproved = db_dk.CDNT_TrinhKy
+                        .Where(s => s.Ma_Don == maDon && s.CapDuyet > 0 && s.CapDuyet < myStep.CapDuyet)
+                        .All(s => s.TinhTrang_ID == (int)TinhTrangDonDangKy.DaXuLy);
+
+                    canAct = lowerAllApproved;
+                }
+            }
+
+            ViewBag.CanAct = canAct;
+            ViewBag.MyStepStatus = myStepStatus; // 1 / 2 / 4 / null
+            ViewBag.MyStepId = myStepId;
+            ViewBag.MyStepCap = myCap;
+            ViewBag.MaDon = maDon;
+
+            return View(data); // Model: List<CDNT_DonDangKyDetail>
         }
 
         public ActionResult Create(List<ChiTietDonVM> danhSach = null)

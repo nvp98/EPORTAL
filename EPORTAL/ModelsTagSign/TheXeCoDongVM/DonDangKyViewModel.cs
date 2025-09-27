@@ -20,6 +20,9 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string FileHoSoXe { get; set; }
         public string TenTinhTrang { get; set; }
         public int? TinhTrang_ID { get; set; }
+
+        public int PerUserStatusCode { get; set; }
+        public string PerUserStatusText { get; set; }
     }
     public class ChiTietDonVM
     {
@@ -180,5 +183,10 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public List<CDNT_DonDangKyDetail> ChiTietDon { get; set; }
         public List<TrinhKyModel> TrinhKy { get; set; }
     }
-
+    public class StepInfo
+    {
+        public string Ma_Don { get; set; }
+        public int? CapDuyet { get; set; }
+        public int? TinhTrang_ID { get; set; }
+    }
 }
