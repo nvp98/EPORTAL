@@ -188,21 +188,11 @@
                                                             string btnClass;
                                                             switch (item.TinhTrang_ID)
                                                             {
-                                                                case 1:
-                                                                    btnClass = "btn-warning";
-                                                                    break;
-                                                                case 2:
-                                                                    btnClass = "btn-info";
-                                                                    break;
-                                                                case 3:
-                                                                    btnClass = "btn-success";
-                                                                    break;
-                                                                case 4:
-                                                                    btnClass = "btn-danger";
-                                                                    break;
-                                                                default:
-                                                                    btnClass = "btn-secondary";
-                                                                    break;
+                                                                case 1: btnClass = "btn-warning"; break;      // Chờ xử lý
+                                                                case 2: btnClass = "btn-info"; break;         // Đã xử lý
+                                                                case 4: btnClass = "btn-danger"; break;       // Không đạt yêu cầu
+                                                                case 5: btnClass = "btn-secondary"; break;    // Chưa trình ký
+                                                                default: btnClass = "btn-dark"; break;
                                                             }
                                                         }
                                                         <a href="@Url.Action("LuongTrinhKy", "TheXeCoDong_NT", new { Ma_Don = item.Ma_Don })" style="text-decoration:none;">

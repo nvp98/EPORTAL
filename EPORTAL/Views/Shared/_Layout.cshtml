@@ -1021,13 +1021,9 @@
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>
                             <ul id="listatld1">
-
                                 <li>
-                                    <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
-                                        <i class="fa fa-file-archive p-lg-1 "></i>
-                                        Duyệt đơn
-                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                    </a>
+                                    <i class="fa fa-file-archive p-lg-1"></i>
+                                    Duyệt đơn <span id="duyetdon-label" class="text-danger"></span>
                                 </li>
                             </ul>
                             <ul id="listatld2">
@@ -1519,6 +1515,11 @@
         //        return false;
         //    }
         //};
+        $(document).ready(function () {
+            $.getJSON('/TagSign/TheXeCoDong_NT/HPDQ_Notify', function (data) {
+                $('#duyetdon-label').text(data.Total);
+            });
+        });
     </script>
 
 </body>

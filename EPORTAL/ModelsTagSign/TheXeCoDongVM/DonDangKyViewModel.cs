@@ -11,7 +11,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int ID { get; set; }
         public string Ma_Don { get; set; }
         public string NoiDung { get; set; }
-        // public string TenLoaiNT { get; set; }
+
         public string TenNhanVienNT { get; set; }
         public string TenBPQL { get; set; }
         public string TenNhaThau { get; set; }
@@ -188,5 +188,10 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string Ma_Don { get; set; }
         public int? CapDuyet { get; set; }
         public int? TinhTrang_ID { get; set; }
+    }
+    public class CapCountResult
+    {
+        public int CapDuyet { get; set; }
+        public int SoLuong { get; set; }
     }
 }

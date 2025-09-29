@@ -276,7 +276,7 @@
             },
             success: function (res) {
                 alert(res.message);
-                if (res.success) location.reload();
+                window.location.href = res.redirectUrl;
             },
             error: function () {
                 alert("Có lỗi xảy ra khi gửi yêu cầu duyệt.");
