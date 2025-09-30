@@ -1774,6 +1774,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             int pageNumber = page ?? 1;
             int pageSize = 10;
+            int userId = Models.MyAuthentication.ID;
 
             // Lấy tất cả đơn đã xử lý hoặc hoàn thành
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
@@ -1781,12 +1782,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
                 new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
                 new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
-            )
-            .Where(d => d.TinhTrang_ID == 2 || d.TinhTrang_ID == 4)
+            ).ToList();
+            var userSteps = db_dk.CDNT_TrinhKy.Where(x => x.NguoiDuyet_ID == userId && (x.TinhTrang_ID == 2 || x.TinhTrang_ID == 4))
+               .Select(x => x.Ma_Don)
+               .Distinct()
+               .ToList();
+            var filtered = data
+            .Where(d => userSteps.Contains(d.Ma_Don) && (d.TinhTrang_ID == 2 || d.TinhTrang_ID == 3))
             .OrderByDescending(d => d.NgayTrinhKy ?? DateTime.MinValue)
             .ToList();
-
-            if (!data.Any())
+            if (!filtered.Any())
             {
                 SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
                 return View(new List<DonDangKyViewModel>().ToPagedList(pageNumber, pageSize));
