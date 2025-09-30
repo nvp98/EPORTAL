@@ -1022,16 +1022,15 @@
                             </a>
                             <ul id="listatld1">
                                 <li>
-                                    <i class="fa fa-file-archive p-lg-1"></i>
-                                    Duyệt đơn <span id="duyetdon-label" class="text-danger"></span>
-                                </li>
-                            </ul>
-                            <ul id="listatld2">
-
-                                <li>
                                     <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
+                                        <i class="fa fa-file-archive p-lg-1"></i>
+                                        Hồ sơ chờ xử lý <span id="duyetdon-label" class="text-danger"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="@Url.Action("HPDQ_Index_DaXuLy", "TheXeCoDong_NT", new {area="TagSign"})">
                                         <i class="fa fa-file-archive p-lg-1 "></i>
-                                        Bộ phận cấp phát thẻ
+                                        Hồ sơ đã xử lý
                                         <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                     </a>
                                 </li>

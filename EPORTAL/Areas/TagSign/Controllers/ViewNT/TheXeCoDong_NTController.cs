@@ -1770,5 +1770,33 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 Total = soluong
             }, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult HPDQ_Index_DaXuLy(DateTime? begind, DateTime? endd, string maPhieu, int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 10;
+
+            // Lấy tất cả đơn đã xử lý hoặc hoàn thành
+            var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
+                "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate, @p_MaPhieu",
+                new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
+                new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+                new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+            )
+            .Where(d => d.TinhTrang_ID == 2 || d.TinhTrang_ID == 4)
+            .OrderByDescending(d => d.NgayTrinhKy ?? DateTime.MinValue)
+            .ToList();
+
+            if (!data.Any())
+            {
+                SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+                return View(new List<DonDangKyViewModel>().ToPagedList(pageNumber, pageSize));
+            }
+
+            var ordered = data.ToPagedList(pageNumber, pageSize);
+
+            SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+            return View(ordered);
+        }
+
     }
 }

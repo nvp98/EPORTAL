@@ -22,18 +22,23 @@
 @{
     var hasTrinhKy = (Model != null && Model.TrinhKy != null);
 
-    var cpt = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 2) : null;
-    var bpql = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 1) : null;
     var nhathau = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 0) : null;
-      DateTime? ngayNT = (nhathau != null) ? nhathau.NgayDuyet : (DateTime?)null;
+    var cap1 = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 1) : null;
+    var cap2 = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 2) : null;
+    var cpt = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 3) : null;
 
-    // Hiển thị dd/MM/yyyy
+    // Quy tắc xác định ký chính / ký nháy cho BPQL
+    var bpqlChinh = (cap2 != null) ? cap2 : cap1;   // ưu tiên cấp 2
+    var bpqlNhay = (cap2 != null && cap1 != null) ? cap1 : null; // chỉ có khi cả 1 & 2 cùng tồn tại
+
+    DateTime? ngayNT = (nhathau != null) ? nhathau.NgayDuyet : (DateTime?)null;
+
     var ngayNTText = ngayNT.HasValue ? ngayNT.Value.ToString("dd/MM/yyyy") : "";
-
-    // Hoặc chuỗi: Quảng Ngãi, ngày d tháng M năm yyyy
     var chuKyNgay = ngayNT.HasValue
         ? string.Format("Quảng Ngãi, ngày {0} tháng {1} năm {2}", ngayNT.Value.Day, ngayNT.Value.Month, ngayNT.Value.Year)
         : "Quảng Ngãi, ngày...tháng...năm.....";
+
+    string baseUrl = "https://portal.hoaphatdungquat.vn";
 }
 
 <meta charset="utf-8" />
@@ -161,20 +166,25 @@
                     </label>
                 </div>
 
-
-                @*@{
-                    // Ví dụ: CapDuyet = 1: CPT, 2: BP quản lý, 3: Nhà thầu
-                    var cpt = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 2);
-                    var bpql = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 1);
-                    var nhathau = Model.TrinhKy?.FirstOrDefault(tk => tk.CapDuyet == 0);
-                }*@
-                @{
-                    string baseUrl = "https://portal.hoaphatdungquat.vn";
-                }
                 <table style="width: 100%; font-size: 20px; text-align: center; margin-top: 30px; border-collapse: collapse;">
                     <tr>
                         <td><strong>Tổ CPT (P.ATMT)</strong></td>
-                        <td><strong>BP quản lý</strong></td>
+                        <td>
+                            <strong>BP quản lý</strong>
+                            @* Ký nháy nếu có *@
+                            @if (bpqlNhay != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(bpqlNhay.ChuKyNguoiDuyet))
+                                {
+                                    var imgUrl = baseUrl + bpqlNhay.ChuKyNguoiDuyet.Replace("~", "");
+                                    <img src="@imgUrl" alt="Ký nháy" style="height:38px; background:#fff; padding:2px 10px; margin-left:8px; vertical-align:middle;" />
+                                }
+                                else
+                                {
+                                    <span style="border:2px solid red; color:red; font-weight:bold; padding:2px 10px; margin-left:8px; vertical-align:middle;">Ký nháy</span>
+                                }
+                            }
+                        </td>
                         <td><strong>Đại diện Nhà thầu</strong></td>
                     </tr>
                     <tr>
@@ -182,42 +192,38 @@
                             @if (cpt != null && !string.IsNullOrWhiteSpace(cpt.ChuKyNguoiDuyet))
                             {
                                 var imgUrl = baseUrl + cpt.ChuKyNguoiDuyet.Replace("~", "");
-                                <img src="@imgUrl" alt="Chữ ký" style="height:80px; width:auto;" />
+                                <img src="@imgUrl" alt="Chữ ký CPT" style="height:80px; width:auto;" />
                             }
                             else
                             {
-                                <div style="height:80px; width:100%; overflow:hidden; border:none;"></div>
+                                <div style="height:80px; width:100%;"></div>
                             }
                         </td>
                         <td>
-                            @if (bpql != null && !string.IsNullOrWhiteSpace(bpql.ChuKyNguoiDuyet))
+                            @if (bpqlChinh != null && !string.IsNullOrWhiteSpace(bpqlChinh.ChuKyNguoiDuyet))
                             {
-                                var imgUrl = baseUrl + bpql.ChuKyNguoiDuyet.Replace("~", "");
-                                <img src="@imgUrl" alt="Chữ ký" style="height:80px; width:auto;" />
+                                var imgUrl = baseUrl + bpqlChinh.ChuKyNguoiDuyet.Replace("~", "");
+                                <img src="@imgUrl" alt="Chữ ký BP quản lý" style="height:80px; width:auto;" />
                             }
                             else
                             {
-                                <div style="height:80px; width:100%; overflow:hidden; border:none;"></div>
+                                <div style="height:80px; width:100%;"></div>
                             }
                         </td>
                         <td>
                             @if (nhathau != null && !string.IsNullOrWhiteSpace(nhathau.ChuKyNguoiDuyet))
                             {
                                 var imgUrl = baseUrl + nhathau.ChuKyNguoiDuyet.Replace("~", "");
-                                <img src="@imgUrl" alt="Chữ ký" style="height:80px; width:auto;" />
+                                <img src="@imgUrl" alt="Chữ ký Nhà thầu" style="height:80px; width:auto;" />
                             }
                             else
                             {
-                                <div style="height:80px; width:100%; overflow:hidden; border:none;"></div>
+                                <div style="height:80px; width:100%;"></div>
                             }
                         </td>
                     </tr>
-                    <tr>
-                        @*<td>@(cpt?.TenNguoiDuyet ?? "")</td>
-                            <td>@(bpql?.TenNguoiDuyet ?? "")</td>
-                            <td>@(nhathau?.TenNguoiDuyet ?? "")</td>*@
-                    </tr>
                 </table>
+
                 <div class="col-md-12 pt-5" style="width:100%">
                     <div style="margin-left: 2%; font-size: 15px; font-style: italic;">
                         <p>
