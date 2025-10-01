@@ -1358,7 +1358,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         if (item.CapMoi != null)
                         {
                             var CheckVP = db_nt.NT_NhanVienVP.Where(x => x.CCCD == item.CCCD && x.TinhTrang == 0).FirstOrDefault();
-                            var CheckNVNT = db_nt.NT_NhanVienNT.Where(x => x.CCCD.Contains(item.CCCD) || x.CCCD == item.CCCD && x.TTLV == 1).FirstOrDefault();
+                            var CheckNVNT = db_nt.NT_NhanVienNT.Where(x => x.CCCD.Contains(item.CCCD) && x.TTLV == 1 || x.CCCD == item.CCCD && x.TTLV == 1).FirstOrDefault();
                             if (item.HoVaTen != "" && item.CCCD != "" && CheckVP != null)
                             {
                                 TempData["msgSuccess"] = "<script>alert('Nhân viên nằm trong danh sách vi phạm.  Nhân viên : " + item.HoVaTen + "');</script>";
