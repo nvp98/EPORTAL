@@ -310,7 +310,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     don.PerUserStatusText = "Chờ xử lý";
                 }
 
-                result.Add(don);
+                if (don.TinhTrang_ID == 5 || don.TinhTrang_ID == 1)
+                {
+                    result.Add(don);
+                }
             }
 
             var ordered = result
@@ -1770,38 +1773,85 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 Total = soluong
             }, JsonRequestBehavior.AllowGet);
         }
+        //public ActionResult HPDQ_Index_DaXuLy(DateTime? begind, DateTime? endd, string maPhieu, int? page)
+        //{
+        //    int pageNumber = page ?? 1;
+        //    int pageSize = 10;
+        //    int userId = Models.MyAuthentication.ID;
+
+        //    // Lấy tất cả đơn đã xử lý hoặc hoàn thành
+        //    var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
+        //        "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate, @p_MaPhieu",
+        //        new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
+        //        new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+        //        new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+        //    ).ToList();
+        //    var userSteps = db_dk.CDNT_TrinhKy.Where(x => x.NguoiDuyet_ID == userId && (x.TinhTrang_ID == 2 || x.TinhTrang_ID == 4))
+        //       .Select(x => x.Ma_Don)
+        //       .Distinct()
+        //       .ToList();
+        //    var filtered = data
+        //    .Where(d => userSteps.Contains(d.Ma_Don) && (d.TinhTrang_ID == 2 || d.TinhTrang_ID == 3))
+        //    .OrderByDescending(d => d.NgayTrinhKy ?? DateTime.MinValue)
+        //    .ToList();
+        //    if (!filtered.Any())
+        //    {
+        //        SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+        //        return View(new List<DonDangKyViewModel>().ToPagedList(pageNumber, pageSize));
+        //    }
+
+        //    var ordered = data.ToPagedList(pageNumber, pageSize);
+
+        //    SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+        //    return View(ordered);
+        //}
         public ActionResult HPDQ_Index_DaXuLy(DateTime? begind, DateTime? endd, string maPhieu, int? page)
         {
             int pageNumber = page ?? 1;
             int pageSize = 10;
             int userId = Models.MyAuthentication.ID;
 
-            // Lấy tất cả đơn đã xử lý hoặc hoàn thành
+            // Lấy tất cả đơn
             var data = db_dk.Database.SqlQuery<DonDangKyViewModel>(
                 "EXEC CDNT_DonDangKy_Search @p_BeginDate, @p_EndDate, @p_MaPhieu",
                 new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
                 new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
                 new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
             ).ToList();
-            var userSteps = db_dk.CDNT_TrinhKy.Where(x => x.NguoiDuyet_ID == userId && (x.TinhTrang_ID == 2 || x.TinhTrang_ID == 4))
-               .Select(x => x.Ma_Don)
-               .Distinct()
-               .ToList();
+
+            // Lấy các đơn mà user đã duyệt ở bước nào đó (và bước đó đã xử lý hoặc hoàn thành)
+            var userSteps = db_dk.CDNT_TrinhKy
+                .Where(x => x.NguoiDuyet_ID == userId && (x.TinhTrang_ID == 2 || x.TinhTrang_ID == 4))
+                .Select(x => x.Ma_Don)
+                .Distinct()
+                .ToList();
+
+            // Lấy danh sách các đơn mà tất cả các bước đều đã xử lý hoặc hoàn thành
+            var maDonList = data.Select(d => d.Ma_Don).Distinct().ToList();
+            var stepsByDon = db_dk.CDNT_TrinhKy
+                .Where(x => maDonList.Contains(x.Ma_Don) && x.CapDuyet >= 0 && x.CapDuyet <= 3)
+                .GroupBy(x => x.Ma_Don)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
             var filtered = data
-            .Where(d => userSteps.Contains(d.Ma_Don) && (d.TinhTrang_ID == 2 || d.TinhTrang_ID == 3))
-            .OrderByDescending(d => d.NgayTrinhKy ?? DateTime.MinValue)
-            .ToList();
+                .Where(d =>
+                    userSteps.Contains(d.Ma_Don) &&
+                    stepsByDon.ContainsKey(d.Ma_Don) &&
+                    stepsByDon[d.Ma_Don].All(s => s.TinhTrang_ID == 2 || s.TinhTrang_ID == 4)
+                )
+                .OrderByDescending(d => d.NgayTrinhKy ?? DateTime.MinValue)
+                .ToList();
+
             if (!filtered.Any())
             {
                 SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
                 return View(new List<DonDangKyViewModel>().ToPagedList(pageNumber, pageSize));
             }
 
-            var ordered = data.ToPagedList(pageNumber, pageSize);
+            var ordered = filtered.ToPagedList(pageNumber, pageSize);
 
             SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
             return View(ordered);
         }
-
     }
 }

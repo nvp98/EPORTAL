@@ -405,12 +405,39 @@
             }
         });
 }
-    $(document).ready(function () {
-        $("#btnSave").click(function (e) {
-            submitForm(e); // Gọi hàm submitForm đã viết ở dưới
-        });
-    });
+    $("#btnSave").click(function (e) {
+        e.preventDefault();
 
+        // Lấy danh sách xe từ bảng hiện tại
+        var listXe = [];
+        $("#tbodyImportExcel tr").each(function () {
+            var row = $(this);
+            var xe = {
+                ID_LoaiPhuongTien: row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
+                    row.find("input[type=checkbox]").eq(1).is(":checked") ? 2 :
+                        row.find("input[type=checkbox]").eq(2).is(":checked") ? 3 : 0,
+                CapMoi: row.find("input[name*='CapMoi']").is(":checked")
+            };
+            listXe.push(xe);
+        });
+
+        // Đếm số xe máy mới, xe 3 gác mới
+        var soXeMayMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 1 && x.CapMoi).length;
+        var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 3 && x.CapMoi).length;
+
+        // Kiểm tra vượt định biên
+        if (dinhBienPhuongTien) {
+            if (soXeMayMoi > dinhBienPhuongTien.XeMay_ConLai || soXe3GacMoi > dinhBienPhuongTien.Xe3Gac_ConLai) {
+                alert(`Vượt định biên: Xe máy (còn lại ${dinhBienPhuongTien.XeMay_ConLai}, đăng ký ${soXeMayMoi}), `
+                    + `Xe 3 gác (còn lại ${dinhBienPhuongTien.Xe3Gac_ConLai}, đăng ký ${soXe3GacMoi})`);
+                return; // KHÔNG gọi submitForm!
+            }
+        }
+
+        // Nếu hợp lệ, gọi submitForm như cũ
+        submitForm(e);
+    });
+    let dinhBienPhuongTien = null;
     $(document).ready(function () {
         $.ajax({
             url: '@Url.Action("GetDinhBienPhuongTien", "TheXeCoDong_NT")',
@@ -418,6 +445,8 @@
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
+                    dinhBienPhuongTien = res.data;
+                    //console.log(dinhBienPhuongTien)
                     const data = res.data;
 
                     const html = `
