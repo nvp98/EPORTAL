@@ -45,41 +45,21 @@ namespace EPORTAL.ModelsTagSign
         public virtual DbSet<TK_CardExtend> TK_CardExtend { get; set; }
         public virtual DbSet<TK_CardRegistrationInfor> TK_CardRegistrationInfor { get; set; }
     
-        public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(string p_MaDon, string p_BienSoXe, Nullable<int> p_ID_LoaiPhuongTien, Nullable<bool> p_CapMoi, Nullable<bool> p_CapLai, Nullable<bool> p_GiaHan, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay)
+        public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(Nullable<int> p_NhaThauID, Nullable<int> p_LoaiPhuongTien, string p_BienSoXe)
         {
-            var p_MaDonParameter = p_MaDon != null ?
-                new ObjectParameter("p_MaDon", p_MaDon) :
-                new ObjectParameter("p_MaDon", typeof(string));
+            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
+                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
+                new ObjectParameter("p_NhaThauID", typeof(int));
+    
+            var p_LoaiPhuongTienParameter = p_LoaiPhuongTien.HasValue ?
+                new ObjectParameter("p_LoaiPhuongTien", p_LoaiPhuongTien) :
+                new ObjectParameter("p_LoaiPhuongTien", typeof(int));
     
             var p_BienSoXeParameter = p_BienSoXe != null ?
                 new ObjectParameter("p_BienSoXe", p_BienSoXe) :
                 new ObjectParameter("p_BienSoXe", typeof(string));
     
-            var p_ID_LoaiPhuongTienParameter = p_ID_LoaiPhuongTien.HasValue ?
-                new ObjectParameter("p_ID_LoaiPhuongTien", p_ID_LoaiPhuongTien) :
-                new ObjectParameter("p_ID_LoaiPhuongTien", typeof(int));
-    
-            var p_CapMoiParameter = p_CapMoi.HasValue ?
-                new ObjectParameter("p_CapMoi", p_CapMoi) :
-                new ObjectParameter("p_CapMoi", typeof(bool));
-    
-            var p_CapLaiParameter = p_CapLai.HasValue ?
-                new ObjectParameter("p_CapLai", p_CapLai) :
-                new ObjectParameter("p_CapLai", typeof(bool));
-    
-            var p_GiaHanParameter = p_GiaHan.HasValue ?
-                new ObjectParameter("p_GiaHan", p_GiaHan) :
-                new ObjectParameter("p_GiaHan", typeof(bool));
-    
-            var p_TuNgayParameter = p_TuNgay.HasValue ?
-                new ObjectParameter("p_TuNgay", p_TuNgay) :
-                new ObjectParameter("p_TuNgay", typeof(System.DateTime));
-    
-            var p_DenNgayParameter = p_DenNgay.HasValue ?
-                new ObjectParameter("p_DenNgay", p_DenNgay) :
-                new ObjectParameter("p_DenNgay", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_ChiTietDon_Search_Result>("CDNT_ChiTietDon_Search", p_MaDonParameter, p_BienSoXeParameter, p_ID_LoaiPhuongTienParameter, p_CapMoiParameter, p_CapLaiParameter, p_GiaHanParameter, p_TuNgayParameter, p_DenNgayParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_ChiTietDon_Search_Result>("CDNT_ChiTietDon_Search", p_NhaThauIDParameter, p_LoaiPhuongTienParameter, p_BienSoXeParameter);
         }
     
         public virtual int CDNT_DonDangKi_UpdateFull_XML(string ma_Don, string noiDung, Nullable<int> bPQL_ID, Nullable<int> nhanVienNT_ID, Nullable<int> nhaThau_ID, string hopDong, Nullable<System.DateTime> ngayTrinhKy, string fileHoSoXe, Nullable<int> trinhKy_ID, Nullable<int> tinhTrang_ID, Nullable<int> loaiNT_ID, string chiTiet_XML)

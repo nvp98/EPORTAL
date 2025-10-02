@@ -159,7 +159,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string CMND_CCCD { get; set; }
         public string TenNgan { get; set; }
         public int? LoaiPhuongTien_ID { get; set; }
-        public string TenLoaiPhuongTien { get; set; }
+        public string LoaiPhuongTien { get; set; }
         public string BienSoXe { get; set; }
         public DateTime? TuNgay { get; set; }
         public DateTime? DenNgay { get; set; }

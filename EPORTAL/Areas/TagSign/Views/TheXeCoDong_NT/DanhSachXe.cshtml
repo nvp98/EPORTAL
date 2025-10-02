@@ -29,6 +29,11 @@
     //   var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
 }
 <link href="~/Content/PagedList.css" rel="stylesheet" />
+<div id="importOverlay" style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: white; font-size: 1.5rem;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Đang tải dữ liệu, vui lòng chờ...
+    </div>
+</div>
 <div class="app-main__outer">
     <div class="app-main__inner">
         <div class="app-page-title">
@@ -52,27 +57,40 @@
             <div class="row">
                 <div class="card">
                     <div class="card-header">
-                        <div class="row" style="width:100%">
-                            <div class="col-md-10 col-lg-10">
-                                <div class="row">
-                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
-                                    <div class="col-md-2">
+                        <div class="row align-items-center" style="width:100%">
+                            <div class="col-lg-12">
+                                <form class="form-row" autocomplete="off" id="searchForm">
+                                    <div class="form-group col-md-2">
+                                        <label for="begind">Từ ngày</label>
                                         @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
                                     </div>
-                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
-                                    <div class="col-md-2">
+                                    <div class="form-group col-md-2">
+                                        <label for="endd">Đến ngày</label>
                                         @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
                                     </div>
-
-                                    <div class="col-md-3">
+                                    <div class="form-group col-md-2">
+                                        <label for="search">Biển số/ Tìm kiếm</label>
                                         @Html.TextBox("search", ViewBag.Search as string, new { @id = "search", @class = "form-control", @placeholder = "Tìm kiếm..." })
                                     </div>
-
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    <div class="form-group col-md-2">
+                                        <label for="nhaThauId">Nhà thầu</label>
+                                        @Html.DropDownList("nhaThauId", (SelectList)ViewBag.ListNhaThau, "Chọn nhà thầu", new { @class = "form-control chosen-select", @id = "nhaThauId", @style = "width:100%;" })
                                     </div>
-                                </div>
-                            </div>                            
+                                    <div class="form-group col-md-2">
+                                        <label for="loaiPhuongTien">Loại phương tiện</label>
+                                        @Html.DropDownList("loaiPhuongTien", (SelectList)ViewBag.ListLoaiPhuongTien, "Chọn loại phương tiện", new { @class = "form-control chosen-select", @id = "loaiPhuongTien", @style = "width:100%;" })
+                                    </div>
+                                    <div class="form-group col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary mr-2" id="btn-search">
+                                            <i class="fa fa-search"></i> Tìm kiếm
+                                        </button>
+                                        <button type="button" class="btn btn-success" id="btn-import-excel">
+                                            <i class="fa fa-upload"></i> Import Excel
+                                        </button>
+                                        <input type="file" id="fileImportExcel" style="display:none;" accept=".xlsx,.xls" />
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -82,41 +100,30 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center" width="10px">TT</th>
-                                            <th class="text-center" width="150px">Họ và tên</th>
-                                            <th class="text-center" width="150px">CMND/CCCD</th>
-                                            <th class="text-center" width="200px">Tên nhà thầu</th>
+                                            <th class="text-center" width="200px">Nhà thầu</th>
                                             <th class="text-center" width="150px">Loại phương tiện</th>
                                             <th class="text-center" width="150px">Biển số</th>
-                                            <th class="text-center" width="150px">Hạn sử dụng</th>
-                                            <th class="text-center" width="100px">Tình trạng</th>
-
+                                            <th class="text-center" width="150px">Thời hạn</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            <tr>
-                                                <td>@item.ID</td>
-                                                <td class="text-center">@(!string.IsNullOrWhiteSpace(item.HoVaTen) ? item.HoVaTen : "–")</td>
-                                                <td class="text-center">@(!string.IsNullOrWhiteSpace(item.CMND_CCCD) ? item.CMND_CCCD : "–")</td>
-                                                <td class="text-center">@item.TenNhaThau</td>
-                                                <td class="text-center">@item.TenLoaiPhuongTien</td>
-                                                <td class="text-center">@item.BienSoXe</td>
-                                                <td class="text-center">
-                                                    @(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "") – @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")
-                                                </td>
-                                                <td class="text-center">
-                                                    @if (item.TinhTrang == true)
-                                                    {
-                                                        <span class="btn btn-outline-success">Đang hoạt động</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="btn btn-outline-danger">Đã khóa</span>
-                                                    }
-                                                </td>
-
-                                            </tr>
+                                        @{
+                                            int stt = (ViewBag.Page - 1) * ViewBag.PageSize + 1;
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@stt</td>
+                                                    <td class="text-center">@item.TenNhaThau</td>
+                                                    <td class="text-center">@item.LoaiPhuongTien</td>
+                                                    <td class="text-center">@item.BienSoXe</td>
+                                                    <td class="text-center">
+                                                        @(item.TuNgay.HasValue ? item.TuNgay.Value.ToString("dd/MM/yyyy") : "")
+                                                        –
+                                                        @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")
+                                                    </td>
+                                                </tr>
+                                                stt++;
+                                            }
                                         }
                                     </tbody>
                                 </table>
@@ -156,6 +163,12 @@
     //        $("#myModal").modal('show');
     //    });
     //});
+    $(function () {
+        $(".chosen-select").chosen({
+            width: "100%",
+            no_results_text: "Không tìm thấy nhà thầu!"
+        });
+    });
     $('#btn-Import').click(function () {
         var url = $('#myModalImport').data('url');
         $.get(url, function (data) {
@@ -164,15 +177,85 @@
             $("#myModal").modal('show');
         });
     });
+
     $("#btn-search").on('click', function () {
     var begind = $('#begind').val();
-        var endd = $('#endd').val();
-        var search = $('#search').val();
+    var endd = $('#endd').val();
+    var search = $('#search').val();
+    var nhaThauId = $('#nhaThauId').val();
+    var loaiPhuongTien = $('#loaiPhuongTien').val();
+    // Hiện overlay loading
+        $("#importOverlay").show();
 
-        window.location.href = '@Url.Action("DanhSachXe", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&search=' + encodeURIComponent(search);
-
+    window.location.href = '@Url.Action("DanhSachXe", "TheXeCoDong_NT")'
+        + '?begind=' + encodeURIComponent(begind)
+        + '&endd=' + encodeURIComponent(endd)
+        + '&search=' + encodeURIComponent(search)
+        + '&nhaThauId=' + encodeURIComponent(nhaThauId)
+        + '&loaiPhuongTien=' + encodeURIComponent(loaiPhuongTien);
+    });
+    $("#btn-import-excel").click(function () {
+        $("#fileImportExcel").click();
     });
 
+    @*$("#fileImportExcel").change(function () {
+        var file = this.files[0];
+        if (!file) return;
+        var formData = new FormData();
+        formData.append("file", file);
+
+        $.ajax({
+            url: '@Url.Action("ImportExcelXe", "TheXeCoDong_NT")', // Đổi đúng action/controller
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                if (res.success) {
+                    alert("Import thành công!");
+                    location.reload();
+                } else {
+                    alert("Lỗi import: " + res.message);
+                }
+            },
+            error: function () {
+                alert("Có lỗi khi import file Excel.");
+            }
+        });
+    });*@
+    $("#fileImportExcel").change(function () {
+    var file = this.files[0];
+    if (!file) return;
+    var formData = new FormData();
+    formData.append("file", file);
+
+    // Hiện overlay/loading
+    $("#importOverlay").show();
+
+    $.ajax({
+        url: '@Url.Action("ImportExcelXe", "TheXeCoDong_NT")',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (res) {
+            // Ẩn overlay/loading
+            $("#importOverlay").hide();
+
+            if (res.success) {
+                alert("Import thành công!");
+                location.reload();
+            } else {
+                alert("Lỗi import: " + res.message);
+            }
+        },
+        error: function () {
+            // Ẩn overlay/loading
+            $("#importOverlay").hide();
+            alert("Có lỗi khi import file Excel.");
+        }
+    });
+});
 </script>
 
 

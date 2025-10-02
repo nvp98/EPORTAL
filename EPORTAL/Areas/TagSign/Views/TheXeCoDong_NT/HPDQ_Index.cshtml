@@ -29,6 +29,11 @@
     //   var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
 }
 <link href="~/Content/PagedList.css" rel="stylesheet" />
+<div id="importOverlay" style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: white; font-size: 1.5rem;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Đang tải dữ liệu, vui lòng chờ...
+    </div>
+</div>
 <div class="app-main__outer">
     <div class="app-main__inner">
         <div class="app-page-title">
@@ -254,7 +259,7 @@
     var begind = $('#begind').val();
     var endd = $('#endd').val();
     var maPhieu = $('#maPhieu').val();
-
+        $("#importOverlay").show();
         window.location.href = '@Url.Action("HPDQ_Index", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
 
     });

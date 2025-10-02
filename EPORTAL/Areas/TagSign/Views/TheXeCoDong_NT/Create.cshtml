@@ -383,7 +383,12 @@
             };
             listXe.push(xe);
         });
-
+        var bienSoArray = listXe.map(x => x.BienSoXe ? x.BienSoXe.trim().toUpperCase() : "");
+        var bienSoSet = new Set(bienSoArray);
+        if (bienSoSet.size < bienSoArray.length) {
+            alert("Không được phép có hai biển số xe trùng nhau trong cùng một đơn!");
+            return;
+        }
         formData.append("JsonDanhSachXe", JSON.stringify(listXe));
         //console.log('formData', formData)
         $.ajax({

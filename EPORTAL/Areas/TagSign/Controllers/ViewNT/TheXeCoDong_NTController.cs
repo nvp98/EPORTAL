@@ -350,16 +350,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             ViewBag.PageSize = size;
         }
 
-        
-        //public ActionResult HPDQ_Detail(string maDon)
-        //{
-        //    var data = db_dk.Database.SqlQuery<CDNT_DonDangKyDetail>(
-        //        "EXEC CDNT_DonDangKy_Detail @Ma_Don",
-        //        new SqlParameter("@Ma_Don", maDon ?? (object)DBNull.Value)
-        //    ).ToList();
-
-        //    return View(data);
-        //}
         public ActionResult HPDQ_Detail(string maDon)
         {
             if (string.IsNullOrWhiteSpace(maDon))
@@ -486,6 +476,14 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     return Json(new { success = false, message = "Bạn phải chọn file hồ sơ xe!" });
                 }
+
+                var danhSachXe = JsonConvert.DeserializeObject<List<ChiTietDonVM>>(model.JsonDanhSachXe);
+                var bienSoList = danhSachXe.Select(x => x.BienSoXe?.Trim().ToUpper()).ToList();
+                if (bienSoList.Count != bienSoList.Distinct().Count())
+                {
+                    return Json(new { success = false, message = "Không được phép có hai biển số xe trùng nhau!" });
+                }
+
                 // 2. Xử lý file upload (nếu có)
                 if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
                 {
@@ -1066,6 +1064,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Vui lòng chọn nhà thầu" });
                 }
 
+                var bienSoList = model.DanhSachXe.Select(x => x.BienSoXe?.Trim().ToUpper()).ToList();
+                if (bienSoList.Count != bienSoList.Distinct().Count())
+                {
+                    return Json(new { success = false, message = "Không được phép có hai biển số xe trùng nhau trong cùng một đơn!" });
+                }
+
                 // Tìm đơn đăng ký
                 var donDangKy = db_dk.CDNT_DonDangKy.FirstOrDefault(x => x.Ma_Don == model.Ma_Don);
                 if (donDangKy == null)
@@ -1348,44 +1352,50 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(model);
         }
-        //public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? page)
-        //{
-        //    int pageNumber = page ?? 1;
-        //    int pageSize = 10;
+        public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? nhaThauId, int? loaiPhuongTien, int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 30;
+            // Lấy danh sách nhà thầu cho dropdown
+            var listNhaThau = db.NT_Partner
+                .OrderBy(x => x.FullName)
+                .Select(x => new { x.ID, x.FullName, x.BPID, x.ShortName })
+                .ToList();
+            ViewBag.ListNhaThau = new SelectList(listNhaThau, "ID", "FullName", nhaThauId);
 
-        //    var data = db_dk.Database.SqlQuery<XeCoDongModel>(
-        //    @"CDNT_XeCoDong_Search 
-        //    @p_ID_NT, 
-        //    @p_BP_ID, 
-        //    @p_TenNhaThau, 
-        //    @p_TenDayDu, 
-        //    @p_LoaiPhuongTien_ID, 
-        //    @p_BienSoXe, 
-        //    @p_TinhTrang, 
-        //    @p_TuNgay, 
-        //    @p_DenNgay",
+            // Lấy danh sách loại phương tiện cho dropdown
+            var listLoaiPT = db_dk.CDNT_LoaiPhuongTien
+                .OrderBy(x => x.LoaiPhuongTien)
+                .Select(x => new { x.ID, x.LoaiPhuongTien })
+                .ToList();
+            ViewBag.ListLoaiPhuongTien = new SelectList(listLoaiPT, "ID", "LoaiPhuongTien", loaiPhuongTien);
 
-        //        new SqlParameter("@p_ID_NT", DBNull.Value),
-        //        new SqlParameter("@p_BP_ID", DBNull.Value),
-        //        new SqlParameter("@p_TenNhaThau", DBNull.Value),
-        //        new SqlParameter("@p_TenDayDu", DBNull.Value),
-        //        new SqlParameter("@p_LoaiPhuongTien_ID", DBNull.Value),
-        //        new SqlParameter("@p_BienSoXe", (object)search ?? DBNull.Value),
-        //        new SqlParameter("@p_TinhTrang", DBNull.Value),
-        //        new SqlParameter("@p_TuNgay", (object)begind ?? DBNull.Value),
-        //        new SqlParameter("@p_DenNgay", (object)endd ?? DBNull.Value)
-        //    ).ToList();
+            var data = db_dk.Database.SqlQuery<XeCoDongModel>(
+                @"EXEC CDNT_ChiTietDon_Search 
+                @p_NhaThauID, 
+                @p_LoaiPhuongTien, 
+                @p_BienSoXe,
+                @p_TuNgay,
+                @p_DenNgay",
+            new SqlParameter("@p_NhaThauID", nhaThauId ?? (object)DBNull.Value),
+            new SqlParameter("@p_LoaiPhuongTien", SqlDbType.Int) { Value = (object)loaiPhuongTien ?? DBNull.Value },
+            new SqlParameter("@p_BienSoXe", SqlDbType.NVarChar, 50) { Value = search ?? (object)DBNull.Value },
+            new SqlParameter("@p_TuNgay", SqlDbType.Date) { Value = begind ?? (object)DBNull.Value },
+            new SqlParameter("@p_DenNgay", SqlDbType.Date) { Value = endd ?? (object)DBNull.Value }
+             ).ToList();
 
-        //    var pagedData = data.ToPagedList(pageNumber, pageSize);
+            var pagedData = data.ToPagedList(pageNumber, pageSize);
 
-        //    ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
-        //    ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
-        //    ViewBag.Search = search;
-        //    ViewBag.Page = pageNumber;
-        //    ViewBag.PageSize = pageSize;
+            ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+            ViewBag.NhaThauId = nhaThauId;
+            ViewBag.LoaiPhuongTien = loaiPhuongTien;
+            ViewBag.Search = search;
+            ViewBag.Page = pageNumber;
+            ViewBag.PageSize = pageSize;
 
-        //    return View(pagedData);
-        //}
+            return View(pagedData);
+        }
         public ActionResult ExportDonDangKyPdf(string maDon)
         {
             var vm = GetDonDangKyPdfViewModel(maDon);
@@ -1853,5 +1863,74 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
             return View(ordered);
         }
+
+        [HttpPost]
+        public ActionResult ImportExcelXe(HttpPostedFileBase file)
+        {
+            if (file == null || file.ContentLength == 0)
+                return Json(new { success = false, message = "Vui lòng chọn file Excel!" });
+
+            using (var workbook = new XLWorkbook(file.InputStream))
+            {
+                var ws = workbook.Worksheet(1); // Lấy sheet đầu tiên
+                var rows = ws.RangeUsed().RowsUsed().Skip(1); // Bỏ qua dòng tiêu đề
+
+                foreach (var row in rows)
+                {
+                    // Cột A: TÊN ĐẦY ĐỦ (VD: "10304 - CÔNG TY ...")
+                    var tenDayDu = row.Cell(1).GetString().Trim();
+                    string bpidStr = null;
+                    int? idNhaThau = null;
+
+                    if (!string.IsNullOrEmpty(tenDayDu))
+                    {
+                        var match = Regex.Match(tenDayDu, @"^\d+"); // lấy số ở đầu
+                        if (match.Success)
+                        {
+                            bpidStr = match.Value; // => "10304"
+                        }
+                        if (!string.IsNullOrEmpty(bpidStr))
+                        {
+                            if (int.TryParse(bpidStr, out var bpidInt))
+                            {
+                                var partner = db.NT_Partner.FirstOrDefault(x => x.BPID == bpidInt);
+                                idNhaThau = partner?.ID;
+                            }
+                        }
+                    }
+
+                    var bienSoXe = row.Cell(2).GetString().Trim();     // Cột B: BIỂN KIỂM SOÁT
+                    var loaiPTStr = row.Cell(3).GetString().Trim();    // Cột C: LOẠI PHƯƠNG TIỆN
+                    var tuNgay = ParseExcelDate(row.Cell(4));          // Cột D: NGÀY CẤP
+                    var denNgay = ParseExcelDate(row.Cell(5));         // Cột E: THỜI HẠN
+
+                    // Map loại phương tiện sang ID (ví dụ: XE MÁY = 1, XE BA GÁC = 2, XE Ô TÔ = 3)
+                    int? idLoaiPhuongTien = null;
+                    switch (loaiPTStr.ToUpper())
+                    {
+                        case "XE MÁY": idLoaiPhuongTien = 1; break;
+                        case "XE BA GÁC": idLoaiPhuongTien = 2; break;
+                        case "XE Ô TÔ": idLoaiPhuongTien = 3; break;
+                    }
+
+                    // Lưu DB
+                    var chiTietDon = new CDNT_ChiTietDon
+                    {
+                        BienSoXe = bienSoXe,
+                        TuNgay = tuNgay,
+                        DenNgay = denNgay,
+                        ID_NhaThau = idNhaThau,
+                        ID_LoaiPhuongTien = idLoaiPhuongTien,
+                        TrangThaiDuyet_ID = 1
+
+                    };
+                    db_dk.CDNT_ChiTietDon.Add(chiTietDon);
+                }
+                db_dk.SaveChanges();
+            }
+            return Json(new { success = true, message = "Import thành công!" });
+        }
+
+
     }
 }

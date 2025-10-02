@@ -396,7 +396,13 @@
             alert("Danh sách xe không được trống.");
             return;
         }
-
+        // Kiểm tra trùng biển số xe
+        let bienSoArray = danhSachXe.map(x => x.BienSoXe ? x.BienSoXe.trim().toUpperCase() : "");
+        let bienSoSet = new Set(bienSoArray);
+        if (bienSoSet.size < bienSoArray.length) {
+            alert("Không được phép có hai biển số xe trùng nhau trong cùng một đơn!");
+            return;
+        }
         // Tạo FormData từ form chính và thêm danhSachXe vào
         let formData = new FormData($("form")[0]);
         formData.append("KTV_ID", $("#KTV_QL").val());
