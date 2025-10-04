@@ -1877,7 +1877,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                 foreach (var row in rows)
                 {
-                    // Cột A: TÊN ĐẦY ĐỦ (VD: "10304 - CÔNG TY ...")
                     var tenDayDu = row.Cell(1).GetString().Trim();
                     string bpidStr = null;
                     int? idNhaThau = null;
@@ -1904,7 +1903,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     var tuNgay = ParseExcelDate(row.Cell(4));          // Cột D: NGÀY CẤP
                     var denNgay = ParseExcelDate(row.Cell(5));         // Cột E: THỜI HẠN
 
-                    // Map loại phương tiện sang ID (ví dụ: XE MÁY = 1, XE BA GÁC = 2, XE Ô TÔ = 3)
                     int? idLoaiPhuongTien = null;
                     switch (loaiPTStr.ToUpper())
                     {
@@ -1913,24 +1911,57 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         case "XE Ô TÔ": idLoaiPhuongTien = 3; break;
                     }
 
-                    // Lưu DB
-                    var chiTietDon = new CDNT_ChiTietDon
-                    {
-                        BienSoXe = bienSoXe,
-                        TuNgay = tuNgay,
-                        DenNgay = denNgay,
-                        ID_NhaThau = idNhaThau,
-                        ID_LoaiPhuongTien = idLoaiPhuongTien,
-                        TrangThaiDuyet_ID = 1
+                    // Kiểm tra biển số xe đã tồn tại chưa
+                    var chiTietDon = db_dk.CDNT_ChiTietDon.FirstOrDefault(x => x.BienSoXe == bienSoXe);
 
-                    };
-                    db_dk.CDNT_ChiTietDon.Add(chiTietDon);
+                    if (chiTietDon != null)
+                    {
+                        // Đã có, cập nhật thông tin
+                        chiTietDon.TuNgay = tuNgay;
+                        chiTietDon.DenNgay = denNgay;
+                        chiTietDon.TrangThaiDuyet_ID = 1;
+                        // Nếu muốn cập nhật luôn nhà thầu hoặc loại phương tiện:
+                        chiTietDon.ID_NhaThau = idNhaThau;
+                        chiTietDon.ID_LoaiPhuongTien = idLoaiPhuongTien;
+                        // Không cần .Add(), Entity Framework sẽ tự nhận là update
+                    }
+                    else
+                    {
+                        // Chưa có, thêm mới
+                        chiTietDon = new CDNT_ChiTietDon
+                        {
+                            BienSoXe = bienSoXe,
+                            TuNgay = tuNgay,
+                            DenNgay = denNgay,
+                            ID_NhaThau = idNhaThau,
+                            ID_LoaiPhuongTien = idLoaiPhuongTien,
+                            TrangThaiDuyet_ID = 1
+                        };
+                        db_dk.CDNT_ChiTietDon.Add(chiTietDon);
+                    }
                 }
                 db_dk.SaveChanges();
             }
             return Json(new { success = true, message = "Import thành công!" });
         }
 
+        public FileResult DownloadFile()
+        {
+            // Đổi tên file đúng với biểu mẫu thẻ xe cơ động của bạn
+            var fileName = "Template_XCD.xlsx";
+            var filePath = Server.MapPath("~/App_Data/" + fileName);
 
+            if (!System.IO.File.Exists(filePath))
+            {
+                // Vì chữ ký trả về FileResult nên ném 404 thay vì HttpNotFound()
+                throw new HttpException(404, "Không tìm thấy biểu mẫu thẻ xe cơ động để tải.");
+            }
+
+            // Lấy MIME theo đuôi file
+            var mime = MimeMapping.GetMimeMapping(fileName);
+
+            // Trả file cho người dùng tải xuống (Content-Disposition: attachment)
+            return File(filePath, mime, fileName);
+        }
     }
 }

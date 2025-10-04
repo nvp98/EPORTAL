@@ -84,8 +84,11 @@
                                         <button type="button" class="btn btn-primary mr-2" id="btn-search">
                                             <i class="fa fa-search"></i> Tìm kiếm
                                         </button>
-                                        <button type="button" class="btn btn-success" id="btn-import-excel">
+                                        <button type="button" class="btn btn-success mr-2" id="btn-import-excel">
                                             <i class="fa fa-upload"></i> Import Excel
+                                        </button>
+                                        <button type="button" class="btn btn-info" id="btn-download-template">
+                                            <i class="fa fa-download"></i> Tải biểu mẫu
                                         </button>
                                         <input type="file" id="fileImportExcel" style="display:none;" accept=".xlsx,.xls" />
                                     </div>
@@ -129,9 +132,16 @@
                                 </table>
                                 <div class="pager">
                                     @Html.PagedListPager(Model, page => Url.Action("DanhSachXe", "TheXeCoDong_NT", new
-                                    { area = "TagSign",page, begind = ViewBag.BeginDate,endd = ViewBag.EndDate,search = ViewBag.Search}))
+                                    {
+                                        area = "TagSign",
+                                        page,
+                                        begind = ViewBag.BeginDate,
+                                        endd = ViewBag.EndDate,
+                                        search = ViewBag.Search,
+                                        nhaThauId = ViewBag.NhaThauId,
+                                        loaiPhuongTien = ViewBag.LoaiPhuongTien
+                                    }))
                                     <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
-
                                 </div>
                             </div>
                         </div>
@@ -256,6 +266,10 @@
         }
     });
 });
+    $('#btn-download-template').click(function() {
+            window.location.href = '@Url.Action("DownloadFile", "TheXeCoDong_NT")';
+        });
+
 </script>
 
 
