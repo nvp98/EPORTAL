@@ -1018,6 +1018,7 @@
                             <a href="#" id="CDNT">
                                 <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
                                 Đăng ký thẻ xe cơ động
+                                <span id="cdnt-count" style="margin-left:6px;"></span>
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>
                             <ul id="listatld1">
@@ -1517,6 +1518,14 @@
         $(document).ready(function () {
             $.getJSON('/TagSign/TheXeCoDong_NT/HPDQ_Notify', function (data) {
                 $('#duyetdon-label').text(data.Total);
+                $('#cdnt-count').text(data.Total > 0 ? data.Total : '');
+                if (data.Total > 0) {
+                    // Đổi màu chữ sang đỏ
+                    $('#CDNT').addClass('text-danger');
+                } else {
+                    // Nếu không có đơn, giữ màu mặc định
+                    $('#CDNT').removeClass('text-danger');
+                }
             });
         });
     </script>
