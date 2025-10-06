@@ -1767,20 +1767,31 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             int userId = Models.MyAuthentication.ID;
 
-            var choxulyByCap = db_dk.Database.SqlQuery<CapCountResult>(
-                "EXEC CDNT_TrinhKy_CountChoXuLyByUser @UserId",
-                new SqlParameter("@UserId", userId)
-            ).ToList();
+            // Lấy các bước trình ký mà user là người duyệt, đang chờ xử lý
+            var mySteps = db_dk.CDNT_TrinhKy
+                .Where(x => x.NguoiDuyet_ID == userId && x.TinhTrang_ID == 1)
+                .Select(x => new { x.Ma_Don, x.CapDuyet })
+                .ToList();
 
-            int[] capCount = new int[3];
-            for (int i = 1; i <= 3; i++)
-                capCount[i - 1] = choxulyByCap.FirstOrDefault(c => c.CapDuyet == i)?.SoLuong ?? 0;
+            int count = 0;
+            foreach (var step in mySteps)
+            {
+                // Lấy các bước trước cùng đơn
+                var lowerSteps = db_dk.CDNT_TrinhKy
+                    .Where(x => x.Ma_Don == step.Ma_Don && (x.CapDuyet ?? 0) < (step.CapDuyet ?? 0))
+                    .Select(x => x.TinhTrang_ID)
+                    .ToList();
 
-            int soluong = capCount.Sum();
+                // Nếu tất cả các bước trước đã xử lý hoặc hoàn thành (2, 3) thì tới lượt user
+                if (lowerSteps.All(s => s == 2 || s == 3))
+                {
+                    count++;
+                }
+            }
 
             return Json(new
             {
-                Total = soluong
+                Total = count
             }, JsonRequestBehavior.AllowGet);
         }
         //public ActionResult HPDQ_Index_DaXuLy(DateTime? begind, DateTime? endd, string maPhieu, int? page)
