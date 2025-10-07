@@ -64,7 +64,7 @@
                             <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                 <thead>
                                     <tr style="background-color: #f8f9fa;">
-                                        <th class="text-center" width="50px">Nhà thầu &nbsp;&nbsp;<span style="color:red;">(*)</span> : </th>
+                                        <th class="text-center" width="50px">Nhà thầu &nbsp;&nbsp;</th>
                                         <th class="text-center" width="120px">Hồ sơ xe kèm theo &nbsp;&nbsp; <span style="color:red;">(*)</span> :</th>
                                     </tr>
                                 </thead>
@@ -178,10 +178,10 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn KTV--", new { @class = "form-control", id = "KTV_QL" })
+                                        @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Nhân viên--", new { @class = "form-control", id = "KTV_QL" })
                                     </td>
                                     <td>
-                                        @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Trưởng/Phó--", new { @class = "form-control", id = "TP_QL" })
+                                        @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Tr/P Bộ phận (*)--", new { @class = "form-control", id = "TP_QL" })
                                     </td>
                                 </tr>
                             </tbody>
@@ -195,7 +195,7 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        @Html.DropDownList("VP1C", (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn VP1C--", new { @class = "form-control", id = "VP1C" })
+                                        @Html.DropDownList("VP1C", (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Tổ CPT--", new { @class = "form-control", id = "VP1C" })
                                     </td>
                                 </tr>
                             </tbody>

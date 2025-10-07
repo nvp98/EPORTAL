@@ -34,8 +34,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         PhanQuyenHTEntities dbP = new PhanQuyenHTEntities();
         EPORTALEntities db = new EPORTALEntities();
         EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
-        //int IDQuyenHT = EPORTAL.Models.MyAuthentication.IDQuyenHT;
-        //String controll = "ContractorGroup";
+        int IDQuyenHT = EPORTAL.Models.MyAuthentication.IDQuyenHT;
+        String controll = "TheXeCoDong_NT";
         // GET: TagSign/ContractorGroup
 
         public ActionResult Index_Test(DateTime? begind, DateTime? endd, string maPhieu, int? page)
@@ -166,6 +166,13 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         //}
         public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu, int? page)
         {
+            //var ListQuyen = new Models.MyAuthentication().GetPermisionCN(IDQuyenHT, controll);
+            //ViewBag.QUYENCN = ListQuyen;
+            //if (!ListQuyen.Contains("VIEW_ALL"))
+            //{
+            //    TempData["msgError"] = "<script>alert('Bạn không có quyền thực hiện chức năng này');</script>";
+            //    return RedirectToAction("Logout", "Login", new { area = "" });
+            //}
             int pageNumber = page ?? 1;
             int pageSize = 10;
             int userId = Models.MyAuthentication.ID;
@@ -272,7 +279,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                 // Gán TenTinhTrang theo TinhTrang_ID của đơn
                 don.TenTinhTrang = TranslateTinhTrang(don.TinhTrang_ID);
-                string[] capNames = { "Nhà thầu", "KTV", "T/P", "CPT" };
+                string[] capNames = { "Nhà thầu", "NV", "T/P", "CPT" };
                 // Góc nhìn user (tùy vào cấp và trạng thái step)
                 if (hasReject)
                 {
@@ -566,7 +573,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             CapDuyet = 1,
                             NguoiDuyet_ID = KTV_ID.Value,
                             TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
-                            GhiChu = "Chờ duyệt - Kỹ thuật viên"
+                            GhiChu = "Chờ duyệt - Nhân viên"
                         });
                     }
 
@@ -579,7 +586,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             CapDuyet = 2,
                             NguoiDuyet_ID = TP_ID.Value,
                             TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
-                            GhiChu = "Chờ duyệt cấp - Trưởng/Phó phòng"
+                            GhiChu = "Chờ duyệt cấp - Trưởng/Phó Bộ phận"
                         });
                     }
 
@@ -986,8 +993,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             // Lấy thông tin KTV, TP, VP1C từ CDNT_TrinhKy
             var trinhKy = db_dk.CDNT_TrinhKy.AsNoTracking().Where(x => x.Ma_Don == id).ToList();
-            ViewBag.KTV_ID = trinhKy.FirstOrDefault(x => x.CapDuyet == 1 && x.GhiChu.Contains("Kỹ thuật viên"))?.NguoiDuyet_ID;
-            ViewBag.TP_ID = trinhKy.FirstOrDefault(x => x.CapDuyet == 2 && x.GhiChu.Contains("Trưởng/Phó phòng"))?.NguoiDuyet_ID;
+            ViewBag.KTV_ID = trinhKy.FirstOrDefault(x => x.CapDuyet == 1)?.NguoiDuyet_ID;
+            ViewBag.TP_ID = trinhKy.FirstOrDefault(x => x.CapDuyet == 2)?.NguoiDuyet_ID;
             ViewBag.VP1C_ID = trinhKy.FirstOrDefault(x => x.CapDuyet == 3)?.NguoiDuyet_ID;
 
             // Lấy danh sách KTV và TP theo phòng ban (BPQL_ID)
@@ -1161,7 +1168,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         CapDuyet = 1,
                         NguoiDuyet_ID = KTV_ID.Value,
                         TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
-                        GhiChu = "Chờ duyệt - Kỹ thuật viên"
+                        GhiChu = "Chờ duyệt - Nhân viên"
                     });
                 }
 
@@ -1174,7 +1181,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         CapDuyet = 2,
                         NguoiDuyet_ID = TP_ID.Value,
                         TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
-                        GhiChu = "Chờ duyệt cấp - Trưởng/Phó phòng"
+                        GhiChu = "Chờ duyệt cấp - Trưởng/Phó Bộ phận"
                     });
                 }
 
@@ -1654,10 +1661,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     switch (step.CapDuyet)
                     {
                         case 1:
-                            step.GhiChu = "Chờ duyệt - KTV";
+                            step.GhiChu = "Chờ duyệt - NV";
                             break;
                         case 2:
-                            step.GhiChu = "Chờ duyệt - TP";
+                            step.GhiChu = "Chờ duyệt - Tr/P";
                             break;
                         case 3:
                             step.GhiChu = "Chờ duyệt - CPT";
@@ -1733,16 +1740,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     switch (s.CapDuyet)
                     {
                         case 1:
-                            s.GhiChu = "Nháp - KTV";
+                            s.GhiChu = "Lưu nháp - NV";
                             break;
                         case 2:
-                            s.GhiChu = "Nháp - TP";
+                            s.GhiChu = "Lưu nháp - Tr/P";
                             break;
                         case 3:
-                            s.GhiChu = "Nháp - CPT";
+                            s.GhiChu = "Lưu nháp - CPT";
                             break;
                         default:
-                            s.GhiChu = $"Nháp - Cấp {s.CapDuyet}";
+                            s.GhiChu = $"Lưu nháp - Cấp {s.CapDuyet}";
                             break;
                     }
                     s.NgayDuyet = null;

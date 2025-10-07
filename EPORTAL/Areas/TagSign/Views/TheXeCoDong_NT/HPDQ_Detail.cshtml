@@ -196,7 +196,18 @@
                                             <td class="text-center">@(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
                                             <td>@item.GhiChu</td>
                                             <td class="text-center">
-                                                @(item.TrangThaiDuyet_ID == 1 ? "Được duyệt" : item.TrangThaiDuyet_ID == 2 ? "Từ chối" : "Chưa duyệt")
+                                                @if (item.TrangThaiDuyet_ID == 1)
+                                                {
+                                                    <span class="btn btn-outline-success btn-sm">Được duyệt</span>
+                                                }
+                                                else if (item.TrangThaiDuyet_ID == 2)
+                                                {
+                                                    <span class="btn btn-outline-danger btn-sm">Từ chối</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="btn btn-outline-secondary btn-sm">Chưa duyệt</span>
+                                                }
                                             </td>
                                         </tr>
                                     }

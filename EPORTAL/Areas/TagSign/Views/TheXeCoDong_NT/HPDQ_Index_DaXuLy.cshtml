@@ -125,26 +125,31 @@
                                                             <a title="Xóa" href="javascript:void(0);" class="btn-action" onclick="xoaDon('@item.Ma_Don', '@item.NoiDung')">
                                                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                                             </a>
-                                                            }
-                                                            @if (item.TinhTrang_ID == 2)
-                                                            {
-                                                                <!-- Nếu đã duyệt thì cho phép tải PDF -->
-                                                                <a href="@Url.Action("ExportDonDangKyPdf", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
-                                                                    <i class="fa fa-download text-success"></i>
-                                                                </a>
-                                                            }
-                                                            else
-                                                            {
-                                                                <!-- Nếu chưa duyệt hoặc từ chối thì hiển thị icon cấm -->
-                                                                <i class="fa-solid fa-ban text-primary" title="Đơn chưa được duyệt, không thể tải PDF"></i>
-                                                            }
-                                                           
-                                                            <a class="btn-action"
-                                                               title="Chi tiết danh sách"
-                                                               href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
-                                                                <i class="fa-solid fa-bars"></i>
+                                                        }
+                                                        @if (item.TinhTrang_ID == 2)
+                                                        {
+                                                            <!-- Nếu đã duyệt thì cho phép tải PDF -->
+                                                            <a href="@Url.Action("ExportDonDangKyPdf", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                                <i class="fa fa-download text-success"></i>
                                                             </a>
-                                                        </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <!-- Nếu chưa duyệt hoặc từ chối thì hiển thị icon cấm -->
+                                                            <i class="fa-solid fa-ban text-primary" title="Đơn chưa được duyệt, không thể tải PDF"></i>
+                                                        }
+
+                                                        @*<a class="btn-action"
+                                                           title="Chi tiết danh sách"
+                                                           href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                            <i class="fa-solid fa-bars"></i>
+                                                        </a>*@
+                                                        <a class="btn btn-outline-success"
+                                                           title="Chi tiết đơn"
+                                                           href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                            Xem
+                                                        </a>
+                                                    </td>
                                                     <td>@item.Ma_Don</td>
                                                     <td>@item.NoiDung</td>
                                                     <td>@item.TenNhanVienNT</td>
