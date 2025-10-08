@@ -492,7 +492,7 @@
                             if (data.success) {
                                 // Gán danh sách KTV
                                 var ktvSelect = $("#KTV_QL");
-                                ktvSelect.empty().append('<option value="">--Chọn KTV--</option>');
+                                ktvSelect.empty().append('<option value="">--Chọn Nhân viên--</option>');
                                 $.each(data.ktvList, function (i, item) {
                                     ktvSelect.append($('<option>', {
                                         value: item.ID,
@@ -502,7 +502,7 @@
 
                                 // Gán danh sách TP
                                 var tpSelect = $("#TP_QL");
-                                tpSelect.empty().append('<option value="">--Chọn Trưởng/Phó--</option>');
+                                tpSelect.empty().append('<option value="">--Chọn Tr/P Bộ phận(*)--</option>');
                                 $.each(data.tpList, function (i, item) {
                                     tpSelect.append($('<option>', {
                                         value: item.ID,
