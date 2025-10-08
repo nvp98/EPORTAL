@@ -4154,6 +4154,7 @@
     </Content>
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_Index_DaXuLy.cshtml" />
     <Content Include="App_Data\Template_XCD.xlsx" />
+    <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_Index_All.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

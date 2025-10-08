@@ -199,7 +199,7 @@
                                     </tbody>
                                 </table>
                                 <div class="pager">
-                                    @Html.PagedListPager(Model, page => Url.Action("Index_Test", "TheXeCoDong_NT", new { area = "TagSign", page }))
+                                    @Html.PagedListPager(Model, page => Url.Action("HPDQ_Index_DaXuLy", "TheXeCoDong_NT", new { area = "TagSign", page }))
                                     <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
                                 </div>
                             </div>
@@ -245,7 +245,7 @@
     var endd = $('#endd').val();
     var maPhieu = $('#maPhieu').val();
         $("#importOverlay").show();
-        window.location.href = '@Url.Action("HPDQ_Index", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
+        window.location.href = '@Url.Action("HPDQ_Index_DaXuLy", "TheXeCoDong_NT")?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
 
     });
     $(document).ready(function () {
