@@ -598,7 +598,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(FileHoSoXe.FileName);
-                    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles"), fileName);
+                    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
                     FileHoSoXe.SaveAs(filePath);
 
                     // Lưu tên file (đường dẫn tương đối)
@@ -1203,7 +1203,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 if (FileHoSoXE != null && FileHoSoXE.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(FileHoSoXE.FileName);
-                    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles"), fileName);
+                    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
                     FileHoSoXE.SaveAs(filePath);
                     donDangKy.FileHoSoXe = fileName;
                 }

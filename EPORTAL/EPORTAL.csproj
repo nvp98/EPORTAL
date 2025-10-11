@@ -4256,6 +4256,7 @@
     <Folder Include="UploadedFiles\UploadedFiles\Partner\" />
     <Folder Include="UploadedFiles\UploadedFiles\ReplyToFeedback\" />
     <Folder Include="UploadedFiles\UploadedFiles\Respond\" />
+    <Folder Include="UploadedFiles\XeCoDong\" />
     <Folder Include="Views\EmployeeAPI\" />
     <Folder Include="Views\Servey\" />
   </ItemGroup>
