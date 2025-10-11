@@ -25,7 +25,7 @@ namespace EPORTAL.ModelsTagSign
         public Nullable<System.DateTime> DenNgay { get; set; }
         public string GhiChu { get; set; }
         public string HoSoTheoXe { get; set; }
-        public Nullable<int> NguoiDuyet_ID { get; set; }
         public Nullable<int> TrangThaiDuyet_ID { get; set; }
+        public Nullable<int> ID_NhaThau { get; set; }
     }
 }

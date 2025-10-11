@@ -51,9 +51,9 @@
                                     </tbody>
                                 </table>
 
-                                <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
+                                @*<div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
                                     <span class="text-center" style="margin-top: 8px">Thông tin Nhà thầu <span style="color:red;">(*)</span> : </span>
-                                </div>
+                                </div>*@
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
                                         <tr style="background-color: #f8f9fa;">
@@ -64,7 +64,8 @@
                                     <tbody>
                                         <tr>
                                             <td style="width: 50%;">
-                                                @Html.DropDownListFor(m => m.NhaThau_ID, (SelectList)ViewBag.IDNT, "--Chọn tên nhà thầu--", new { id = "NhaThau_ID", @class = "form-control" })
+                                                <input type="hidden" id="NhaThau_ID" name="NhaThau_ID" value="@(ViewBag.NhaThau_ID ?? "")" />
+                                                <input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly />
                                             </td>
                                             <td>
                                                 <fieldset id="SubmitForm">
@@ -170,17 +171,20 @@
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
                                         <tr style="background-color: #f8f9fa;">
-                                            <th class="text-center" width="25%">Kỹ Thuật Viên (KTV)</th>
-                                            <th class="text-center" width="25%">Trưởng/Phó phòng</th>
+                                            <th colspan="2" class="text-center" style="font-size: 20px">Bộ Phận Quản Lý</th>
+                                        </tr>
+                                        <tr style="background-color: #f8f9fa;font-size:15px;">
+                                            <th class="text-center" width="25%">Nhân viên</th>
+                                            <th class="text-center" width="25%">T/P Bộ phận</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>
-                                                @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn KTV--", new { @class = "form-control", id = "KTV_QL" })
+                                                @Html.DropDownList("KTV_QL", (SelectList)ViewBag.KTV_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Nhân viên --", new { @class = "form-control", id = "KTV_QL" })
                                             </td>
                                             <td>
-                                                @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "--Chọn Trưởng/Phó--", new { @class = "form-control", id = "TP_QL" })
+                                                @Html.DropDownList("TP_QL", (SelectList)ViewBag.TP_QL_List ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Tr/P Bộ phận(*) --", new { @class = "form-control", id = "TP_QL" })
                                             </td>
                                         </tr>
                                     </tbody>
@@ -188,13 +192,13 @@
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
                                         <tr style="background-color: #f8f9fa;">
-                                            <th class="text-center" width="25%">Tổ cấp phát thẻ</th>
+                                            <th class="text-center" style="font-size: 20px" width="25%">Tổ cấp phát thẻ</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>
-                                                @Html.DropDownList("VP1C_ID", (SelectList)ViewBag.VP1C_List, "-- Chọn VP1C --", new { @class = "form-control", @value = ViewBag.VP1C_ID })
+                                                @Html.DropDownList("VP1C_ID", (SelectList)ViewBag.VP1C_List, "-- Chọn Tổ CPT --", new { @class = "form-control", @value = ViewBag.VP1C_ID })
                                             </td>
                                         </tr>
                                     </tbody>
@@ -225,7 +229,7 @@
 <script type="text/javascript">
  $(document).ready(function () {
     // Khởi tạo chosen cho dropdown
-    $("#NhaThau_ID").chosen({ width: "100%" });
+   /* $("#NhaThau_ID").chosen({ width: "100%" });*/
     $("#PhongBan_ID").chosen({ width: "100%" });
 
     let danhSachXe = [];
@@ -381,10 +385,10 @@
             alert("Vui lòng chọn phòng ban quản lý.");
             return;
         }
-        if (!$("#NhaThau_ID").val()) {
-            alert("Vui lòng chọn nhà thầu.");
-            return;
-        }
+        //if (!$("#NhaThau_ID").val()) {
+        //    alert("Vui lòng chọn nhà thầu.");
+        //    return;
+        //}
 
         updateDanhSachXeFromTable(); // Cập nhật lại dữ liệu trước khi submit
 
@@ -392,7 +396,13 @@
             alert("Danh sách xe không được trống.");
             return;
         }
-
+        // Kiểm tra trùng biển số xe
+        let bienSoArray = danhSachXe.map(x => x.BienSoXe ? x.BienSoXe.trim().toUpperCase() : "");
+        let bienSoSet = new Set(bienSoArray);
+        if (bienSoSet.size < bienSoArray.length) {
+            alert("Không được phép có hai biển số xe trùng nhau trong cùng một đơn!");
+            return;
+        }
         // Tạo FormData từ form chính và thêm danhSachXe vào
         let formData = new FormData($("form")[0]);
         formData.append("KTV_ID", $("#KTV_QL").val());

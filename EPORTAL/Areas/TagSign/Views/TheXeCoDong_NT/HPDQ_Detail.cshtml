@@ -22,6 +22,10 @@
     EPORTALEntities db = new EPORTALEntities();
     EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
     // var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
+    var canAct = ViewBag.CanAct != null && (bool)ViewBag.CanAct;
+    int? myStepStatus = ViewBag.MyStepStatus as int?;
+    int? myStepId = ViewBag.MyStepId as int?;
+    string maDon = ViewBag.MaDon as string;
 }
 
 <link href="~/Content/PagedList.css" rel="stylesheet" />
@@ -31,18 +35,21 @@
         <div class="tab-content">
             <div class="row" style="padding-top:150px">
                 <div class="card">
-                    @if (Model != null && Model.Count > 0)
+                    @if (canAct)
                     {
-                        var maDon = Model[0].Ma_Don;
-                        <div class="d-flex justify-content-start mb-3" style="gap: 10px;">
-                            <button class="btn btn-success btn-duyet" data-madon="@maDon">
+                        <div id="actionButtons" class="d-flex mb-3" style="gap:10px;">
+                            <button class="btn btn-success btn-duyet"
+                                    data-madon="@maDon"
+                                    data-stepid="@myStepId">
                                 <i class="fa fa-check"></i> Duyệt
                             </button>
-                            <button class="btn btn-danger btn-tuchoi" data-madon="@maDon">
+                            <button class="btn btn-danger btn-tuchoi"
+                                    data-madon="@maDon"
+                                    data-stepid="@myStepId">
                                 <i class="fa fa-times"></i> Từ chối
                             </button>
                         </div>
-                    }
+                    }                   
                     <div style="height: 500px;">
                         <div class="row" style="width:100%">
                             <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
@@ -189,7 +196,18 @@
                                             <td class="text-center">@(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
                                             <td>@item.GhiChu</td>
                                             <td class="text-center">
-                                                @(item.TrangThaiDuyet_ID == 1 ? "Được duyệt" : item.TrangThaiDuyet_ID == 2 ? "Từ chối" : "Chưa duyệt")
+                                                @if (item.TrangThaiDuyet_ID == 1)
+                                                {
+                                                    <span class="btn btn-outline-success btn-sm">Được duyệt</span>
+                                                }
+                                                else if (item.TrangThaiDuyet_ID == 2)
+                                                {
+                                                    <span class="btn btn-outline-danger btn-sm">Từ chối</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="btn btn-outline-secondary btn-sm">Chưa duyệt</span>
+                                                }
                                             </td>
                                         </tr>
                                     }
@@ -269,7 +287,7 @@
             },
             success: function (res) {
                 alert(res.message);
-                if (res.success) location.reload();
+                window.location.href = res.redirectUrl;
             },
             error: function () {
                 alert("Có lỗi xảy ra khi gửi yêu cầu duyệt.");

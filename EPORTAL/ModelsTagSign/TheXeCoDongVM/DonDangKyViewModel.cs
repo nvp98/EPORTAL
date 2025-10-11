@@ -11,7 +11,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int ID { get; set; }
         public string Ma_Don { get; set; }
         public string NoiDung { get; set; }
-        // public string TenLoaiNT { get; set; }
+
         public string TenNhanVienNT { get; set; }
         public string TenBPQL { get; set; }
         public string TenNhaThau { get; set; }
@@ -20,6 +20,9 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string FileHoSoXe { get; set; }
         public string TenTinhTrang { get; set; }
         public int? TinhTrang_ID { get; set; }
+
+        public int PerUserStatusCode { get; set; }
+        public string PerUserStatusText { get; set; }
     }
     public class ChiTietDonVM
     {
@@ -58,10 +61,11 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
     }
     public enum TinhTrangDonDangKy
     {
-        ChoXuLy = 1,         // Nhà thầu trình ký -> Chờ BPQL xử lý
-        DaXuLy = 2,          // BPQL đã duyệt -> chờ CPT xác nhận
-        HoanThanh = 3,       // CPT đã xác nhận cấp thẻ
-        KhongDatYeuCau = 4   // BPQL từ chối
+        ChoXuLy = 1,
+        DaXuLy = 2,
+        HoanThanh = 3,
+        KhongDatYeuCau = 4,
+        Nhap = 5
     }
 
     public class DonDangKyInsertModel
@@ -155,7 +159,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string CMND_CCCD { get; set; }
         public string TenNgan { get; set; }
         public int? LoaiPhuongTien_ID { get; set; }
-        public string TenLoaiPhuongTien { get; set; }
+        public string LoaiPhuongTien { get; set; }
         public string BienSoXe { get; set; }
         public DateTime? TuNgay { get; set; }
         public DateTime? DenNgay { get; set; }
@@ -179,5 +183,15 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public List<CDNT_DonDangKyDetail> ChiTietDon { get; set; }
         public List<TrinhKyModel> TrinhKy { get; set; }
     }
-
+    public class StepInfo
+    {
+        public string Ma_Don { get; set; }
+        public int? CapDuyet { get; set; }
+        public int? TinhTrang_ID { get; set; }
+    }
+    public class CapCountResult
+    {
+        public int CapDuyet { get; set; }
+        public int SoLuong { get; set; }
+    }
 }
