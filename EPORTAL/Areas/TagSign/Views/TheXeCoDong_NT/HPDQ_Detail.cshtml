@@ -105,7 +105,7 @@
                                                 <div class="form-group" style="margin-left: 13%;">
                                                     @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].FileHoSoXe))
                                                     {
-                                                        var filePath = Url.Content("~/UploadedFiles/" + Model[0].FileHoSoXe);
+                                                        var filePath = Url.Content("~/UploadedFiles/XeCoDong/" + Model[0].FileHoSoXe);
                                                         <a href="@filePath" download>@Model[0].FileHoSoXe</a>
                                                     }
                                                     else
