@@ -532,8 +532,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             string tenNhaThau = "";
             int? nhaThauID = null;
 
-            int nhanVienNT_ID = Models.MyAuthentication.ID;
-            var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
+            int nhanVienNT_ID = Models.MyAuthentication.ID; // ID tài khoản NT
+            var nhanVien = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == nhanVienNT_ID); // thông tin tài khoản
 
             if (nhanVien != null && nhanVien.IDNT.HasValue)
             {
