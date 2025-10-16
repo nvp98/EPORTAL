@@ -163,7 +163,10 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string BienSoXe { get; set; }
         public DateTime? TuNgay { get; set; }
         public DateTime? DenNgay { get; set; }
-        public bool? TinhTrang { get; set; }
+        public int? TTHD { get; set; }
+        public int? User_Edit { get; set; }
+
+        public string HoVaTenUser_Edit { get; set; }
     }
     public class TrinhKyModel
     {
@@ -194,4 +197,11 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int CapDuyet { get; set; }
         public int SoLuong { get; set; }
     }
+}
+
+public enum TrangThaiHoatDong
+{
+    HoatDong = 1,
+    HetHan = 2,
+    DaKhoa = 3,
 }

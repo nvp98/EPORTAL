@@ -37,21 +37,29 @@
 <div class="app-main__outer">
     <div class="app-main__inner">
         <div class="app-page-title">
-            <div class="page-title-wrapper">
-                <div class="page-title-heading">
+            <div class="page-title-wrapper d-flex justify-content-between align-items-center">
+                <div class="page-title-heading d-flex align-items-center">
                     <div class="page-title-icon">
-                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
-                        </i>
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early"></i>
                     </div>
                     <div>
                         Danh sách xe cơ động
-                        <div class="page-title-subheading">
-                        </div>
+                        <div class="page-title-subheading"></div>
                     </div>
                 </div>
 
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-success mr-2" id="btn-import-excel">
+                        <i class="fa fa-upload"></i> Import Excel
+                    </button>
+                    <button type="button" class="btn btn-info" id="btn-download-template">
+                        <i class="fa fa-download"></i> Tải biểu mẫu
+                    </button>
+                    <input type="file" id="fileImportExcel" style="display:none;" accept=".xlsx,.xls" />
+                </div>
             </div>
         </div>
+
 
         <div class="tab-content">
             <div class="row">
@@ -60,16 +68,16 @@
                         <div class="row align-items-center" style="width:100%">
                             <div class="col-lg-12">
                                 <form class="form-row" autocomplete="off" id="searchForm">
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group col-md-1,5">
                                         <label for="begind">Từ ngày</label>
                                         @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
                                     </div>
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group col-md-1,5">
                                         <label for="endd">Đến ngày</label>
                                         @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
                                     </div>
                                     <div class="form-group col-md-2">
-                                        <label for="search">Biển số/ Tìm kiếm</label>
+                                        <label for="search">Biển số</label>
                                         @Html.TextBox("search", ViewBag.Search as string, new { @id = "search", @class = "form-control", @placeholder = "Tìm kiếm..." })
                                     </div>
                                     <div class="form-group col-md-2">
@@ -80,17 +88,20 @@
                                         <label for="loaiPhuongTien">Loại phương tiện</label>
                                         @Html.DropDownList("loaiPhuongTien", (SelectList)ViewBag.ListLoaiPhuongTien, "Chọn loại phương tiện", new { @class = "form-control chosen-select", @id = "loaiPhuongTien", @style = "width:100%;" })
                                     </div>
-                                    <div class="form-group col-md-2 d-flex align-items-end">
+                                    <div class="form-group col-md-2">
+                                        <label for="TrangThai">Trạng Thái</label>
+                                        @Html.DropDownList("TrangThai", new List<SelectListItem>
+                                        {
+                                            new SelectListItem { Text = "Hoạt động", Value = "1" },
+                                            new SelectListItem { Text = "Hết hạn", Value = "2" },
+                                            new SelectListItem { Text = "Đã khóa", Value = "3" }
+                                        }, "Chọn trạng thái", new { @class = "form-control chosen-select", @id = "TrangThai", style = "width:70%;" })
+                                    </div>
+
+                                    <div class="form-group col-md-1 d-flex align-items-end">
                                         <button type="button" class="btn btn-primary mr-2" id="btn-search">
                                             <i class="fa fa-search"></i> Tìm kiếm
                                         </button>
-                                        <button type="button" class="btn btn-success mr-2" id="btn-import-excel">
-                                            <i class="fa fa-upload"></i> Import Excel
-                                        </button>
-                                        <button type="button" class="btn btn-info" id="btn-download-template">
-                                            <i class="fa fa-download"></i> Tải biểu mẫu
-                                        </button>
-                                        <input type="file" id="fileImportExcel" style="display:none;" accept=".xlsx,.xls" />
                                     </div>
                                 </form>
                             </div>
@@ -107,6 +118,8 @@
                                             <th class="text-center" width="150px">Loại phương tiện</th>
                                             <th class="text-center" width="150px">Biển số</th>
                                             <th class="text-center" width="150px">Thời hạn</th>
+                                            <th class="text-center" width="150px">Tình Trạng</th>
+                                            <th class="text-center" width="150px">Người chỉnh sửa</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -124,6 +137,18 @@
                                                         –
                                                         @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")
                                                     </td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            var t = item.TTHD ?? 0;
+                                                            var text = t == 1 ? "Hoạt động" : t == 2 ? "Hết hạn" : t == 3 ? "Đã khóa" : "";
+                                                            var cls = t == 1 ? "badge badge-success"
+                                                                     : t == 2 ? "badge badge-warning"
+                                                                     : t == 3 ? "badge badge-secondary"
+                                                                     : "badge badge-light";
+                                                        }
+                                                        <span class="@cls">@text</span>
+                                                    </td>
+                                                      <td class="text-center"> @item.HoVaTenUser_Edit</td>
                                                 </tr>
                                                 stt++;
                                             }
@@ -132,15 +157,17 @@
                                 </table>
                                 <div class="pager">
                                     @Html.PagedListPager(Model, page => Url.Action("DanhSachXe", "TheXeCoDong_NT", new
-                                    {
-                                        area = "TagSign",
-                                        page,
-                                        begind = ViewBag.BeginDate,
-                                        endd = ViewBag.EndDate,
-                                        search = ViewBag.Search,
-                                        nhaThauId = ViewBag.NhaThauId,
-                                        loaiPhuongTien = ViewBag.LoaiPhuongTien
-                                    }))
+                                       {
+                                           area = "TagSign",
+                                           page,
+                                           begind = ViewBag.BeginDate,
+                                           endd = ViewBag.EndDate,
+                                           search = ViewBag.Search,
+                                           nhaThauId = ViewBag.NhaThauId,
+                                           loaiPhuongTien = ViewBag.LoaiPhuongTien,
+                                           TrangThai = ViewBag.TrangThai
+
+                                       }))
                                     <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
                                 </div>
                             </div>
@@ -194,6 +221,7 @@
     var search = $('#search').val();
     var nhaThauId = $('#nhaThauId').val();
     var loaiPhuongTien = $('#loaiPhuongTien').val();
+    var trangThai = $('#TrangThai').val() || '';
     // Hiện overlay loading
         $("#importOverlay").show();
 
@@ -202,7 +230,8 @@
         + '&endd=' + encodeURIComponent(endd)
         + '&search=' + encodeURIComponent(search)
         + '&nhaThauId=' + encodeURIComponent(nhaThauId)
-        + '&loaiPhuongTien=' + encodeURIComponent(loaiPhuongTien);
+        + '&loaiPhuongTien=' + encodeURIComponent(loaiPhuongTien)
+        + '&TrangThai=' + encodeURIComponent(trangThai);
     });
     $("#btn-import-excel").click(function () {
         $("#fileImportExcel").click();

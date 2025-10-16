@@ -26,6 +26,7 @@ using static EPORTAL.ModelsTagSign.TheXeCoDongVM.ChiTietDonVM;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -948,7 +949,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                     ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
                                     ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
 
-                                BienSoXe = ws.Cell(row, 5).GetString().Trim(),
+                                BienSoXe = NormalizeBienSo(ws.Cell(row, 5).GetString()),
                                 CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
                                 CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
                                 GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
@@ -965,7 +966,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     var dinhBien = DinhBienPhuongTienService.LayDinhBienTheoNhaThau(nhaThauID);
 
                     int soXeMayMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 1 && x.CapMoi);
-                    int soXe3GacMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 3 && x.CapMoi);
+                    int soXe3GacMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 2 && x.CapMoi);
 
                     if (soXeMayMoi > dinhBien.XeMay_ConLai || soXe3GacMoi > dinhBien.Xe3Gac_ConLai)
                     {
@@ -1321,8 +1322,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             try
             {
+
+
                 int nhanVienNT_ID = Models.MyAuthentication.ID;
-                var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
+                var nhanVien = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == nhanVienNT_ID);
+
                 if (nhanVien == null || nhanVien.IDNT == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy nhà thầu." }, JsonRequestBehavior.AllowGet);
@@ -1462,7 +1466,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(model);
         }
-        public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? nhaThauId, int? loaiPhuongTien, int? page)
+        public ActionResult DanhSachXe(DateTime? begind, DateTime? endd, string search, int? nhaThauId, int? loaiPhuongTien, int? TrangThai, int? page)
         {
             int pageNumber = page ?? 1;
             int pageSize = 30;
@@ -1486,12 +1490,14 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 @p_LoaiPhuongTien, 
                 @p_BienSoXe,
                 @p_TuNgay,
-                @p_DenNgay",
+                @p_DenNgay,
+                @p_TTHD",
             new SqlParameter("@p_NhaThauID", nhaThauId ?? (object)DBNull.Value),
             new SqlParameter("@p_LoaiPhuongTien", SqlDbType.Int) { Value = (object)loaiPhuongTien ?? DBNull.Value },
             new SqlParameter("@p_BienSoXe", SqlDbType.NVarChar, 50) { Value = search ?? (object)DBNull.Value },
             new SqlParameter("@p_TuNgay", SqlDbType.Date) { Value = begind ?? (object)DBNull.Value },
-            new SqlParameter("@p_DenNgay", SqlDbType.Date) { Value = endd ?? (object)DBNull.Value }
+            new SqlParameter("@p_DenNgay", SqlDbType.Date) { Value = endd ?? (object)DBNull.Value },
+            new SqlParameter("@p_TTHD", SqlDbType.Int) { Value = (object)TrangThai ?? DBNull.Value }
              ).ToList();
 
             var pagedData = data.ToPagedList(pageNumber, pageSize);
@@ -1503,6 +1509,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             ViewBag.Search = search;
             ViewBag.Page = pageNumber;
             ViewBag.PageSize = pageSize;
+            ViewBag.TrangThai = TrangThai;
 
             return View(pagedData);
         }
@@ -1644,14 +1651,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return tempPdf;
         }
-
-        private string SanitizeFileName(string input)
-        {
-            string invalidChars = new string(Path.GetInvalidFileNameChars());
-            string pattern = $"[{Regex.Escape(invalidChars)}]";
-            return Regex.Replace(input, pattern, "_");
-        }
-
 
         public class DinhBienPhuongTienService
         {
@@ -2019,10 +2018,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         }
                     }
 
-                    var bienSoXe = row.Cell(2).GetString().Trim();     // Cột B: BIỂN KIỂM SOÁT
+                    var bienSoXe = NormalizeBienSo(row.Cell(2).GetString().Trim());     // Cột B: BIỂN KIỂM SOÁT
                     var loaiPTStr = row.Cell(3).GetString().Trim();    // Cột C: LOẠI PHƯƠNG TIỆN
                     var tuNgay = ParseExcelDate(row.Cell(4));          // Cột D: NGÀY CẤP
                     var denNgay = ParseExcelDate(row.Cell(5));         // Cột E: THỜI HẠN
+                    var ttHD = row.Cell(6).GetString().Trim();           // Cột F: TRẠNG THÁI HOẠT ĐỘNG
 
                     int? idLoaiPhuongTien = null;
                     switch (loaiPTStr.ToUpper())
@@ -2031,7 +2031,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         case "XE BA GÁC": idLoaiPhuongTien = 2; break;
                         case "XE Ô TÔ": idLoaiPhuongTien = 3; break;
                     }
-
+                    int? idTrangThaiHoatDong = null;
+                    switch (ttHD.ToUpper())
+                    {
+                    
+                        case "HẾT HẠN": idTrangThaiHoatDong = (int)(TrangThaiHoatDong.HetHan); break;// Hết hạn
+                        case "ĐÃ KHÓA": idTrangThaiHoatDong = (int)TrangThaiHoatDong.DaKhoa; break; // Đã khóa
+                        default:
+                            idTrangThaiHoatDong = (int)TrangThaiHoatDong.HoatDong; // mặc định an toàn
+                            break;
+                    }
                     // Kiểm tra biển số xe đã tồn tại chưa
                     var chiTietDon = db_dk.CDNT_ChiTietDon.FirstOrDefault(x => x.BienSoXe == bienSoXe);
 
@@ -2044,6 +2053,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         // Nếu muốn cập nhật luôn nhà thầu hoặc loại phương tiện:
                         chiTietDon.ID_NhaThau = idNhaThau;
                         chiTietDon.ID_LoaiPhuongTien = idLoaiPhuongTien;
+                        chiTietDon.TTHD = idTrangThaiHoatDong;
+                        chiTietDon.User_Edit = Models.MyAuthentication.ID;
                         // Không cần .Add(), Entity Framework sẽ tự nhận là update
                     }
                     else
@@ -2056,7 +2067,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             DenNgay = denNgay,
                             ID_NhaThau = idNhaThau,
                             ID_LoaiPhuongTien = idLoaiPhuongTien,
-                            TrangThaiDuyet_ID = 1
+                            TrangThaiDuyet_ID = 1,
+                            TTHD = idTrangThaiHoatDong,
+                            User_Edit = Models.MyAuthentication.ID,
                         };
                         db_dk.CDNT_ChiTietDon.Add(chiTietDon);
                     }
@@ -2189,5 +2202,35 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             return View(paged);
         }
 
+
+        /// hàm phụ trợ
+        private string SanitizeFileName(string input)
+        {
+            string invalidChars = new string(Path.GetInvalidFileNameChars());
+            string pattern = $"[{Regex.Escape(invalidChars)}]";
+            return Regex.Replace(input, pattern, "_");
+        }
+        private static string NormalizeBienSo(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            var s = input.Normalize(NormalizationForm.FormKC).Trim();
+
+            // Thay NBSP -> space rồi sẽ xử lý qua regex
+            s = s.Replace('\u00A0', ' '); // NBSP
+                                          // Chuẩn hóa các loại gạch ngang về '-'
+            s = s.Replace('–', '-').Replace('—', '-');
+
+            // Bỏ khoảng trắng quanh dấu '-' -> còn lại một dấu '-'
+            s = Regex.Replace(s, @"\s*-\s*", "-");
+
+            // Bỏ mọi khoảng trắng còn lại (space, tab, …)
+            s = Regex.Replace(s, @"\s+", "");
+
+            // Đưa về uppercase
+            s = s.ToUpperInvariant();
+
+            return s;
+        }
     }
 }
