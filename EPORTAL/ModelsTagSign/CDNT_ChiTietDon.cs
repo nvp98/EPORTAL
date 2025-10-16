@@ -27,5 +27,7 @@ namespace EPORTAL.ModelsTagSign
         public string HoSoTheoXe { get; set; }
         public Nullable<int> TrangThaiDuyet_ID { get; set; }
         public Nullable<int> ID_NhaThau { get; set; }
+        public Nullable<int> TTHD { get; set; }
+        public Nullable<int> User_Edit { get; set; }
     }
 }
