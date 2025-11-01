@@ -44,8 +44,9 @@ namespace EPORTAL.ModelsTagSign
         public virtual DbSet<SignOff_Flow> SignOff_Flow { get; set; }
         public virtual DbSet<TK_CardExtend> TK_CardExtend { get; set; }
         public virtual DbSet<TK_CardRegistrationInfor> TK_CardRegistrationInfor { get; set; }
+        public virtual DbSet<CDNT_DinhBienXinThem> CDNT_DinhBienXinThem { get; set; }
     
-        public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(Nullable<int> p_NhaThauID, Nullable<int> p_LoaiPhuongTien, string p_BienSoXe)
+        public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(Nullable<int> p_NhaThauID, Nullable<int> p_LoaiPhuongTien, string p_BienSoXe, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay, Nullable<int> p_TTHD)
         {
             var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
                 new ObjectParameter("p_NhaThauID", p_NhaThauID) :
@@ -59,7 +60,19 @@ namespace EPORTAL.ModelsTagSign
                 new ObjectParameter("p_BienSoXe", p_BienSoXe) :
                 new ObjectParameter("p_BienSoXe", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_ChiTietDon_Search_Result>("CDNT_ChiTietDon_Search", p_NhaThauIDParameter, p_LoaiPhuongTienParameter, p_BienSoXeParameter);
+            var p_TuNgayParameter = p_TuNgay.HasValue ?
+                new ObjectParameter("p_TuNgay", p_TuNgay) :
+                new ObjectParameter("p_TuNgay", typeof(System.DateTime));
+    
+            var p_DenNgayParameter = p_DenNgay.HasValue ?
+                new ObjectParameter("p_DenNgay", p_DenNgay) :
+                new ObjectParameter("p_DenNgay", typeof(System.DateTime));
+    
+            var p_TTHDParameter = p_TTHD.HasValue ?
+                new ObjectParameter("p_TTHD", p_TTHD) :
+                new ObjectParameter("p_TTHD", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_ChiTietDon_Search_Result>("CDNT_ChiTietDon_Search", p_NhaThauIDParameter, p_LoaiPhuongTienParameter, p_BienSoXeParameter, p_TuNgayParameter, p_DenNgayParameter, p_TTHDParameter);
         }
     
         public virtual int CDNT_DonDangKi_UpdateFull_XML(string ma_Don, string noiDung, Nullable<int> bPQL_ID, Nullable<int> nhanVienNT_ID, Nullable<int> nhaThau_ID, string hopDong, Nullable<System.DateTime> ngayTrinhKy, string fileHoSoXe, Nullable<int> trinhKy_ID, Nullable<int> tinhTrang_ID, Nullable<int> loaiNT_ID, string chiTiet_XML)
@@ -332,13 +345,13 @@ namespace EPORTAL.ModelsTagSign
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CDNT_XeCoDong_Search_Result>("CDNT_XeCoDong_Search", p_ID_NTParameter, p_BP_IDParameter, p_TenDayDuParameter, p_TenNhaThauParameter, p_LoaiPhuongTien_IDParameter, p_BienSoXeParameter, p_TinhTrangParameter, p_TuNgayParameter, p_DenNgayParameter);
         }
     
-        public virtual int CNDT_GetDinhBienPhuongTien(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan, ObjectParameter p_XeMay_DaCap, ObjectParameter p_Xe3Gac_DaCap, ObjectParameter p_XeMay_ToiDa, ObjectParameter p_Xe3Gac_ToiDa, ObjectParameter p_XeMay_ConLai, ObjectParameter p_Xe3Gac_ConLai)
+        public virtual int CNDT_GetDinhBienPhuongTien(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan, ObjectParameter p_XeMay_DaCap, ObjectParameter p_Xe3Gac_DaCap, ObjectParameter p_XeMay_ToiDa, ObjectParameter p_Xe3Gac_ToiDa, ObjectParameter p_XeMay_ConLai, ObjectParameter p_Xe3Gac_ConLai, ObjectParameter p_DinhBienXinThem_XeMay, ObjectParameter p_DinhBienXinThem_Xe3Gac)
         {
             var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
                 new ObjectParameter("p_NhaThauID", p_NhaThauID) :
                 new ObjectParameter("p_NhaThauID", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CNDT_GetDinhBienPhuongTien", p_NhaThauIDParameter, p_SoQuanLy, p_SoCongNhan, p_XeMay_DaCap, p_Xe3Gac_DaCap, p_XeMay_ToiDa, p_Xe3Gac_ToiDa, p_XeMay_ConLai, p_Xe3Gac_ConLai);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CNDT_GetDinhBienPhuongTien", p_NhaThauIDParameter, p_SoQuanLy, p_SoCongNhan, p_XeMay_DaCap, p_Xe3Gac_DaCap, p_XeMay_ToiDa, p_Xe3Gac_ToiDa, p_XeMay_ConLai, p_Xe3Gac_ConLai, p_DinhBienXinThem_XeMay, p_DinhBienXinThem_Xe3Gac);
         }
     
         public virtual int CNDT_GetNhanSuTheoChucVu(Nullable<int> p_NhaThauID, ObjectParameter p_SoQuanLy, ObjectParameter p_SoCongNhan)

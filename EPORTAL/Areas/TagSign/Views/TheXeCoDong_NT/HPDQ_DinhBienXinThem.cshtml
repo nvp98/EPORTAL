@@ -1,0 +1,337 @@
+﻿@model PagedList.IPagedList<EPORTAL.ModelsTagSign.TheXeCoDongVM.DinhBienPhuongTienVM>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "HPDQ_DinhBienXinThem";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<div id="importOverlay" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-size:1.2rem;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Đang tải dữ liệu, vui lòng chờ...
+    </div>
+</div>
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon"><i class="pe-7s-portfolio icon-gradient bg-grow-early"></i></div>
+                    <div>
+                        ĐỊNH BIÊN XIN THÊM
+                        <div class="page-title-subheading">Danh sách nhà thầu và số lượng phương tiện</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card w-100">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="row align-items-center w-100">
+                                <!-- Filter: Mã/Nhà thầu (q) -->
+                                <!-- Filter: Mã/Nhà thầu (dùng Chosen) -->
+                                <div class="col-lg-4 col-md-6 d-flex align-items-center mb-2">
+                                    @*<label for="filterSelect" class="mb-0 mr-2" style="min-width: 90px;">Tìm (ID/Tên):</label>*@
+                                    <select id="filterSelect" name="q" class="form-control chosen-select" data-placeholder="Nhập mã hoặc tên nhà thầu">
+                                        <option value="">-- Tất cả --</option>
+                                        @if (ViewBag.ListNhaThau != null)
+                                        {
+                                            foreach (System.Web.Mvc.SelectListItem nt in (IEnumerable<System.Web.Mvc.SelectListItem>)ViewBag.ListNhaThau)
+                                            {
+                                                <option value="@nt.Value" @(nt.Selected ? "selected" : "")>@nt.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Nút tìm kiếm -->
+                                <div class="col-lg-2 col-md-6 mb-2">
+                                    <button class="btn btn-primary w-100" id="btn-search">
+                                        <i class="fa fa-search"></i> Tìm kiếm
+                                    </button>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 mb-2">
+                                    <button type="button" class="btn btn-success w-50" data-toggle="modal" data-target="#modalDinhBien">
+                                        <i class="fa fa-plus"></i> Xin thêm định biên
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th width="40px" class="text-center">STT</th>
+                                        <th class="text-center" width="80px">NhaThauID</th>
+                                        <th class="text-left" width="150px">Tên Nhà Thầu</th>
+                                        <th class="text-right" width="80px">Xe Máy Xin Thêm</th>
+                                        <th class="text-right" width="90px">Xe 3 Gác Xin Thêm</th>
+                                        <th class="text-right" width="110px">Xe Máy Đã Cấp</th>
+                                        <th class="text-right" width="110px">Xe 3 Gác Đã Cấp</th>
+                                        <th class="text-right" width="110px">Xe Máy Tối Đa</th>
+                                        <th class="text-right" width="110px">Xe 3 Gác Tối Đa</th>
+                                        <th class="text-right" width="110px">Xe Máy Còn Lại</th>
+                                        <th class="text-right" width="110px">Xe 3 Gác Còn Lại</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        if (Model != null && Model.Any())
+                                        {
+                                            int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@stt</td>
+                                                    <td class="text-center">@item.NhaThauID</td>
+
+                                                    <td class="text-center">@item.NhaThauName</td>
+                                                    <td class="text-right">@item.DinhBienXinThem_XeMay</td>
+                                                    <td class="text-right">@item.DinhBienXinThem_Xe3Gac</td>
+                                                    <td class="text-right">@item.XeMay_DaCap</td>
+                                                    <td class="text-right">@item.Xe3Gac_DaCap</td>
+                                                    <td class="text-right">@item.XeMay_ToiDa</td>
+                                                    <td class="text-right">@item.Xe3Gac_ToiDa</td>
+                                                    <td class="text-right">@item.XeMay_ConLai</td>
+                                                    <td class="text-right">@item.Xe3Gac_ConLai</td>
+                                                </tr>
+                                                stt++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="11" class="text-center">Không có dữ liệu</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+
+                            <div class="pager d-flex align-items-center justify-content-between">
+                                <div>
+                                    @Html.PagedListPager(
+                                             Model,
+                                             p => Url.Action("HPDQ_DinhBienXinThem", "TheXeCoDong_NT", new
+                                             {
+                                                 area = "TagSign",
+                                                 q = Request["q"],
+                                                 nhaThauID = Request["nhaThauID"],
+                                                 page = p
+                                             }),
+                                             PagedListRenderOptions.ClassicPlusFirstAndLast
+                                         )
+                                </div>
+                                <div>
+                                    <span class="pageoff">Trang @(Model == null ? 0 : Model.PageNumber) / @(Model == null ? 0 : Model.PageCount)</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="app-wrapper-footer">
+        <div class="app-footer"><div class="app-footer__inner"></div></div>
+    </div>
+</div><!-- Modal Định biên xin thêm -->
+<!-- Modal Định biên xin thêm -->
+<div class="modal fade" id="modalDinhBien" tabindex="-1" role="dialog" aria-labelledby="modalDinhBienLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalDinhBienLabel">Tạo định biên xin thêm</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                @* Anti-forgery token to validate AJAX POST *@
+                @Html.AntiForgeryToken()
+                <form id="formDinhBien">
+                    <div class="form-group">
+                        <label>Nhà thầu</label>
+                        <select id="NhaThau_ID" class="form-control chosen-select" required>
+                            <option value="">-- Chọn nhà thầu --</option>
+                            @if (ViewBag.ListNhaThau != null)
+                            {
+                                // ViewBag.ListNhaThau is a SelectList
+                                foreach (System.Web.Mvc.SelectListItem nt in (IEnumerable<System.Web.Mvc.SelectListItem>)ViewBag.ListNhaThau)
+                                {
+                                    <option value="@nt.Value" @(nt.Selected ? "selected" : "")>@nt.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Xe máy xin thêm</label>
+                            <input type="number" class="form-control" id="DinhBienXinThem_XeMay" min="0" required />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Xe 3 gác xin thêm</label>
+                            <input type="number" class="form-control" id="DinhBienXinThem_Xe3Gac" min="0" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea class="form-control" id="GhiChu" rows="3" placeholder="Nhập ghi chú nếu có"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btnLuuDinhBien">Gửi yêu cầu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+    // Initialize Chosen on page load for any selects already rendered server-side.
+    $(function () {
+        $(".chosen-select").chosen({
+            width: "100%",
+            no_results_text: "Không tìm thấy nhà thầu!"
+        });
+    });
+
+    $("#btn-search").on('click', function () {
+    var selectedVal = $('#filterSelect').val(); // trả ID nếu chọn, rỗng nếu không chọn (tất cả)
+    var q = selectedVal || '';
+
+    $("#importOverlay").show();
+
+    var baseUrl = '@Url.Action("HPDQ_DinhBienXinThem", "TheXeCoDong_NT", new { area = (ViewContext.RouteData.DataTokens["area"] ?? "").ToString() })';
+    if (!baseUrl || baseUrl.length === 0) {
+        baseUrl = '@Url.Action("HPDQ_DinhBienXinThem", "TheXeCoDong_NT")';
+    }
+    var sep = baseUrl.indexOf('?') === -1 ? '?' : '&';
+    var qs = sep + 'q=' + encodeURIComponent(q);
+
+    window.location.href = baseUrl + qs;
+});
+
+    // Khi modal mở, nếu select chỉ có placeholder thì load bằng AJAX
+    $('#modalDinhBien').on('show.bs.modal', function () {
+        var $sel = $('#NhaThau_ID');
+        if ($sel.find('option').length <= 1) { // chỉ còn placeholder
+            $.get('@Url.Action("GetNhaThauList", "TheXeCoDong_NT", new { area = "TagSign" })')
+                .done(function (data) {
+                    $sel.empty();
+                    $sel.append($('<option>').val('').text('-- Chọn nhà thầu --'));
+                    $.each(data, function (i, item) {
+                        $sel.append($('<option>').val(item.id).text(item.text));
+                    });
+
+                    // Nếu Chosen đã được khởi tạo, cập nhật nó để hiển thị option mới
+                    if ($sel.hasClass('chosen-select')) {
+                        try {
+                            $sel.trigger('chosen:updated');
+                        } catch (e) {
+                            // nếu có lỗi (ví dụ Chosen chưa load), khởi tạo lại
+                            $sel.chosen({
+                                width: "100%",
+                                no_results_text: "Không tìm thấy nhà thầu!"
+                            });
+                        }
+                    } else {
+                        // chưa init -> thêm class và init
+                        $sel.addClass('chosen-select').chosen({
+                            width: "100%",
+                            no_results_text: "Không tìm thấy nhà thầu!"
+                        });
+                    }
+                })
+                .fail(function () {
+                    alert('Không tải được danh sách nhà thầu.');
+                });
+        } else {
+            // Nếu options đã có (server-side render), đảm bảo Chosen cập nhật
+            if ($sel.hasClass('chosen-select')) {
+                try { $sel.trigger('chosen:updated'); } catch (e) { /* ignore */ }
+            }
+        }
+    });
+
+    $('#btnLuuDinhBien').on('click', function () {
+        var NhaThau_ID = $('#NhaThau_ID').val();
+        var DinhBienXinThem_XeMay = $('#DinhBienXinThem_XeMay').val();
+        var DinhBienXinThem_Xe3Gac = $('#DinhBienXinThem_Xe3Gac').val();
+        var GhiChu = $('#GhiChu').val();
+
+        if (!NhaThau_ID) {
+            alert('Vui lòng chọn nhà thầu.');
+            return;
+        }
+
+        DinhBienXinThem_XeMay = DinhBienXinThem_XeMay ? parseInt(DinhBienXinThem_XeMay, 10) : 0;
+        DinhBienXinThem_Xe3Gac = DinhBienXinThem_Xe3Gac ? parseInt(DinhBienXinThem_Xe3Gac, 10) : 0;
+
+        $("#importOverlay").show();
+
+        // Lấy anti-forgery token
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '@Url.Action("CreateDinhBienXinThem", "TheXeCoDong_NT", new { area = "TagSign" })',
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: token,
+                NhaThau_ID: NhaThau_ID,
+                DinhBienXinThem_XeMay: DinhBienXinThem_XeMay,
+                DinhBienXinThem_Xe3Gac: DinhBienXinThem_Xe3Gac,
+                GhiChu: GhiChu
+            },
+            success: function (res) {
+                $("#importOverlay").hide();
+                if (res.success) {
+                    alert(res.message);
+                    $('#modalDinhBien').modal('hide');
+                    location.reload();
+                } else {
+                    alert(res.message);
+                }
+            },
+            error: function (xhr, status, err) {
+                $("#importOverlay").hide();
+                var msg = "Lỗi kết nối đến server.";
+                try {
+                    var json = JSON.parse(xhr.responseText);
+                    if (json && json.message) msg = json.message;
+                } catch (e) {}
+                alert(msg);
+            }
+        });
+    });
+</script>

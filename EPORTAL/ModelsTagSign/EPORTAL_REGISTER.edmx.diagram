@@ -22,6 +22,7 @@
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.SignOff_Flow" Width="1.5" PointX="10.75" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.TK_CardExtend" Width="1.5" PointX="12.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EPORTAL_REGISTERModel.TK_CardRegistrationInfor" Width="1.5" PointX="12.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EPORTAL_REGISTERModel.CDNT_DinhBienXinThem" Width="1.5" PointX="7.375" PointY="12.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

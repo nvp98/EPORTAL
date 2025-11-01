@@ -25,6 +25,18 @@
           <Property Name="TTHD" Type="int" />
           <Property Name="User_Edit" Type="int" />
         </EntityType>
+        <EntityType Name="CDNT_DinhBienXinThem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NhaThau_ID" Type="int" />
+          <Property Name="DinhBienXinThem_XeMay" Type="int" />
+          <Property Name="DinhBienXinThem_Xe3Gac" Type="int" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="250" />
+          <Property Name="User_Edit" Type="nvarchar" MaxLength="25" />
+          <Property Name="NgayCapNhat" Type="datetime" />
+        </EntityType>
         <EntityType Name="CDNT_DonDangKy">
           <Key>
             <PropertyRef Name="ID" />
@@ -273,6 +285,7 @@
           <Parameter Name="p_BienSoXe" Type="nvarchar" Mode="In" />
           <Parameter Name="p_TuNgay" Type="date" Mode="In" />
           <Parameter Name="p_DenNgay" Type="date" Mode="In" />
+          <Parameter Name="p_TTHD" Type="int" Mode="In" />
         </Function>
         <Function Name="CDNT_DonDangKi_UpdateFull_XML" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Ma_Don" Type="nvarchar" Mode="In" />
@@ -359,6 +372,11 @@
           <Parameter Name="p_Xe3Gac_ToiDa" Type="int" Mode="InOut" />
           <Parameter Name="p_XeMay_ConLai" Type="int" Mode="InOut" />
           <Parameter Name="p_Xe3Gac_ConLai" Type="int" Mode="InOut" />
+          <Parameter Name="p_DinhBienXinThem_XeMay" Type="int" Mode="InOut" />
+          <Parameter Name="p_DinhBienXinThem_Xe3Gac" Type="int" Mode="InOut" />
+        </Function>
+        <Function Name="CNDT_GetDinhBienPhuongTien_All" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="p_NhaThauID" Type="int" Mode="In" />
         </Function>
         <Function Name="CNDT_GetNhanSuTheoChucVu" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="p_NhaThauID" Type="int" Mode="In" />
@@ -662,6 +680,7 @@
         </Function>
         <EntityContainer Name="EPORTAL_REGISTERModelStoreContainer">
           <EntitySet Name="CDNT_ChiTietDon" EntityType="Self.CDNT_ChiTietDon" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_DinhBienXinThem" EntityType="Self.CDNT_DinhBienXinThem" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_DonDangKy" EntityType="Self.CDNT_DonDangKy" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_LoaiPhuongTien" EntityType="Self.CDNT_LoaiPhuongTien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CDNT_TinhTrang" EntityType="Self.CDNT_TinhTrang" Schema="dbo" store:Type="Tables" />
@@ -969,6 +988,7 @@
             <Parameter Name="p_BienSoXe" Mode="In" Type="String" />
             <Parameter Name="p_TuNgay" Mode="In" Type="DateTime" />
             <Parameter Name="p_DenNgay" Mode="In" Type="DateTime" />
+            <Parameter Name="p_TTHD" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="CDNT_DonDangKi_UpdateFull_XML">
             <Parameter Name="Ma_Don" Mode="In" Type="String" />
@@ -1055,6 +1075,8 @@
             <Parameter Name="p_Xe3Gac_ToiDa" Mode="InOut" Type="Int32" />
             <Parameter Name="p_XeMay_ConLai" Mode="InOut" Type="Int32" />
             <Parameter Name="p_Xe3Gac_ConLai" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_DinhBienXinThem_XeMay" Mode="InOut" Type="Int32" />
+            <Parameter Name="p_DinhBienXinThem_Xe3Gac" Mode="InOut" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="CNDT_GetNhanSuTheoChucVu">
             <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
@@ -1356,6 +1378,13 @@
             <Parameter Name="NgayDuyet" Mode="In" Type="DateTime" />
             <Parameter Name="GhiChu" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="CDNT_DinhBienXinThem" EntityType="EPORTAL_REGISTERModel.CDNT_DinhBienXinThem" />
+          <FunctionImport Name="CNDT_GetAllDinhBienPhuongTien" ReturnType="Collection(EPORTAL_REGISTERModel.CNDT_GetAllDinhBienPhuongTien_Result)">
+          <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CNDT_GetDinhBienPhuongTien_All" ReturnType="Collection(EPORTAL_REGISTERModel.CNDT_GetDinhBienPhuongTien_All_Result)">
+            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
         <ComplexType Name="CDNT_ChiTietDon_Search_Result">
           <Property Type="Int32" Name="ID" Nullable="false" />
@@ -1506,6 +1535,39 @@
           <Property Type="DateTime" Name="TuNgay" Nullable="true" Precision="23" />
           <Property Type="DateTime" Name="DenNgay" Nullable="true" Precision="23" />
           <Property Type="Boolean" Name="TinhTrang" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="CDNT_DinhBienXinThem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NhaThau_ID" Type="Int32" />
+          <Property Name="DinhBienXinThem_XeMay" Type="Int32" />
+          <Property Name="DinhBienXinThem_Xe3Gac" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="User_Edit" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="NgayCapNhat" Type="DateTime" Precision="3" />
+        </EntityType>
+        <ComplexType Name="CNDT_GetAllDinhBienPhuongTien_Result">
+          <Property Type="Int32" Name="NhaThauID" Nullable="true" />
+          <Property Type="Int32" Name="SoQuanLy" Nullable="false" />
+          <Property Type="Int32" Name="SoCongNhan" Nullable="false" />
+          <Property Type="Int32" Name="XeMay_DaCap" Nullable="false" />
+          <Property Type="Int32" Name="Xe3Gac_DaCap" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="CNDT_GetDinhBienPhuongTien_All_Result">
+          <Property Type="Int32" Name="NhaThauID" Nullable="true" />
+          <Property Type="String" Name="NhaThauName" Nullable="true" MaxLength="400" />
+          <Property Type="Int32" Name="SoQuanLy" Nullable="false" />
+          <Property Type="Int32" Name="SoCongNhan" Nullable="false" />
+          <Property Type="Int32" Name="XeMay_DaCap" Nullable="false" />
+          <Property Type="Int32" Name="Xe3Gac_DaCap" Nullable="false" />
+          <Property Type="Int32" Name="XeMay_ToiDa" Nullable="true" />
+          <Property Type="Int32" Name="Xe3Gac_ToiDa" Nullable="true" />
+          <Property Type="Int32" Name="XeMay_ConLai" Nullable="true" />
+          <Property Type="Int32" Name="Xe3Gac_ConLai" Nullable="true" />
+          <Property Type="Int32" Name="DinhBienXinThem_XeMay" Nullable="false" />
+          <Property Type="Int32" Name="DinhBienXinThem_Xe3Gac" Nullable="false" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2015,6 +2077,37 @@
           <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Cancel" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Cancel" />
           <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_Insert" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_Insert" />
           <FunctionImportMapping FunctionImportName="TK_CardRegistrationInfor_UpdateTK" FunctionName="EPORTAL_REGISTERModel.Store.TK_CardRegistrationInfor_UpdateTK" />
+          <EntitySetMapping Name="CDNT_DinhBienXinThem">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_DinhBienXinThem">
+              <MappingFragment StoreEntitySet="CDNT_DinhBienXinThem">
+                <ScalarProperty Name="NgayCapNhat" ColumnName="NgayCapNhat" />
+                <ScalarProperty Name="User_Edit" ColumnName="User_Edit" />
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="DinhBienXinThem_Xe3Gac" ColumnName="DinhBienXinThem_Xe3Gac" />
+                <ScalarProperty Name="DinhBienXinThem_XeMay" ColumnName="DinhBienXinThem_XeMay" />
+                <ScalarProperty Name="NhaThau_ID" ColumnName="NhaThau_ID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="CNDT_GetDinhBienPhuongTien_All" FunctionName="EPORTAL_REGISTERModel.Store.CNDT_GetDinhBienPhuongTien_All">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EPORTAL_REGISTERModel.CNDT_GetDinhBienPhuongTien_All_Result">
+                <ScalarProperty Name="NhaThauID" ColumnName="NhaThauID" />
+                <ScalarProperty Name="NhaThauName" ColumnName="NhaThauName" />
+                <ScalarProperty Name="SoQuanLy" ColumnName="SoQuanLy" />
+                <ScalarProperty Name="SoCongNhan" ColumnName="SoCongNhan" />
+                <ScalarProperty Name="XeMay_DaCap" ColumnName="XeMay_DaCap" />
+                <ScalarProperty Name="Xe3Gac_DaCap" ColumnName="Xe3Gac_DaCap" />
+                <ScalarProperty Name="XeMay_ToiDa" ColumnName="XeMay_ToiDa" />
+                <ScalarProperty Name="Xe3Gac_ToiDa" ColumnName="Xe3Gac_ToiDa" />
+                <ScalarProperty Name="XeMay_ConLai" ColumnName="XeMay_ConLai" />
+                <ScalarProperty Name="Xe3Gac_ConLai" ColumnName="Xe3Gac_ConLai" />
+                <ScalarProperty Name="DinhBienXinThem_XeMay" ColumnName="DinhBienXinThem_XeMay" />
+                <ScalarProperty Name="DinhBienXinThem_Xe3Gac" ColumnName="DinhBienXinThem_Xe3Gac" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
