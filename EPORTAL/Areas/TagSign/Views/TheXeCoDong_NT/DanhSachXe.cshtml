@@ -113,6 +113,7 @@
                                 <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
                                     <thead>
                                         <tr>
+                                            <th class="text-center" width="100px">Hành động</th>
                                             <th class="text-center" width="10px">TT</th>
                                             <th class="text-center" width="200px">Nhà thầu</th>
                                             <th class="text-center" width="150px">Loại phương tiện</th>
@@ -128,6 +129,19 @@
                                             foreach (var item in Model)
                                             {
                                                 <tr>
+                                                    <td class="text-center">
+                                                        <!-- Nút Xóa -->
+                                                        <button type="button" class="btn btn-sm btn-danger btn-delete-xe" data-id="@item.ID">
+                                                            <i class="fa fa-trash"></i> Xóa
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-primary btn-edit-xe"
+                                                                data-id="@item.ID"
+                                                                data-toggle="modal"
+                                                                data-target="#modalEdit">
+                                                            <i class="fa fa-edit"></i> Sửa
+                                                        </button>
+                                                    </td>
                                                     <td class="text-center">@stt</td>
                                                     <td class="text-center">@item.TenNhaThau</td>
                                                     <td class="text-center">@item.LoaiPhuongTien</td>
@@ -148,7 +162,7 @@
                                                         }
                                                         <span class="@cls">@text</span>
                                                     </td>
-                                                      <td class="text-center"> @item.HoVaTenUser_Edit</td>
+                                                    <td class="text-center"> @item.HoVaTenUser_Edit</td>
                                                 </tr>
                                                 stt++;
                                             }
@@ -190,7 +204,67 @@
 
 
 </div>
+<!-- Modal sửa xe (id = modalEdit) -->
+<div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <form id="form-edit">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalEditLabel">Cập nhật thông tin xe</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
 
+                <div class="modal-body">
+                    <input type="hidden" id="edit-ID" name="ID" />
+
+                    <div class="form-group">
+                        <label>Biển số</label>
+                        <input type="text" id="edit-BienSoXe" name="BienSoXe" class="form-control" />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Từ ngày</label>
+                            <input type="date" id="edit-TuNgay" name="TuNgay" class="form-control" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Đến ngày</label>
+                            <input type="date" id="edit-DenNgay" name="DenNgay" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Loại phương tiện</label>
+                            <select id="edit-ID_LoaiPhuongTien" name="ID_LoaiPhuongTien" class="form-control">
+                                <option value="">-- Chọn --</option>
+                                <option value="1">XE MÁY</option>
+                                <option value="2">XE BA GÁC</option>
+                                <option value="3">XE Ô TÔ</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Trạng thái hoạt động</label>
+                            <select id="edit-TTHD" name="TTHD" class="form-control">
+                                <option value="">-- Chọn --</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="2">Hết hạn</option>
+                                <option value="3">Đã khóa</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     //$('#btn-add').click(function () {
     //    var url = $('#myModal').data('url');
@@ -298,7 +372,111 @@
     $('#btn-download-template').click(function() {
             window.location.href = '@Url.Action("DownloadFile", "TheXeCoDong_NT")';
         });
+    $(document).on('click', '.btn-delete-xe', function (e) {
+      e.preventDefault();
+      var btn = $(this);
+      var id = btn.data('id');
 
+      if (!id) {
+          alert('ID không hợp lệ.');
+          return;
+      }
+
+      if (!confirm('Bạn có chắc muốn xóa xe này?')) return;
+
+      $.ajax({
+          url: '@Url.Action("XoaXe")', // nếu action ở controller khác: '@Url.Action("XoaXe","YourController")'
+          type: 'POST',
+          data: {
+              id: id
+          },
+          success: function (res) {
+              if (res && res.success) {
+                  alert(res.message);
+                  // reload lại trang để cập nhật paging / filter
+                  location.reload();
+              } else {
+                  alert(res && res.message ? res.message : 'Xóa không thành công.');
+              }
+          },
+          error: function (xhr) {
+              alert('Có lỗi phía server: ' + xhr.statusText);
+          }
+      });
+  });
+  $(document).on('click', '.btn-edit-xe', function (e) {
+  e.preventDefault();
+  var id = $(this).data('id');
+  if (!id) { alert('ID không hợp lệ'); return; }
+
+  // gọi GetXe (phải đúng route)
+  $.get('@Url.Action("GetXe", "TheXeCoDong_NT", new { area = "TagSign" })', { id: id })
+    .done(function (res) {
+      if (!res || !res.success) {
+        alert(res && res.message ? res.message : 'Không lấy được dữ liệu.');
+        return;
+      }
+      var d = res.data || {};
+
+      // gán giá trị vào form trong modal
+      $('#edit-ID').val(d.ID || '');
+      $('#edit-BienSoXe').val(d.BienSoXe || '');
+      $('#edit-TuNgay').val(d.TuNgay || '');
+      $('#edit-DenNgay').val(d.DenNgay || '');
+      $('#edit-ID_LoaiPhuongTien').val(d.ID_LoaiPhuongTien || '');
+      $('#edit-TTHD').val(d.TTHD || '');
+
+      // bây giờ mở modal (nếu bạn đã dùng data-toggle/modal thì bootstrap có thể đã mở nó;
+      // gọi lại .modal('show') an toàn)
+      $('#modalEdit').modal('show');
+    })
+    .fail(function (xhr, status, err) {
+      console.error('GetXe failed', status, err);
+      alert('Lỗi khi lấy dữ liệu từ server.');
+    });
+});
+
+// Submit form cập nhật
+$('#form-edit').submit(function (e) {
+  e.preventDefault();
+  var data = {
+    ID: $('#edit-ID').val(),
+    BienSoXe: $('#edit-BienSoXe').val(),
+    TuNgay: $('#edit-TuNgay').val() || null,
+    DenNgay: $('#edit-DenNgay').val() || null,
+    ID_LoaiPhuongTien: $('#edit-ID_LoaiPhuongTien').val() || null,
+    TTHD: $('#edit-TTHD').val() || null
+  };
+
+  $.post('@Url.Action("CapNhatXe", "TheXeCoDong_NT", new { area = "TagSign" })', data)
+    .done(function (res) {
+      if (!res) { alert('Phản hồi rỗng từ server.'); return; }
+      if (res.success) {
+        // cập nhật DOM theo response nếu cần
+        var d = res.data;
+        var row = $('#row-' + d.ID);
+        if (row.length) {
+          row.find('.col-biensoxe').text(d.BienSoXe || '');
+          row.find('.col-thoihan').text((d.TuNgay || '') + ' – ' + (d.DenNgay || ''));
+          if (d.LoaiPhuongTien !== undefined) row.find('.col-loaipt').text(d.LoaiPhuongTien || '');
+          var t = parseInt(d.TTHD || 0, 10);
+          var text = t === 1 ? 'Hoạt động' : t === 2 ? 'Hết hạn' : t === 3 ? 'Đã khóa' : '';
+          var cls = t === 1 ? 'badge badge-success' : t === 2 ? 'badge badge-warning' : t === 3 ? 'badge badge-secondary' : 'badge badge-light';
+          row.find('.col-tinhtrang').html('<span class="' + cls + '">' + text + '</span>');
+        }
+
+        $('#modalEdit').modal('hide');
+        // nếu muốn reload toàn trang thay vì cập nhật DOM, dùng: location.reload();
+          alert(res.message);
+          location.reload();
+      } else {
+        alert(res.message || 'Cập nhật thất bại.');
+      }
+    })
+    .fail(function (xhr) {
+      alert('Có lỗi phía server: ' + xhr.statusText);
+    });
+});
 </script>
 
 
