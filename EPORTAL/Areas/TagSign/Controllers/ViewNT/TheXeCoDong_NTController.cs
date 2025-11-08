@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Runtime.InteropServices;
 using System.Text;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -112,7 +113,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return View(pagedData);
         }
-        
+
         //public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu, int? page)
         //{
         //    var ListQuyen = new Models.MyAuthentication().GetPermisionCN(IDQuyenHT, controll);
@@ -1124,7 +1125,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 .ToList();
             if (danhSachXe == null || danhSachXe.Count == 0)
             {
-                danhSachXe = new List<ChiTietDonVM>(); 
+                danhSachXe = new List<ChiTietDonVM>();
             }
             // Tạo model cho view
             var model = new DonDangKyModel
@@ -1666,6 +1667,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 var p_Xe3Gac_ToiDa = new ObjectParameter("p_Xe3Gac_ToiDa", typeof(int));
                 var p_XeMay_ConLai = new ObjectParameter("p_XeMay_ConLai", typeof(int));
                 var p_Xe3Gac_ConLai = new ObjectParameter("p_Xe3Gac_ConLai", typeof(int));
+                var p_DinhBienXinThem_XeMay = new ObjectParameter("p_DinhBienXinThem_XeMay", typeof(int));
+                var p_DinhBienXinThem_Xe3Gac = new ObjectParameter("p_DinhBienXinThem_Xe3Gac", typeof(int));
+
 
                 using (var db = new EPORTAL_REGISTEREntities())
                 {
@@ -1678,7 +1682,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         p_XeMay_ToiDa,
                         p_Xe3Gac_ToiDa,
                         p_XeMay_ConLai,
-                        p_Xe3Gac_ConLai
+                        p_Xe3Gac_ConLai,
+                        p_DinhBienXinThem_XeMay,
+                        p_DinhBienXinThem_Xe3Gac
                     );
                 }
 
@@ -1690,7 +1696,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 result.Xe3Gac_ToiDa = (int)p_Xe3Gac_ToiDa.Value;
                 result.XeMay_ConLai = (int)p_XeMay_ConLai.Value;
                 result.Xe3Gac_ConLai = (int)p_Xe3Gac_ConLai.Value;
-
+                result.DinhBienXinThem_XeMay = (int)p_DinhBienXinThem_XeMay.Value;
+                result.DinhBienXinThem_Xe3Gac = (int)p_DinhBienXinThem_Xe3Gac.Value;
                 return result;
             }
         }
@@ -2034,7 +2041,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     int? idTrangThaiHoatDong = null;
                     switch (ttHD.ToUpper())
                     {
-                    
+
                         case "HẾT HẠN": idTrangThaiHoatDong = (int)(TrangThaiHoatDong.HetHan); break;// Hết hạn
                         case "ĐÃ KHÓA": idTrangThaiHoatDong = (int)TrangThaiHoatDong.DaKhoa; break; // Đã khóa
                         default:
@@ -2232,5 +2239,169 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return s;
         }
+
+        // trong TheXeCoDong_NTController.cs
+        public ActionResult HPDQ_DinhBienXinThem(int? nhaThauID, string q, int? page)
+        {
+            // --- populate dropdown options for Chosen ---
+            var listNhaThau = db.NT_Partner
+                .OrderBy(x => x.FullName)
+                .Select(x => new { x.ID, x.FullName })
+                .ToList();
+
+            // If q contains an ID, preselect it; otherwise use nhaThauID
+            int? selectedId = null;
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                if (int.TryParse(q.Trim(), out int idFromQ))
+                {
+                    selectedId = idFromQ;
+                }
+            }
+            if (!selectedId.HasValue && nhaThauID.HasValue) selectedId = nhaThauID;
+
+            ViewBag.ListNhaThau = new SelectList(listNhaThau, "ID", "FullName", selectedId);
+
+            // --- existing code: call SP, filter by q, paging ---
+            var param = new SqlParameter("@p_NhaThauID", SqlDbType.Int)
+            {
+                Value = nhaThauID.HasValue ? (object)nhaThauID.Value : DBNull.Value
+            };
+
+            var list = db_dk.Database
+                            .SqlQuery<DinhBienPhuongTienVM>("EXEC dbo.CNDT_GetDinhBienPhuongTien_All @p_NhaThauID", param)
+                            .ToList();
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var qTrim = q.Trim().ToLower();
+                int idFilter;
+                bool isNumber = int.TryParse(qTrim, out idFilter);
+
+                list = list.Where(x =>
+                            (isNumber && x.NhaThauID == idFilter)
+                            || (!string.IsNullOrEmpty(x.NhaThauName) && x.NhaThauName.ToLower().Contains(qTrim))
+                        ).ToList();
+            }
+
+            int pageNumber = page ?? 1;
+            int pageSize = 20;
+            var paged = list.OrderBy(x => x.NhaThauID).ToPagedList(pageNumber, pageSize);
+
+            return View(paged);
+        }
+
+        [HttpPost]
+        //public JsonResult CreateDinhBienXinThem(int NhaThau_ID, int DinhBienXinThem_XeMay, int DinhBienXinThem_Xe3Gac, string GhiChu)
+        //{
+        //    try
+        //    {
+        //        int userId = Models.MyAuthentication.ID;
+
+        //        // Bảo đảm giá trị không âm (nếu cần)
+        //        var xeMay = Math.Max(0, DinhBienXinThem_XeMay);
+        //        var xe3Gac = Math.Max(0, DinhBienXinThem_Xe3Gac);
+
+        //        var sql = @"
+        //            INSERT INTO EPORTAL_REGISTER.dbo.CDNT_DinhBienXinThem
+        //                (NhaThau_ID, DinhBienXinThem_XeMay, DinhBienXinThem_Xe3Gac, GhiChu, User_Edit, NgayCapNhat)
+        //            VALUES
+        //                (@NhaThau_ID, @XeMay, @Xe3Gac, @GhiChu, @User_Edit, GETDATE())";
+
+        //        var parameters = new[]
+        //        {
+        //            new SqlParameter("@NhaThau_ID", SqlDbType.Int) { Value = NhaThau_ID },
+        //            new SqlParameter("@XeMay", SqlDbType.Int) { Value = xeMay },
+        //            new SqlParameter("@Xe3Gac", SqlDbType.Int) { Value = xe3Gac },
+        //            new SqlParameter("@GhiChu", SqlDbType.NVarChar, 4000) { Value = (object)GhiChu ?? DBNull.Value },
+        //            new SqlParameter("@User_Edit", SqlDbType.Int) { Value = userId }
+        //        };
+
+        //        // Thực thi (EF6)
+        //        db_dk.Database.ExecuteSqlCommand(sql, parameters);
+
+        //        return Json(new { success = true, message = "Gửi yêu cầu định biên xin thêm thành công." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // TODO: log lỗi chi tiết vào hệ thống log của bạn
+        //        return Json(new { success = false, message = "Lỗi khi lưu: " + ex.Message });
+        //    }
+        //}
+        public JsonResult CreateDinhBienXinThem(int NhaThau_ID, int DinhBienXinThem_XeMay, int DinhBienXinThem_Xe3Gac, string GhiChu)
+        {
+            try
+            {
+                int userId = Models.MyAuthentication.ID;
+
+                // Bảo đảm giá trị không âm
+                var xeMay = Math.Max(0, DinhBienXinThem_XeMay);
+                var xe3Gac = Math.Max(0, DinhBienXinThem_Xe3Gac);
+
+                // SQL delete + insert trong 1 transaction để thay thế bản ghi trước đó của cùng user & nhà thầu
+                // Nếu bạn muốn xóa tất cả bản ghi (không quan tâm user) thì thay điều kiện WHERE cho phù hợp.
+                using (var tx = db_dk.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var deleteSql = @"
+                    DELETE FROM EPORTAL_REGISTER.dbo.CDNT_DinhBienXinThem
+                    WHERE NhaThau_ID = @NhaThau_ID
+                      AND User_Edit = @User_Edit"; // chỉ xóa các request do chính user này tạo
+
+                        var deleteParams = new[]
+                        {
+                    new SqlParameter("@NhaThau_ID", SqlDbType.Int) { Value = NhaThau_ID },
+                    new SqlParameter("@User_Edit", SqlDbType.Int) { Value = userId }
+                };
+
+                        db_dk.Database.ExecuteSqlCommand(deleteSql, deleteParams);
+
+                        var insertSql = @"
+                    INSERT INTO EPORTAL_REGISTER.dbo.CDNT_DinhBienXinThem
+                        (NhaThau_ID, DinhBienXinThem_XeMay, DinhBienXinThem_Xe3Gac, GhiChu, User_Edit, NgayCapNhat)
+                    VALUES
+                        (@NhaThau_ID, @XeMay, @Xe3Gac, @GhiChu, @User_Edit, GETDATE())";
+
+                        var insertParams = new[]
+                        {
+                    new SqlParameter("@NhaThau_ID", SqlDbType.Int) { Value = NhaThau_ID },
+                    new SqlParameter("@XeMay", SqlDbType.Int) { Value = xeMay },
+                    new SqlParameter("@Xe3Gac", SqlDbType.Int) { Value = xe3Gac },
+                    new SqlParameter("@GhiChu", SqlDbType.NVarChar, 4000) { Value = (object)GhiChu ?? DBNull.Value },
+                    new SqlParameter("@User_Edit", SqlDbType.Int) { Value = userId }
+                };
+
+                        db_dk.Database.ExecuteSqlCommand(insertSql, insertParams);
+
+                        tx.Commit();
+                    }
+                    catch
+                    {
+                        tx.Rollback();
+                        throw;
+                    }
+                }
+
+                return Json(new { success = true, message = "Gửi yêu cầu định biên xin thêm thành công." });
+            }
+            catch (Exception ex)
+            {
+                // TODO: log lỗi chi tiết vào hệ thống log của bạn
+                return Json(new { success = false, message = "Lỗi khi lưu: " + ex.Message });
+            }
+        }
+        [HttpGet]
+        public JsonResult GetNhaThauList()
+        {
+            var list = db.NT_Partner
+                .OrderBy(x => x.FullName)
+                .Select(x => new { id = x.ID, text = x.FullName })
+                .ToList();
+
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
     }
 }
+        
+    

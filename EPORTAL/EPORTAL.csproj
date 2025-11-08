@@ -460,6 +460,7 @@
     <Compile Include="Areas\TagSign\Controllers\ViewNT\PortToController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\PositionController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\WorkPlaceController.cs" />
+    <None Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_DinhBienXinThem.cshtml" />
     <Compile Include="Areas\View360\Controllers\DocumentGroupController.cs" />
     <Compile Include="Areas\View360\Controllers\DocumentLibraryController.cs" />
     <Compile Include="Areas\View360\Controllers\ListVirtualController.cs" />
@@ -906,6 +907,9 @@
     <Compile Include="ModelsTagSign\CDNT_ChiTietDon_Search_Result.cs">
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelsTagSign\CDNT_DinhBienXinThem.cs">
+      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelsTagSign\CDNT_DonDangKy.cs">
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
@@ -943,6 +947,12 @@
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelsTagSign\CDNT_XeCoDong_Search_Result.cs">
+      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelsTagSign\CNDT_GetAllDinhBienPhuongTien_Result.cs">
+      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelsTagSign\CNDT_GetDinhBienPhuongTien_All_Result.cs">
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelsTagSign\DataInformationValidation.cs" />

@@ -410,7 +410,39 @@
             }
         });
 }
-    $("#btnSave").click(function (e) {
+    //$("#btnSave").click(function (e) {
+    //    e.preventDefault();
+
+    //    // Lấy danh sách xe từ bảng hiện tại
+    //    var listXe = [];
+    //    $("#tbodyImportExcel tr").each(function () {
+    //        var row = $(this);
+    //        var xe = {
+    //            ID_LoaiPhuongTien: row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
+    //                row.find("input[type=checkbox]").eq(1).is(":checked") ? 2 :
+    //                    row.find("input[type=checkbox]").eq(2).is(":checked") ? 3 : 0,
+    //            CapMoi: row.find("input[name*='CapMoi']").is(":checked")
+    //        };
+    //        listXe.push(xe);
+    //    });
+
+    //    // Đếm số xe máy mới, xe 3 gác mới
+    //    var soXeMayMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 1 && x.CapMoi).length;
+    //    var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 3 && x.CapMoi).length;
+
+    //    // Kiểm tra vượt định biên
+    //    if (dinhBienPhuongTien) {
+    //        if (soXeMayMoi > dinhBienPhuongTien.XeMay_ConLai || soXe3GacMoi > dinhBienPhuongTien.Xe3Gac_ConLai) {
+    //            alert(`Vượt định biên: Xe máy (còn lại ${dinhBienPhuongTien.XeMay_ConLai}, đăng ký ${soXeMayMoi}), `
+    //                + `Xe 3 gác (còn lại ${dinhBienPhuongTien.Xe3Gac_ConLai}, đăng ký ${soXe3GacMoi})`);
+    //            return; // KHÔNG gọi submitForm!
+    //        }
+    //    }
+
+    //    // Nếu hợp lệ, gọi submitForm như cũ
+    //    submitForm(e);
+    //});
+    $("#btnSave").off('click').on('click', function (e) {
         e.preventDefault();
 
         // Lấy danh sách xe từ bảng hiện tại
@@ -430,13 +462,35 @@
         var soXeMayMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 1 && x.CapMoi).length;
         var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 3 && x.CapMoi).length;
 
+        // Nếu không có thông tin định biên từ server thì submit bình thường
+        if (!dinhBienPhuongTien) {
+            return submitForm(e);
+        }
+
+        // Lấy các giá trị từ dinhBienPhuongTien (an toàn với string/null)
+        var xeMayToiDa = parseInt(dinhBienPhuongTien.XeMay_ToiDa || 0, 10);
+        var xe3GacToiDa = parseInt(dinhBienPhuongTien.Xe3Gac_ToiDa || 0, 10);
+        var xeMayDaCap = parseInt(dinhBienPhuongTien.XeMay_DaCap || 0, 10);
+        var xe3GacDaCap = parseInt(dinhBienPhuongTien.Xe3Gac_DaCap || 0, 10);
+        var xinThemXeMay = parseInt(dinhBienPhuongTien.DinhBienXinThem_XeMay || 0, 10);
+        var xinThemXe3Gac = parseInt(dinhBienPhuongTien.DinhBienXinThem_Xe3Gac || 0, 10);
+
+        // Công thức yêu cầu: available = ToiDa + XinThem - DaCap
+        var availXeMay = xeMayToiDa + xinThemXeMay - xeMayDaCap;
+        var availXe3Gac = xe3GacToiDa + xinThemXe3Gac - xe3GacDaCap;
+
+        // Clamp >= 0 (nếu muốn cho âm, bỏ các dòng dưới)
+        availXeMay = Math.max(0, availXeMay);
+        availXe3Gac = Math.max(0, availXe3Gac);
+
         // Kiểm tra vượt định biên
-        if (dinhBienPhuongTien) {
-            if (soXeMayMoi > dinhBienPhuongTien.XeMay_ConLai || soXe3GacMoi > dinhBienPhuongTien.Xe3Gac_ConLai) {
-                alert(`Vượt định biên: Xe máy (còn lại ${dinhBienPhuongTien.XeMay_ConLai}, đăng ký ${soXeMayMoi}), `
-                    + `Xe 3 gác (còn lại ${dinhBienPhuongTien.Xe3Gac_ConLai}, đăng ký ${soXe3GacMoi})`);
-                return; // KHÔNG gọi submitForm!
-            }
+        if (soXeMayMoi > availXeMay || soXe3GacMoi > availXe3Gac) {
+            alert(
+                `Vượt định biên:\n` +
+                `Xe máy — Tối đa: ${xeMayToiDa}, Đã cấp: ${xeMayDaCap}, Xin thêm: ${xinThemXeMay}, Khả dụng: ${availXeMay}, Đăng ký: ${soXeMayMoi}\n` +
+                `Xe 3 gác — Tối đa: ${xe3GacToiDa}, Đã cấp: ${xe3GacDaCap}, Xin thêm: ${xinThemXe3Gac}, Khả dụng: ${availXe3Gac}, Đăng ký: ${soXe3GacMoi}`
+            );
+            return; // KHÔNG gọi submitForm
         }
 
         // Nếu hợp lệ, gọi submitForm như cũ
@@ -460,15 +514,16 @@
                                         <div><b>Xe máy đã cấp:</b> ${data.XeMay_DaCap}</div>
                                         <div><b>Định biên xe máy tối đa:</b> ${data.XeMay_ToiDa}</div>
                                         <div><b>Định biên xe máy còn lại:</b> ${data.XeMay_ConLai}</div>
+                                        <div><b>Định biên xe máy xin thêm:</b> ${data.DinhBienXinThem_XeMay}</div>
                                     </div>
                                     <div style="flex: 1;">
                                         <div><b>Xe 3 gác đã cấp:</b> ${data.Xe3Gac_DaCap}</div>
                                         <div><b>Định biên xe 3 gác tối đa:</b> ${data.Xe3Gac_ToiDa}</div>
                                         <div><b>Định biên xe 3 gác còn lại:</b> ${data.Xe3Gac_ConLai}</div>
+                                         <div><b>Định biên xe 3 gác xin thêm:</b> ${data.DinhBienXinThem_Xe3Gac}</div>
                                     </div>
                                 </div>
                             `;
-
 
                     $('#tdDinhBienPhuongTien').html(html);
                 } else {

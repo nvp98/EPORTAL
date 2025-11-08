@@ -148,6 +148,10 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
 
         public int XeMay_ConLai { get; set; }
         public int Xe3Gac_ConLai { get; set; }
+        public string NhaThauName { get; set; }
+
+        public int DinhBienXinThem_XeMay { get; set; }
+        public int DinhBienXinThem_Xe3Gac { get; set; }
     }
     public class XeCoDongModel
     {
