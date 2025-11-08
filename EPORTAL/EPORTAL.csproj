@@ -460,7 +460,6 @@
     <Compile Include="Areas\TagSign\Controllers\ViewNT\PortToController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\PositionController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\WorkPlaceController.cs" />
-    <None Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_DinhBienXinThem.cshtml" />
     <Compile Include="Areas\View360\Controllers\DocumentGroupController.cs" />
     <Compile Include="Areas\View360\Controllers\DocumentLibraryController.cs" />
     <Compile Include="Areas\View360\Controllers\ListVirtualController.cs" />
@@ -4165,6 +4164,7 @@
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_Index_DaXuLy.cshtml" />
     <Content Include="App_Data\Template_XCD.xlsx" />
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_Index_All.cshtml" />
+    <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_DinhBienXinThem.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

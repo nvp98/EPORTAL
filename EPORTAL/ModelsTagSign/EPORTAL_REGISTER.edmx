@@ -1383,7 +1383,7 @@
           <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="CNDT_GetDinhBienPhuongTien_All" ReturnType="Collection(EPORTAL_REGISTERModel.CNDT_GetDinhBienPhuongTien_All_Result)">
-            <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
+          <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
           </FunctionImport>
         </EntityContainer>
         <ComplexType Name="CDNT_ChiTietDon_Search_Result">

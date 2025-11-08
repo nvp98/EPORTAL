@@ -1431,5 +1431,23 @@ namespace EPORTAL.ModelsTagSign
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("TK_CardRegistrationInfor_UpdateTK", iDTKDKTParameter, tinhTrangIDParameter, ngayDuyetParameter, ghiChuParameter);
         }
+    
+        public virtual ObjectResult<CNDT_GetAllDinhBienPhuongTien_Result> CNDT_GetAllDinhBienPhuongTien(Nullable<int> p_NhaThauID)
+        {
+            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
+                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
+                new ObjectParameter("p_NhaThauID", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CNDT_GetAllDinhBienPhuongTien_Result>("CNDT_GetAllDinhBienPhuongTien", p_NhaThauIDParameter);
+        }
+    
+        public virtual ObjectResult<CNDT_GetDinhBienPhuongTien_All_Result> CNDT_GetDinhBienPhuongTien_All(Nullable<int> p_NhaThauID)
+        {
+            var p_NhaThauIDParameter = p_NhaThauID.HasValue ?
+                new ObjectParameter("p_NhaThauID", p_NhaThauID) :
+                new ObjectParameter("p_NhaThauID", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<CNDT_GetDinhBienPhuongTien_All_Result>("CNDT_GetDinhBienPhuongTien_All", p_NhaThauIDParameter);
+        }
     }
 }
