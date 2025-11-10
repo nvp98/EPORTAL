@@ -2401,6 +2401,123 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             return Json(list, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public JsonResult XoaXe(int id)
+        {
+            try
+            {
+                var xe = db_dk.CDNT_ChiTietDon.Find(id);
+                if (xe == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi." });
+                }
+
+                db_dk.CDNT_ChiTietDon.Remove(xe);
+                db_dk.SaveChanges();
+
+                return Json(new { success = true, message = "Xóa xe thành công." });
+            }
+            catch (Exception ex)
+            {
+                // log ex nếu cần
+                return Json(new { success = false, message = "Có lỗi khi xóa: " + ex.Message });
+            }
+        }
+        [HttpGet]
+        public JsonResult GetXe(int id)
+        {
+            try
+            {
+                // Lấy dữ liệu thô (DateTime? không format) từ database — EF có thể dịch điều này
+                var xeRaw = db_dk.CDNT_ChiTietDon
+                    .Where(x => x.ID == id)
+                    .Select(x => new
+                    {
+                        x.ID,
+                        x.BienSoXe,
+                        x.TuNgay,
+                        x.DenNgay,
+                        x.ID_LoaiPhuongTien,
+                        x.TTHD
+                    })
+                    .FirstOrDefault();
+
+                if (xeRaw == null)
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi." }, JsonRequestBehavior.AllowGet);
+
+                // Chuyển đổi định dạng ngày trong bộ nhớ (sau khi đã materialize)
+                var xe = new
+                {
+                    xeRaw.ID,
+                    xeRaw.BienSoXe,
+                    TuNgay = xeRaw.TuNgay.HasValue ? xeRaw.TuNgay.Value.ToString("yyyy-MM-dd") : null,
+                    DenNgay = xeRaw.DenNgay.HasValue ? xeRaw.DenNgay.Value.ToString("yyyy-MM-dd") : null,
+                    xeRaw.ID_LoaiPhuongTien,
+                    xeRaw.TTHD
+                };
+
+                return Json(new { success = true, data = xe }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // Cập nhật chỉ các cột: BienSoXe, TuNgay, DenNgay, ID_LoaiPhuongTien, TTHD
+        [HttpPost]
+        public JsonResult CapNhatXe(int ID, string BienSoXe, DateTime? TuNgay, DateTime? DenNgay, int? ID_LoaiPhuongTien, int? TTHD)
+        {
+            try
+            {
+                var xe = db_dk.CDNT_ChiTietDon.Find(ID);
+                if (xe == null)
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi." });
+
+                // CHỈ cập nhật những cột yêu cầu
+                xe.BienSoXe = string.IsNullOrWhiteSpace(BienSoXe) ? xe.BienSoXe : BienSoXe.Trim();
+                xe.TuNgay = TuNgay;
+                xe.DenNgay = DenNgay;
+                xe.ID_LoaiPhuongTien = ID_LoaiPhuongTien;
+                xe.TTHD = TTHD;
+
+                // Ghi lại người chỉnh sửa nếu muốn
+                xe.User_Edit = Models.MyAuthentication.ID;
+
+                db_dk.SaveChanges();
+
+                // Lấy tên Loại phương tiện để client hiển thị
+                var loaiPT = xe.ID_LoaiPhuongTien.HasValue
+                    ? db_dk.CDNT_LoaiPhuongTien
+                        .Where(l => l.ID == xe.ID_LoaiPhuongTien)
+                        .Select(l => l.LoaiPhuongTien)
+                        .FirstOrDefault()
+                    : "";
+
+                var userEditName = Models.MyAuthentication.ID; // hoặc query tên user nếu cần
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Cập nhật thành công.",
+                    data = new
+                    {
+                        ID = xe.ID,
+                        BienSoXe = xe.BienSoXe,
+                        TuNgay = xe.TuNgay.HasValue ? xe.TuNgay.Value.ToString("dd/MM/yyyy") : "",
+                        DenNgay = xe.DenNgay.HasValue ? xe.DenNgay.Value.ToString("dd/MM/yyyy") : "",
+                        TTHD = xe.TTHD,
+                        LoaiPhuongTien = loaiPT,
+                        User_EditName = userEditName
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Có lỗi khi cập nhật: " + ex.Message });
+            }
+        }
+
     }
 }
         
