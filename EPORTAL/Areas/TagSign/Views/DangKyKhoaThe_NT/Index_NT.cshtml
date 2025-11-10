@@ -1,0 +1,365 @@
+﻿@{
+    ViewBag.Title = "Index_NT";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+@model PagedList.IPagedList<EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyKhoaTheViewModel>
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@using EPORTAL.ModelsPartner;
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    EPORTAL_NTEntities db_nt = new EPORTAL_NTEntities();
+    //   var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        ĐƠN ĐỀ NGHỊ KHÓA THẺ DÀI NGÀY
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-10 col-lg-10">
+                                <div class="row">
+                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
+                                    <div class="col-md-2">
+                                        @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-3">
+                                        @Html.TextBox("maPhieu", ViewBag.MaPhieu as string, new { @class = "form-control", placeholder = "Nhập mã phiếu" })
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="col-md-2">
+
+                                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
+                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","TheXeCoDong_NT",new {area="TagSign"})' style="margin-top:50px"></div>
+                                </div>*@
+                            <div class="col-md-2">
+                                <a href="@Url.Action("TaoDonDangKy", "DangKyKhoaThe_NT", new { area = "TagSign" })"
+                                   class="btn btn-primary"
+                                   style="margin-left:10px;float:right">
+                                    <i class="fa fa-plus"></i> Thêm mới
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px" class="text-center">STT</th>
+                                            <th class="text-center" width="100px" style="vertical-align:middle">Thao tác</th>
+                                            <th class="text-center" width="200px" style="vertical-align:middle">Mã đơn</th>
+                                            <th class="text-center" width="200px" style="vertical-align:middle">Nội dung</th>
+                                            <th class="text-center" width="200px" style="vertical-align:middle">BP Quản lý</th>
+                                            <th class="text-center" width="200px" style="vertical-align:middle">Nhà thầu</th>
+                                            <th class="text-center" width="150px" style="vertical-align:middle">Ngày trình ký</th>
+                                            <th class="text-center" width="100px" style="vertical-align:middle">Tình trạng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model != null && Model.Any())
+                                        {
+                                            int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@stt</td>
+                                                    <td class="text-center">
+                                                        @if (item.TinhTrang == 0) // Chưa trình ký
+                                                        {
+                                                            <a href="@Url.Action("ChiTiet", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
+                                                               class="btn btn-sm btn-info" title="Xem chi tiết">
+                                                                <i class="fa fa-eye"></i>
+                                                            </a>
+                                                            <a href="@Url.Action("Edit", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
+                                                               class="btn btn-sm btn-warning" title="Sửa">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                            <button type="button" class="btn btn-sm btn-success btn-trinhky"
+                                                                    data-madon="@item.MaDon" title="Trình ký">
+                                                                <i class="fa fa-paper-plane"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger"
+                                                                    onclick="xoaDon('@item.MaDon', '@item.NoiDung')" title="Xóa">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        }
+                                                        else if (item.TinhTrang == 1) // Đã trình ký
+                                                        {
+                                                            <a href="@Url.Action("ChiTiet", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
+                                                               class="btn btn-sm btn-info" title="Xem chi tiết">
+                                                                <i class="fa fa-eye"></i>
+                                                            </a>
+                                                            <button type="button" class="btn btn-sm btn-secondary btn-huy-trinhky"
+                                                                    data-madon="@item.MaDon" title="Hủy trình ký">
+                                                                <i class="fa fa-undo"></i>
+                                                            </button>
+                                                        }
+                                                        else // Đã duyệt hoặc từ chối
+                                                        {
+                                                            <a href="@Url.Action("ChiTiet", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
+                                                               class="btn btn-sm btn-info" title="Xem chi tiết">
+                                                                <i class="fa fa-eye"></i>
+                                                            </a>
+                                                        }
+                                                    </td>
+                                                    <td class="text-center">@item.MaDon</td>
+                                                    <td>@item.NoiDung</td>
+                                                    <td class="text-center">-</td>
+                                                    <td>@item.TenNhaThau</td>
+                                                    <td class="text-center">@(item.NgayTao.HasValue ? item.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                                                    <td class="text-center">
+                                                        @if (item.TinhTrang == 0)
+                                                        {
+                                                            <span class="badge badge-secondary">Chưa trình ký</span>
+                                                        }
+                                                        else if (item.TinhTrang == 1)
+                                                        {
+                                                            <span class="badge badge-warning">Đang chờ duyệt</span>
+                                                        }
+                                                        else if (item.TinhTrang == 2)
+                                                        {
+                                                            <span class="badge badge-success">Đã duyệt</span>
+                                                        }
+                                                        else if (item.TinhTrang == 3)
+                                                        {
+                                                            <span class="badge badge-danger">Từ chối</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                stt++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="8" class="text-center">Không có dữ liệu</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <div class="pager">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index_NT", new
+                                    {
+                                        page,
+                                        begind = Request.QueryString["begind"],
+                                        endd = Request.QueryString["endd"],
+                                        maPhieu = Request.QueryString["maPhieu"]
+                                    }))
+                                    <div class="text-right">
+                                        Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount - Tổng @Model.TotalItemCount bản ghi
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    $('#btn-Import').click(function () {
+        var url = $('#myModalImport').data('url');
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Add Permission");
+            $("#myModal").modal('show');
+        });
+    });
+    $("#btn-search").on('click', function () {
+    var begind = $('#begind').val();
+    var endd = $('#endd').val();
+        var maPhieu = $('#maPhieu').val();
+        console.log(maPhieu)
+
+         window.location.href = '@Url.Action("Index_NT", "DangKyKhoaThe_NT", new { area = "TagSign" })?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
+
+    });
+    $(document).ready(function () {
+        var dateNewFormat, onlyDate, today = new Date();
+
+        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        dateLastDate = prevMonthLastDate.getFullYear() + '-';
+        if (prevMonthLastDate.getMonth() >= 9) {
+
+            dateLastDate += (prevMonthLastDate.getMonth() + 1);
+        }
+        else {
+            dateLastDate += '0' + (prevMonthLastDate.getMonth() + 1);
+        }
+
+        onlyLastDate = prevMonthLastDate.getDate();
+
+        if (onlyLastDate.toString().length == 2) {
+
+            dateLastDate += "-" + onlyLastDate;
+        }
+        else {
+            dateLastDate += '-0' + onlyLastDate;
+        }
+
+
+
+        dateNewFormat = today.getFullYear() + '-';
+        if (today.getMonth() >= 9) {
+
+            dateNewFormat += (today.getMonth() + 1);
+        }
+        else {
+            dateNewFormat += '0' + (today.getMonth() + 1);
+        }
+
+        onlyDate = today.getDate();
+        if (onlyDate.toString().length == 2) {
+
+            dateNewFormat += "-" + onlyDate;
+        }
+        else {
+            dateNewFormat += '-0' + onlyDate;
+        }
+        if ($('#begind').val() == '') {
+            $('#begind').val(dateLastDate);
+        }
+        if ($('#endd').val() == '') {
+            $('#endd').val(dateNewFormat);
+        }
+    });
+    function xoaDon(maDon, noiDung) {
+        if (!confirm("Bạn muốn xóa Thông tin: " + noiDung)) return;
+
+        $.ajax({
+            url: '/TheXeCoDong_NT/Delete',
+            type: 'POST',
+            data: { maDon: maDon },
+            success: function (res) {
+                if (res.success) {
+                    alert(res.message);
+                    location.reload();
+                } else {
+                    alert("Không thể xóa: " + res.message);
+                }
+            },
+            error: function () {
+                alert("Có lỗi khi gửi yêu cầu xóa.");
+            }
+        });
+    }
+    $(document).on('click', '.btn-trinhky', function () {
+    var $btn = $(this);
+    var maDon = $btn.data('madon');
+
+    if (!confirm('Xác nhận trình ký đơn ' + maDon + ' ?')) return;
+
+    // Chống double-click
+    $btn.addClass('disabled').css('pointer-events', 'none');
+
+    $.ajax({
+        url: '@Url.Action("TrinhKy","TheXeCoDong_NT", new { area = "TagSign" })', // thêm area nếu view không cùng Area
+        type: 'POST',
+        data: {
+            maDon: maDon
+        },
+        success: function(res){
+            if (res && res.success) {
+                alert(res.message || 'Trình ký thành công.');
+                location.reload();
+            } else {
+                alert('Lỗi: ' + (res && res.message ? res.message : 'Không rõ nguyên nhân.'));
+                $btn.removeClass('disabled').css('pointer-events', '');
+            }
+        },
+        error: function(){
+            alert('Có lỗi khi trình ký.');
+            $btn.removeClass('disabled').css('pointer-events', '');
+        }
+    });
+    });
+    $(document).on('click', '.btn-huy-trinhky', function () {
+        var $btn = $(this);
+        var maDon = $btn.data('madon');
+        if (!confirm('Xác nhận HỦY TRÌNH KÝ đơn ' + maDon + ' ?')) return;
+
+        $btn.addClass('disabled').css('pointer-events', 'none');
+
+        $.ajax({
+            url: '@Url.Action("HuyTrinhKy","TheXeCoDong_NT", new { area = "TagSign" })',
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                maDon: maDon
+            },
+            success: function (res) {
+                if (res && res.success) {
+                    alert(res.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + (res && res.message ? res.message : 'Không rõ nguyên nhân.'));
+                    $btn.removeClass('disabled').css('pointer-events', '');
+                }
+            },
+            error: function () {
+                alert('Có lỗi khi hủy trình ký.');
+                $btn.removeClass('disabled').css('pointer-events', '');
+            }
+        });
+    });
+</script>
