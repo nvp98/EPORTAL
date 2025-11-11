@@ -995,6 +995,12 @@
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelsTagSign\Follow_RegisterPeopleValidation.cs" />
+    <Compile Include="ModelsTagSign\KTNT_ChiTiet.cs">
+      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelsTagSign\KTNT_DonDangKy.cs">
+      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelsTagSign\List_Detail_RegisterPeopleValidation.cs" />
     <Compile Include="ModelsTagSign\List_RegisterPeopleValidation.cs" />
     <Compile Include="ModelsTagSign\NT_CarteTempo.cs" />
@@ -4169,6 +4175,9 @@
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\HPDQ_DinhBienXinThem.cshtml" />
     <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\Index_NT.cshtml" />
     <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\TaoDonDangKy.cshtml" />
+    <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\Update.cshtml" />
+    <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\Detail.cshtml" />
+    <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\Detail_PDF.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

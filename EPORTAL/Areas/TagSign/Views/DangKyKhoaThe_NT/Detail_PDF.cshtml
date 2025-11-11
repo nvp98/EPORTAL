@@ -1,0 +1,164 @@
+﻿@*@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.CDNT_DonDangKyDetail>*@
+@*@model EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyPDFViewModel
+@{*@
+    ViewBag.Title = "Chi tiết đơn đăng ký";
+    Layout = "~/Views/Shared/PrintView.cshtml";
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@using EPORTAL.ModelsTagSign
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@using System.Linq
+@{
+    //var hasTrinhKy = (Model != null && Model.TrinhKy != null);
+
+    //var nhathau = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 0) : null;
+    //var cap1 = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 1) : null;
+    //var cap2 = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 2) : null;
+    //var cpt = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 3) : null;
+
+    // Quy tắc xác định ký chính / ký nháy cho BPQL
+    //var bpqlChinh = (cap2 != null) ? cap2 : cap1;   // ưu tiên cấp 2
+    //var bpqlNhay = (cap2 != null && cap1 != null) ? cap1 : null; // chỉ có khi cả 1 & 2 cùng tồn tại
+
+    //DateTime? ngayNT = (nhathau != null) ? nhathau.NgayDuyet : (DateTime?)null;
+
+    //var ngayNTText = ngayNT.HasValue ? ngayNT.Value.ToString("dd/MM/yyyy") : "";
+    //var chuKyNgay = ngayNT.HasValue
+    //    ? string.Format("Quảng Ngãi, ngày {0} tháng {1} năm {2}", ngayNT.Value.Day, ngayNT.Value.Month, ngayNT.Value.Year)
+    //    : "Quảng Ngãi, ngày...tháng...năm.....";
+
+    string baseUrl = "https://portal.hoaphatdungquat.vn";
+}
+
+<meta charset="utf-8" />
+<style>
+    .custom-table {
+        border-collapse: collapse !important;
+        width: 100%;
+    }
+
+        .custom-table,
+        .custom-table th,
+        .custom-table td {
+            border: 1px solid black !important;
+        }
+
+            .custom-table th,
+            .custom-table td {
+                text-align: center;
+                vertical-align: middle;
+                padding: 4px;
+            }
+</style>
+<div class="app-main__outer" style="margin-top: 0%;">
+    <div class="app-main__inner" style="display: block; padding-bottom: 0px; background-color:#fff;">
+        <div>
+
+            <div>
+                <div style="flex: 0 0 50%; float: left; max-width: 300px; text-align: center; font-weight: bold; font-size: 1.2rem; text-transform: uppercase;">
+                    <img alt="Hòa Phát Dung Quất" src="https://portal.hoaphatdungquat.vn/Content/assets/images/logo-inverse.png" width="90%" />
+                    <span class="" style="margin-top: 0; margin-bottom: 1rem;">Công ty Cổ phần Thép</span>
+                    <p class="" style="margin-top: 0; margin-bottom: 1rem;">Hòa Phát Dung Quất</p>
+
+                </div>
+                <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
+                    <span>BM.10/QT.20</span>
+                    <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025</p>
+                    <p><span style="font-style:italic;">Lần sửa đổi:</span> 02</p>
+                    @*@if (Model.ChiTietDon != null && Model.ChiTietDon.Any())
+                    {
+                        <p style="font-size:15px"><span>@Model.ChiTietDon[0].Ma_Don</span></p>
+                    }
+                    else
+                    {
+                        <span>Không có dữ liệu</span>
+                    }*@
+                </div>
+                <div style="clear: both;"></div>
+                <div style="width: 100%; text-align: center; padding-bottom: 1rem;">
+                    <p style=" font-size: 1.5rem; font-weight: bold; white-space: nowrap;text-transform: uppercase;">
+                        ĐƠN ĐỀ NGHỊ KHÓA THẺ DÀI NGÀY
+                    </p>
+                </div>
+
+                @{
+
+                    <div class="col-md-12">
+                        <label style="font-size:15px"> <b>Kính gửi:</b> Công ty Cổ phần Thép Hòa Phát Dung Quất.</label><br />
+                        <label style="font-size:15px">
+                          <b>Nhà thầu</b>
+                            @*@if (Model.ChiTietDon != null && Model.ChiTietDon.Any() && !string.IsNullOrEmpty(Model.ChiTietDon[0].FullName))
+                            {
+                                <b><span>@Model.ChiTietDon[0].FullName</span></b>
+                            }*@
+                            @*else
+                            {
+                                <span>Không có dữ liệu</span>
+                            }*@
+                            đề nghị Quý Công ty khóa thẻ dài ngày theo danh sách dưới đây:
+                        </label>  <br />
+                    </div>
+                }
+                <div class="card-body" style="margin-top: 2%;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover custom-table" id="table" style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); border: 1px solid black !important; color: #000000 !important; text-indent: initial; border-collapse: collapse; " cellpadding="0">
+                            <thead>
+                                <tr style="background-color: #f8f9fa;">
+                                    <th rowspan="2" style="width:55px; text-align:center; vertical-align:middle; border:1px solid #000;">STT</th>
+                                    <th colspan="2" style="text-align:center; border:1px solid #000;">Thẻ người</th>
+                                    <th colspan="2" style="text-align:center; border:1px solid #000;">Thẻ xe cơ động</th>
+                                    <th colspan="2" style="text-align:center; border:1px solid #000;">Thẻ phương tiện</th>
+                                    <th rowspan="2" style="width:170px; text-align:center; vertical-align:middle; border:1px solid #000;">Ghi chú</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:center; border:1px solid #000; width:160px;">Họ và tên</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">CCCD/ Hộ chiếu</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">Loại xe cơ động</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">Biển kiểm soát</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">Loại phương tiện</th>
+                                    <th style="text-align:center; border:1px solid #000; width:180px;">Biển kiểm soát - Số khung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @*@if (Model.ChiTietDon != null)
+                                {
+                                    for (int i = 0; i < Model.ChiTietDon.Count; i++)
+                                    {
+                                        var item = Model.ChiTietDon[i];
+                                        <tr>
+                                            <td>@(i + 1)</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 1) ? "X" : "")</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 2) ? "X" : "")</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 3) ? "X" : "")</td>
+                                            <td>@item.BienSoXe</td>
+                                            <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
+                                            <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
+                                            <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
+                                            <td>@(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
+                                            <td>@item.GhiChu</td>
+                                        </tr>
+                                    }
+                                }*@
+                            </tbody>
+                        </table>
+                    </div>
+                </div>              
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>

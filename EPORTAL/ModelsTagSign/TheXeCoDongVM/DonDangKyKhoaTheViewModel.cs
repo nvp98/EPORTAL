@@ -11,7 +11,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string NoiDung { get; set; }
         public int? ID_NhaThau { get; set; }
         public string TenNhaThau { get; set; }
-        public string BoPhanQuanLy { get; set; }
+        public int BP_XuLy_ID { get; set; }
         public int? TinhTrang { get; set; }
         public DateTime? NgayTao { get; set; }
     }
@@ -35,10 +35,11 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
     public class TaoDonDangKyViewModel
     {
         public int ID { get; set; }
+        public string MaDon { get; set; }
         public string NoiDung { get; set; }
-        public int? NhaThau_ID { get; set; }
+        public int? ID_NhaThau { get; set; }
         public DateTime? NgayTao { get; set; }
-        public int? VP1C_ID { get; set; }
+        public int? BP_XuLy_ID { get; set; }
         public List<KTNT_ChiTietVM> ChiTiet { get; set; }
     }
     public class SPResult
@@ -46,5 +47,38 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int Result { get; set; }
         public string Message { get; set; }
         public string MaDon { get; set; }
+    }
+    public enum TinhTrangDonDangKyKhoaThe
+    {
+        ChoXuLy = 1,
+        DaXuLy = 2,
+        HoanThanh = 3,
+        KhongDatYeuCau = 4,
+        ChuaTrinhKy = 5
+    }
+
+    public class KTNT_DonDangKy_Detail
+    {
+        // Header
+        public int? ID { get; set; }
+        public string MaDon { get; set; }
+        public string NoiDung { get; set; }
+        public int? NhaThau_ID { get; set; }
+        public string TenNhaThau { get; set; }
+        public int? TinhTrang_ID { get; set; }
+        public int? BP_XuLy_ID { get; set; }
+        public string UserNameLogin { get; set; }
+        public DateTime? NgayTao_Don { get; set; }
+
+        // Detail
+        public int? ChiTiet_ID { get; set; }
+        public string TN_HoTen { get; set; }
+        public string TN_CCCD_HoChieu { get; set; }
+        public string TX_LoaiXeCoDong { get; set; }
+        public string TX_BienKiemSoat { get; set; }
+        public string PT_LoaiPhuongTien { get; set; }
+        public string PT_BienKiemSoat { get; set; }
+        public string GhiChu { get; set; }
+        public DateTime? NgayTao { get; set; }
     }
 }

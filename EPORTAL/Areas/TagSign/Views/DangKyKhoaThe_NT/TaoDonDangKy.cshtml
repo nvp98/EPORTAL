@@ -59,11 +59,11 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <input type="hidden" id="NhaThau_ID" name="NhaThau_ID" value="@(ViewBag.NhaThau_ID ?? "")" />
+                                                <input type="hidden" id="ID_NhaThau" name="ID_NhaThau" value="@(ViewBag.ID_NhaThau ?? "")" />
                                                 <input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly />
                                             </td>
                                             <td>
-                                                    @Html.DropDownListFor(m => m.VP1C_ID,
+                                                    @Html.DropDownListFor(m => m.BP_XuLy_ID,
                                                         (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()),
                                                         "--Chọn tổ cấp phát thẻ--",
                                                         new { @class = "form-control" })
@@ -111,7 +111,7 @@
 
                             <!-- NÚT LƯU -->
                             <div class="text-end mt-4">
-                                <a class="btn btn-secondary" href="@Url.Action("Index_NT","TheXeCoDong_NT")">
+                                <a class="btn btn-secondary" href="@Url.Action("Index_NT","DangKyKhoaThe_NT")">
                                     <i class="fa fa-arrow-left"></i> Quay lại
                                 </a>
                                 <button type="submit" class="btn btn-primary">
@@ -137,27 +137,27 @@
                     <tr>
                         <td class="text-center">${rowIndex}</td>
 
-                        <td><input type="text" name="ChiTiet[${rowIndex}].HoTen" class="form-control" placeholder="Nhập họ tên" /></td>
-                        <td><input type="text" name="ChiTiet[${rowIndex}].CCCD" class="form-control" placeholder="Nhập CCCD/Hộ chiếu" /></td>
+                        <td><input type="text" name="ChiTiet[${rowIndex}].TN_HoTen" class="form-control" placeholder="Nhập họ tên" /></td>
+                        <td><input type="text" name="ChiTiet[${rowIndex}].TN_CCCD_HoChieu" class="form-control" placeholder="Nhập CCCD/Hộ chiếu" /></td>
 
                         <td>
-                            <select name="ChiTiet[${rowIndex}].LoaiXeCoDong" class="form-control">
+                            <select name="ChiTiet[${rowIndex}].TX_LoaiXeCoDong" class="form-control">
                                 <option value="">--Chọn loại--</option>
                                 <option value="Xe máy">Xe máy</option>
                                 <option value="Xe ô tô">Xe ô tô</option>
                                 <option value="Xe 3 gác">Xe 3 gác</option>
                             </select>
                         </td>
-                        <td><input type="text" name="ChiTiet[${rowIndex}].BienSoCoDong" class="form-control" placeholder="Biển kiểm soát" /></td>
+                        <td><input type="text" name="ChiTiet[${rowIndex}].TX_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát" /></td>
 
                         <td>
                         <input type="text"
-                               name="ChiTiet[${rowIndex}].LoaiPhuongTien"
+                               name="ChiTiet[${rowIndex}].PT_LoaiPhuongTien"
                                class="form-control"
                                placeholder="Nhập loại phương tiện" />
                         </td>
 
-                        <td><input type="text" name="ChiTiet[${rowIndex}].BienSoPT" class="form-control" placeholder="Biển kiểm soát - Số khung" /></td>
+                        <td><input type="text" name="ChiTiet[${rowIndex}].PT_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát - Số khung" /></td>
 
                         <td><input type="text" name="ChiTiet[${rowIndex}].GhiChu" class="form-control" placeholder="Ghi chú" /></td>
                         <td class="text-center">
@@ -193,12 +193,12 @@
                 $("#tbodyChiTiet tr").each(function () {
                     const row = $(this);
                     const data = {
-                        HoTen: row.find("input[name*='HoTen']").val(),
-                        CCCD: row.find("input[name*='CCCD']").val(),
-                        LoaiXeCoDong: row.find("select[name*='LoaiXeCoDong']").val(),
-                        BienSoCoDong: row.find("input[name*='BienSoCoDong']").val(),
-                        LoaiPhuongTien: row.find("select[name*='LoaiPhuongTien']").val(),
-                        BienSoPT: row.find("input[name*='BienSoPT']").val(),
+                        TN_HoTen: row.find("input[name*='TN_HoTen']").val(),
+                        TN_CCCD_HoChieu: row.find("input[name*='TN_CCCD_HoChieu']").val(),
+                        TX_LoaiXeCoDong: row.find("select[name*='TX_LoaiXeCoDong']").val(),
+                        TX_BienKiemSoat: row.find("input[name*='TX_BienKiemSoat']").val(),
+                        PT_LoaiPhuongTien: row.find("input[name*='PT_LoaiPhuongTien']").val(),
+                        PT_BienKiemSoat: row.find("input[name*='PT_BienKiemSoat']").val(),
                         GhiChu: row.find("input[name*='GhiChu']").val()
                     };
                     chiTietList.push(data);
@@ -216,7 +216,7 @@
                     success: function (res) {
                         if (res.success) {
                             alert("Lưu đơn thành công!");
-                            window.location.href = '@Url.Action("Index_NT","TheXeCoDong_NT")';
+                            window.location.href = '@Url.Action("Index_NT", "DangKyKhoaThe_NT")';
                         } else {
                             alert("Lưu thất bại: " + res.message);
                         }

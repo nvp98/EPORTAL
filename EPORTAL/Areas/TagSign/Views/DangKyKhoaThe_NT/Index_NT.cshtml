@@ -93,8 +93,7 @@
                                             <th width="30px" class="text-center">STT</th>
                                             <th class="text-center" width="100px" style="vertical-align:middle">Thao tác</th>
                                             <th class="text-center" width="200px" style="vertical-align:middle">Mã đơn</th>
-                                            <th class="text-center" width="200px" style="vertical-align:middle">Nội dung</th>
-                                            <th class="text-center" width="200px" style="vertical-align:middle">BP Quản lý</th>
+                                            <th class="text-center" width="150px" style="vertical-align:middle">Nội dung</th>
                                             <th class="text-center" width="200px" style="vertical-align:middle">Nhà thầu</th>
                                             <th class="text-center" width="150px" style="vertical-align:middle">Ngày trình ký</th>
                                             <th class="text-center" width="100px" style="vertical-align:middle">Tình trạng</th>
@@ -109,22 +108,28 @@
                                                 <tr>
                                                     <td class="text-center">@stt</td>
                                                     <td class="text-center">
-                                                        @if (item.TinhTrang == 0) // Chưa trình ký
+                                                        @if (item.TinhTrang == 5) // Chưa trình ký
                                                         {
-                                                            <a href="@Url.Action("ChiTiet", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
+                                                            <a href="@Url.Action("Detail", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
                                                                class="btn btn-sm btn-info" title="Xem chi tiết">
                                                                 <i class="fa fa-eye"></i>
                                                             </a>
-                                                            <a href="@Url.Action("Edit", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
+                                                            <a href="@Url.Action("Update", "DangKyKhoaThe_NT", new { area = "TagSign", id = item.MaDon })"
                                                                class="btn btn-sm btn-warning" title="Sửa">
                                                                 <i class="fa fa-edit"></i>
                                                             </a>
-                                                            <button type="button" class="btn btn-sm btn-success btn-trinhky"
-                                                                    data-madon="@item.MaDon" title="Trình ký">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-success btn-trinhky"
+                                                                    data-madon="@item.MaDon"
+                                                                    title="Trình ký">
                                                                 <i class="fa fa-paper-plane"></i>
                                                             </button>
-                                                            <button type="button" class="btn btn-sm btn-danger"
-                                                                    onclick="xoaDon('@item.MaDon', '@item.NoiDung')" title="Xóa">
+
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-danger btn-xoa-don"
+                                                                    data-madon="@item.MaDon"
+                                                                    data-noidung="@item.NoiDung"
+                                                                    title="Xóa đơn">
                                                                 <i class="fa fa-trash"></i>
                                                             </button>
                                                         }
@@ -134,10 +139,15 @@
                                                                class="btn btn-sm btn-info" title="Xem chi tiết">
                                                                 <i class="fa fa-eye"></i>
                                                             </a>
-                                                            <button type="button" class="btn btn-sm btn-secondary btn-huy-trinhky"
-                                                                    data-madon="@item.MaDon" title="Hủy trình ký">
+                                                         
+
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-secondary btn-huy-trinhky"
+                                                                    data-madon="@item.MaDon"
+                                                                    title="Hủy trình ký">
                                                                 <i class="fa fa-undo"></i>
                                                             </button>
+
                                                         }
                                                         else // Đã duyệt hoặc từ chối
                                                         {
@@ -149,11 +159,10 @@
                                                     </td>
                                                     <td class="text-center">@item.MaDon</td>
                                                     <td>@item.NoiDung</td>
-                                                    <td class="text-center">-</td>
                                                     <td>@item.TenNhaThau</td>
                                                     <td class="text-center">@(item.NgayTao.HasValue ? item.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
                                                     <td class="text-center">
-                                                        @if (item.TinhTrang == 0)
+                                                        @if (item.TinhTrang == 5)
                                                         {
                                                             <span class="badge badge-secondary">Chưa trình ký</span>
                                                         }
@@ -167,7 +176,7 @@
                                                         }
                                                         else if (item.TinhTrang == 3)
                                                         {
-                                                            <span class="badge badge-danger">Từ chối</span>
+                                                            <span class="badge badge-danger">Không đạt yêu cầu</span>
                                                         }
                                                     </td>
                                                 </tr>
@@ -191,7 +200,7 @@
                                         maPhieu = Request.QueryString["maPhieu"]
                                     }))
                                     <div class="text-right">
-                                        Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount - Tổng @Model.TotalItemCount bản ghi
+                                        Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount -  @Model.TotalItemCount
                                     </div>
                                 </div>
                             </div>
@@ -304,52 +313,22 @@
         });
     }
     $(document).on('click', '.btn-trinhky', function () {
-    var $btn = $(this);
-    var maDon = $btn.data('madon');
-
-    if (!confirm('Xác nhận trình ký đơn ' + maDon + ' ?')) return;
-
-    // Chống double-click
-    $btn.addClass('disabled').css('pointer-events', 'none');
-
-    $.ajax({
-        url: '@Url.Action("TrinhKy","TheXeCoDong_NT", new { area = "TagSign" })', // thêm area nếu view không cùng Area
-        type: 'POST',
-        data: {
-            maDon: maDon
-        },
-        success: function(res){
-            if (res && res.success) {
-                alert(res.message || 'Trình ký thành công.');
-                location.reload();
-            } else {
-                alert('Lỗi: ' + (res && res.message ? res.message : 'Không rõ nguyên nhân.'));
-                $btn.removeClass('disabled').css('pointer-events', '');
-            }
-        },
-        error: function(){
-            alert('Có lỗi khi trình ký.');
-            $btn.removeClass('disabled').css('pointer-events', '');
-        }
-    });
-    });
-    $(document).on('click', '.btn-huy-trinhky', function () {
         var $btn = $(this);
         var maDon = $btn.data('madon');
-        if (!confirm('Xác nhận HỦY TRÌNH KÝ đơn ' + maDon + ' ?')) return;
+
+        if (!confirm('Xác nhận TRÌNH KÝ đơn ' + maDon + ' ?')) return;
 
         $btn.addClass('disabled').css('pointer-events', 'none');
 
         $.ajax({
-            url: '@Url.Action("HuyTrinhKy","TheXeCoDong_NT", new { area = "TagSign" })',
+            url: '@Url.Action("TrinhKy", "DangKyKhoaThe_NT", new { area = "TagSign" })', // ✅ Controller đúng
             type: 'POST',
             data: {
-                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                 maDon: maDon
             },
             success: function (res) {
                 if (res && res.success) {
-                    alert(res.message);
+                    alert(res.message || 'Trình ký thành công.');
                     location.reload();
                 } else {
                     alert('Lỗi: ' + (res && res.message ? res.message : 'Không rõ nguyên nhân.'));
@@ -357,9 +336,73 @@
                 }
             },
             error: function () {
-                alert('Có lỗi khi hủy trình ký.');
+                alert('Có lỗi khi trình ký.');
                 $btn.removeClass('disabled').css('pointer-events', '');
             }
         });
     });
+
+        $(document).on('click', '.btn-huy-trinhky', function () {
+        var $btn = $(this);
+        var maDon = $btn.data('madon');
+
+        if (!confirm('Xác nhận HỦY TRÌNH KÝ đơn ' + maDon + ' ?')) return;
+
+        $btn.prop('disabled', true).addClass('disabled');
+
+        $.ajax({
+            url: '@Url.Action("HuyTrinhKy", "DangKyKhoaThe_NT", new { area = "TagSign" })',
+            type: 'POST',
+            data: {
+                maDon: maDon
+            },
+            success: function (res) {
+                if (res && res.success) {
+                    alert(res.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + (res?.message ?? 'Không rõ nguyên nhân.'));
+                    $btn.prop('disabled', false).removeClass('disabled');
+                }
+            },
+            error: function () {
+                alert('Có lỗi khi hủy trình ký.');
+                $btn.prop('disabled', false).removeClass('disabled');
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-xoa-don', function () {
+    var $btn = $(this);
+    var maDon = $btn.data('madon');
+    var noiDung = $btn.data('noidung') || '';
+
+    if (!confirm('Xác nhận XÓA đơn ' + maDon + (noiDung ? ' - ' + noiDung : '') + ' ?')) return;
+
+    // Disable nút tránh click 2 lần
+    $btn.addClass('disabled').css('pointer-events', 'none');
+
+    $.ajax({
+        url: '@Url.Action("Delete", "DangKyKhoaThe_NT", new { area = "TagSign" })',
+        type: 'POST',
+        data: {
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            maDon: maDon
+        },
+        success: function (res) {
+            if (res && res.success) {
+                alert(res.message);
+                location.reload();
+            } else {
+                alert('Lỗi: ' + (res && res.message ? res.message : 'Không rõ nguyên nhân.'));
+                $btn.removeClass('disabled').css('pointer-events', '');
+            }
+        },
+        error: function () {
+            alert('Có lỗi khi xóa đơn.');
+            $btn.removeClass('disabled').css('pointer-events', '');
+        }
+    });
+});
+
 </script>

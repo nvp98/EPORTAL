@@ -45,7 +45,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             int pageNumber = page ?? 1;
             int pageSize = 10;
-            var userNameLogin = Models.MyAuthentication.ID;
+            var userNameLogin = Models.MyAuthentication.Username;
 
             var data = db_dk.Database.SqlQuery<DonDangKyKhoaTheViewModel>(
                "EXEC KTNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu,@p_UserNameLogin",
@@ -85,7 +85,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             }
 
             // Truyền ID và Tên nhà thầu ra View (để hiển thị + submit)
-            ViewBag.NhaThau_ID = nhaThauID;
+            ViewBag.ID_NhaThau = nhaThauID;
             ViewBag.TenNhaThau = tenNhaThau;
             // Các ViewBag khác bạn đang dùng
             var VP1C = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 3)
@@ -99,7 +99,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             return View();
         }
         [HttpPost]
-        public ActionResult TaoDonDangKy(TaoDonDangKyViewModel model)
+        public ActionResult TaoDonDangKy(TaoDonDangKyViewModel model, string ChiTietJson)
         {
             try
             {
@@ -107,49 +107,52 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Nội dung đơn không được để trống!" });
 
                 // 1. Tạo JSON danh sách chi tiết từ model.ChiTiet
-                var chiTietJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.ChiTiet);
+               // var chiTietJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.ChiTiet);
+
+                var chiTietJson = ChiTietJson;
+                if (string.IsNullOrWhiteSpace(chiTietJson))
+                {
+                    chiTietJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.ChiTiet ?? new List<KTNT_ChiTietVM>());
+                }
 
                 var Business_Partner = Models.MyAuthentication.Username;
                 var thangNam = DateTime.Now.ToString("yyyyMMdd");
-
-                var prefix = $"{Business_Partner}_XCĐ{thangNam}-";
+                var prefix = $"{Business_Partner}_DKTK{thangNam}-";
 
                 var lastMaDon = db_dk.KTNT_DonDangKy
-                    .Where(x => x.Ma_Don.StartsWith(prefix))
-                    .OrderByDescending(x => x.Ma_Don)
-                    .Select(x => x.Ma_Don)
+                    .Where(x => x.MaDon.StartsWith(prefix))
+                    .OrderByDescending(x => x.MaDon)
+                    .Select(x => x.MaDon)
                     .FirstOrDefault();
 
                 int stt = 1;
-                if (!string.IsNullOrEmpty(lastMaDon))
+                if (!string.IsNullOrEmpty(lastMaDon) && lastMaDon.Length > prefix.Length)
                 {
                     var soStr = lastMaDon.Substring(prefix.Length);
-                    int.TryParse(soStr, out stt);
-                    stt++;
+                    if (int.TryParse(soStr, out int lastNum))
+                        stt = lastNum + 1;
                 }
 
-                model.Ma_Don = prefix + stt.ToString("D6");
-                // 2. Sinh mã đơn (ví dụ: "DDK-20251110-001")
-                string maDon = "DDK-" + DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                model.MaDon = prefix + stt.ToString("D3");
 
                 // 3. Lấy thông tin người dùng hiện tại
-                string userNameLogin = User.Identity.Name; // hoặc từ MyAuthentication
+                string userNameLogin = Models.MyAuthentication.Username; 
 
                 // 4. Thực hiện gọi stored procedure
 
-                var result = db.Database.SqlQuery<SPResult>(
-                    @"EXEC dbo.KTNT_DonDangKy_Insert
+                var result = db_dk.Database.SqlQuery<SPResult>(
+                    @"EXEC KTNT_DonDangKy_Insert
                     @p_Ma_Don,
                     @p_NoiDung,
                     @p_NhaThau_ID,
-                    //@p_VP1C_ID,
                     @p_UserNameLogin,
+                    @p_BP_XuLy_ID,
                     @JsonDanhSachChiTiet",
-                    new SqlParameter("@p_Ma_Don", maDon),
+                    new SqlParameter("@p_Ma_Don", model.MaDon),
                     new SqlParameter("@p_NoiDung", model.NoiDung ?? ""),
-                    new SqlParameter("@p_NhaThau_ID", model.NhaThau_ID),
-                    //new SqlParameter("@p_VP1C_ID", (object)model.VP1C_ID ?? DBNull.Value),
+                    new SqlParameter("@p_NhaThau_ID", model.ID_NhaThau),
                     new SqlParameter("@p_UserNameLogin", userNameLogin ?? ""),
+                    new SqlParameter("@p_BP_XuLy_ID", model.BP_XuLy_ID),
                     new SqlParameter("@JsonDanhSachChiTiet", chiTietJson ?? "")
                 ).FirstOrDefault();
 
@@ -163,5 +166,317 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
+
+        public ActionResult Update(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return HttpNotFound();
+            }
+
+            // Lấy thông tin đơn đăng ký
+            var donDangKy = db_dk.KTNT_DonDangKy.AsNoTracking().FirstOrDefault(x => x.MaDon == id);
+            if (donDangKy == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Kiểm tra quyền chỉnh sửa
+            var currentUser = Models.MyAuthentication.Username ?? string.Empty;
+            var createdBy = (donDangKy.UserNameLogin ?? string.Empty);
+            if (!string.Equals(currentUser, createdBy, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["msgError"] = "Bạn không có quyền chỉnh sửa đơn này.";
+                return RedirectToAction("Index_Test");
+            }
+
+            // Kiểm tra trạng thái đơn
+            if (donDangKy.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy)
+            {
+                TempData["msgError"] = "Đơn đã được duyệt, không thể chỉnh sửa";
+                return RedirectToAction("Index_Test");
+            }
+
+            // Lấy tên nhà thầu từ đơn
+            int? nhaThauID = donDangKy.ID_NhaThau;
+            string tenNhaThau = "";
+            if (nhaThauID.HasValue)
+            {
+                var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID.Value);
+                tenNhaThau = nhaThau?.FullName ?? "";
+            }
+            // Truyền ra View để hiển thị+submit
+            ViewBag.NhaThau_ID = nhaThauID;
+            ViewBag.TenNhaThau = tenNhaThau;
+
+
+            // Lấy danh sách VP1C
+            var VP1C = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 3)
+                        join a in db.NhanViens on au.IDNhanVien equals a.ID
+                        select new CheckInforUser
+                        {
+                            IDNhanVien = (int)au.IDNhanVien,
+                            HoTen = a.HoTen + " : " + a.MaNV,
+                        }).ToList();
+            ViewBag.VP1C_List = new SelectList(VP1C, "IDNhanVien", "HoTen");
+
+
+           // ViewBag.VP1C_ID = .FirstOrDefault(x => x.CapDuyet == 3)?.NguoiDuyet_ID;
+
+            ViewBag.TenNhaThau = tenNhaThau;
+
+            // Lấy chi tiết theo MaDon
+            var chiTietList = db_dk.KTNT_ChiTiet
+                                   .AsNoTracking()
+                                   .Where(x => x.MaDon == id)
+                                   .Select(x => new KTNT_ChiTietVM
+                                   {
+                                       ID = x.ID,
+                                       MaDon = x.MaDon,
+                                       TN_HoTen = x.TN_HoTen,
+                                       TN_CCCD_HoChieu = x.TN_CCCD_HoChieu,
+                                       TX_LoaiXeCoDong = x.TX_LoaiXeCoDong,
+                                       TX_BienKiemSoat = x.TX_BienKiemSoat,
+                                       PT_LoaiPhuongTien = x.PT_LoaiPhuongTien,
+                                       PT_BienKiemSoat = x.PT_BienKiemSoat,
+                                       GhiChu = x.GhiChu,
+                                       NgayTao = x.NgayTao
+                                   })
+                                   .ToList();
+
+            var model = new TaoDonDangKyViewModel
+            {
+                ID = donDangKy.ID,
+                MaDon = donDangKy.MaDon,
+                NoiDung = donDangKy.NoiDung,
+                ID_NhaThau = donDangKy.ID_NhaThau,
+                BP_XuLy_ID = donDangKy.BP_XuLy_ID, 
+                NgayTao = donDangKy.NgayTao,
+                ChiTiet = chiTietList ?? new List<KTNT_ChiTietVM>()
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult Update(TaoDonDangKyViewModel model, string ChiTietJson)
+        {
+            try
+            {
+                // Kiểm tra mã đơn
+                if (string.IsNullOrEmpty(model.MaDon))
+                {
+                    return Json(new { success = false, message = "Mã đơn không hợp lệ" });
+                }
+
+                // Kiểm tra danh sách xe
+                if (model.ChiTiet == null || !model.ChiTiet.Any())
+                {
+                    return Json(new { success = false, message = "Danh sách xe không được trống" });
+                }
+
+                // Kiểm tra phòng ban
+                if (!model.BP_XuLy_ID.HasValue)
+                {
+                    return Json(new { success = false, message = "Vui lòng chọn phòng ban quản lý" });
+                }          
+                // Tìm đơn đăng ký
+                var donDangKy = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == model.MaDon);
+                if (donDangKy == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đơn đăng ký" });
+                }
+
+                // Kiểm tra quyền chỉnh sửa
+                if (donDangKy.UserNameLogin != Models.MyAuthentication.Username)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền chỉnh sửa đơn này" });
+                }
+
+                // Kiểm tra trạng thái đơn
+                if (donDangKy.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy)
+                {
+                    return Json(new { success = false, message = "Đơn đã được duyệt, không thể chỉnh sửa" });
+                }
+
+
+                // Cập nhật thông tin đơn
+                donDangKy.NoiDung = model.NoiDung;
+                donDangKy.ID_NhaThau = model.ID_NhaThau;
+                donDangKy.BP_XuLy_ID = model.BP_XuLy_ID;
+
+                // Xóa danh sách xe cũ
+                var oldChiTietDon = db_dk.KTNT_ChiTiet.Where(x => x.MaDon == model.MaDon).ToList();
+                foreach (var item in oldChiTietDon)
+                {
+                    db_dk.KTNT_ChiTiet.Remove(item);
+                }
+
+                // Thêm danh sách xe mới
+                foreach (var item in model.ChiTiet)
+                {
+                    // Validate dữ liệu xe
+
+                    db_dk.KTNT_ChiTiet.Add(new KTNT_ChiTiet
+                    {
+                        MaDon = model.MaDon,
+                        TN_HoTen = item.TN_HoTen,
+                        TN_CCCD_HoChieu = item.TN_CCCD_HoChieu,
+                        TX_LoaiXeCoDong = item.TX_LoaiXeCoDong,
+                        TX_BienKiemSoat = item.TX_BienKiemSoat,
+                        PT_LoaiPhuongTien = item.PT_LoaiPhuongTien,
+                        PT_BienKiemSoat = item.PT_BienKiemSoat,
+                        GhiChu = item.GhiChu,
+                        NgayTao = DateTime.Now
+                    });
+                }
+                // Lưu thay đổi
+                db_dk.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Cập nhật đơn thành công",
+                    maDon = model.MaDon
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        public ActionResult Detail(string maDon)
+        {
+            var data = db_dk.Database.SqlQuery<KTNT_DonDangKy_Detail>(
+                "EXEC KTNT_DonDangKy_Detail @MaDon",
+                new SqlParameter("@MaDon", maDon ?? (object)DBNull.Value)
+            ).ToList();
+            if (data == null || !data.Any())
+            {
+                // Có thể trả View với model rỗng hoặc Redirect/Thông báo
+                return View(new List<KTNT_DonDangKy_Detail>());
+            }
+            return View(data);
+        }
+
+        public ActionResult Detail_PDF()
+        {
+            //var model = GetDonDangKyPdfViewModel(maDon);
+            //if (model == null || model.ChiTietDon == null || !model.ChiTietDon.Any())
+            //    return HttpNotFound("Không có dữ liệu.");
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult TrinhKy(string maDon)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(maDon))
+                    return Json(new { success = false, message = "Thiếu mã đơn." });
+
+                var don = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == maDon);
+                if (don == null)
+                    return Json(new { success = false, message = "Không tìm thấy đơn." });
+
+                // Chỉ người tạo được trình ký
+                var currentUser = Models.MyAuthentication.Username ?? string.Empty;
+                if (!string.Equals(currentUser, don.UserNameLogin ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                    return Json(new { success = false, message = "Bạn không có quyền trình ký đơn này." });
+
+                // Chỉ trình ký khi đang ở trạng thái Chưa trình ký
+                if (don.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy)
+                    return Json(new { success = false, message = "Đơn không ở trạng thái 'Chưa trình ký'." });
+
+                // Kiểm tra điều kiện tối thiểu
+                if (don.ID_NhaThau == null)
+                    return Json(new { success = false, message = "Chưa chọn nhà thầu." });
+
+                if (don.BP_XuLy_ID <= 0)
+                    return Json(new { success = false, message = "Chưa chọn bộ phận xử lý." });
+
+                bool hasDetails = db_dk.KTNT_ChiTiet.Any(ct => ct.MaDon == maDon);
+                if (!hasDetails)
+                    return Json(new { success = false, message = "Danh sách chi tiết trống." });
+
+                don.TinhTrang = (int)TinhTrangDonDangKyKhoaThe.ChoXuLy;
+                db_dk.SaveChanges();
+
+                return Json(new { success = true, message = "Đã trình ký. Trạng thái chuyển sang 'Chờ xử lý'." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult HuyTrinhKy(string maDon)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(maDon))
+                    return Json(new { success = false, message = "Thiếu mã đơn." });
+
+                var don = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == maDon);
+                if (don == null)
+                    return Json(new { success = false, message = "Không tìm thấy đơn." });
+
+                var currentUser = Models.MyAuthentication.Username ?? string.Empty;
+                if (!string.Equals(currentUser, don.UserNameLogin ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                    return Json(new { success = false, message = "Bạn không có quyền hủy trình ký." });
+
+                if (don.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChoXuLy)
+                    return Json(new { success = false, message = "Chỉ hủy khi trạng thái 'Chờ xử lý'." });
+
+                don.TinhTrang = (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy;
+                db_dk.SaveChanges();
+
+                return Json(new { success = true, message = "Đã hủy trình ký thành công." });
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu có hệ thống logging
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+        [HttpPost]
+        public ActionResult Delete(string maDon)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(maDon))
+                    return Json(new { success = false, message = "Mã đơn không hợp lệ." });
+
+                var don = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == maDon);
+                if (don == null)
+                    return Json(new { success = false, message = "Không tìm thấy đơn." });
+
+                bool daKy = db_dk.KTNT_DonDangKy.Any(x =>
+                    x.MaDon == maDon && x.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy);
+
+                if (daKy)
+                    return Json(new { success = false, message = "Đơn đã được ký, không thể xóa." });
+
+                // Gọi stored procedure với tham số an toàn
+                var maDonParam = new SqlParameter("@p_MaDon", maDon);
+
+                var result = db_dk.Database.SqlQuery<StoreResult>(
+                    "EXEC KTNT_DonDangKy_Delete @p_MaDon", maDonParam
+                ).FirstOrDefault();
+
+                return Json(new
+                {
+                    success = (result?.Result == 1),
+                    message = result?.Message ?? "Xóa thất bại."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
     }
 }

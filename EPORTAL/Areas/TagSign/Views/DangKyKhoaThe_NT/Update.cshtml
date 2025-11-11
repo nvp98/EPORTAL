@@ -1,0 +1,276 @@
+﻿@using EPORTAL.ModelsTagSign.TheXeCoDongVM
+@model TaoDonDangKyViewModel
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+@{
+    ViewBag.Title = "Cập nhật đơn đăng ký";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    <div class="alert alert-success mt-2">@Html.Raw(TempData["msgSuccess"])</div>
+}
+@if (TempData["msgError"] != null)
+{
+    <div class="alert alert-danger mt-2">@Html.Raw(TempData["msgError"])</div>
+}
+
+@{
+    // Danh sách loại xe cơ động (tĩnh)
+    var loaiXeOptions = new List<SelectListItem>
+{
+        new SelectListItem { Value = "Xe máy", Text = "Xe máy" },
+        new SelectListItem { Value = "Xe ô tô", Text = "Xe ô tô" },
+        new SelectListItem { Value = "Xe 3 gác", Text = "Xe 3 gác" }
+    };
+}
+@using (Html.BeginForm("Update", "DangKyKhoaThe_NT", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmUpdate" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MaDon)
+    @Html.HiddenFor(m => m.ID_NhaThau)
+
+    <div class="app-main__outer" style="margin-top: -4%;">
+        <div class="app-main__inner" style="display:block;padding-bottom:0;">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card">
+                        <div style="padding: 15px 20px 50px 20px;">
+
+                            <!-- THÔNG TIN ĐƠN -->
+                            <div class="row" style="width:100%;">
+                                <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
+                                    <h6 style="color:red;"><b>CẬP NHẬT ĐƠN ĐĂNG KÝ</b></h6>
+                                </div>
+
+                                <table class="table table-bordered table-hover" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center" width="25%">Mã đơn</th>
+                                            <th class="text-center" width="75%">Nội dung trích yếu <span style="color:red;">(*)</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control" value="@Model.MaDon" readonly />
+                                            </td>
+                                            <td>
+                                                @Html.TextAreaFor(m => m.NoiDung, 3, 50, new { @class = "form-control", placeholder = "Nhập nội dung tóm tắt..." })
+                                                @Html.ValidationMessageFor(m => m.NoiDung, "", new { @class = "text-danger" })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered table-hover" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center" width="50%">Nhà thầu</th>
+                                            <th class="text-center" width="50%">Tổ cấp phát thẻ (BP xử lý)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly />
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(m => m.BP_XuLy_ID,
+                                                              (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()),
+                                                              "--Chọn tổ cấp phát thẻ--",
+                                                              new { @class = "form-control" })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- DANH SÁCH CHI TIẾT -->
+                            <div class="col-md-12 col-lg-12" style="padding-top:1%;">
+                                <h6 style="color:red;"><b>DANH SÁCH CHI TIẾT</b></h6>
+                            </div>
+
+                            <div class="table-responsive" style="width:100%;overflow-x:auto;">
+                                <table class="table table-bordered table-hover" id="tblChiTiet" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th rowspan="2" class="text-center align-middle" style="width:55px;">STT</th>
+                                            <th colspan="2" class="text-center">Thẻ người</th>
+                                            <th colspan="2" class="text-center">Thẻ xe cơ động</th>
+                                            <th colspan="2" class="text-center">Thẻ phương tiện</th>
+                                            <th rowspan="2" class="text-center align-middle" style="width:160px;">Ghi chú</th>
+                                            <th rowspan="2" class="text-center align-middle" style="width:70px;">Xóa</th>
+                                        </tr>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center">Họ và tên</th>
+                                            <th class="text-center">CCCD/Hộ chiếu</th>
+                                            <th class="text-center">Loại xe cơ động</th>
+                                            <th class="text-center">Biển kiểm soát</th>
+                                            <th class="text-center">Loại phương tiện</th>
+                                            <th class="text-center">Biển kiểm soát - Số khung</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyChiTiet">
+                                        @if (Model.ChiTiet != null && Model.ChiTiet.Count > 0)
+                                        {
+                                            for (int i = 0; i < Model.ChiTiet.Count; i++)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@(i + 1)</td>
+
+                                                    <td>@Html.TextBoxFor(m => m.ChiTiet[i].TN_HoTen, new { @class = "form-control" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ChiTiet[i].TN_CCCD_HoChieu, new { @class = "form-control" })</td>
+
+                                                    <td>
+                                                        @Html.TextBoxFor(m => m.ChiTiet[i].TX_LoaiXeCoDong, new { @class = "form-control", placeholder = "Loại xe cơ động" })
+                                                    </td>
+                                                    <td>@Html.TextBoxFor(m => m.ChiTiet[i].TX_BienKiemSoat, new { @class = "form-control", placeholder = "Biển kiểm soát" })</td>
+
+                                                    <td>@Html.TextBoxFor(m => m.ChiTiet[i].PT_LoaiPhuongTien, new { @class = "form-control", placeholder = "Loại phương tiện" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ChiTiet[i].PT_BienKiemSoat, new { @class = "form-control", placeholder = "Biển kiểm soát - Số khung" })</td>
+
+                                                    <td>@Html.TextBoxFor(m => m.ChiTiet[i].GhiChu, new { @class = "form-control", placeholder = "Ghi chú" })</td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-danger btn-sm btnDeleteRow">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr><td colspan="9" class="text-center text-muted">Chưa có chi tiết</td></tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <div style="margin-top:10px;">
+                                    <button id="btnAddRow" type="button" class="btn btn-success">
+                                        <i class="fa fa-plus"></i> Thêm dòng
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- NÚT LƯU -->
+                            <div class="text-end mt-4">
+                                <a class="btn btn-secondary" href="@Url.Action("Index_NT","DangKyKhoaThe_NT")">
+                                    <i class="fa fa-arrow-left"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-save"></i> Lưu cập nhật
+                                </button>
+                            </div>
+
+                        </div> <!-- end inner -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    (function () {
+        const tbody = document.getElementById('tbodyChiTiet');
+        const btnAdd = document.getElementById('btnAddRow');
+        const form = document.getElementById('frmUpdate');
+
+        function reindexRows() {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((tr, i) => {
+                // STT
+                const sttCell = tr.querySelector('td:first-child');
+                if (sttCell) sttCell.textContent = i + 1;
+
+                // Update all input name indices: ChiTiet[old].Prop -> ChiTiet[i].Prop
+                tr.querySelectorAll('input, select, textarea').forEach(inp => {
+                    if (!inp.name) return;
+                    const parts = inp.name.split('.');
+                    if (parts.length > 1) {
+                        parts[0] = `ChiTiet[${i}]`;
+                        inp.name = parts.join('.');
+                    }
+                });
+            });
+        }
+
+        function addRow() {
+            const index = tbody.querySelectorAll('tr').length;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-center">${index + 1}</td>
+
+                <td><input name="ChiTiet[${index}].TN_HoTen" class="form-control" placeholder="Nhập họ tên" /></td>
+                <td><input name="ChiTiet[${index}].TN_CCCD_HoChieu" class="form-control" placeholder="Nhập CCCD/Hộ chiếu" /></td>
+
+                 <td>
+                      <select name="ChiTiet[${index}].TX_LoaiXeCoDong" class="form-control">
+                          <option value="">--Chọn loại--</option>
+                          <option value="Xe máy">Xe máy</option>
+                          <option value="Xe ô tô">Xe ô tô</option>
+                          <option value="Xe 3 gác">Xe 3 gác</option>
+                      </select>
+                  </td>
+
+                <td><input name="ChiTiet[${index}].TX_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát" /></td>
+
+                <td><input name="ChiTiet[${index}].PT_LoaiPhuongTien" class="form-control" placeholder="Loại phương tiện" /></td>
+                <td><input name="ChiTiet[${index}].PT_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát - Số khung" /></td>
+
+                <td><input name="ChiTiet[${index}].GhiChu" class="form-control" placeholder="Ghi chú" /></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm btnDeleteRow">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        btnAdd?.addEventListener('click', addRow);
+
+        tbody.addEventListener('click', function (e) {
+            if (e.target.closest('.btnDeleteRow')) {
+                const tr = e.target.closest('tr');
+                tr.parentNode.removeChild(tr);
+                reindexRows();
+            }
+        });
+
+        // Submit bằng AJAX để nhận JSON từ ActionResult
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Kiểm tra tối thiểu: họ tên + CCCD không trống ở ít nhất 1 dòng
+            const rows = tbody.querySelectorAll('tr');
+            if (rows.length === 0) {
+                alert('Danh sách chi tiết không được trống.');
+                return;
+            }
+
+            const fd = new FormData(form);
+            $.ajax({
+                url: '@Url.Action("Update", "DangKyKhoaThe_NT")',
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (res) {
+                    if (res && res.success) {
+                        alert(res.message || 'Cập nhật đơn thành công.');
+                        // Điều hướng tùy ý:
+                        // window.location.href = '@Url.Action("Index_Test","DangKyKhoaThe_NT")';
+                    } else {
+                        alert(res.message || 'Cập nhật thất bại.');
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra khi gửi dữ liệu!');
+                }
+            });
+        });
+    })();
+</script>
