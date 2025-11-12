@@ -245,6 +245,7 @@
           <Property Name="TinhTrang" Type="int" />
           <Property Name="NgayTao" Type="date" />
           <Property Name="UserNameLogin" Type="nvarchar" MaxLength="50" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="RegisterPeople">
           <Key>
@@ -1628,6 +1629,7 @@
           <Property Name="NgayTao" Type="DateTime" Precision="0" />
           <Property Name="UserNameLogin" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="BP_XuLy_ID" Type="Int32" />
+          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2187,6 +2189,7 @@
           <EntitySetMapping Name="KTNT_DonDangKy">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.KTNT_DonDangKy">
               <MappingFragment StoreEntitySet="KTNT_DonDangKy">
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
                 <ScalarProperty Name="BP_XuLy_ID" ColumnName="BP_XuLy_ID" />
                 <ScalarProperty Name="UserNameLogin" ColumnName="UserNameLogin" />
                 <ScalarProperty Name="NgayTao" ColumnName="NgayTao" />

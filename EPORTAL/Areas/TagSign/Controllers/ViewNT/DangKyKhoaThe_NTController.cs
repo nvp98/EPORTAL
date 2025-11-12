@@ -70,12 +70,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             string tenNhaThau = "";
             int? nhaThauID = null;
 
-            int nhanVienNT_ID = Models.MyAuthentication.ID; // ID tài khoản NT
-            var nhanVien = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == nhanVienNT_ID); // thông tin tài khoản
+            int userid = Models.MyAuthentication.ID; // ID tài khoản NT
+            var nt = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == userid); // thông tin tài khoản
 
-            if (nhanVien != null && nhanVien.IDNT.HasValue)
+            if (nt != null && nt.IDNT.HasValue)
             {
-                nhaThauID = nhanVien.IDNT.Value;
+                nhaThauID = nt.IDNT.Value;
 
                 var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID.Value);
                 if (nhaThau != null)
@@ -107,7 +107,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Nội dung đơn không được để trống!" });
 
                 // 1. Tạo JSON danh sách chi tiết từ model.ChiTiet
-               // var chiTietJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.ChiTiet);
+                // var chiTietJson = Newtonsoft.Json.JsonConvert.SerializeObject(model.ChiTiet);
 
                 var chiTietJson = ChiTietJson;
                 if (string.IsNullOrWhiteSpace(chiTietJson))
@@ -136,7 +136,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 model.MaDon = prefix + stt.ToString("D3");
 
                 // 3. Lấy thông tin người dùng hiện tại
-                string userNameLogin = Models.MyAuthentication.Username; 
+                string userNameLogin = Models.MyAuthentication.Username;
 
                 // 4. Thực hiện gọi stored procedure
 
@@ -221,7 +221,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             ViewBag.VP1C_List = new SelectList(VP1C, "IDNhanVien", "HoTen");
 
 
-           // ViewBag.VP1C_ID = .FirstOrDefault(x => x.CapDuyet == 3)?.NguoiDuyet_ID;
+            // ViewBag.VP1C_ID = .FirstOrDefault(x => x.CapDuyet == 3)?.NguoiDuyet_ID;
 
             ViewBag.TenNhaThau = tenNhaThau;
 
@@ -250,7 +250,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 MaDon = donDangKy.MaDon,
                 NoiDung = donDangKy.NoiDung,
                 ID_NhaThau = donDangKy.ID_NhaThau,
-                BP_XuLy_ID = donDangKy.BP_XuLy_ID, 
+                BP_XuLy_ID = donDangKy.BP_XuLy_ID,
                 NgayTao = donDangKy.NgayTao,
                 ChiTiet = chiTietList ?? new List<KTNT_ChiTietVM>()
             };
@@ -278,7 +278,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 if (!model.BP_XuLy_ID.HasValue)
                 {
                     return Json(new { success = false, message = "Vui lòng chọn phòng ban quản lý" });
-                }          
+                }
                 // Tìm đơn đăng ký
                 var donDangKy = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == model.MaDon);
                 if (donDangKy == null)
@@ -358,16 +358,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             }
             return View(data);
         }
-
-        public ActionResult Detail_PDF()
-        {
-            //var model = GetDonDangKyPdfViewModel(maDon);
-            //if (model == null || model.ChiTietDon == null || !model.ChiTietDon.Any())
-            //    return HttpNotFound("Không có dữ liệu.");
-
-            return View();
-        }
-
         [HttpPost]
         public ActionResult TrinhKy(string maDon)
         {
@@ -477,6 +467,182 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+        [HttpPost]
+        public ActionResult DuyetDon(string maDon, bool isApproved, string ghiChu = "")
+        {
+            try
+            {
+                var userId = Models.MyAuthentication.ID;
 
+                var don = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == maDon);
+                if (don == null)
+                    return Json(new { success = false, message = "Không tìm thấy đơn" });
+
+                if (don.BP_XuLy_ID != userId)
+                    return Json(new { success = false, message = "Bạn không có quyền xử lý đơn này." });
+
+                if (don.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChoXuLy)
+                    return Json(new { success = false, message = "Đơn không còn ở trạng thái chờ xử lý." });
+                don.TinhTrang = isApproved
+               ? (int)TinhTrangDonDangKyKhoaThe.DaXuLy
+               : (int)TinhTrangDonDangKyKhoaThe.KhongDatYeuCau;
+                don.GhiChu = ghiChu;
+
+                db_dk.SaveChanges();
+                string msg = isApproved ? "Đã duyệt đơn thành công." : "Đã từ chối đơn.";
+                return Json(new { success = true, message = msg });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+
+        }
+        public ActionResult HPDQ_Detail(string maDon)
+        {
+            var data = db_dk.Database.SqlQuery<KTNT_DonDangKy_Detail>(
+                "EXEC KTNT_DonDangKy_Detail @MaDon",
+                new SqlParameter("@MaDon", maDon ?? (object)DBNull.Value)
+            ).ToList();
+            if (data == null || !data.Any())
+            {
+                
+                return View(new List<KTNT_DonDangKy_Detail>());
+            }
+            return View(data);
+        }
+        public ActionResult HPDQ_Index(DateTime? begind, DateTime? endd, string maPhieu, int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 10;
+           // var userNameLogin = Models.MyAuthentication.Username;
+
+            var data = db_dk.Database.SqlQuery<DonDangKyKhoaTheViewModel>(
+               "EXEC KTNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
+               new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
+               new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+               new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+           ).ToList();
+
+            var filtered = data
+                .Where(d => d.TinhTrang == (int)TinhTrangDonDangKyKhoaThe.ChoXuLy)
+                .ToList();
+
+            var pagedData = filtered.ToPagedList(pageNumber, pageSize);
+            ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+            ViewBag.MaPhieu = maPhieu;
+            ViewBag.Page = pageNumber;
+            ViewBag.PageSize = pageSize;
+            return View(pagedData);
+        }
+        public JsonResult HPDQ_KTNotify()
+        {
+            int userId = Models.MyAuthentication.ID;
+
+            int total = db_dk.KTNT_DonDangKy.Count(x => x.BP_XuLy_ID == userId && x.TinhTrang == 1);
+            return Json(new
+            {
+                Total = total
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ExportKhoaThePdf(string maDon)
+        {
+            var rows = GetKhoaTheData(maDon);
+            if (rows == null || rows.Count == 0)
+                return HttpNotFound("Không có dữ liệu.");
+
+            var header = rows.First();
+            string safe = SanitizeFileName(header.TenNhaThau ?? header.MaDon ?? "don_khoa_the") + ".pdf";
+
+            // Dùng hàm tạo pdf tạm (giống GenerateTempPdf cũ)
+            string tempPath = GenerateTempPdf_KhoaThe(maDon);
+
+            byte[] pdfBytes = System.IO.File.ReadAllBytes(tempPath);
+            System.IO.File.Delete(tempPath);
+
+            return File(pdfBytes, "application/pdf", safe);
+        }
+
+        // Action để hiển thị preview (HTML) – Rotativa sẽ gọi lại Action này
+        public ActionResult Detail_PDF(string maDon)
+        {
+            var rows = GetKhoaTheData(maDon);
+            if (rows == null || rows.Count == 0)
+                return HttpNotFound("Không có dữ liệu.");
+
+            return View(rows); // View mạnh kiểu: List<KTNT_DonDangKy_Detail>
+        }
+
+        private List<KTNT_DonDangKy_Detail> GetKhoaTheData(string maDon)
+        {
+            if (string.IsNullOrWhiteSpace(maDon)) return new List<KTNT_DonDangKy_Detail>();
+
+            // EXEC SP đơn giản
+            var rows = db_dk.Database.SqlQuery<KTNT_DonDangKy_Detail>(
+                "EXEC KTNT_DonDangKy_Detail_PDF @MaDon",
+                new SqlParameter("@MaDon", maDon)
+            ).ToList();
+
+            return rows ?? new List<KTNT_DonDangKy_Detail>();
+        }
+
+        private string GenerateTempPdf_KhoaThe(string maDon)
+        {
+            string root = Server.MapPath("~/UploadedFiles/PDFDangKyThe/");
+            if (!Directory.Exists(root))
+                Directory.CreateDirectory(root);
+
+            string tempPdf = Path.Combine(root, $"{Guid.NewGuid()}.pdf");
+
+            var pdf = new Rotativa.ActionAsPdf("Detail_PDF", new { maDon })
+            {
+                PageSize = Rotativa.Options.Size.A4,
+                PageMargins = new Rotativa.Options.Margins(13, 5, 10, 5),
+                CustomSwitches = "--encoding utf-8"
+            };
+
+            byte[] bytes = pdf.BuildPdf(ControllerContext);
+            System.IO.File.WriteAllBytes(tempPdf, bytes);
+            return tempPdf;
+        }
+
+        private string SanitizeFileName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "don_khoa_the";
+            foreach (var c in Path.GetInvalidFileNameChars()) name = name.Replace(c, '_');
+            if (name.Length > 80) name = name.Substring(0, 80);
+            return name.Trim('_');
+        }
+
+        public ActionResult HPDQ_IndexAll(DateTime? begind, DateTime? endd, string maPhieu, int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 10;
+            // var userNameLogin = Models.MyAuthentication.Username;
+
+            var data = db_dk.Database.SqlQuery<DonDangKyKhoaTheViewModel>(
+               "EXEC KTNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
+               new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
+               new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+               new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+           ).ToList();
+            var filtered = data
+                .Where(d => d.TinhTrang == (int)TinhTrangDonDangKyKhoaThe.DaXuLy
+                         || d.TinhTrang == (int)TinhTrangDonDangKyKhoaThe.KhongDatYeuCau)
+                .ToList();
+
+            
+            var pagedData = filtered.ToPagedList(pageNumber, pageSize);
+            ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+            ViewBag.MaPhieu = maPhieu;
+            ViewBag.Page = pageNumber;
+            ViewBag.PageSize = pageSize;
+            return View(pagedData);
+        }
     }
 }
+

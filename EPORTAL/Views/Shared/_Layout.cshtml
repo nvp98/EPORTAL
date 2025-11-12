@@ -712,7 +712,7 @@
                             </a>
                         </li>*@
                                             <li>
-                                                @{ 
+                                                @{
                                                     var TheNguoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 0 && x.TinhTrang_ID == 1 || x.TrinhKy_ID == null && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_TheNguoi = new List<int>();
                                                     foreach (var thenguoi in TheNguoi_)
@@ -1014,51 +1014,74 @@
                             </li>
                             @*đăng kí thẻ xe cơ động nhà thầu*@
 
-                        <li>
-                            <a href="#" id="CDNT">
-                                <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
-                                Đăng ký thẻ xe cơ động
-                                <span id="cdnt-count" style="margin-left:6px;"></span>
-                                <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                            </a>
-                            <ul id="listatld1">
-                                <li>
-                                    <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
-                                        <i class="fa fa-file-archive p-lg-1"></i>
-                                        Hồ sơ đến tôi  <span id="duyetdon-label" class="text-danger"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@Url.Action("HPDQ_Index_DaXuLy", "TheXeCoDong_NT", new {area="TagSign"})">
-                                        <i class="fa fa-file-archive p-lg-1 "></i>
-                                        Hồ sơ đã xử lý
-                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@Url.Action("HPDQ_Index_All", "TheXeCoDong_NT", new {area="TagSign"})">
-                                        <i class="fa fa-file-archive p-lg-1 "></i>
-                                        Danh sách hồ sơ
-                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="#" id="CDNT">
+                                    <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
+                                    Đăng ký thẻ xe cơ động
+                                    <span id="cdnt-count" style="margin-left:6px;"></span>
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                                <ul id="listatld1">
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1"></i>
+                                            Hồ sơ đến tôi  <span id="duyetdon-label" class="text-danger"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index_DaXuLy", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Hồ sơ đã xử lý
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index_All", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Danh sách hồ sơ
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
 
-                                <li>
-                                    <a href="@Url.Action("DanhSachXe", "TheXeCoDong_NT", new {area="TagSign"})">
-                                        <i class="fa fa-file-archive p-lg-1 "></i>
-                                        Danh sách xe
-                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@Url.Action("HPDQ_DinhBienXinThem", "TheXeCoDong_NT", new {area="TagSign"})">
-                                        <i class="fa fa-file-archive p-lg-1 "></i>
-                                        Định biên xe cơ động
-                                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                                    <li>
+                                        <a href="@Url.Action("DanhSachXe", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Danh sách xe
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_DinhBienXinThem", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Định biên xe cơ động
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" id="KTNT">
+                                    <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
+                                    Đăng ký khóa thẻ
+                                    <span id="ktnt-count" style="margin-left:6px;"></span>
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                                <ul id="listatld1">
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index", "DangKyKhoaThe_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1"></i>
+                                            Hồ sơ đến tôi  <span id="duyetdonkt-label" class="text-danger"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_IndexAll", "DangKyKhoaThe_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Hồ sơ đã xử lý
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                             <li>
                                 <a href="#" id="CTRV">
                                     <i class="metismenu-icon fa fa-rectangle-list"></i>
@@ -1539,6 +1562,20 @@
                     $('#CDNT').removeClass('text-danger');
                 }
             });
+           $.getJSON('@Url.Action("HPDQ_KTNotify", "DangKyKhoaThe_NT", new { area="TagSign" })', function(data) {
+                $('#duyetdonkt-label').text(data.Total);
+                $('#ktnt-count').text(data.Total > 0 ? data.Total : '');
+                if (data.Total > 0) {
+                    // Đổi màu chữ sang đỏ
+                    $('#KTNT').addClass('text-danger');
+                } else {
+                    // Nếu không có đơn, giữ màu mặc định
+                    $('#KTNT').removeClass('text-danger');
+                }
+            });
+
+
+
         });
     </script>
 

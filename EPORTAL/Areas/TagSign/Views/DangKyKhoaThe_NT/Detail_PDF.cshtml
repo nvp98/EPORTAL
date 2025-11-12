@@ -1,6 +1,5 @@
-﻿@*@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.CDNT_DonDangKyDetail>*@
-@*@model EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyPDFViewModel
-@{*@
+﻿@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.KTNT_DonDangKy_Detail>
+@{
     ViewBag.Title = "Chi tiết đơn đăng ký";
     Layout = "~/Views/Shared/PrintView.cshtml";
 }
@@ -20,25 +19,29 @@
 }
 @using System.Linq
 @{
-    //var hasTrinhKy = (Model != null && Model.TrinhKy != null);
+    var header = Model != null && Model.Any() ? Model.FirstOrDefault() : null;
 
-    //var nhathau = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 0) : null;
-    //var cap1 = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 1) : null;
-    //var cap2 = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 2) : null;
-    //var cpt = hasTrinhKy ? Model.TrinhKy.FirstOrDefault(tk => tk.CapDuyet == 3) : null;
+    DateTime? ngayNT = header.NgayTao_Don;
 
-    // Quy tắc xác định ký chính / ký nháy cho BPQL
-    //var bpqlChinh = (cap2 != null) ? cap2 : cap1;   // ưu tiên cấp 2
-    //var bpqlNhay = (cap2 != null && cap1 != null) ? cap1 : null; // chỉ có khi cả 1 & 2 cùng tồn tại
+    var ngayNTText = ngayNT.HasValue ? ngayNT.Value.ToString("dd/MM/yyyy") : "";
 
-    //DateTime? ngayNT = (nhathau != null) ? nhathau.NgayDuyet : (DateTime?)null;
-
-    //var ngayNTText = ngayNT.HasValue ? ngayNT.Value.ToString("dd/MM/yyyy") : "";
-    //var chuKyNgay = ngayNT.HasValue
-    //    ? string.Format("Quảng Ngãi, ngày {0} tháng {1} năm {2}", ngayNT.Value.Day, ngayNT.Value.Month, ngayNT.Value.Year)
-    //    : "Quảng Ngãi, ngày...tháng...năm.....";
+    // Dòng chữ ký có ngày
+    var chuKyNgay = ngayNT.HasValue
+        ? string.Format("Quảng Ngãi, ngày {0} tháng {1} năm {2}", ngayNT.Value.Day, ngayNT.Value.Month, ngayNT.Value.Year)
+        : "Quảng Ngãi, ngày...tháng...năm.....";
 
     string baseUrl = "https://portal.hoaphatdungquat.vn";
+}
+@{
+    string sigSrc = null;
+
+    if (!string.IsNullOrWhiteSpace(header.ChuKy))
+    {
+        if (header.ChuKy.StartsWith("~") || header.ChuKy.StartsWith("/"))
+        {
+            sigSrc = baseUrl + header.ChuKy.Replace("~", "");
+        }
+    }
 }
 
 <meta charset="utf-8" />
@@ -76,14 +79,14 @@
                     <span>BM.10/QT.20</span>
                     <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025</p>
                     <p><span style="font-style:italic;">Lần sửa đổi:</span> 02</p>
-                    @*@if (Model.ChiTietDon != null && Model.ChiTietDon.Any())
+                    @if (header != null && !string.IsNullOrEmpty(header.MaDon))
                     {
-                        <p style="font-size:15px"><span>@Model.ChiTietDon[0].Ma_Don</span></p>
+                        <p style="font-size:15px; margin-top:5px;"><span>Mã đơn: </span><b>@header.MaDon</b></p>
                     }
                     else
                     {
-                        <span>Không có dữ liệu</span>
-                    }*@
+                        <p style="font-size:15px; margin-top:5px;"><i>Không có mã đơn</i></p>
+                    }
                 </div>
                 <div style="clear: both;"></div>
                 <div style="width: 100%; text-align: center; padding-bottom: 1rem;">
@@ -93,21 +96,24 @@
                 </div>
 
                 @{
-
                     <div class="col-md-12">
                         <label style="font-size:15px"> <b>Kính gửi:</b> Công ty Cổ phần Thép Hòa Phát Dung Quất.</label><br />
-                        <label style="font-size:15px">
-                          <b>Nhà thầu</b>
-                            @*@if (Model.ChiTietDon != null && Model.ChiTietDon.Any() && !string.IsNullOrEmpty(Model.ChiTietDon[0].FullName))
-                            {
-                                <b><span>@Model.ChiTietDon[0].FullName</span></b>
-                            }*@
-                            @*else
-                            {
-                                <span>Không có dữ liệu</span>
-                            }*@
+                        <label style="font-size:15px;">
+                            <b>Nhà thầu:</b>
+                            <b>
+                                @if (header != null && !string.IsNullOrEmpty(header.TenNhaThau))
+                                {
+                                    @header.TenNhaThau
+                                }
+                                else
+                                {
+                                    <span><i>Không có dữ liệu</i></span>
+                                }
+                            </b>
                             đề nghị Quý Công ty khóa thẻ dài ngày theo danh sách dưới đây:
-                        </label>  <br />
+                        </label>
+                        <br />
+
                     </div>
                 }
                 <div class="card-body" style="margin-top: 2%;">
@@ -131,32 +137,45 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @*@if (Model.ChiTietDon != null)
+                                @if (Model != null && Model.Any())
                                 {
-                                    for (int i = 0; i < Model.ChiTietDon.Count; i++)
+                                    for (int i = 0; i < Model.Count; i++)
                                     {
-                                        var item = Model.ChiTietDon[i];
+                                        var item = Model[i];
                                         <tr>
-                                            <td>@(i + 1)</td>
-                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 1) ? "X" : "")</td>
-                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 2) ? "X" : "")</td>
-                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 3) ? "X" : "")</td>
-                                            <td>@item.BienSoXe</td>
-                                            <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
-                                            <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
-                                            <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
-                                            <td>@(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
-                                            <td>@item.GhiChu</td>
+                                            <td class="text-center">@(i + 1)</td>
+                                            <td class="text-center">@item.TN_HoTen</td>
+                                            <td class="text-center">@item.TN_CCCD_HoChieu</td>
+                                            <td class="text-center">@item.TX_LoaiXeCoDong</td>
+                                            <td class="text-center">@item.TX_BienKiemSoat</td>
+                                            <td class="text-center">@item.PT_LoaiPhuongTien</td>
+                                            <td class="text-center">@item.PT_BienKiemSoat</td>
+                                            <td class="text-center">@item.GhiChu</td>
                                         </tr>
                                     }
-                                }*@
+                                }
                             </tbody>
                         </table>
                     </div>
-                </div>              
+                </div>
+                <div style="margin-top:40px; width:100%; text-align:right;">
+                    <p>@chuKyNgay</p>
+
+                    <div style="margin-top: 10px; margin-right: 82px;">
+                        <p><strong>Nhà thầu</strong></p>
+
+                        @if (!string.IsNullOrWhiteSpace(sigSrc))
+                        {
+                            <img src="@sigSrc" alt="Chữ ký nhà thầu" style="max-height: 100px; margin-top: 5px; margin-right: -105px;" />
+                        }
+                        else
+                        {
+                            <div style="height:90px;"></div>
+                        }
+                    </div>
+                </div>
+
             </div>
-
-
         </div>
 
 

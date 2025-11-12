@@ -1,6 +1,6 @@
 ﻿@{
-    ViewBag.Title = "Index_NT";
-    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+    ViewBag.Title = "HPDQ_Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @model PagedList.IPagedList<EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyKhoaTheViewModel>
@@ -63,6 +63,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         @Html.TextBox("maPhieu", ViewBag.MaPhieu as string, new { @id = "maPhieu", @class = "form-control", placeholder = "Nhập mã phiếu" })
+
                                     </div>
                                     <div class="col-md-2">
                                         <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
@@ -91,8 +92,8 @@
                                     <thead>
                                         <tr>
                                             <th width="30px" class="text-center">STT</th>
-                                            <th class="text-center" width="150px" style="vertical-align:middle">Thao tác</th>
-                                            <th class="text-center" width="150px" style="vertical-align:middle">Mã đơn</th>
+                                            <th class="text-center" width="100px" style="vertical-align:middle">Thao tác</th>
+                                            <th class="text-center" width="200px" style="vertical-align:middle">Mã đơn</th>
                                             <th class="text-center" width="150px" style="vertical-align:middle">Nội dung</th>
                                             <th class="text-center" width="200px" style="vertical-align:middle">Nhà thầu</th>
                                             <th class="text-center" width="150px" style="vertical-align:middle">Ngày trình ký</th>
@@ -108,53 +109,30 @@
                                             {
                                                 <tr>
                                                     <td class="text-center">@stt</td>
-                                                    <td class="text-center">
-                                                        @if (item.TinhTrang == 5) // Chưa trình ký
+                                                    <td>
+                                                        @if (item.TinhTrang == 5) // 5 = nháp
                                                         {
-                                                            <a href="@Url.Action("Detail", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
-                                                               class="btn btn-sm btn-info" title="Xem chi tiết">
-                                                                <i class="fa fa-eye"></i>
-                                                            </a>
-                                                            <a href="@Url.Action("Update", "DangKyKhoaThe_NT", new { area = "TagSign", id = item.MaDon })"
-                                                               class="btn btn-sm btn-warning" title="Sửa">
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-success btn-trinhky"
-                                                                    data-madon="@item.MaDon"
-                                                                    title="Trình ký">
-                                                                <i class="fa fa-paper-plane"></i>
-                                                            </button>
-
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-danger btn-xoa-don"
-                                                                    data-madon="@item.MaDon"
-                                                                    data-noidung="@item.NoiDung"
-                                                                    title="Xóa đơn">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        }
-                                                        else if (item.TinhTrang == 1) // Đã trình ký
-                                                        {
-                                                            <a href="@Url.Action("Detail", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
-                                                               class="btn btn-sm btn-info" title="Xem chi tiết">
-                                                                <i class="fa fa-eye"></i>
-                                                            </a>
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-secondary btn-huy-trinhky"
-                                                                    data-madon="@item.MaDon"
-                                                                    title="Hủy trình ký">
-                                                                <i class="fa fa-undo"></i>
-                                                            </button>
-
-                                                        }
-                                                        else // Đã duyệt hoặc từ chối
-                                                        {
-                                                            <a href="@Url.Action("Detail", "DangKyKhoaThe_NT", new { area = "TagSign", maDon = item.MaDon })"
-                                                               class="btn btn-sm btn-info" title="Xem chi tiết">
-                                                                <i class="fa fa-eye"></i>
+                                                            <a title="Xóa" href="javascript:void(0);" class="btn-action" onclick="xoaDon('@item.MaDon', '@item.NoiDung')">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
                                                             </a>
                                                         }
+                                                        @if (item.TinhTrang == 2)
+                                                        {
+                                                            <!-- Nếu đã duyệt thì cho phép tải PDF -->
+                                                            <a href="@Url.Action("ExportKhoaThePdf", "DangKyKhoaThe_NT", new { maDon = item.MaDon })">
+                                                                <i class="fa fa-download text-success"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <!-- Nếu chưa duyệt hoặc từ chối thì hiển thị icon cấm -->
+                                                            <i class="fa-solid fa-ban text-primary" title="Đơn chưa được duyệt, không thể tải PDF"></i>
+                                                        }
+                                                        <a class="btn btn-outline-success"
+                                                           title="Chi tiết đơn"
+                                                           href="@Url.Action("HPDQ_Detail", "DangKyKhoaThe_NT", new { maDon = item.MaDon })">
+                                                            Xem
+                                                        </a>
                                                     </td>
                                                     <td class="text-center">@item.MaDon</td>
                                                     <td>@item.NoiDung</td>
@@ -192,7 +170,7 @@
                                     </tbody>
                                 </table>
                                 <div class="pager">
-                                    @Html.PagedListPager(Model, page => Url.Action("Index_NT", new
+                                    @Html.PagedListPager(Model, page => Url.Action("HPDQ_IndexAll", new
                                     {
                                         page,
                                         begind = Request.QueryString["begind"],
@@ -239,7 +217,7 @@
         var maPhieu = $('#maPhieu').val();
         console.log(maPhieu)
 
-         window.location.href = '@Url.Action("Index_NT", "DangKyKhoaThe_NT", new { area = "TagSign" })?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
+         window.location.href = '@Url.Action("HPDQ_Index", "DangKyKhoaThe_NT", new { area = "TagSign" })?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
 
     });
     $(document).ready(function () {
@@ -296,7 +274,7 @@
         if (!confirm("Bạn muốn xóa Thông tin: " + noiDung)) return;
 
         $.ajax({
-            url: '/DangKyKhoaThe_NT/Delete',
+            url: '/TheXeCoDong_NT/Delete',
             type: 'POST',
             data: { maDon: maDon },
             success: function (res) {
@@ -386,6 +364,7 @@
         url: '@Url.Action("Delete", "DangKyKhoaThe_NT", new { area = "TagSign" })',
         type: 'POST',
         data: {
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
             maDon: maDon
         },
         success: function (res) {

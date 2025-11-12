@@ -13,6 +13,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string TenNhaThau { get; set; }
         public int BP_XuLy_ID { get; set; }
         public int? TinhTrang { get; set; }
+        public string GhiChu { get; set; }
         public DateTime? NgayTao { get; set; }
     }
     public class KTNT_ChiTietVM
@@ -65,7 +66,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string NoiDung { get; set; }
         public int? NhaThau_ID { get; set; }
         public string TenNhaThau { get; set; }
-        public int? TinhTrang_ID { get; set; }
+        public int? TinhTrang { get; set; }
         public int? BP_XuLy_ID { get; set; }
         public string UserNameLogin { get; set; }
         public DateTime? NgayTao_Don { get; set; }
@@ -80,5 +81,8 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string PT_BienKiemSoat { get; set; }
         public string GhiChu { get; set; }
         public DateTime? NgayTao { get; set; }
+
+        public string ChuKy { get; set; }
+
     }
 }
