@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model EPORTAL.ModelsView360.KhaiBao_ThongTinCuTru
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Chi tiết Thông tin cư trú
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-bold">
+                    Thông tin nơi thường trú
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tỉnh/Thành phố</label>
+                            <div class="form-control-plaintext">@Model.TinhThuongTru</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Xã/Phường</label>
+                            <div class="form-control-plaintext">@Model.XaPhuongThuongTru</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">Xóm / Số nhà</label>
+                            <div class="form-control-plaintext">@Model.SoNhaThuongTru</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">Thôn / Phố</label>
+                            <div class="form-control-plaintext">@Model.ThonPhoThuongTru</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-bold">
+                    Thông tin nơi ở hiện tại
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tỉnh/Thành phố</label>
+                            <div class="form-control-plaintext">@Model.TinhHienTai</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Xã/Phường</label>
+                            <div class="form-control-plaintext">@Model.XaPhuongHienTai</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">Xóm / Số nhà</label>
+                            <div class="form-control-plaintext">@Model.SoNhaHienTai</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">Thôn / Phố</label>
+                            <div class="form-control-plaintext">@Model.ThonPhoHienTai</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+            <div class="text-center">
+                <a href="@Url.Action("Index", "Residency")"  class="btn btn-primary mt-3">
+                    <i class="bi bi-journal-text"></i>Khai báo lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item web_name">
+                        <span>Công ty cổ phần thép Hòa Phát Dung Quất</span>
+                    </div>
+
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+

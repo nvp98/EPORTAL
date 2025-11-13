@@ -1,0 +1,105 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model EPORTAL.ModelsView360.KhaiBao_CauHinh
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    table {
+        background: #fff;
+    }
+
+    th {
+        vertical-align: middle !important;
+    }
+
+    td {
+        vertical-align: top !important;
+    }
+
+    .table thead th {
+        background-color: #1d4c90;
+        color: white;
+    }
+
+    textarea.form-control {
+        min-height: 70px;
+        resize: vertical;
+    }
+
+    .score-input {
+        width: 80px;
+        text-align: center;
+    }
+
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        background-color: #0d6efd;
+    }
+</style>
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Cập nhật Thông tin cư trú
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+
+            <div class="d-flex align-items-center mb-3">
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ngày đến hạn khai báo</label>
+                        <input type="date" name="NgayDenHan" class="form-control"
+                               value="@(Model.NgayDenHan?.ToString("yyyy-MM-dd"))" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Cập nhật
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item web_name">
+                        <span>Công ty cổ phần thép Hòa Phát Dung Quất</span>
+                    </div>
+
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

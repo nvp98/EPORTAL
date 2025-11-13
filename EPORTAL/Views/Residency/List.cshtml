@@ -1,0 +1,217 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model IEnumerable<EPORTAL.ModelsResidency.ResidencyViewModel>
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    table {
+        background: #fff;
+    }
+
+    th {
+        vertical-align: middle !important;
+    }
+
+    td {
+        vertical-align: top !important;
+    }
+
+    .table thead th {
+        background-color: #1d4c90;
+        color: white;
+    }
+
+    textarea.form-control {
+        min-height: 70px;
+        resize: vertical;
+    }
+
+    .score-input {
+        width: 80px;
+        text-align: center;
+    }
+
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        background-color: #0d6efd;
+    }
+</style>
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Danh sách khai báo Thông tin cư trú
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="col-md-6 col-lg-6">
+                <div class="d-flex align-items-center mb-3">
+                    <form method="get" action="/Residency/List" class="d-flex align-items-center me-2 mb-0">
+                        <input type="text" name="search" value="@ViewBag.Search"
+                               class="form-control me-2"
+                               placeholder="Tìm theo tên hoặc mã NV" />
+                        <button type="submit" class="btn btn-primary d-flex align-items-center">
+                            <i class="bi bi-search me-1"></i> Tìm
+                        </button>
+                    </form>
+
+                    <a href="@Url.Action("ExportToExcel", "Residency", new { search = ViewBag.Search })"
+                       class="btn btn-success d-flex align-items-center">
+                        <i class="bi bi-file-earmark-excel me-1"></i> Xuất Excel
+                    </a>
+                </div>
+            </div>
+
+            <table class="table table-bordered align-middle">
+                <thead class="sticky-top text-center">
+                    <tr>
+                        <th rowspan="2">#</th>
+                        <th rowspan="2">Họ và tên</th>
+                        <th rowspan="2">Vị trí công việc</th>
+                        <th rowspan="2">Đơn vị</th>
+                        <th colspan="4">Hộ khẩu thường trú</th>
+                        <th colspan="4">Nơi ở hiện tại</th>
+                    </tr>
+                    <tr>
+                        <th>Tỉnh/Thành</th>
+                        <th>Xã/Phường</th>
+                        <th>Xóm / Số nhà</th>
+                        <th>Thôn / Phố</th>
+
+                        <th>Tỉnh/Thành</th>
+                        <th>Xã/Phường</th>
+                        <th>Xóm / Số nhà</th>
+                        <th>Thôn / Phố</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="12" class="text-center text-muted">Không có dữ liệu</td></tr>
+                    }
+                    else
+                    {
+                        int index = (ViewBag.CurrentPage - 1) * 50 + 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center">@index</td>
+                                <td>@item.EmployeeName - @item.MaNhanVien</td>
+                                <td>@item.TenViTri</td>
+                                <td>@item.TenPhongBan</td>
+
+                                @if (item.IsChange == false)
+                                {
+                                    <td colspan="8" class="text-center">
+                                        Không thay đổi so với app nhân sự
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>@item.PermanentProvinceName</td>
+                                    <td>@item.PermanentCommuneName</td>
+                                    <td>@item.PermanentAddress01</td>
+                                    <td>@item.PermanentAddress02</td>
+
+                                    <td>@item.CurrentProvinceName</td>
+                                    <td>@item.CurrentCommuneName</td>
+                                    <td>@item.CurrentAddress01</td>
+                                    <td>@item.CurrentAddress02</td>
+                                }
+                            </tr>
+                            index++;
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+            @{
+                int currentPage = ViewBag.CurrentPage;
+                int totalPages = ViewBag.TotalPages;
+                string search = ViewBag.Search ?? "";
+
+                int startPage = Math.Max(1, currentPage - 2);
+                int endPage = Math.Min(totalPages, currentPage + 2);
+            }
+
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center">
+
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=1&search=@search" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage - 1)&search=@search" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="?page=@i&search=@search">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@(currentPage + 1)&search=@search" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="?page=@totalPages&search=@search" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+        </div>
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item web_name">
+                        <span>Công ty cổ phần thép Hòa Phát Dung Quất</span>
+                    </div>
+
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

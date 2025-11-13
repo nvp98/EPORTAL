@@ -1,0 +1,377 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model EPORTAL.ModelsResidency.ResidencyViewModel
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
+                        </i>
+                    </div>
+                    <div>
+                        Cập nhật Thông tin cư trú
+                        <div class="page-title-subheading">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-content">
+            @if (ViewBag.HetHan == true)
+            {
+                <div class="alert alert-danger text-center">
+                    <h5>Đã qua thời hạn khai báo.</h5>
+                </div>
+            }
+            else
+            {
+                if (ViewBag.NgayDenHan != null)
+                {
+                    <strong class="bg-light text-danger">Hạn khai báo: Hết ngày @(((DateTime)ViewBag.NgayDenHan).ToString("dd/MM/yyyy"))</strong>
+                }
+                <div class="card mb-4 p-3">
+                    <label class="fw-bold d-block mb-2">Tình trạng khai báo:</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="changeOption" id="noChange" value="nochange" checked>
+                        <label class="form-check-label fw-bold text-secondary" for="noChange">
+                            Không thay đổi thông tin so với app nhân sự
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="changeOption" id="change" value="change">
+                        <label class="form-check-label fw-bold" for="change">
+                            Thay đổi thông tin so với app nhân sự
+                        </label>
+                    </div>
+                </div>
+                <form id="formResidency" onsubmit="return validateAndSave(event)">
+                    <div id="residencyFormSection">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light fw-bold">
+                                Thông tin nơi thường trú
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="provincePermanent" class="form-label fw-bold">Tỉnh/Thành phố</label>
+                                        <select id="provincePermanent" class="form-control">
+                                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                                            @foreach (var p in Model.Provinces)
+                                            {
+                                                <option value="@p.code">@p.name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="communePermanent" class="form-label fw-bold">Xã/Phường</label>
+                                        <select id="communePermanent" class="form-control">
+                                            <option value="">-- Chọn xã/phường --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="addressPermanent01" class="form-label fw-bold">Xóm / Số nhà</label>
+                                        <input type="text" id="addressPermanent01" class="form-control" 
+                                               placeholder="Nhập Xóm / Số nhà ở nơi thường trú" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="addressPermanent02" class="form-label fw-bold">Thôn / Phố</label>
+                                        <input type="text" id="addressPermanent02" class="form-control" 
+                                               placeholder="Nhập Thôn / Phố ở nơi thường trú" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light fw-bold">
+                                Thông tin nơi ở hiện tại
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="provinceCurrent" class="form-label fw-bold">Tỉnh/Thành phố</label>
+                                        <select id="provinceCurrent" class="form-control">
+                                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                                            @foreach (var p in Model.Provinces)
+                                            {
+                                                <option value="@p.code">@p.name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="communeCurrent" class="form-label fw-bold">Xã/Phường</label>
+                                        <select id="communeCurrent" class="form-control">
+                                            <option value="">-- Chọn xã/phường --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="addressCurrent01" class="form-label fw-bold">Xóm / Số nhà</label>
+                                        <input type="text" id="addressCurrent01" class="form-control" 
+                                               placeholder="Nhập Xóm / Số nhà hiện tại" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="addressCurrent02" class="form-label fw-bold">Thôn / Phố</label>
+                                        <input type="text" id="addressCurrent02" class="form-control" 
+                                               placeholder="Nhập Thôn / Phố hiện tại" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Lưu thông tin
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+                <div class="footer_content d-flex justify-content-between">
+                    <div class="footer_item web_name">
+                        <span>Công ty cổ phần thép Hòa Phát Dung Quất</span>
+                    </div>
+
+                    <div class="footer_item_copy d-flex">
+                        <span class="copyright">Copyright</span>
+                        <ul class="copyright_ul">
+                            <li>Ban công nghệ thông tin</li>
+                            <li>Hòa Phát Dung Quất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function validateAndSave(e) {
+        e.preventDefault();
+
+        const form = $("#formResidency")[0];
+        const changeOption = $('input[name="changeOption"]:checked').val();
+
+        if (changeOption === "nochange") {
+            
+        } else {
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
+            // Validate input
+            const requiredAddressFields = [
+                { id: '#addressPermanent01', label: 'Xóm / Số nhà ở nơi thường trú' },
+                { id: '#addressPermanent02', label: 'Thôn / Phố ở nơi thường trú' },
+                { id: '#addressCurrent01', label: 'Nhập Xóm / Số nhà hiện tại' },
+                { id: '#addressCurrent02', label: 'Nhập Thôn / Phố hiện tại' }
+            ];
+
+            for (const field of requiredAddressFields) {
+                const $el = $(field.id);
+                if (!$el.val() || $el.val().trim() === "") {
+                    alert('Vui lòng nhập ' + field.label + '.');
+                    $el.focus();
+                    return false;
+                }
+            }
+
+            function checkSelect(selector, message) {
+                var $sel = $(selector);
+                var val = $sel.val();
+                if (!val || val === "") {
+                    var $chosen = $sel.next('.chosen-container');
+                    if ($chosen.length) {
+                        var $searchInput = $chosen.find('input');
+                        if ($searchInput.length) {
+                            $searchInput.focus();
+                        } else {
+                            $chosen.focus();
+                        }
+                    } else {
+                        $sel.focus();
+                    }
+                    alert('Vui lòng chọn ' + message + '.');
+                    return false;
+                }
+                return true;
+            }
+
+            if (!checkSelect('#provincePermanent', 'Tỉnh/Thành phố nơi thường trú')) return false;
+            if (!checkSelect('#communePermanent', 'Xã/Phường nơi thường trú')) return false;
+            if (!checkSelect('#provinceCurrent', 'Tỉnh/Thành phố nơi ở hiện tại')) return false;
+            if (!checkSelect('#communeCurrent', 'Xã/Phường nơi ở hiện tại')) return false;
+        }
+
+        // Data
+        var data = {
+            ChangeOption: changeOption,
+            PermanentProvinceCode: $('#provincePermanent').val(),
+            PermanentProvinceName: $('#provincePermanent option:selected').text(),
+            PermanentCommuneCode: $('#communePermanent').val(),
+            PermanentCommuneName: $('#communePermanent option:selected').text(),
+            PermanentAddress01: $('#addressPermanent01').val(),
+            PermanentAddress02: $('#addressPermanent02').val(),
+            CurrentProvinceCode: $('#provinceCurrent').val(),
+            CurrentProvinceName: $('#provinceCurrent option:selected').text(),
+            CurrentCommuneCode: $('#communeCurrent').val(),
+            CurrentCommuneName: $('#communeCurrent option:selected').text(),
+            CurrentAddress01: $('#addressCurrent01').val(),
+            CurrentAddress02: $('#addressCurrent02').val()
+        };
+
+        $.ajax({
+            url: '/Residency/Save',
+            type: 'POST',
+            data: data,
+            success: function (res) {
+                if (res.ok) {
+                    alert(res.message);
+                    if (res.redirectUrl) {
+                        window.location.href = res.redirectUrl;
+                    } else {
+                        window.location.href = "/Residency/Details";
+                    }
+                } else {
+                    alert('Không lưu được: ' + res.message);
+                }
+            },
+            error: function () {
+                alert('Có lỗi khi gửi yêu cầu.');
+            }
+        });
+
+        return false;
+    }
+
+    $(document).ready(function () {
+
+        // Radio
+        const $formSection = $('#residencyFormSection');
+        const $noChange = $('#noChange');
+        const $change = $('#change');
+
+        // Hide form
+        if ($noChange.is(':checked')) {
+            $formSection.hide();
+        }
+
+        $('input[name="changeOption"]').on('change', function () {
+            if ($change.is(':checked')) {
+                $formSection.slideDown(200);
+            } else {
+                $formSection.slideUp(200);
+            }
+        });
+
+        let PermanentProvinceName = "";
+        let PermanentCommuneName = "";
+        let CurrentProvinceName = "";
+        let CurrentCommuneName = "";
+
+        $('#provincePermanent').on('change', function () {
+            var provinceCode = $(this).val();
+            var provinceText = $('#provincePermanent option:selected').text();
+            PermanentProvinceName = provinceText !== "-- Chọn tỉnh/thành phố --" ? provinceText : "";
+
+            var communeSelect = $('#communePermanent');
+            communeSelect.prop('disabled', true).empty().append('<option>Đang tải...</option>');
+
+            if (provinceCode) {
+                $.getJSON(`/Residency/GetCommunes?provinceId=${provinceCode}`, function (res) {
+                    communeSelect.empty().append('<option value="">-- Chọn xã/phường --</option>');
+                    $.each(res.data, function (i, c) {
+                        communeSelect.append(`<option value="${c.code}">${c.name}</option>`);
+                    });
+                    communeSelect.prop('disabled', false);
+
+                    if (communeSelect.data('chosen')) {
+                        communeSelect.trigger("chosen:updated");
+                    } else {
+                        communeSelect.chosen({ width: "100%" });
+                    }
+
+                    PermanentCommuneName = "";
+                });
+            } else {
+                communeSelect.empty().append('<option value="">-- Chọn xã/phường --</option>');
+                if (communeSelect.data('chosen')) {
+                    communeSelect.trigger("chosen:updated");
+                }
+                PermanentCommuneName = "";
+            }
+        });
+
+        $('#communePermanent').on('change', function () {
+            var communeText = $('#communePermanent option:selected').text();
+            PermanentCommuneName = communeText !== "-- Chọn xã/phường --" ? communeText : "";
+        });
+
+        $('#provinceCurrent').on('change', function () {
+            var provinceCode = $(this).val();
+            var provinceText = $('#provinceCurrent option:selected').text();
+            CurrentProvinceName = provinceText !== "-- Chọn tỉnh/thành phố --" ? provinceText : "";
+
+            var communeSelect = $('#communeCurrent');
+            communeSelect.prop('disabled', true).empty().append('<option>Đang tải...</option>');
+
+            if (provinceCode) {
+                $.getJSON(`/Residency/GetCommunes?provinceId=${provinceCode}`, function (res) {
+                    communeSelect.empty().append('<option value="">-- Chọn xã/phường --</option>');
+                    $.each(res.data, function (i, c) {
+                        communeSelect.append(`<option value="${c.code}">${c.name}</option>`);
+                    });
+                    communeSelect.prop('disabled', false);
+
+                    if (communeSelect.data('chosen')) {
+                        communeSelect.trigger("chosen:updated");
+                    } else {
+                        communeSelect.chosen({ width: "100%" });
+                    }
+
+                    CurrentCommuneName = "";
+                });
+            } else {
+                communeSelect.empty().append('<option value="">-- Chọn xã/phường --</option>');
+                if (communeSelect.data('chosen')) {
+                    communeSelect.trigger("chosen:updated");
+                }
+                CurrentCommuneName = "";
+            }
+        });
+
+        $('#communeCurrent').on('change', function () {
+            var communeText = $('#communeCurrent option:selected').text();
+            CurrentCommuneName = communeText !== "-- Chọn xã/phường --" ? communeText : "";
+        });
+    });
+</script>
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<script type="text/javascript">
+
+    $("#provincePermanent, #provinceCurrent, #communePermanent, #communeCurrent").chosen({
+        width: "100%"
+    });
+
+</script>
+
+

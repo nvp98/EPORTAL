@@ -350,14 +350,14 @@
                                     Đăng ký
                                 </a>
                             </li>
-                           
-                            @*<li>
-                                <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
-                                    <i class="metismenu-icon fa-solid fa-list-ol"></i>
-                                    Khai báo thông tin Vợ/Chồng, Con
-                                </a>
 
-                            </li>*@
+                            @*<li>
+            <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
+                <i class="metismenu-icon fa-solid fa-list-ol"></i>
+                Khai báo thông tin Vợ/Chồng, Con
+            </a>
+
+        </li>*@
                             @if (listControll.Contains("FamilyDeclaration"))
                             {
                                 <li>
@@ -369,7 +369,36 @@
                                 </li>
                             }
 
-
+                            <li>
+                                <a href="#" id="QTNT">
+                                    <i class="metismenu-icon  fa fa-cogs"></i>
+                                    Thông tin cư trú
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                                <ul id="listqtnt">
+                                    <li>
+                                        <a id="Gate" href="@Url.Action("Details", "Residency", new { area = "" })">
+                                            <i class="fa fa-user-plus p-lg-1"></i>
+                                            Khai báo thông tin
+                                        </a>
+                                    </li>
+                                    @if (listControll.Contains("Residency"))
+                                    {
+                                        <li>
+                                            <a id="DelegationPowers" href="@Url.Action("List", "Residency", new { area = "" })">
+                                                <i class="fa fa-list p-lg-1"></i>
+                                                Danh sách khai báo
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a id="DelegationPowers" href="@Url.Action("Deadline", "Residency", new { area = "" })">
+                                                <i class="fa fa-calendar p-lg-1"></i>
+                                                Đặt thời hạn khai báo
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
 
                             <li class="app-sidebar__heading">DANH BẠ-ĐỐI TÁC</li>
                             <li>
