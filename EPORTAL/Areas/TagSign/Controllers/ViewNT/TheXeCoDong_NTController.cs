@@ -613,7 +613,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     var Business_Partner = Models.MyAuthentication.Username;
                     var thangNam = DateTime.Now.ToString("yyyyMMdd");
 
-                    var prefix = $"{Business_Partner}_XCĐ{thangNam}-";
+                    var prefix = $"{Business_Partner}_XCD{thangNam}-";
 
                     var lastMaDon = db_dk.CDNT_DonDangKy
                         .Where(x => x.Ma_Don.StartsWith(prefix))

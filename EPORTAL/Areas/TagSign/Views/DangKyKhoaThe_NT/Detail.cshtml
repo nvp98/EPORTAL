@@ -93,7 +93,19 @@ else
                                                     <td class="text-center">@(++stt)</td>
                                                     <td>@d.TN_HoTen</td>
                                                     <td>@d.TN_CCCD_HoChieu</td>
-                                                    <td>@d.TX_LoaiXeCoDong</td>
+                                                    @*<td>@d.TX_LoaiXeCoDong</td>*@
+                                                    <td>
+                                                        @{
+                                                            int loaiXeId = 0;
+                                                            int.TryParse(d.TX_LoaiXeCoDong, out loaiXeId);
+
+                                                            string loaiXe = loaiXeId == 1 ? "XE MÁY"
+                                                                          : loaiXeId == 2 ? "XE BA GÁC"
+                                                                          : loaiXeId == 3 ? "XE Ô TÔ"
+                                                                          : "KHÁC";
+                                                        }
+                                                        @loaiXe
+                                                    </td>
                                                     <td>@d.TX_BienKiemSoat</td>
                                                     <td>@d.PT_LoaiPhuongTien</td>
                                                     <td>@d.PT_BienKiemSoat</td>
