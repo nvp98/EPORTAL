@@ -226,7 +226,7 @@
           <Property Name="MaDon" Type="nvarchar" MaxLength="50" />
           <Property Name="TN_HoTen" Type="nvarchar" MaxLength="50" />
           <Property Name="TN_CCCD_HoChieu" Type="varchar" MaxLength="50" />
-          <Property Name="TX_LoaiXeCoDong" Type="nvarchar" MaxLength="50" />
+          <Property Name="TX_LoaiXeCoDong" Type="int" />
           <Property Name="TX_BienKiemSoat" Type="nvarchar" MaxLength="50" />
           <Property Name="PT_LoaiPhuongTien" Type="nvarchar" MaxLength="50" />
           <Property Name="PT_BienKiemSoat" Type="nvarchar" MaxLength="50" />
@@ -1416,8 +1416,8 @@
           <FunctionImport Name="CNDT_GetDinhBienPhuongTien_All" ReturnType="Collection(EPORTAL_REGISTERModel.CNDT_GetDinhBienPhuongTien_All_Result)">
           <Parameter Name="p_NhaThauID" Mode="In" Type="Int32" />
           </FunctionImport>
-          <EntitySet Name="KTNT_ChiTiet" EntityType="EPORTAL_REGISTERModel.KTNT_ChiTiet" />
           <EntitySet Name="KTNT_DonDangKy" EntityType="EPORTAL_REGISTERModel.KTNT_DonDangKy" />
+          <EntitySet Name="KTNT_ChiTiet" EntityType="EPORTAL_REGISTERModel.KTNT_ChiTiet" />
         </EntityContainer>
         <ComplexType Name="CDNT_ChiTietDon_Search_Result">
           <Property Type="Int32" Name="ID" Nullable="false" />
@@ -1602,21 +1602,6 @@
           <Property Type="Int32" Name="DinhBienXinThem_XeMay" Nullable="false" />
           <Property Type="Int32" Name="DinhBienXinThem_Xe3Gac" Nullable="false" />
         </ComplexType>
-        <EntityType Name="KTNT_ChiTiet">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="MaDon" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="TN_HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="TN_CCCD_HoChieu" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="TX_LoaiXeCoDong" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="TX_BienKiemSoat" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="PT_LoaiPhuongTien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="PT_BienKiemSoat" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="NgayTao" Type="DateTime" Precision="3" />
-        </EntityType>
         <EntityType Name="KTNT_DonDangKy">
           <Key>
             <PropertyRef Name="ID" />
@@ -1630,6 +1615,21 @@
           <Property Name="UserNameLogin" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="BP_XuLy_ID" Type="Int32" />
           <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="KTNT_ChiTiet">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaDon" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TN_HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TN_CCCD_HoChieu" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TX_LoaiXeCoDong" Type="Int32" />
+          <Property Name="TX_BienKiemSoat" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="PT_LoaiPhuongTien" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="PT_BienKiemSoat" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GhiChu" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="NgayTao" Type="DateTime" Precision="3" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2170,6 +2170,21 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="KTNT_DonDangKy">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.KTNT_DonDangKy">
+              <MappingFragment StoreEntitySet="KTNT_DonDangKy">
+                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
+                <ScalarProperty Name="BP_XuLy_ID" ColumnName="BP_XuLy_ID" />
+                <ScalarProperty Name="UserNameLogin" ColumnName="UserNameLogin" />
+                <ScalarProperty Name="NgayTao" ColumnName="NgayTao" />
+                <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
+                <ScalarProperty Name="ID_NhaThau" ColumnName="ID_NhaThau" />
+                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
+                <ScalarProperty Name="MaDon" ColumnName="MaDon" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="KTNT_ChiTiet">
             <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.KTNT_ChiTiet">
               <MappingFragment StoreEntitySet="KTNT_ChiTiet">
@@ -2181,21 +2196,6 @@
                 <ScalarProperty Name="TX_LoaiXeCoDong" ColumnName="TX_LoaiXeCoDong" />
                 <ScalarProperty Name="TN_CCCD_HoChieu" ColumnName="TN_CCCD_HoChieu" />
                 <ScalarProperty Name="TN_HoTen" ColumnName="TN_HoTen" />
-                <ScalarProperty Name="MaDon" ColumnName="MaDon" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="KTNT_DonDangKy">
-            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.KTNT_DonDangKy">
-              <MappingFragment StoreEntitySet="KTNT_DonDangKy">
-                <ScalarProperty Name="GhiChu" ColumnName="GhiChu" />
-                <ScalarProperty Name="BP_XuLy_ID" ColumnName="BP_XuLy_ID" />
-                <ScalarProperty Name="UserNameLogin" ColumnName="UserNameLogin" />
-                <ScalarProperty Name="NgayTao" ColumnName="NgayTao" />
-                <ScalarProperty Name="TinhTrang" ColumnName="TinhTrang" />
-                <ScalarProperty Name="ID_NhaThau" ColumnName="ID_NhaThau" />
-                <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
                 <ScalarProperty Name="MaDon" ColumnName="MaDon" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>

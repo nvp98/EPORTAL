@@ -344,6 +344,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         //        return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
         //    }
         //}
+ 
         public ActionResult Update(string id)
         {
             if (string.IsNullOrEmpty(id)) return HttpNotFound();
@@ -453,12 +454,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     db_dk.KTNT_ChiTiet.Add(new KTNT_ChiTiet
                     {
                         MaDon = model.MaDon,
-                        TN_HoTen = item.TN_HoTen,
-                        TN_CCCD_HoChieu = item.TN_CCCD_HoChieu,
-                        TX_LoaiXeCoDong = item.TX_LoaiXeCoDong,           // 1/2/3
-                        TX_BienKiemSoat = item.TX_BienKiemSoat,
-                        PT_LoaiPhuongTien = item.PT_LoaiPhuongTien,
-                        PT_BienKiemSoat = item.PT_BienKiemSoat,
+                        TN_HoTen = (item.TN_HoTen ?? "").Trim(),
+                        TN_CCCD_HoChieu = (item.TN_CCCD_HoChieu ?? "").Trim(),
+                        TX_LoaiXeCoDong = item.TX_LoaiXeCoDong,
+                        TX_BienKiemSoat = (item.TX_BienKiemSoat ?? "").Trim(),
+                        PT_LoaiPhuongTien = (item.PT_LoaiPhuongTien ?? "").Trim(),
+                        PT_BienKiemSoat = (item.PT_BienKiemSoat ?? "").Trim(),
                         GhiChu = item.GhiChu,
                         NgayTao = DateTime.Now
                     });
@@ -645,7 +646,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             int pageNumber = page ?? 1;
             int pageSize = 10;
-           // var userNameLogin = Models.MyAuthentication.Username;
+            // var userNameLogin = Models.MyAuthentication.Username;
+            int userId = Models.MyAuthentication.ID;
 
             var data = db_dk.Database.SqlQuery<DonDangKyKhoaTheViewModel>(
                "EXEC KTNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
@@ -655,7 +657,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
            ).ToList();
 
             var filtered = data
-                .Where(d => d.TinhTrang == (int)TinhTrangDonDangKyKhoaThe.ChoXuLy)
+                .Where(d => d.TinhTrang == (int)TinhTrangDonDangKyKhoaThe.ChoXuLy && d.BP_XuLy_ID == userId) 
                 .ToList();
 
             var pagedData = filtered.ToPagedList(pageNumber, pageSize);
@@ -875,13 +877,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                 var results = list.Select(nv =>
                 {
-                    var idValue = nv.CCCD ?? nv.CMND ?? ""; // ưu tiên CCCD, nếu trống fallback CMND
+                    var idValue = nv.CCCD ?? nv.CMND ?? "";
                     return new
                     {
-                        id = idValue,                                   // Select2 value
-                        text = 
-                               idValue,
-                               
+                        id = idValue,                                   
+                        text = idValue,                              
                         hoTen = nv.HoTen ?? ""
                     };
                 });

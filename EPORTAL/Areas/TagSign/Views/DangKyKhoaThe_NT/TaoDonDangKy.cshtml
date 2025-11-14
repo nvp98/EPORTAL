@@ -214,6 +214,10 @@
                     $(this).find("td:first").text(rowIndex);
                 });
             }
+            function getSafe(element) {
+                let v = element.val();
+                return v ? v.trim() : "";
+            }
 
             // ====== Gửi form bằng AJAX ======
             $("form").submit(function (e) {
@@ -223,13 +227,13 @@
                 $("#tbodyChiTiet tr").each(function () {
                     const row = $(this);
                     const data = {
-                        TN_HoTen: row.find("input[name*='TN_HoTen']").val(),
-                        TN_CCCD_HoChieu: row.find("select[name*='TN_CCCD_HoChieu']").val(),
-                        TX_LoaiXeCoDong: row.find("select[name*='TX_LoaiXeCoDong']").val(),
-                        TX_BienKiemSoat: row.find("select[name*='TX_BienKiemSoat']").val(),
-                        PT_LoaiPhuongTien: row.find("input[name*='PT_LoaiPhuongTien']").val(),
-                        PT_BienKiemSoat: row.find("input[name*='PT_BienKiemSoat']").val(),
-                        GhiChu: row.find("input[name*='GhiChu']").val()
+                        TN_HoTen: getSafe(row.find("input[name*='TN_HoTen']")),
+                        TN_CCCD_HoChieu: getSafe(row.find("select[name*='TN_CCCD_HoChieu']")),
+                        TX_LoaiXeCoDong: row.find("select[name*='TX_LoaiXeCoDong']").val() || 0,
+                        TX_BienKiemSoat: getSafe(row.find("select[name*='TX_BienKiemSoat']")),
+                        PT_LoaiPhuongTien: getSafe(row.find("input[name*='PT_LoaiPhuongTien']")),
+                        PT_BienKiemSoat: getSafe(row.find("input[name*='PT_BienKiemSoat']")),
+                        GhiChu: getSafe(row.find("input[name*='GhiChu']"))
                     };
                     chiTietList.push(data);
                 });

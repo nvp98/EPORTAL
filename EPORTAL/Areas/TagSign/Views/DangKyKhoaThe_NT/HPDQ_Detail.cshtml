@@ -104,7 +104,13 @@ else
                                                     <td class="text-center">@(++stt)</td>
                                                     <td>@d.TN_HoTen</td>
                                                     <td>@d.TN_CCCD_HoChieu</td>
-                                                    <td>@d.TX_LoaiXeCoDong</td>
+                                                    <td>
+                                                    @(d.TX_LoaiXeCoDong == 1 ? "XE MÁY"
+                                                        : d.TX_LoaiXeCoDong ==2 ? "XE BA GÁC"
+                                                        : d.TX_LoaiXeCoDong ==3 ? "XE Ô TÔ"
+                                                        : ""
+                                                        )                                                   
+                                                    </td>
                                                     <td>@d.TX_BienKiemSoat</td>
                                                     <td>@d.PT_LoaiPhuongTien</td>
                                                     <td>@d.PT_BienKiemSoat</td>
