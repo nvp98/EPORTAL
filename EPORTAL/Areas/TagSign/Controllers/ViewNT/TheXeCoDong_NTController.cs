@@ -1432,7 +1432,17 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                 foreach (var xe in dsXe)
                 {
-                    xe.TrangThaiDuyet_ID = bienSoBiTuChoi.Contains(xe.BienSoXe) ? 2 : 1;
+                    // xe.TrangThaiDuyet_ID = bienSoBiTuChoi.Contains(xe.BienSoXe) ? 2 : 1;
+                    var bs = (xe.BienSoXe ?? "").Trim().ToUpper();
+                    if (bienSoBiTuChoi.Contains(bs))
+                    {
+                        xe.TrangThaiDuyet_ID = 2; // Từ chối
+                    }
+                    else
+                    {
+                        xe.TrangThaiDuyet_ID = 1; // Được duyệt
+                        xe.TTHD = 1;              // YÊU CẦU MỚI: đánh dấu hoạt động = 1 khi xe được duyệt
+                    }
                 }
             }
             else
