@@ -1,0 +1,527 @@
+﻿@using EPORTAL.ModelsTagSign.TheXeCoDongVM
+@model TaoDonDangKyViewModel
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+@{
+    ViewBag.Title = "Cập nhật đơn đăng ký";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    <div class="alert alert-success mt-2">@Html.Raw(TempData["msgSuccess"])</div>
+}
+@if (TempData["msgError"] != null)
+{
+    <div class="alert alert-danger mt-2">@Html.Raw(TempData["msgError"])</div>
+}
+
+@using (Html.BeginForm("Update", "DangKyKhoaThe_NT", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmUpdate" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MaDon)
+    @Html.HiddenFor(m => m.ID_NhaThau)
+
+    <div class="app-main__outer" style="margin-top:-4%;">
+        <div class="app-main__inner" style="display:block;padding-bottom:0;">
+            <div class="row">
+                <div class="card">
+                    <div style="padding:15px 20px 50px 20px;">
+                        <div class="row" style="width:100%;">
+                            <div class="col-md-12 col-lg-12" style="padding-top:1%;">
+                                <h6 style="color:red;"><b>CẬP NHẬT ĐƠN ĐĂNG KÝ</b></h6>
+                            </div>
+
+                            <table class="table table-bordered table-hover" width="100%">
+                                <thead>
+                                    <tr style="background-color:#f8f9fa;">
+                                        <th class="text-center" width="25%">Mã đơn</th>
+                                        <th class="text-center" width="75%">Nội dung trích yếu <span style="color:red;">(*)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control" value="@Model.MaDon" readonly /></td>
+                                        <td>
+                                            @Html.TextAreaFor(m => m.NoiDung, 3, 50, new { @class = "form-control", placeholder = "Nhập nội dung tóm tắt...", autocomplete = "off" })
+                                            @Html.ValidationMessageFor(m => m.NoiDung, "", new { @class = "text-danger" })
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table table-bordered table-hover" width="100%">
+                                <thead>
+                                    <tr style="background-color:#f8f9fa;">
+                                        <th class="text-center" width="50%">Nhà thầu</th>
+                                        <th class="text-center" width="50%">Tổ cấp phát thẻ (BP xử lý)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly /></td>
+                                        <td>
+                                            @Html.DropDownListFor(m => m.BP_XuLy_ID,
+                                                (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()),
+                                                "--Chọn tổ cấp phát thẻ--",
+                                                new { @class = "form-control" })
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12" style="padding-top:1%;">
+                            <h6 style="color:red;"><b>DANH SÁCH CHI TIẾT</b></h6>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="tblChiTiet" width="100%">
+                                <thead>
+                                    <tr style="background-color:#f8f9fa;">
+                                        <th rowspan="2" class="text-center align-middle" style="width:55px;">STT</th>
+                                        <th colspan="2" class="text-center">Thẻ người</th>
+                                        <th colspan="2" class="text-center">Thẻ xe cơ động</th>
+                                        <th colspan="2" class="text-center">Thẻ phương tiện</th>
+                                        <th rowspan="2" class="text-center align-middle" style="width:160px;">Ghi chú</th>
+                                        <th rowspan="2" class="text-center align-middle" style="width:70px;">Xóa</th>
+                                    </tr>
+                                    <tr style="background-color:#f8f9fa;">
+                                        <th class="text-center">Họ và tên</th>
+                                        <th class="text-center">CCCD/Hộ chiếu</th>
+                                        <th class="text-center">Loại xe cơ động</th>
+                                        <th class="text-center">Biển kiểm soát</th>
+                                        <th class="text-center">Loại phương tiện</th>
+                                        <th class="text-center">Biển kiểm soát - Số khung</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyChiTiet">
+                                    @if (Model.ChiTiet != null && Model.ChiTiet.Count > 0)
+                                    {
+                                        for (int i = 0; i < Model.ChiTiet.Count; i++)
+                                        {
+                                            var cccdVal = Model.ChiTiet[i].TN_CCCD_HoChieu ?? "";
+                                            var bksVal = Model.ChiTiet[i].TX_BienKiemSoat ?? "";
+                                            var loaiXeVal = Model.ChiTiet[i].TX_LoaiXeCoDong;
+                                            <tr>
+                                                <td class="text-center">@(i + 1)</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.ChiTiet[i].TN_HoTen, new { @class = "form-control", placeholder = "Nhập họ tên", autocomplete = "off" })
+                                                </td>
+                                                <td>
+                                                    <select id="cccd_@i"
+                                                            name="ChiTiet[@i].TN_CCCD_HoChieu"
+                                                            class="form-control js-cccd-select"
+                                                            data-row="@i"
+                                                            data-init-value="@cccdVal"
+                                                            autocomplete="off">
+                                                        @if (!string.IsNullOrWhiteSpace(cccdVal))
+                                                        {
+                                                            <option value="@cccdVal" selected>@cccdVal</option>
+                                                        }
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select id="loaixe_@i"
+                                                            name="ChiTiet[@i].TX_LoaiXeCoDong"
+                                                            class="form-control js-loaixe-select"
+                                                            data-row="@i"
+                                                            data-init-value="@loaiXeVal">
+                                                        <option value="">--Chọn loại--</option>
+                                                        <option value="1" @(loaiXeVal == 1 ? "selected" : "")>XE MÁY</option>
+                                                        <option value="2" @(loaiXeVal == 2 ? "selected" : "")>XE BA GÁC</option>
+                                                        <option value="3" @(loaiXeVal == 3 ? "selected" : "")>XE Ô TÔ</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select id="bks_@i"
+                                                            name="ChiTiet[@i].TX_BienKiemSoat"
+                                                            class="form-control js-bks-select"
+                                                            data-row="@i"
+                                                            data-init-value="@bksVal"
+                                                            autocomplete="off">
+                                                        @if (!string.IsNullOrWhiteSpace(bksVal))
+                                                        {
+                                                            <option value="@bksVal" selected>@bksVal</option>
+                                                        }
+                                                    </select>
+                                                </td>
+                                                <td>@Html.TextBoxFor(m => m.ChiTiet[i].PT_LoaiPhuongTien, new { @class = "form-control", placeholder = "Loại phương tiện", autocomplete = "off" })</td>
+                                                <td>@Html.TextBoxFor(m => m.ChiTiet[i].PT_BienKiemSoat, new { @class = "form-control", placeholder = "Biển kiểm soát - Số khung", autocomplete = "off" })</td>
+                                                <td>@Html.TextBoxFor(m => m.ChiTiet[i].GhiChu, new { @class = "form-control", placeholder = "Ghi chú", autocomplete = "off" })</td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-danger btn-sm btnDeleteRow">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr class="row-placeholder">
+                                            <td colspan="9" class="text-center text-muted">Chưa có chi tiết</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            <div style="margin-top:10px;">
+                                <button id="btnAddRow" type="button" class="btn btn-success">
+                                    <i class="fa fa-plus"></i> Thêm dòng
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <a class="btn btn-secondary" href="@Url.Action("Index_NT","DangKyKhoaThe_NT")">
+                                <i class="fa fa-arrow-left"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i> Lưu cập nhật
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+  // ========= Cache & Init CCCD =========
+  const cccdCacheByNT = {};
+
+  function initCCCDSelect2($el) {
+    const idNhaThau = $("#ID_NhaThau").val();
+    const initVal = $el.data('init-value');
+
+    function applySelect2(data) {
+      $el.select2({
+        width: "100%",
+        placeholder: "Chọn hoặc tìm CCCD/Hộ chiếu...",
+        allowClear: true,
+        data: data,
+        matcher: function(params, dataObj) {
+          if ($.trim(params.term) === "") return dataObj;
+          if (!dataObj || !dataObj.text) return null;
+          const term = params.term.toLowerCase();
+          const text = (dataObj.text || "").toLowerCase();
+          const id = (dataObj.id || "").toLowerCase();
+          return (text.includes(term) || id.includes(term)) ? dataObj : null;
+        }
+      });
+
+      // Sau khi tạo, set lại đúng giá trị ban đầu của riêng dòng này
+      if (initVal) {
+        // Nếu option chưa có, thêm tạm
+        if ($el.find("option[value='" + initVal + "']").length === 0) {
+          $el.append(new Option(initVal, initVal, true, true));
+        }
+        $el.val(initVal).trigger('change');
+      } else {
+        $el.val(null).trigger('change');
+      }
+    }
+
+    if (cccdCacheByNT[idNhaThau]) {
+      applySelect2(cccdCacheByNT[idNhaThau]);
+      return;
+    }
+
+    $.ajax({
+      url: '@Url.Action("GetNhanVienNTByCCCD", "DangKyKhoaThe_NT")',
+      type: 'GET',
+      dataType: 'json',
+      data: { idNT: idNhaThau, cccd: '' },
+      success: function(res) {
+        const list = (res && res.results) ? res.results : [];
+        cccdCacheByNT[idNhaThau] = list;
+        applySelect2(list);
+      },
+      error: function() {
+        applySelect2([]);
+      }
+    });
+  }
+
+  // ========= Init BKS =========
+  function initBienSoSelect2($el) {
+    const idNhaThau = $("#ID_NhaThau").val();
+    const initVal = $el.data('init-value');
+
+    $el.select2({
+      width: "100%",
+      placeholder: "Tìm biển kiểm soát...",
+      allowClear: true,
+      minimumInputLength: 0,
+      ajax: {
+        url: '@Url.Action("SearchXeByNhaThau", "DangKyKhoaThe_NT")',
+        dataType: "json",
+        delay: 250,
+        data: function(params) {
+          const $row = $el.closest("tr");
+          const loaiPhuongTienId = $row.find("select.js-loaixe-select").val();
+          return {
+            idNhaThau: idNhaThau,
+            q: params.term || "",
+            page: params.page || 1,
+            loaiPhuongTienId: loaiPhuongTienId || null
+          };
+        },
+        processResults: function(data, params) {
+          params.page = params.page || 1;
+          return {
+            results: (data.results || []).map(x => ({
+              id: x.id,
+              text: x.text,
+              loaiPhuongTienId: x.loaiPhuongTienId
+            })),
+            pagination: { more: data.pagination && data.pagination.more }
+          };
+        },
+        cache: true
+      },
+      tags: true,
+      createTag: function(params) {
+        const term = (params.term || "").trim();
+        if (term === "") return null;
+        return { id: term, text: term, newOption: true };
+      },
+      templateResult: function(data) {
+        if (data.loading) return data.text;
+        if (data.newOption) return `Thêm mới: ${data.text}`;
+        return data.text;
+      }
+    });
+
+    // Set lại giá trị ban đầu nếu có
+    if (initVal) {
+      if ($el.find("option[value='" + initVal + "']").length === 0) {
+        $el.append(new Option(initVal, initVal, true, true));
+      }
+      $el.val(initVal).trigger('change');
+    } else {
+      $el.val(null).trigger('change');
+    }
+
+    // Liên kết Loại xe thay đổi => clear BKS
+    const $loaiXe = $el.closest("tr").find("select.js-loaixe-select");
+    $loaiXe.off("change.bks").on("change.bks", function(e){
+      if (!e.originalEvent) return;
+      $el.val(null).trigger('change');
+    });
+
+    // Khi chọn BKS gán loại xe nếu API trả về
+    $el.on("select2:select", function(e){
+      const selected = e.params.data;
+      if (selected && selected.loaiPhuongTienId != null) {
+        $loaiXe.val(String(selected.loaiPhuongTienId));
+      }
+    });
+  }
+
+  // ========= Destroy tất cả Select2 (để reindex an toàn) =========
+  function destroyAllSelect2() {
+    $('#tbodyChiTiet select.js-cccd-select').each(function(){
+      if ($(this).data('select2')) $(this).select2('destroy');
+    });
+    $('#tbodyChiTiet select.js-bks-select').each(function(){
+      if ($(this).data('select2')) $(this).select2('destroy');
+    });
+  }
+
+  // ========= Reindex =========
+  function reindexRows() {
+    destroyAllSelect2(); // Hủy trước
+
+    $('#tbodyChiTiet tr').each(function(i){
+      $(this).find('td:first').text(i + 1);
+      // CCCD select
+      const $cccd = $(this).find('select.js-cccd-select');
+      if ($cccd.length) {
+        $cccd.attr('id', 'cccd_' + i);
+        const oldName = $cccd.attr('name');
+        if (oldName) {
+          $cccd.attr('name', oldName.replace(/ChiTiet\[\d+\]/, 'ChiTiet[' + i + ']'));
+        }
+        $cccd.attr('data-row', i);
+      }
+
+      // Loại xe select
+      const $lx = $(this).find('select.js-loaixe-select');
+      if ($lx.length) {
+        $lx.attr('id', 'loaixe_' + i);
+        const oldName2 = $lx.attr('name');
+        if (oldName2) {
+          $lx.attr('name', oldName2.replace(/ChiTiet\[\d+\]/, 'ChiTiet[' + i + ']'));
+        }
+        $lx.attr('data-row', i);
+      }
+
+      // BKS select
+      const $bks = $(this).find('select.js-bks-select');
+      if ($bks.length) {
+        $bks.attr('id', 'bks_' + i);
+        const oldName3 = $bks.attr('name');
+        if (oldName3) {
+          $bks.attr('name', oldName3.replace(/ChiTiet\[\d+\]/, 'ChiTiet[' + i + ']'));
+        }
+        $bks.attr('data-row', i);
+      }
+
+      // Input khác
+      $(this).find('input, textarea').each(function(){
+        const oldName = $(this).attr('name');
+        if (oldName) {
+          $(this).attr('name', oldName.replace(/ChiTiet\[\d+\]/, 'ChiTiet[' + i + ']'));
+        }
+      });
+    });
+
+    // Khởi tạo lại Select2 với đúng giá trị ban đầu (đã lưu trong data-init-value)
+    $('#tbodyChiTiet select.js-cccd-select').each(function(){ initCCCDSelect2($(this)); });
+    $('#tbodyChiTiet select.js-bks-select').each(function(){ initBienSoSelect2($(this)); });
+  }
+
+  // ========= Chống trùng CCCD & Clear họ tên =========
+  $(document).on('select2:select', 'select.js-cccd-select', function(e){
+    const $this = $(this);
+    const val = $this.val();
+    const rowIdx = $this.data('row');
+    const selected = e.params.data;
+
+    // Điền họ tên nếu có
+    if (selected && selected.hoTen) {
+      $(`#tbodyChiTiet input[name='ChiTiet[${rowIdx}].TN_HoTen']`).val(selected.hoTen);
+    }
+
+    // Clear các dòng khác trùng
+    $('select.js-cccd-select').each(function(){
+      const $other = $(this);
+      if ($other.is($this)) return;
+      if ($other.val() === val) {
+        $other.val(null).trigger('change');
+        const otherRow = $other.data('row');
+        $(`#tbodyChiTiet input[name='ChiTiet[${otherRow}].TN_HoTen']`).val('');
+      }
+    });
+  });
+
+  $(document).on('select2:clear change', 'select.js-cccd-select', function(){
+    const $el = $(this);
+    if (!$el.val()) {
+      const rowIdx = $el.data('row');
+      $(`#tbodyChiTiet input[name='ChiTiet[${rowIdx}].TN_HoTen']`).val('');
+    }
+  });
+
+  // ========= Clear search khi mở (CCCD & BKS) =========
+  $(document).on('select2:open', 'select.js-cccd-select, select.js-bks-select', function(){
+    const $search = $(".select2-container--open .select2-search__field");
+    $search.val("").trigger("input");
+  });
+
+  // ========= Khởi tạo ban đầu =========
+  $(function(){
+    $('#tbodyChiTiet select.js-cccd-select').each(function(){ initCCCDSelect2($(this)); });
+    $('#tbodyChiTiet select.js-bks-select').each(function(){ initBienSoSelect2($(this)); });
+
+    // Thêm dòng
+    $('#btnAddRow').on('click', function(){
+      const $tbody = $('#tbodyChiTiet');
+      const $placeholder = $tbody.find('tr.row-placeholder');
+      if ($placeholder.length) $placeholder.remove();
+
+      const idx = $tbody.find('tr').length;
+      const rowHtml = `
+        <tr>
+          <td class="text-center">${idx + 1}</td>
+          <td><input name="ChiTiet[${idx}].TN_HoTen" class="form-control" placeholder="Nhập họ tên" autocomplete="off" /></td>
+          <td>
+            <select id="cccd_${idx}"
+                    name="ChiTiet[${idx}].TN_CCCD_HoChieu"
+                    class="form-control js-cccd-select"
+                    data-row="${idx}"
+                    data-init-value=""
+                    autocomplete="off"></select>
+          </td>
+          <td>
+            <select id="loaixe_${idx}"
+                    name="ChiTiet[${idx}].TX_LoaiXeCoDong"
+                    class="form-control js-loaixe-select"
+                    data-row="${idx}"
+                    data-init-value="">
+              <option value="">--Chọn loại--</option>
+              <option value="1">XE MÁY</option>
+              <option value="2">XE BA GÁC</option>
+              <option value="3">XE Ô TÔ</option>
+            </select>
+          </td>
+          <td>
+            <select id="bks_${idx}"
+                    name="ChiTiet[${idx}].TX_BienKiemSoat"
+                    class="form-control js-bks-select"
+                    data-row="${idx}"
+                    data-init-value=""
+                    autocomplete="off"></select>
+          </td>
+          <td><input name="ChiTiet[${idx}].PT_LoaiPhuongTien" class="form-control" placeholder="Loại phương tiện" autocomplete="off" /></td>
+          <td><input name="ChiTiet[${idx}].PT_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát - Số khung" autocomplete="off" /></td>
+          <td><input name="ChiTiet[${idx}].GhiChu" class="form-control" placeholder="Ghi chú" autocomplete="off" /></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-danger btn-sm btnDeleteRow"><i class="fa fa-trash"></i></button>
+          </td>
+        </tr>`;
+      $tbody.append(rowHtml);
+
+      // Khởi tạo riêng dòng mới
+      initCCCDSelect2($('#cccd_' + idx));
+      initBienSoSelect2($('#bks_' + idx));
+      // Loại xe không dùng select2 => nếu cần plugin thì thêm
+
+      // Dòng mới CCCD phải trống
+      $('#cccd_' + idx).val(null).trigger('change');
+    });
+
+    // Xóa dòng
+    $(document).on('click', '.btnDeleteRow', function(){
+      $(this).closest('tr').remove();
+      reindexRows();
+      if ($('#tbodyChiTiet tr').length === 0) {
+        $('#tbodyChiTiet').append('<tr class="row-placeholder"><td colspan="9" class="text-center text-muted">Chưa có chi tiết</td></tr>');
+      }
+    });
+
+    // Submit
+    $('#frmUpdate').on('submit', function(e){
+      e.preventDefault();
+      reindexRows();
+      const fd = new FormData(this);
+      $.ajax({
+        url: '@Url.Action("Update", "DangKyKhoaThe_NT")',
+        type: 'POST',
+        data: fd,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(res){
+          if (res && res.success) {
+            alert(res.message || 'Cập nhật đơn thành công.');
+            // location.href = '@Url.Action("Index_NT","DangKyKhoaThe_NT")';
+          } else {
+            alert(res.message || 'Cập nhật thất bại.');
+          }
+        },
+        error: function(){
+          alert('Có lỗi xảy ra khi gửi dữ liệu!');
+        }
+      });
+    });
+  });
+</script>

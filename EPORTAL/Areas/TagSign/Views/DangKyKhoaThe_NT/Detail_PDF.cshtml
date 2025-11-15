@@ -1,0 +1,188 @@
+﻿@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.KTNT_DonDangKy_Detail>
+@{
+    ViewBag.Title = "Chi tiết đơn đăng ký";
+    Layout = "~/Views/Shared/PrintView.cshtml";
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@using EPORTAL.ModelsTagSign
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@using System.Linq
+@{
+    var header = Model != null && Model.Any() ? Model.FirstOrDefault() : null;
+
+    DateTime? ngayNT = header.NgayTao_Don;
+
+    var ngayNTText = ngayNT.HasValue ? ngayNT.Value.ToString("dd/MM/yyyy") : "";
+
+    // Dòng chữ ký có ngày
+    var chuKyNgay = ngayNT.HasValue
+        ? string.Format("Quảng Ngãi, ngày {0} tháng {1} năm {2}", ngayNT.Value.Day, ngayNT.Value.Month, ngayNT.Value.Year)
+        : "Quảng Ngãi, ngày...tháng...năm.....";
+
+    string baseUrl = "https://portal.hoaphatdungquat.vn";
+}
+@{
+    string sigSrc = null;
+
+    if (!string.IsNullOrWhiteSpace(header.ChuKy))
+    {
+        if (header.ChuKy.StartsWith("~") || header.ChuKy.StartsWith("/"))
+        {
+            sigSrc = baseUrl + header.ChuKy.Replace("~", "");
+        }
+    }
+}
+
+<meta charset="utf-8" />
+<style>
+    .custom-table {
+        border-collapse: collapse !important;
+        width: 100%;
+    }
+
+        .custom-table,
+        .custom-table th,
+        .custom-table td {
+            border: 1px solid black !important;
+        }
+
+            .custom-table th,
+            .custom-table td {
+                text-align: center;
+                vertical-align: middle;
+                padding: 4px;
+            }
+</style>
+<div class="app-main__outer" style="margin-top: 0%;">
+    <div class="app-main__inner" style="display: block; padding-bottom: 0px; background-color:#fff;">
+        <div>
+
+            <div>
+                <div style="flex: 0 0 50%; float: left; max-width: 300px; text-align: center; font-weight: bold; font-size: 1.2rem; text-transform: uppercase;">
+                    <img alt="Hòa Phát Dung Quất" src="https://portal.hoaphatdungquat.vn/Content/assets/images/logo-inverse.png" width="90%" />
+                    <span class="" style="margin-top: 0; margin-bottom: 1rem;">Công ty Cổ phần Thép</span>
+                    <p class="" style="margin-top: 0; margin-bottom: 1rem;">Hòa Phát Dung Quất</p>
+
+                </div>
+                <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
+                    <span>BM.10/QT.20</span>
+                    <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025</p>
+                    <p><span style="font-style:italic;">Lần sửa đổi:</span> 02</p>
+                    @if (header != null && !string.IsNullOrEmpty(header.MaDon))
+                    {
+                        <p style="font-size:15px; margin-top:5px;"><span>Mã đơn: </span><b>@header.MaDon</b></p>
+                    }
+                    else
+                    {
+                        <p style="font-size:15px; margin-top:5px;"><i>Không có mã đơn</i></p>
+                    }
+                </div>
+                <div style="clear: both;"></div>
+                <div style="width: 100%; text-align: center; padding-bottom: 1rem;">
+                    <p style=" font-size: 1.5rem; font-weight: bold; white-space: nowrap;text-transform: uppercase;">
+                        ĐƠN ĐỀ NGHỊ KHÓA THẺ DÀI NGÀY
+                    </p>
+                </div>
+
+                @{
+                    <div class="col-md-12">
+                        <label style="font-size:15px"> <b>Kính gửi:</b> Công ty Cổ phần Thép Hòa Phát Dung Quất.</label><br />
+                        <label style="font-size:15px;">
+                            <b>Nhà thầu:</b>
+                            <b>
+                                @if (header != null && !string.IsNullOrEmpty(header.TenNhaThau))
+                                {
+                                    @header.TenNhaThau
+                                }
+                                else
+                                {
+                                    <span><i>Không có dữ liệu</i></span>
+                                }
+                            </b>
+                            đề nghị Quý Công ty khóa thẻ dài ngày theo danh sách dưới đây:
+                        </label>
+                        <br />
+
+                    </div>
+                }
+                <div class="card-body" style="margin-top: 2%;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover custom-table" id="table" style="width: 100%; margin-bottom: 1px; background-color: rgba(0, 0, 0, 0); border: 1px solid black !important; color: #000000 !important; text-indent: initial; border-collapse: collapse; " cellpadding="0">
+                            <thead>
+                                <tr style="background-color: #f8f9fa;">
+                                    <th rowspan="2" style="width:55px; text-align:center; vertical-align:middle; border:1px solid #000;">STT</th>
+                                    <th colspan="2" style="text-align:center; border:1px solid #000;">Thẻ người</th>
+                                    <th colspan="2" style="text-align:center; border:1px solid #000;">Thẻ xe cơ động</th>
+                                    <th colspan="2" style="text-align:center; border:1px solid #000;">Thẻ phương tiện</th>
+                                    <th rowspan="2" style="width:170px; text-align:center; vertical-align:middle; border:1px solid #000;">Ghi chú</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:center; border:1px solid #000; width:160px;">Họ và tên</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">CCCD/ Hộ chiếu</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">Loại xe cơ động</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">Biển kiểm soát</th>
+                                    <th style="text-align:center; border:1px solid #000; width:150px;">Loại phương tiện</th>
+                                    <th style="text-align:center; border:1px solid #000; width:180px;">Biển kiểm soát - Số khung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    for (int i = 0; i < Model.Count; i++)
+                                    {
+                                        var item = Model[i];
+                                        <tr>
+                                            <td class="text-center">@(i + 1)</td>
+                                            <td class="text-center">@item.TN_HoTen</td>
+                                            <td class="text-center">@item.TN_CCCD_HoChieu</td>
+                                            <td class="text-center">
+                                                @(item.TX_LoaiXeCoDong == 1 ? "XE MÁY"
+                                                    :item.TX_LoaiXeCoDong == 2 ? "XE BA GÁC"
+                                                    :item.TX_LoaiXeCoDong== 3 ? "XE Ô TÔ"
+                                                    : "")
+                                            </td>
+                                            <td class="text-center">@item.TX_BienKiemSoat</td>
+                                            <td class="text-center">@item.PT_LoaiPhuongTien</td>
+                                            <td class="text-center">@item.PT_BienKiemSoat</td>
+                                            <td class="text-center">@item.GhiChu</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div style="margin-top:40px; width:100%; text-align:right;">
+                    <p>@chuKyNgay</p>
+
+                    <div style="margin-top: 10px; margin-right: 82px;">
+                        <p><strong>Nhà thầu</strong></p>
+
+                        @if (!string.IsNullOrWhiteSpace(sigSrc))
+                        {
+                            <img src="@sigSrc" alt="Chữ ký nhà thầu" style="max-height: 100px; margin-top: 5px; margin-right: -105px;" />
+                        }
+                        else
+                        {
+                            <div style="height:90px;"></div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>

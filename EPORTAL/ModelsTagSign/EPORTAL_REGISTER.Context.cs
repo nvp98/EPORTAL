@@ -45,6 +45,8 @@ namespace EPORTAL.ModelsTagSign
         public virtual DbSet<TK_CardExtend> TK_CardExtend { get; set; }
         public virtual DbSet<TK_CardRegistrationInfor> TK_CardRegistrationInfor { get; set; }
         public virtual DbSet<CDNT_DinhBienXinThem> CDNT_DinhBienXinThem { get; set; }
+        public virtual DbSet<KTNT_DonDangKy> KTNT_DonDangKy { get; set; }
+        public virtual DbSet<KTNT_ChiTiet> KTNT_ChiTiet { get; set; }
     
         public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(Nullable<int> p_NhaThauID, Nullable<int> p_LoaiPhuongTien, string p_BienSoXe, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay, Nullable<int> p_TTHD)
         {
