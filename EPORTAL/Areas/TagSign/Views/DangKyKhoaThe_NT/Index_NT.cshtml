@@ -155,6 +155,13 @@
                                                                 <i class="fa fa-eye"></i>
                                                             </a>
                                                         }
+                                                        @if (item.TinhTrang == 2)
+                                                        {
+                                                            <!-- Nếu đã duyệt thì cho phép tải PDF -->
+                                                            <a href="@Url.Action("ExportKhoaThePdf", "DangKyKhoaThe_NT", new { maDon = item.MaDon })">
+                                                                <i class="fa fa-download text-success"></i>
+                                                            </a>
+                                                        }
                                                     </td>
                                                     <td class="text-center">@item.MaDon</td>
                                                     <td>@item.NoiDung</td>

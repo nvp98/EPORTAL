@@ -1,7 +1,8 @@
 ﻿@using EPORTAL.ModelsTagSign.TheXeCoDongVM
 @model TaoDonDangKyViewModel
 <link href="~/Content/PagedList.css" rel="stylesheet" />
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @{
     ViewBag.Title = "Tạo đơn đăng ký";
     Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
@@ -63,11 +64,11 @@
                                                 <input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly />
                                             </td>
                                             <td>
-                                                    @Html.DropDownListFor(m => m.BP_XuLy_ID,
-                                                        (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()),
-                                                        "--Chọn tổ cấp phát thẻ--",
-                                                        new { @class = "form-control" })
-                                                </td>
+                                                @Html.DropDownListFor(m => m.BP_XuLy_ID,
+                                                    (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()),
+                                                    "--Chọn tổ cấp phát thẻ--",
+                                                    new { @class = "form-control" })
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -130,59 +131,92 @@
         $(document).ready(function () {
             let rowIndex = 0;
 
-            // ====== Thêm dòng mới ======
             $("#btnAddRow").click(function () {
                 rowIndex++;
+
                 const newRow = `
-                    <tr>
-                        <td class="text-center">${rowIndex}</td>
+                <tr>
+                    <td class="text-center">${rowIndex}</td>
 
-                        <td><input type="text" name="ChiTiet[${rowIndex}].TN_HoTen" class="form-control" placeholder="Nhập họ tên" /></td>
-                        <td><input type="text" name="ChiTiet[${rowIndex}].TN_CCCD_HoChieu" class="form-control" placeholder="Nhập CCCD/Hộ chiếu" /></td>
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].TN_HoTen"
+                               class="form-control" placeholder="Nhập họ tên" />
+                    </td>
 
-                        <td>
-                            <select name="ChiTiet[${rowIndex}].TX_LoaiXeCoDong" class="form-control">
-                                <option value="">--Chọn loại--</option>
-                                <option value="Xe máy">Xe máy</option>
-                                <option value="Xe ô tô">Xe ô tô</option>
-                                <option value="Xe 3 gác">Xe 3 gác</option>
-                            </select>
-                        </td>
-                        <td><input type="text" name="ChiTiet[${rowIndex}].TX_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát" /></td>
+                    <td>
+                        <select name="ChiTiet[${rowIndex}].TN_CCCD_HoChieu"
+                                class="form-control js-cccd-select"
+                                data-row="${rowIndex}"></select>
+                    </td>
 
-                        <td>
-                        <input type="text"
-                               name="ChiTiet[${rowIndex}].PT_LoaiPhuongTien"
-                               class="form-control"
-                               placeholder="Nhập loại phương tiện" />
-                        </td>
+                    <td>
+                        <select name="ChiTiet[${rowIndex}].TX_LoaiXeCoDong"
+                                class="form-control">
+                            <option value="">--Chọn loại--</option>
+                            <option value="1">XE MÁY</option>
+                            <option value="2">XE BA GÁC</option>
+                            <option value="3">XE Ô TÔ</option>
+                        </select>
+                    </td>
 
-                        <td><input type="text" name="ChiTiet[${rowIndex}].PT_BienKiemSoat" class="form-control" placeholder="Biển kiểm soát - Số khung" /></td>
+                    <td>
+                        <select name="ChiTiet[${rowIndex}].TX_BienKiemSoat"
+                                class="form-control js-bks-select"
+                                data-row="${rowIndex}"></select>
+                    </td>
 
-                        <td><input type="text" name="ChiTiet[${rowIndex}].GhiChu" class="form-control" placeholder="Ghi chú" /></td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-danger btn-sm btnDeleteRow">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].PT_LoaiPhuongTien"
+                               class="form-control" placeholder="Nhập loại phương tiện" />
+                    </td>
+
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].PT_BienKiemSoat"
+                               class="form-control" placeholder="Biển kiểm soát - Số khung" />
+                    </td>
+
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].GhiChu"
+                               class="form-control" placeholder="Ghi chú" />
+                    </td>
+
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm btnDeleteRow">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
                 $("#tbodyChiTiet").append(newRow);
+
+                // --- Khởi tạo Select2 cho CCCD và Biển số ---
+                const $cccd = $(`#tbodyChiTiet select.js-cccd-select[data-row='${rowIndex}']`);
+                const $bks = $(`#tbodyChiTiet select.js-bks-select[data-row='${rowIndex}']`);
+
+                initCCCDSelect2($cccd);
+                initBienSoSelect2($bks);
             });
 
-            // ====== Xóa dòng ======
+
+            // ====================== XÓA DÒNG ======================
             $(document).on("click", ".btnDeleteRow", function () {
                 $(this).closest("tr").remove();
                 updateSTT();
             });
 
-            // ====== Cập nhật lại STT sau khi xóa dòng ======
+
+            // ====================== CẬP NHẬT STT SAU KHI XÓA ======================
             function updateSTT() {
                 rowIndex = 0;
                 $("#tbodyChiTiet tr").each(function () {
                     rowIndex++;
                     $(this).find("td:first").text(rowIndex);
                 });
+            }
+            function getSafe(element) {
+                let v = element.val();
+                return v ? v.trim() : "";
             }
 
             // ====== Gửi form bằng AJAX ======
@@ -193,13 +227,13 @@
                 $("#tbodyChiTiet tr").each(function () {
                     const row = $(this);
                     const data = {
-                        TN_HoTen: row.find("input[name*='TN_HoTen']").val(),
-                        TN_CCCD_HoChieu: row.find("input[name*='TN_CCCD_HoChieu']").val(),
-                        TX_LoaiXeCoDong: row.find("select[name*='TX_LoaiXeCoDong']").val(),
-                        TX_BienKiemSoat: row.find("input[name*='TX_BienKiemSoat']").val(),
-                        PT_LoaiPhuongTien: row.find("input[name*='PT_LoaiPhuongTien']").val(),
-                        PT_BienKiemSoat: row.find("input[name*='PT_BienKiemSoat']").val(),
-                        GhiChu: row.find("input[name*='GhiChu']").val()
+                        TN_HoTen: getSafe(row.find("input[name*='TN_HoTen']")),
+                        TN_CCCD_HoChieu: getSafe(row.find("select[name*='TN_CCCD_HoChieu']")),
+                        TX_LoaiXeCoDong: row.find("select[name*='TX_LoaiXeCoDong']").val() || 0,
+                        TX_BienKiemSoat: getSafe(row.find("select[name*='TX_BienKiemSoat']")),
+                        PT_LoaiPhuongTien: getSafe(row.find("input[name*='PT_LoaiPhuongTien']")),
+                        PT_BienKiemSoat: getSafe(row.find("input[name*='PT_BienKiemSoat']")),
+                        GhiChu: getSafe(row.find("input[name*='GhiChu']"))
                     };
                     chiTietList.push(data);
                 });
@@ -227,5 +261,141 @@
                 });
             });
         });
+
+ // ====================== CẤU HÌNH SELECT2 BIỂN KIỂM SOÁT ======================
+    function initBienSoSelect2($el) {
+        const idNhaThau = $("#ID_NhaThau").val();
+
+        $el.select2({
+            width: "100%",
+            placeholder: "Tìm biển kiểm soát...",
+            allowClear: true,
+            minimumInputLength: 0,
+            ajax: {
+                url: '@Url.Action("SearchXeByNhaThau", "DangKyKhoaThe_NT")',
+                dataType: "json",
+                delay: 250,
+                data: function (params) {
+                    const $row = $el.closest("tr");
+                    const loaiPhuongTienId = $row.find("select[name*='TX_LoaiXeCoDong']").val();
+
+                    return {
+                        idNhaThau: idNhaThau,
+                        q: params.term || "",
+                        page: params.page || 1,
+                        loaiPhuongTienId: loaiPhuongTienId || null
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: (data.results || []).map(x => ({
+                            id: x.id,
+                            text: x.text,
+                            loaiPhuongTienId: x.loaiPhuongTienId
+                        })),
+                        pagination: { more: data.pagination && data.pagination.more }
+                    };
+                },
+                cache: true
+            },
+            tags: true,
+            createTag: function (params) {
+                const term = (params.term || "").trim();
+                if (term === "") return null;
+                return { id: term, text: term, newOption: true };
+            },
+            templateResult: function (data) {
+                if (data.loading) return data.text;
+                if (data.newOption) return `Thêm mới: ${data.text}`;
+                return data.text;
+            }
+        });
+
+        // Khi chọn biển số → tự động set loại xe tương ứng
+        $el.on("select2:select", function (e) {
+            const selected = e.params.data;
+            const $row = $(this).closest("tr");
+            const $loaiXe = $row.find("select[name*='TX_LoaiXeCoDong']");
+
+            if (selected && selected.loaiPhuongTienId != null) {
+                // Change do code → tránh trigger sự kiện người dùng
+                $loaiXe.val(String(selected.loaiPhuongTienId)).trigger("change");
+            }
+        });
+
+        // Khi user đổi Loại xe → clear Biển số để filter lại
+        const $loaiXeTrongHang = $el.closest("tr").find("select[name*='TX_LoaiXeCoDong']");
+        $loaiXeTrongHang.off("change.bks").on("change.bks", function (e) {
+            if (!e.originalEvent) return; // bỏ qua nếu change do code
+            $el.val(null).trigger("change");
+        });
+    }
+
+
+
+    // ====================== CẤU HÌNH SELECT2 CCCD/HỘ CHIẾU ======================
+    const cccdCacheByNT = {}; // Cache: { idNhaThau: [{ id, text, hoTen }, ...] }
+
+    function initCCCDSelect2($el) {
+        const idNhaThau = $("#ID_NhaThau").val();
+        const rowIdx = $el.data("row");
+
+        // --- Khởi tạo Select2 từ dữ liệu local ---
+        function bindSelect2Local(data) {
+            $el.select2({
+                width: "100%",
+                placeholder: "Chọn hoặc tìm CCCD/Hộ chiếu...",
+                allowClear: true,
+                data: data,
+                matcher: function (params, dataObj) {
+                    if ($.trim(params.term) === '') return dataObj;
+                    if (!dataObj || !dataObj.text) return null;
+
+                    const term = params.term.toLowerCase();
+                    const hayText = (dataObj.text || '').toLowerCase();
+                    const hayId = (dataObj.id || '').toLowerCase();
+
+                    return (hayText.includes(term) || hayId.includes(term)) ? dataObj : null;
+                }
+            });
+
+            // Reset giá trị cũ khi khởi tạo
+            $el.val(null).trigger("change");
+
+            // Khi chọn CCCD → tự điền Họ tên
+            $el.on("select2:select", function (e) {
+                const selected = e.params.data;
+                $(`#tbodyChiTiet input[name='ChiTiet[${rowIdx}].TN_HoTen']`).val(selected.hoTen || "");
+            });
+
+            // Khi clear → xóa họ tên
+            $el.on("select2:clear", function () {
+                $(`#tbodyChiTiet input[name='ChiTiet[${rowIdx}].TN_HoTen']`).val("");
+            });
+        }
+
+        // --- Nếu có cache → dùng luôn ---
+        if (cccdCacheByNT[idNhaThau]) {
+            bindSelect2Local(cccdCacheByNT[idNhaThau]);
+            return;
+        }
+
+        // --- Nếu chưa có cache → tải toàn bộ danh sách 1 lần ---
+        $.ajax({
+            url: '/DangKyKhoaThe_NT/GetNhanVienNTByCCCD',
+            type: 'GET',
+            dataType: 'json',
+            data: { idNT: idNhaThau, cccd: '' },
+            success: function (res) {
+                const list = (res && res.results) ? res.results : [];
+                cccdCacheByNT[idNhaThau] = list; // cache lại theo nhà thầu
+                bindSelect2Local(list);
+            },
+            error: function () {
+                bindSelect2Local([]);
+            }
+        });
+    }
 </script>
 

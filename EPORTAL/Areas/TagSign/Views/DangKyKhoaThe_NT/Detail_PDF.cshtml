@@ -146,7 +146,12 @@
                                             <td class="text-center">@(i + 1)</td>
                                             <td class="text-center">@item.TN_HoTen</td>
                                             <td class="text-center">@item.TN_CCCD_HoChieu</td>
-                                            <td class="text-center">@item.TX_LoaiXeCoDong</td>
+                                            <td class="text-center">
+                                                @(item.TX_LoaiXeCoDong == 1 ? "XE MÁY"
+                                                    :item.TX_LoaiXeCoDong == 2 ? "XE BA GÁC"
+                                                    :item.TX_LoaiXeCoDong== 3 ? "XE Ô TÔ"
+                                                    : "")
+                                            </td>
                                             <td class="text-center">@item.TX_BienKiemSoat</td>
                                             <td class="text-center">@item.PT_LoaiPhuongTien</td>
                                             <td class="text-center">@item.PT_BienKiemSoat</td>

@@ -24,7 +24,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public string TN_HoTen { get; set; }
         public string TN_CCCD_HoChieu { get; set; }
 
-        public string TX_LoaiXeCoDong { get; set; }
+        public int? TX_LoaiXeCoDong { get; set; }
         public string TX_BienKiemSoat { get; set; }
 
         public string PT_LoaiPhuongTien { get; set; }
@@ -75,7 +75,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
         public int? ChiTiet_ID { get; set; }
         public string TN_HoTen { get; set; }
         public string TN_CCCD_HoChieu { get; set; }
-        public string TX_LoaiXeCoDong { get; set; }
+        public int? TX_LoaiXeCoDong { get; set; }
         public string TX_BienKiemSoat { get; set; }
         public string PT_LoaiPhuongTien { get; set; }
         public string PT_BienKiemSoat { get; set; }
