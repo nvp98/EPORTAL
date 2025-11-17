@@ -28,6 +28,7 @@ using System.Configuration;
 using System.Runtime.InteropServices;
 using System.Text;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -633,9 +634,17 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 }
 
                 // 4. Gán người tạo đơn là người đang đăng nhập
-                model.NhanVienNT_ID = Models.MyAuthentication.ID;
-                model.UserNameLogin = Models.MyAuthentication.Username;
+                //model.NhanVienNT_ID = Models.MyAuthentication.ID;
+                //var ntUser = db.NT_UserTemp.FirstOrDefault(x => x.ID == NhanVienNT_ID);
 
+                //var Id_NT =  
+                model.UserNameLogin = Models.MyAuthentication.Username;
+                var username = Models.MyAuthentication.Username;
+                //var ntUser = db.NT_UserTemp.FirstOrDefault(x => x.UserName == username);
+
+                //model.NhanVienNT_ID = ntUser.IDNT;
+                var ntUser = db_nt.NT_UserTemp.FirstOrDefault(x => x.UserName == username);
+                model.NhanVienNT_ID = ntUser.IDNT;
                 // 5. Insert đơn vào DB (thông qua stored procedure hoặc EF)
                 var result = db_dk.CDNT_DonDangKy_Insert(
                     model.Ma_Don,
@@ -765,11 +774,17 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     return Json(new { success = false, message = "Đơn đã được ký, không thể xóa." });
                 }
-
+                var trinhKyList = db_dk.CDNT_TrinhKy.Where(x => x.Ma_Don == maDon).ToList();
+                if (trinhKyList.Any())
+                {
+                    db_dk.CDNT_TrinhKy.RemoveRange(trinhKyList);
+                    db_dk.SaveChanges(); // commit trước khi xóa đơn chính
+                }
                 // Nếu chưa trình ký, gọi stored procedure xóa
                 var result = db_dk.Database.SqlQuery<StoreResult>(
                     "EXEC CDNT_DonDangKy_Delete @p0", maDon
                 ).FirstOrDefault();
+
 
                 if (result != null && result.Result == 1)
                 {
@@ -1740,8 +1755,21 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 if (don == null)
                     return Json(new { success = false, message = "Không tìm thấy đơn." });
 
-                if (don.NhanVienNT_ID != Models.MyAuthentication.ID)
+                //if (don.NhanVienNT_ID != Models.MyAuthentication.ID)
+
+                //return Json(new { success = false, message = "Bạn không có quyền trình ký đơn này." });
+                // Lấy ID của user khi đăng nhập
+                var idLogin = Models.MyAuthentication.ID;
+
+                var ntUser = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == idLogin);
+                if (ntUser == null)
+                    return Json(new { success = false, message = "Không tìm thấy thông tin NT_UserTemp." });
+
+                var idntLogin = ntUser.IDNT;
+
+                if (don.NhanVienNT_ID != idntLogin)
                     return Json(new { success = false, message = "Bạn không có quyền trình ký đơn này." });
+
 
                 if (don.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap)
                     return Json(new { success = false, message = "Đơn không ở trạng thái nháp." });
@@ -1819,8 +1847,17 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 if (don == null)
                     return Json(new { success = false, message = "Không tìm thấy đơn." });
 
-                if (don.NhanVienNT_ID != Models.MyAuthentication.ID)
-                    return Json(new { success = false, message = "Bạn không có quyền hủy trình ký đơn này." });
+                var idLogin = Models.MyAuthentication.ID;
+
+                var ntUser = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == idLogin);
+                if (ntUser == null)
+                    return Json(new { success = false, message = "Không tìm thấy thông tin NT_UserTemp." });
+
+                var idntLogin = ntUser.IDNT;
+
+                if (don.NhanVienNT_ID != idntLogin)
+                    return Json(new { success = false, message = "Bạn không có quyền trình ký đơn này." });
+
 
                 // Chỉ hủy khi đơn đang ở trạng thái Chờ xử lý
                 if (don.TinhTrang_ID != (int)TinhTrangDonDangKy.ChoXuLy)
@@ -2530,5 +2567,5 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
     }
 }
-        
-    
+
+
