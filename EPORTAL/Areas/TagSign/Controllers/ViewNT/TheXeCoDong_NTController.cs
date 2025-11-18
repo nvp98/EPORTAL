@@ -1614,7 +1614,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 BPQL_ID = reader["BPQL_ID"] as int?,
                                 TenPhongBan = reader["TenPhongBan"] as string,
                                 NhanVienNT_ID = reader["NhanVienNT_ID"] as int?,
-                                HoTen = reader["HoTen"] as string,
                                 NhaThau_ID = reader["NhaThau_ID"] as int?,
                                 FullName = reader["FullName"] as string,
                                 HopDong = reader["HopDong"] as string,
