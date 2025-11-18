@@ -29,6 +29,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.EMMA;
+using System.Web.UI.WebControls;
 
 namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 {
@@ -535,8 +536,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             string tenNhaThau = "";
             int? nhaThauID = null;
 
-            int nhanVienNT_ID = Models.MyAuthentication.ID; // ID tài khoản NT
-            var nhanVien = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == nhanVienNT_ID); // thông tin tài khoản
+            int nhanVienNT_ID = Models.MyAuthentication.ID; 
+            var nhanVien = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == nhanVienNT_ID); 
 
             if (nhanVien != null && nhanVien.IDNT.HasValue)
             {
@@ -925,61 +926,54 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
             try
             {
-                int nhanVienNT_ID = Models.MyAuthentication.ID;
+                int loginID = Models.MyAuthentication.ID;
 
-                using (var db_nt = new EPORTAL_NTEntities())
-                using (var db = new EPORTALEntities())
+                var ntUser = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == loginID);
+                if (ntUser == null)
+                    return Json(new { success = false, message = "Không tìm thấy người dùng đăng nhập" });
+
+                int? idntLogin = ntUser.IDNT;
+
+
+                var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == idntLogin);
+                string tenNhaThau = nhaThau?.FullName ?? "";
+
+                if (FileANH == null || FileANH.ContentLength == 0)
                 {
-                    var nhanVien = db_nt.NT_NhanVienNT.FirstOrDefault(x => x.IDNVNT == nhanVienNT_ID);
-                    if (nhanVien == null || !nhanVien.IDNT.HasValue)
+                    return Json(new { success = false, message = "Vui lòng chọn file Excel hợp lệ." }, JsonRequestBehavior.AllowGet);
+                }
+
+                using (var workbook = new XLWorkbook(FileANH.InputStream))
+                {
+                    var ws = workbook.Worksheet(1);
+                    int row = 7;
+
+                    while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
                     {
-                        return Json(new
+                        DateTime? denNgay = ParseExcelDate(ws.Cell(row, 9));
+
+                        var vm = new ChiTietDonVM
                         {
-                            success = false,
-                            message = "Không tìm thấy thông tin Nhà thầu tương ứng với nhân viên đăng nhập."
-                        }, JsonRequestBehavior.AllowGet);
+                            ID_LoaiPhuongTien =
+                                ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
+                                ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
+                                ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
+
+                            BienSoXe = NormalizeBienSo(ws.Cell(row, 5).GetString()),
+                            CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
+                            CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
+                            GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
+                            TuNgay = null,
+                            DenNgay = denNgay,
+                            GhiChu = ws.Cell(row, 10).GetString().Trim()
+                        };
+
+                        danhSach.Add(vm);
+                        row++;
                     }
 
-                    int nhaThauID = nhanVien.IDNT.Value;
-                    var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID);
-                    string tenNhaThau = nhaThau?.FullName ?? "";
 
-                    if (FileANH == null || FileANH.ContentLength == 0)
-                    {
-                        return Json(new { success = false, message = "Vui lòng chọn file Excel hợp lệ." }, JsonRequestBehavior.AllowGet);
-                    }
-
-                    using (var workbook = new XLWorkbook(FileANH.InputStream))
-                    {
-                        var ws = workbook.Worksheet(1);
-                        int row = 7;
-
-                        while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
-                        {
-                            DateTime? denNgay = ParseExcelDate(ws.Cell(row, 9));
-
-                            var vm = new ChiTietDonVM
-                            {
-                                ID_LoaiPhuongTien =
-                                    ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
-                                    ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
-                                    ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
-
-                                BienSoXe = NormalizeBienSo(ws.Cell(row, 5).GetString()),
-                                CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
-                                CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
-                                GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
-                                TuNgay = null,
-                                DenNgay = denNgay,
-                                GhiChu = ws.Cell(row, 10).GetString().Trim()
-                            };
-
-                            danhSach.Add(vm);
-                            row++;
-                        }
-                    }
-
-                    var dinhBien = DinhBienPhuongTienService.LayDinhBienTheoNhaThau(nhaThauID);
+                    var dinhBien = DinhBienPhuongTienService.LayDinhBienTheoNhaThau(idntLogin.Value);
 
                     int soXeMayMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 1 && x.CapMoi);
                     int soXe3GacMoi = danhSach.Count(x => x.ID_LoaiPhuongTien == 2 && x.CapMoi);
@@ -1071,9 +1065,21 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             {
                 return HttpNotFound();
             }
+            // Lấy ID đăng nhập (UserTemp.ID)
+            var loginID = Models.MyAuthentication.ID;
 
-            // Kiểm tra quyền chỉnh sửa
-            if (donDangKy.NhanVienNT_ID != Models.MyAuthentication.ID)
+            // Tìm IDNT
+            var ntUser = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == loginID);
+            if (ntUser == null)
+            {
+                TempData["msgError"] = "Không xác định được người dùng hiện tại.";
+                return RedirectToAction("Index_Test");
+            }
+
+            var idntLogin = ntUser.IDNT;
+
+            // KIỂM TRA QUYỀN
+            if (donDangKy.NhanVienNT_ID != idntLogin)
             {
                 TempData["msgError"] = "Bạn không có quyền chỉnh sửa đơn này";
                 return RedirectToAction("Index_Test");
@@ -1205,10 +1211,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 }
 
                 // Kiểm tra quyền chỉnh sửa
-                if (donDangKy.NhanVienNT_ID != Models.MyAuthentication.ID)
-                {
+                var loginID = Models.MyAuthentication.ID;
+                var ntUser = db_nt.NT_UserTemp.FirstOrDefault(x => x.ID == loginID);
+                if (ntUser == null)
+                    return Json(new { success = false, message = "Không tìm thấy người dùng đăng nhập" });
+
+                var idntLogin = ntUser.IDNT;
+
+                if (donDangKy.NhanVienNT_ID != idntLogin)
                     return Json(new { success = false, message = "Bạn không có quyền chỉnh sửa đơn này" });
-                }
+
 
                 // Kiểm tra trạng thái đơn
                 if (donDangKy.TinhTrang_ID != (int)TinhTrangDonDangKy.Nhap)
@@ -1273,7 +1285,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     Ma_Don = model.Ma_Don,
                     CapDuyet = 0,
-                    NguoiDuyet_ID = model.NhanVienNT_ID ?? Models.MyAuthentication.ID,
+                    NguoiDuyet_ID = model.NhanVienNT_ID ?? idntLogin,
                     NgayDuyet = DateTime.Now,
                     TinhTrang_ID = (int)TinhTrangDonDangKy.Nhap,
                     GhiChu = "Trình ký từ nhà thầu"
