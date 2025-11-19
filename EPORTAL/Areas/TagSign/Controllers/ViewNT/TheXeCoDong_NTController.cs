@@ -956,8 +956,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         {
                             ID_LoaiPhuongTien =
                                 ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
-                                ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 2 :
-                                ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 3 : (int?)null,
+                                ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 3 :
+                                ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 2 : (int?)null,
 
                             BienSoXe = NormalizeBienSo(ws.Cell(row, 5).GetString()),
                             CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",

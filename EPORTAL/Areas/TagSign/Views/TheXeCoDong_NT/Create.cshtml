@@ -295,10 +295,10 @@
                     <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} />
                 </td>
                 <td>
-                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} />
+                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} />
                 </td>
                 <td>
-                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} />
+                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} />
                 </td>
                 <td><input type="text" name="Items[${i}].BienSoXe"  style=" width: 100%" value="${item.BienSoXe}" class="form-control" /></td>
                 <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].CapMoi"  style=" width: 100%" value="true" ${item.CapMoi ? "checked" : ""} /></td>
@@ -371,8 +371,8 @@
             var row = $(this);
             var xe = {
                 ID_LoaiPhuongTien: row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
-                                   row.find("input[type=checkbox]").eq(1).is(":checked") ? 2 :
-                                   row.find("input[type=checkbox]").eq(2).is(":checked") ? 3 : 0,
+                                   row.find("input[type=checkbox]").eq(1).is(":checked") ? 3 :
+                                   row.find("input[type=checkbox]").eq(2).is(":checked") ? 2 : 0,
                 BienSoXe: row.find("input[name*='BienSoXe']").val(),
                 CapMoi: row.find("input[name*='CapMoi']").is(":checked"),
                 CapLai: row.find("input[name*='CapLai']").is(":checked"),
@@ -410,38 +410,6 @@
             }
         });
 }
-    //$("#btnSave").click(function (e) {
-    //    e.preventDefault();
-
-    //    // Lấy danh sách xe từ bảng hiện tại
-    //    var listXe = [];
-    //    $("#tbodyImportExcel tr").each(function () {
-    //        var row = $(this);
-    //        var xe = {
-    //            ID_LoaiPhuongTien: row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
-    //                row.find("input[type=checkbox]").eq(1).is(":checked") ? 2 :
-    //                    row.find("input[type=checkbox]").eq(2).is(":checked") ? 3 : 0,
-    //            CapMoi: row.find("input[name*='CapMoi']").is(":checked")
-    //        };
-    //        listXe.push(xe);
-    //    });
-
-    //    // Đếm số xe máy mới, xe 3 gác mới
-    //    var soXeMayMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 1 && x.CapMoi).length;
-    //    var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 3 && x.CapMoi).length;
-
-    //    // Kiểm tra vượt định biên
-    //    if (dinhBienPhuongTien) {
-    //        if (soXeMayMoi > dinhBienPhuongTien.XeMay_ConLai || soXe3GacMoi > dinhBienPhuongTien.Xe3Gac_ConLai) {
-    //            alert(`Vượt định biên: Xe máy (còn lại ${dinhBienPhuongTien.XeMay_ConLai}, đăng ký ${soXeMayMoi}), `
-    //                + `Xe 3 gác (còn lại ${dinhBienPhuongTien.Xe3Gac_ConLai}, đăng ký ${soXe3GacMoi})`);
-    //            return; // KHÔNG gọi submitForm!
-    //        }
-    //    }
-
-    //    // Nếu hợp lệ, gọi submitForm như cũ
-    //    submitForm(e);
-    //});
     $("#btnSave").off('click').on('click', function (e) {
         e.preventDefault();
 
@@ -450,9 +418,10 @@
         $("#tbodyImportExcel tr").each(function () {
             var row = $(this);
             var xe = {
-                ID_LoaiPhuongTien: row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
-                    row.find("input[type=checkbox]").eq(1).is(":checked") ? 2 :
-                        row.find("input[type=checkbox]").eq(2).is(":checked") ? 3 : 0,
+                ID_LoaiPhuongTien:
+                        row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
+                        row.find("input[type=checkbox]").eq(1).is(":checked") ? 3 :
+                        row.find("input[type=checkbox]").eq(2).is(":checked") ? 2 : 0,
                 CapMoi: row.find("input[name*='CapMoi']").is(":checked")
             };
             listXe.push(xe);
