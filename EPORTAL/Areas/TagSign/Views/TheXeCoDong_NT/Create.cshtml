@@ -478,19 +478,16 @@
         var availXeMay = xeMayToiDa + xinThemXeMay - xeMayDaCap;
         var availXe3Gac = xe3GacToiDa + xinThemXe3Gac - xe3GacDaCap;
 
-        // Clamp >= 0 (nếu muốn cho âm, bỏ các dòng dưới)
-        availXeMay = Math.max(0, availXeMay);
-        availXe3Gac = Math.max(0, availXe3Gac);
-
         // kiểm tra vượt định biên
-        if (soxemaymoi > availxemay || soxe3gacmoi > availxe3gac) {
+        if (soXeMayMoi > availXeMay || soXe3GacMoi > availXe3Gac) {
             alert(
-                `vượt định biên:\n` +
-                `xe máy — tối đa: ${xemaytoida}, đã cấp: ${xemaydacap}, xin thêm: ${xinthemxemay}, khả dụng: ${availxemay}, đăng ký: ${soxemaymoi}\n` +
-                `xe 3 gác — tối đa: ${xe3gactoida}, đã cấp: ${xe3gacdacap}, xin thêm: ${xinthemxe3gac}, khả dụng: ${availxe3gac}, đăng ký: ${soxe3gacmoi}`
+                `Vượt định biên:\n` +
+                `Xe máy — tối đa: ${xeMayToiDa}, đã cấp: ${xeMayDaCap}, xin thêm: ${xinThemXeMay}, khả dụng: ${availXeMay}, đăng ký: ${soXeMayMoi}\n` +
+                `Xe 3 gác — tối đa: ${xe3GacToiDa}, đã cấp: ${xe3GacDaCap}, xin thêm: ${xinThemXe3Gac}, khả dụng: ${availXe3Gac}, đăng ký: ${soXe3GacMoi}`
             );
-            return; // không gọi submitform
+            return;
         }
+
 
         // Nếu hợp lệ, gọi submitForm như cũ
         submitForm(e);
