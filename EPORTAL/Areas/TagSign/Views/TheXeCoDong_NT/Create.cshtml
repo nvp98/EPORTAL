@@ -460,8 +460,7 @@
 
         // Đếm số xe máy mới, xe 3 gác mới
         var soXeMayMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 1 && x.CapMoi).length;
-        var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 3 && x.CapMoi).length;
-
+        var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 2 && x.CapMoi).length;
         // Nếu không có thông tin định biên từ server thì submit bình thường
         if (!dinhBienPhuongTien) {
             return submitForm(e);
@@ -483,14 +482,14 @@
         availXeMay = Math.max(0, availXeMay);
         availXe3Gac = Math.max(0, availXe3Gac);
 
-        // Kiểm tra vượt định biên
-        if (soXeMayMoi > availXeMay || soXe3GacMoi > availXe3Gac) {
+        // kiểm tra vượt định biên
+        if (soxemaymoi > availxemay || soxe3gacmoi > availxe3gac) {
             alert(
-                `Vượt định biên:\n` +
-                `Xe máy — Tối đa: ${xeMayToiDa}, Đã cấp: ${xeMayDaCap}, Xin thêm: ${xinThemXeMay}, Khả dụng: ${availXeMay}, Đăng ký: ${soXeMayMoi}\n` +
-                `Xe 3 gác — Tối đa: ${xe3GacToiDa}, Đã cấp: ${xe3GacDaCap}, Xin thêm: ${xinThemXe3Gac}, Khả dụng: ${availXe3Gac}, Đăng ký: ${soXe3GacMoi}`
+                `vượt định biên:\n` +
+                `xe máy — tối đa: ${xemaytoida}, đã cấp: ${xemaydacap}, xin thêm: ${xinthemxemay}, khả dụng: ${availxemay}, đăng ký: ${soxemaymoi}\n` +
+                `xe 3 gác — tối đa: ${xe3gactoida}, đã cấp: ${xe3gacdacap}, xin thêm: ${xinthemxe3gac}, khả dụng: ${availxe3gac}, đăng ký: ${soxe3gacmoi}`
             );
-            return; // KHÔNG gọi submitForm
+            return; // không gọi submitform
         }
 
         // Nếu hợp lệ, gọi submitForm như cũ
@@ -505,7 +504,7 @@
             success: function (res) {
                 if (res.success) {
                     dinhBienPhuongTien = res.data;
-                    //console.log(dinhBienPhuongTien)
+                    console.log(dinhBienPhuongTien)
                     const data = res.data;
 
                     const html = `
@@ -540,7 +539,7 @@
                 var idPhongBan = $(this).val();
                 if (idPhongBan) {
                     $.ajax({
-                        url: '@Url.Action("GetNguoiKyTheoPhongBan", "TheXeCoDong_NT")', // thay TenController bằng tên thực tế
+                        url: '@Url.Action("GetNguoiKyTheoPhongBan", "TheXeCoDong_NT")',
                         type: 'GET',
                         data: { idPhongBan: idPhongBan },
                         success: function (data) {
