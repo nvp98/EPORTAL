@@ -28,11 +28,9 @@ namespace EPORTAL.ModelsTagSign
         }
     
         public virtual DbSet<CDNT_ChiTietDon> CDNT_ChiTietDon { get; set; }
-        public virtual DbSet<CDNT_DonDangKy> CDNT_DonDangKy { get; set; }
         public virtual DbSet<CDNT_LoaiPhuongTien> CDNT_LoaiPhuongTien { get; set; }
         public virtual DbSet<CDNT_TinhTrang> CDNT_TinhTrang { get; set; }
         public virtual DbSet<CDNT_TrinhKy> CDNT_TrinhKy { get; set; }
-        public virtual DbSet<CDNT_XeCoDong> CDNT_XeCoDong { get; set; }
         public virtual DbSet<Detail_RegisterPeople> Detail_RegisterPeople { get; set; }
         public virtual DbSet<DK_CardExtend> DK_CardExtend { get; set; }
         public virtual DbSet<DK_CardRegistrationInfor> DK_CardRegistrationInfor { get; set; }
@@ -47,6 +45,7 @@ namespace EPORTAL.ModelsTagSign
         public virtual DbSet<CDNT_DinhBienXinThem> CDNT_DinhBienXinThem { get; set; }
         public virtual DbSet<KTNT_DonDangKy> KTNT_DonDangKy { get; set; }
         public virtual DbSet<KTNT_ChiTiet> KTNT_ChiTiet { get; set; }
+        public virtual DbSet<CDNT_DonDangKy> CDNT_DonDangKy { get; set; }
     
         public virtual ObjectResult<CDNT_ChiTietDon_Search_Result> CDNT_ChiTietDon_Search(Nullable<int> p_NhaThauID, Nullable<int> p_LoaiPhuongTien, string p_BienSoXe, Nullable<System.DateTime> p_TuNgay, Nullable<System.DateTime> p_DenNgay, Nullable<int> p_TTHD)
         {

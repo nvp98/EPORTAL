@@ -943,9 +943,6 @@
     <Compile Include="ModelsTagSign\CDNT_TrinhKy_Detail_Result.cs">
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
-    <Compile Include="ModelsTagSign\CDNT_XeCoDong.cs">
-      <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
-    </Compile>
     <Compile Include="ModelsTagSign\CDNT_XeCoDong_Search_Result.cs">
       <DependentUpon>EPORTAL_REGISTER.tt</DependentUpon>
     </Compile>
