@@ -136,8 +136,8 @@
                                             <tr>
                                                 <td>@(i + 1)</td>
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="1" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 1 ? "checked" : "") /></td>
-                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="2" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 2 ? "checked" : "") /></td>
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="3" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 3 ? "checked" : "") /></td>
+                                                <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].ID_LoaiPhuongTien" value="2" @(Model.DanhSachXe[i].ID_LoaiPhuongTien == 2 ? "checked" : "") /></td>
                                                 <td><input type="text" class="form-control" name="DanhSachXe[@i].BienSoXe" value="@Model.DanhSachXe[i].BienSoXe" /></td>
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].CapMoi" value="true" @(Model.DanhSachXe[i].CapMoi ? "checked" : "") /></td>
                                                 <td><input type="checkbox" style="width:100%" name="DanhSachXe[@i].CapLai" value="true" @(Model.DanhSachXe[i].CapLai ? "checked" : "") /></td>
@@ -242,8 +242,8 @@
 
             let loaiPhuongTien = 0;
             if ($tr.find('input[name="DanhSachXe[' + i + '].ID_LoaiPhuongTien"][value="1"]').is(':checked')) loaiPhuongTien = 1;
-            else if ($tr.find('input[name="DanhSachXe[' + i + '].ID_LoaiPhuongTien"][value="2"]').is(':checked')) loaiPhuongTien = 2;
             else if ($tr.find('input[name="DanhSachXe[' + i + '].ID_LoaiPhuongTien"][value="3"]').is(':checked')) loaiPhuongTien = 3;
+            else if ($tr.find('input[name="DanhSachXe[' + i + '].ID_LoaiPhuongTien"][value="2"]').is(':checked')) loaiPhuongTien = 2;
 
             const capMoi = $tr.find('input[name="DanhSachXe[' + i + '].CapMoi"]').is(':checked');
             const capLai = $tr.find('input[name="DanhSachXe[' + i + '].CapLai"]').is(':checked');
@@ -276,8 +276,8 @@
                 <tr>
                     <td class="stt">${i + 1}</td>
                     <td><input type="checkbox" style="width:100%" class="Id-LoaiPT" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="1" ${lp === 1 ? "checked" : ""} /></td>
-                    <td><input type="checkbox" style="width:100%"  class="Id-LoaiPT" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="2" ${lp === 2 ? "checked" : ""} /></td>
                     <td><input type="checkbox" style="width:100%"  class="Id-LoaiPT" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="3" ${lp === 3 ? "checked" : ""} /></td>
+                    <td><input type="checkbox" style="width:100%"  class="Id-LoaiPT" name="DanhSachXe[${i}].ID_LoaiPhuongTien" value="2" ${lp === 2 ? "checked" : ""} /></td>
                     <td><input type="text" style="width:100%" class="form-control" name="DanhSachXe[${i}].BienSoXe" value="${item.BienSoXe || ''}" /></td>
                     <td><input type="checkbox" style="width:100%" class="cap-opt" data-row="${i}" name="DanhSachXe[${i}].CapMoi" value="true" ${chk(item.CapMoi)} /></td>
                     <td><input type="checkbox" style="width:100%" class="cap-opt" data-row="${i}" name="DanhSachXe[${i}].CapLai" value="true" ${chk(item.CapLai)} /></td>
