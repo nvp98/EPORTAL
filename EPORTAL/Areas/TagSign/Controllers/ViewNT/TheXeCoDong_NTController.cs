@@ -981,22 +981,25 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     int availXeMay = dinhBien.XeMay_ToiDa + dinhBien.DinhBienXinThem_XeMay - dinhBien.XeMay_DaCap;
                     int availXe3Gac = dinhBien.Xe3Gac_ToiDa + dinhBien.DinhBienXinThem_Xe3Gac - dinhBien.Xe3Gac_DaCap;
 
-                    // Nếu muốn không âm
-                    availXeMay = Math.Max(0, availXeMay);
-                    availXe3Gac = Math.Max(0, availXe3Gac);
-
-                    // Check vượt định biên
-                    if (soXeMayMoi > availXeMay || soXe3GacMoi > availXe3Gac)
+                    if (soXeMayMoi > 0 && soXeMayMoi > availXeMay)
                     {
                         return Json(new
                         {
                             success = false,
                             message = $@"Vượt định biên:
-                        Xe máy (còn lại {availXeMay}, đăng ký {soXeMayMoi}),
-                        Xe 3 gác (còn lại {availXe3Gac}, đăng ký {soXe3GacMoi})"
-                                                }, JsonRequestBehavior.AllowGet);
+                            Xe máy (còn lại {availXeMay}, đăng ký {soXeMayMoi})"
+                        }, JsonRequestBehavior.AllowGet);
                     }
 
+                    if (soXe3GacMoi > 0 && soXe3GacMoi > availXe3Gac)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = $@"Vượt định biên:
+                            Xe 3 gác (còn lại {availXe3Gac}, đăng ký {soXe3GacMoi})"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                     return Json(new
                     {
                         success = true,

@@ -413,29 +413,29 @@
     $("#btnSave").off('click').on('click', function (e) {
         e.preventDefault();
 
-        // Lấy danh sách xe từ bảng hiện tại
         var listXe = [];
         $("#tbodyImportExcel tr").each(function () {
             var row = $(this);
             var xe = {
                 ID_LoaiPhuongTien:
-                        row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
+                    row.find("input[type=checkbox]").eq(0).is(":checked") ? 1 :
                         row.find("input[type=checkbox]").eq(1).is(":checked") ? 3 :
-                        row.find("input[type=checkbox]").eq(2).is(":checked") ? 2 : 0,
-                CapMoi: row.find("input[name*='CapMoi']").is(":checked")
+                            row.find("input[type=checkbox]").eq(2).is(":checked") ? 2 : 0,
+                CapMoi: row.find("input[name*='CapMoi']").is(":checked"),
+                CapLai: row.find("input[name*='CapLai']").is(":checked"),
+                GiaHan: row.find("input[name*='GiaHan']").is(":checked")
             };
             listXe.push(xe);
+           // console.log(xe);
         });
 
-        // Đếm số xe máy mới, xe 3 gác mới
         var soXeMayMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 1 && x.CapMoi).length;
         var soXe3GacMoi = listXe.filter(x => x.ID_LoaiPhuongTien === 2 && x.CapMoi).length;
-        // Nếu không có thông tin định biên từ server thì submit bình thường
+
         if (!dinhBienPhuongTien) {
             return submitForm(e);
         }
 
-        // Lấy các giá trị từ dinhBienPhuongTien (an toàn với string/null)
         var xeMayToiDa = parseInt(dinhBienPhuongTien.XeMay_ToiDa || 0, 10);
         var xe3GacToiDa = parseInt(dinhBienPhuongTien.Xe3Gac_ToiDa || 0, 10);
         var xeMayDaCap = parseInt(dinhBienPhuongTien.XeMay_DaCap || 0, 10);
@@ -443,24 +443,22 @@
         var xinThemXeMay = parseInt(dinhBienPhuongTien.DinhBienXinThem_XeMay || 0, 10);
         var xinThemXe3Gac = parseInt(dinhBienPhuongTien.DinhBienXinThem_Xe3Gac || 0, 10);
 
-        // Công thức yêu cầu: available = ToiDa + XinThem - DaCap
         var availXeMay = xeMayToiDa + xinThemXeMay - xeMayDaCap;
         var availXe3Gac = xe3GacToiDa + xinThemXe3Gac - xe3GacDaCap;
 
-        // kiểm tra vượt định biên
-        if (soXeMayMoi > availXeMay || soXe3GacMoi > availXe3Gac) {
-            alert(
-                `Vượt định biên:\n` +
-                `Xe máy — tối đa: ${xeMayToiDa}, đã cấp: ${xeMayDaCap}, xin thêm: ${xinThemXeMay}, khả dụng: ${availXeMay}, đăng ký: ${soXeMayMoi}\n` +
-                `Xe 3 gác — tối đa: ${xe3GacToiDa}, đã cấp: ${xe3GacDaCap}, xin thêm: ${xinThemXe3Gac}, khả dụng: ${availXe3Gac}, đăng ký: ${soXe3GacMoi}`
-            );
+        if (soXeMayMoi > 0 && soXeMayMoi > availXeMay) {
+            alert(`Vượt định biên:\nXe máy — khả dụng: ${availXeMay}, đăng ký: ${soXeMayMoi}`);
             return;
         }
 
+        if (soXe3GacMoi > 0 && soXe3GacMoi > availXe3Gac) {
+            alert(`Vượt định biên:\nXe 3 gác — khả dụng: ${availXe3Gac}, đăng ký: ${soXe3GacMoi}`);
+            return;
+        }
 
-        // Nếu hợp lệ, gọi submitForm như cũ
         submitForm(e);
     });
+
     let dinhBienPhuongTien = null;
     $(document).ready(function () {
         $.ajax({
