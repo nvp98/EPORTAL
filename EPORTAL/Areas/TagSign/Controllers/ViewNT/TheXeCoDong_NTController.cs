@@ -599,15 +599,30 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 }
 
                 // 2. Xử lý file upload (nếu có)
+                //if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
+                //{
+                //    var fileName = Path.GetFileName(FileHoSoXe.FileName);
+                //    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
+                //    FileHoSoXe.SaveAs(filePath);
+
+                //    // Lưu tên file (đường dẫn tương đối)
+                //    model.FileHoSoXe = fileName;
+                //}
                 if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
                 {
-                    var fileName = Path.GetFileName(FileHoSoXe.FileName);
+                    var originalName = Path.GetFileNameWithoutExtension(FileHoSoXe.FileName);
+                    var extension = Path.GetExtension(FileHoSoXe.FileName);
+
+                    // Tạo tên file mới: TenGoc_GUID.extension
+                   // var fileName = $"{originalName}_{Guid.NewGuid()}{extension}";
+                    var fileName = $"{originalName}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";                    
                     var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
                     FileHoSoXe.SaveAs(filePath);
 
-                    // Lưu tên file (đường dẫn tương đối)
                     model.FileHoSoXe = fileName;
                 }
+
+
 
                 // 3. Tạo mã đơn tự động nếu chưa có
                 if (string.IsNullOrEmpty(model.Ma_Don))
@@ -1241,13 +1256,30 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 }
 
                 // Xử lý file upload
+                //if (FileHoSoXE != null && FileHoSoXE.ContentLength > 0)
+                //{
+                //    var fileName = Path.GetFileName(FileHoSoXE.FileName);
+                //    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
+                //    FileHoSoXE.SaveAs(filePath);
+                //    donDangKy.FileHoSoXe = fileName;
+                //}
+                // Xử lý file upload
                 if (FileHoSoXE != null && FileHoSoXE.ContentLength > 0)
                 {
-                    var fileName = Path.GetFileName(FileHoSoXE.FileName);
-                    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
+                    var originalName = Path.GetFileNameWithoutExtension(FileHoSoXE.FileName);
+                    var extension = Path.GetExtension(FileHoSoXE.FileName);
+
+                    // Tên gốc + datetime
+                    var fileName = $"{originalName}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";
+                  
+                    var folder = Server.MapPath("~/UploadedFiles/XeCoDong/");
+
+                    var filePath = Path.Combine(folder, fileName);
                     FileHoSoXE.SaveAs(filePath);
+
                     donDangKy.FileHoSoXe = fileName;
                 }
+
 
                 // Cập nhật thông tin đơn
                 donDangKy.NoiDung = model.NoiDung;
