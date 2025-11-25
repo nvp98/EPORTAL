@@ -580,6 +580,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     return Json(new { success = false, message = "Danh sách xe không được trống" });
                 }
+
                 // 2. Kiểm tra nội dung trình ký
                 if (string.IsNullOrWhiteSpace(model.NoiDung))
                 {
@@ -592,6 +593,10 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 }
 
                 var danhSachXe = JsonConvert.DeserializeObject<List<ChiTietDonVM>>(model.JsonDanhSachXe);
+                if (danhSachXe == null || !danhSachXe.Any())
+                {
+                    return Json(new { success = false, message = "Danh sách xe không được trống" });
+                }
                 var bienSoList = danhSachXe.Select(x => x.BienSoXe?.Trim().ToUpper()).ToList();
                 if (bienSoList.Count != bienSoList.Distinct().Count())
                 {
