@@ -91,11 +91,6 @@ namespace EPORTAL.Areas.Equipment.Controllers
             List<NV_LoiSuCoTB> lsc = db.NV_LoiSuCoTB.ToList();
             ViewBag.LSCList = new SelectList(lsc, "IDSC", "TenLoiSC");
 
-            var aa = dbE.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
-
-            var nv3 = aa.Select(x => new EmployeeValidation { MaNV = x.MaNV, HoTen = x.MaNV + " - " + x.HoTen }).ToList();
-            ViewBag.Selected = new SelectList(nv3, "MaNV", "HoTen");
-
             List<PhongBan> pb = dbE.PhongBans.ToList();
             var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.ADD_AD).First();
             if (check == 0)
@@ -476,6 +471,19 @@ namespace EPORTAL.Areas.Equipment.Controllers
                 return RedirectToAction("Index", "EquipmentManagement");
             }
 
+        }
+        public JsonResult GetNhanVienByPhongBan(int idPhongBan)
+        {
+            var data = dbE.NhanViens
+                .Where(x => x.IDPhongBan == idPhongBan && x.IDTinhTrangLV == 1)
+                .Select(x => new
+                {
+                    MaNV = x.MaNV,
+                    HoTen = x.MaNV + " - " + x.HoTen
+                })
+                .ToList();
+
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
     }
 }
