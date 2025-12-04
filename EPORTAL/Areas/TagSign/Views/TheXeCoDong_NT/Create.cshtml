@@ -292,13 +292,13 @@
             <tr>
                 <td>${i + 1}</td>
                  <td>
-                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} />
+                    <input type="checkbox" class="cb-loai loai-may" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 1 ? "checked" : ""} />
                 </td>
                 <td>
-                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} />
+                    <input type="checkbox" class="cb-loai loai-oto" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 3 ? "checked" : ""} />
                 </td>
                 <td>
-                    <input type="checkbox" class="cb-loai" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} />
+                    <input type="checkbox" class="cb-loai loai-3gac" data-group="${i}" style="width: 100%;" ${item.ID_LoaiPhuongTien === 2 ? "checked" : ""} />
                 </td>
                 <td><input type="text" name="Items[${i}].BienSoXe"  style=" width: 100%" value="${item.BienSoXe}" class="form-control" /></td>
                 <td><input type="checkbox" class="cb-cap" data-group="${i}" name="Items[${i}].CapMoi"  style=" width: 100%" value="true" ${item.CapMoi ? "checked" : ""} /></td>
@@ -412,7 +412,52 @@
 }
     $("#btnSave").off('click').on('click', function (e) {
         e.preventDefault();
+        let isValid = true;
+        $("#tbodyImportExcel tr").each(function (index) {
+            var row = $(this);
 
+            // 1. Kiểm tra Hình thức (Cấp mới/Cấp lại/Gia hạn)
+            var isCapMoi = row.find("input[name*='CapMoi']").is(":checked");
+            var isCapLai = row.find("input[name*='CapLai']").is(":checked");
+            var isGiaHan = row.find("input[name*='GiaHan']").is(":checked");
+
+            if (!isCapMoi && !isCapLai && !isGiaHan) {
+                alert("Vui lòng chọn hình thức (Cấp mới, Cấp lại hoặc Gia hạn) tại dòng thứ " + (index + 1));
+                row.find("input[name*='CapMoi']").focus();
+                isValid = false;
+                return false; // Dừng vòng lặp
+            }
+
+            // 2. Kiểm tra Loại xe (Xe máy/Ô tô/3 Gác)
+            var isXeMay = row.find(".loai-may").is(":checked");
+            var isOTo = row.find(".loai-oto").is(":checked");
+            var is3Gac = row.find(".loai-3gac").is(":checked");
+
+            if (!isXeMay && !isOTo && !is3Gac) {
+                alert("Vui lòng chọn Loại phương tiện");
+                isValid = false;
+                return false; // Dừng vòng lặp
+            }
+            // 3.KIỂM TRA BIỂN SỐ XE KHÔNG ĐƯỢC ĐỂ TRỐNG 
+            var bienSoXe = row.find("input[name*='BienSoXe']").val();
+            if (!bienSoXe || bienSoXe.trim() === "") {
+                alert("Biển số xe không được để trống");
+                row.find("input[name*='BienSoXe']").focus();
+                isValid = false;
+                return false; // Dừng vòng lặp
+            }
+            // 4.  KIỂM TRA ĐẾN NGÀY (DenNgay) KHÔNG ĐƯỢC ĐỂ TRỐNG 
+            var denNgay = row.find("input[type=date]").val();
+            if (!denNgay || denNgay.trim() === "") {
+                alert("Vui lòng nhập Thời hạn thẻ xe cơ động ('Đến Ngày')");
+                row.find("input[type=date]").focus();
+                isValid = false;
+                return false; // Dừng vòng lặp
+            }
+        });
+
+        // Nếu kiểm tra thất bại thì dừng ngay, không chạy tiếp
+        if (!isValid) return;
         var listXe = [];
         $("#tbodyImportExcel tr").each(function () {
             var row = $(this);

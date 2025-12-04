@@ -403,6 +403,36 @@
             alert("Không được phép có hai biển số xe trùng nhau trong cùng một đơn!");
             return;
         }
+        // Kiểm tra từng dòng trong danhSachXe
+        for (let i = 0; i < danhSachXe.length; i++) {
+            const item = danhSachXe[i];
+            const row = i + 1;
+
+            // 1. Kiểm tra loại phương tiện
+            if (!item.ID_LoaiPhuongTien || item.ID_LoaiPhuongTien == 0) {
+                alert(`Dòng ${row}: Vui lòng chọn loại phương tiện (Xe máy / Xe ô tô / Xe 3 gác).`);
+                return;
+            }
+
+            // 2. Kiểm tra loại cấp (phải chọn 1)
+            if (!item.CapMoi && !item.CapLai && !item.GiaHan) {
+                alert(`Dòng ${row}: Vui lòng chọn loại cấp (Cấp mới / Cấp lại / Gia hạn).`);
+                return;
+            }
+
+            // 3. Kiểm tra biển số xe
+            if (!item.BienSoXe || item.BienSoXe.trim() === "") {
+                alert(`Dòng ${row}: Biển số xe không được để trống.`);
+                return;
+            }
+
+            // 4. Kiểm tra đến ngày
+            if (!item.DenNgay || item.DenNgay.trim() === "") {
+                alert(`Dòng ${row}: Vui lòng chọn thời hạn thẻ (Đến ngày).`);
+                return;
+            }
+        }
+
         // Tạo FormData từ form chính và thêm danhSachXe vào
         let formData = new FormData($("form")[0]);
         formData.append("KTV_ID", $("#KTV_QL").val());
