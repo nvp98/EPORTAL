@@ -78,12 +78,12 @@
                                     </div>
                                     <div class="col-6">
                                         <label for="addressPermanent01" class="form-label fw-bold">Xóm / Số nhà</label>
-                                        <input type="text" id="addressPermanent01" class="form-control" 
+                                        <input type="text" id="addressPermanent01" class="form-control"
                                                placeholder="Nhập Xóm / Số nhà ở nơi thường trú" />
                                     </div>
                                     <div class="col-6">
                                         <label for="addressPermanent02" class="form-label fw-bold">Thôn / Phố</label>
-                                        <input type="text" id="addressPermanent02" class="form-control" 
+                                        <input type="text" id="addressPermanent02" class="form-control"
                                                placeholder="Nhập Thôn / Phố ở nơi thường trú" />
                                     </div>
                                 </div>
@@ -114,14 +114,95 @@
                                     </div>
                                     <div class="col-6">
                                         <label for="addressCurrent01" class="form-label fw-bold">Xóm / Số nhà</label>
-                                        <input type="text" id="addressCurrent01" class="form-control" 
+                                        <input type="text" id="addressCurrent01" class="form-control"
                                                placeholder="Nhập Xóm / Số nhà hiện tại" />
                                     </div>
                                     <div class="col-6">
                                         <label for="addressCurrent02" class="form-label fw-bold">Thôn / Phố</label>
-                                        <input type="text" id="addressCurrent02" class="form-control" 
+                                        <input type="text" id="addressCurrent02" class="form-control"
                                                placeholder="Nhập Thôn / Phố hiện tại" />
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light fw-bold">
+                                Thông tin liên lạc
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-4">
+                                        <label for="phonePersonal" class="form-label fw-bold">SĐT cá nhân</label>
+                                        <input type="text" id="phonePersonal" class="form-control"
+                                               placeholder="Nhập số điện thoại cá nhân" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="relativeName" class="form-label fw-bold">Họ tên người thân</label>
+                                        <input type="text" id="relativeName" class="form-control"
+                                               placeholder="Nhập họ tên người thân" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="relativePhone" class="form-label fw-bold">SĐT người thân</label>
+                                        <input type="text" id="relativePhone" class="form-control"
+                                               placeholder="Nhập số điện thoại người thân" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light fw-bold">
+                                Thông tin nhân thân
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Họ tên Bố</label>
+                                        <input type="text" id="fatherName" class="form-control" placeholder="Nhập họ tên bố">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Năm sinh Bố</label>
+                                        <select id="fatherYob" class="form-control"></select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Họ tên Mẹ</label>
+                                        <input type="text" id="motherName" class="form-control" placeholder="Nhập họ tên mẹ">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Năm sinh Mẹ</label>
+                                        <select id="motherYob" class="form-control"></select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Họ tên Vợ/Chồng</label>
+                                        <input type="text" id="spouseName" class="form-control" placeholder="Nhập họ tên vợ/chồng">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Năm sinh Vợ/Chồng</label>
+                                        <select id="spouseYob" class="form-control"></select>
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12 d-flex justify-content-between align-items-center">
+                                        <button type="button" class="btn btn-primary btn-sm" id="addChildBtn">
+                                            + Thêm con
+                                        </button>
+                                    </div>
+
+                                    <div id="childrenContainer" class="mt-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -159,8 +240,58 @@
     </div>
 
 </div>
-
 <script>
+
+    let childIndex = 0;
+
+    function addChildRow(name = "", yob = "") {
+        childIndex++;
+
+        let html = `
+        <div class="row g-3 align-items-end mb-2 child-row" data-child-id="${childIndex}">
+            <div class="col-md-6">
+                <input type="text" name="Children[${childIndex}].HoTen"
+                       class="form-control" value="${name}" placeholder="Nhập họ tên con">
+            </div>
+
+            <div class="col-md-4">
+                <select name="Children[${childIndex}].NamSinh" class="form-control">
+                    <option value="">--Chọn năm--</option>
+                    ${generateYearOptions(yob)}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-sm remove-child">Xóa</button>
+            </div>
+        </div>`;
+
+        $("#childrenContainer").append(html);
+    }
+
+    $(document).ready(function () {
+        addChildRow();
+    });
+
+    function generateYearOptions(selectedYear) {
+        const currentYear = new Date().getFullYear();
+        let html = "";
+
+        for (let year = currentYear; year >= 1980; year--) {
+            html += `<option value="${year}" ${selectedYear == year ? "selected" : ""}>${year}</option>`;
+        }
+
+        return html;
+    }
+
+    $("#addChildBtn").on("click", function () {
+        addChildRow();
+    });
+
+    $(document).on("click", ".remove-child", function () {
+        $(this).closest(".child-row").remove();
+    });
+
     function validateAndSave(e) {
         e.preventDefault();
 
@@ -168,56 +299,70 @@
         const changeOption = $('input[name="changeOption"]:checked').val();
 
         if (changeOption === "nochange") {
-            
+
         } else {
+
             // Validate form
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return false;
             }
 
-            // Validate input
-            const requiredAddressFields = [
-                { id: '#addressPermanent01', label: 'Xóm / Số nhà ở nơi thường trú' },
-                { id: '#addressPermanent02', label: 'Thôn / Phố ở nơi thường trú' },
-                { id: '#addressCurrent01', label: 'Nhập Xóm / Số nhà hiện tại' },
-                { id: '#addressCurrent02', label: 'Nhập Thôn / Phố hiện tại' }
+            const permanentFields = [
+                '#provincePermanent',
+                '#communePermanent',
+                '#addressPermanent01',
+                '#addressPermanent02'
             ];
 
-            for (const field of requiredAddressFields) {
-                const $el = $(field.id);
-                if (!$el.val() || $el.val().trim() === "") {
-                    alert('Vui lòng nhập ' + field.label + '.');
-                    $el.focus();
-                    return false;
-                }
-            }
+            const hasPermanentValue = permanentFields.some(id => $(id).val() && $(id).val().trim() !== "");
 
-            function checkSelect(selector, message) {
-                var $sel = $(selector);
-                var val = $sel.val();
-                if (!val || val === "") {
-                    var $chosen = $sel.next('.chosen-container');
-                    if ($chosen.length) {
-                        var $searchInput = $chosen.find('input');
-                        if ($searchInput.length) {
-                            $searchInput.focus();
-                        } else {
-                            $chosen.focus();
-                        }
-                    } else {
-                        $sel.focus();
+            if (hasPermanentValue) {
+                for (let id of permanentFields) {
+                    if (!$(id).val() || $(id).val().trim() === "") {
+                        alert("Vui lòng nhập đầy đủ thông tin nơi thường trú.");
+                        $(id).focus();
+                        return false;
                     }
-                    alert('Vui lòng chọn ' + message + '.');
-                    return false;
                 }
-                return true;
             }
 
-            if (!checkSelect('#provincePermanent', 'Tỉnh/Thành phố nơi thường trú')) return false;
-            if (!checkSelect('#communePermanent', 'Xã/Phường nơi thường trú')) return false;
-            if (!checkSelect('#provinceCurrent', 'Tỉnh/Thành phố nơi ở hiện tại')) return false;
-            if (!checkSelect('#communeCurrent', 'Xã/Phường nơi ở hiện tại')) return false;
+            const currentFields = [
+                '#provinceCurrent',
+                '#communeCurrent',
+                '#addressCurrent01',
+                '#addressCurrent02'
+            ];
+
+            const hasCurrentValue = currentFields.some(id => $(id).val() && $(id).val().trim() !== "");
+
+            if (hasCurrentValue) {
+                for (let id of currentFields) {
+                    if (!$(id).val() || $(id).val().trim() === "") {
+                        alert("Vui lòng nhập đầy đủ thông tin nơi ở hiện tại.");
+                        $(id).focus();
+                        return false;
+                    }
+                }
+            }
+        }
+
+        let validChildren = true;
+
+        $(".child-row").each(function () {
+            let name = $(this).find("input[name*='HoTen']").val().trim();
+            let yob = $(this).find("select[name*='NamSinh']").val().trim();
+
+            if ((name !== "" && yob === "") || (name === "" && yob !== "")) {
+                alert("Vui lòng nhập đầy đủ Họ tên và Năm sinh cho mỗi con.");
+                $(this).find("input, select").first().focus();
+                validChildren = false;
+                return false;
+            }
+        });
+
+        if (!validChildren) {
+            return false;
         }
 
         // Data
@@ -234,8 +379,33 @@
             CurrentCommuneCode: $('#communeCurrent').val(),
             CurrentCommuneName: $('#communeCurrent option:selected').text(),
             CurrentAddress01: $('#addressCurrent01').val(),
-            CurrentAddress02: $('#addressCurrent02').val()
+            CurrentAddress02: $('#addressCurrent02').val(),
+
+            PhonePersonal: $('#phonePersonal').val(),
+            RelativeName: $('#relativeName').val(),
+            RelativePhone: $('#relativePhone').val(),
+
+            FatherName: $('#fatherName').val(),
+            FatherYob: $('#fatherYob').val(),
+            MotherName: $('#motherName').val(),
+            MotherYob: $('#motherYob').val(),
+            SpouseName: $('#spouseName').val(),
+            SpouseYob: $('#spouseYob').val(),
+
+            Children: []
         };
+
+        $(".child-row").each(function () {
+            let name = $(this).find("input[name*='HoTen']").val();
+            let yob = $(this).find("select[name*='NamSinh']").val();
+
+            if (name.trim() !== "") {
+                data.Children.push({
+                    HoTen: name,
+                    NamSinh: yob
+                });
+            }
+        });
 
         $.ajax({
             url: '/Residency/Save',
@@ -361,6 +531,21 @@
             var communeText = $('#communeCurrent option:selected').text();
             CurrentCommuneName = communeText !== "-- Chọn xã/phường --" ? communeText : "";
         });
+
+        function generateYears(selectId) {
+            let currentYear = new Date().getFullYear();
+            let html = '<option value="">-- Chọn năm --</option>';
+
+            for (let year = currentYear; year >= 1930; year--) {
+                html += `<option value="${year}">${year}</option>`;
+            }
+
+            $(selectId).html(html);
+        }
+
+        generateYears("#fatherYob");
+        generateYears("#motherYob");
+        generateYears("#spouseYob");
     });
 </script>
 
@@ -373,5 +558,4 @@
     });
 
 </script>
-
 

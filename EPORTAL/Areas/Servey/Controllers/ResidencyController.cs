@@ -89,91 +89,102 @@ namespace EPORTAL.Controllers
                 var existing = _context.KhaiBao_ThongTinCuTru
                     .FirstOrDefault(x => x.NhanVienID == MyAuthentication.ID);
 
-                // No change
+                bool isNew = false;
+                if (existing == null)
+                {
+                    existing = new KhaiBao_ThongTinCuTru
+                    {
+                        NhanVienID = MyAuthentication.ID
+                    };
+                    isNew = true;
+                }
+
+                existing.HoTen = nhanVien.HoTen;
+                existing.MaNhanVien = nhanVien.MaNV;
+                existing.NgayCapNhat = DateTime.Now;
+
                 if (model.ChangeOption == "nochange")
                 {
-                    if (existing == null)
-                    {
-                        existing = new KhaiBao_ThongTinCuTru
-                        {
-                            NhanVienID = MyAuthentication.ID
-                        };
-                        _context.KhaiBao_ThongTinCuTru.Add(existing);
-                    }
-
-                    existing.HoTen = nhanVien.HoTen;
-                    existing.MaNhanVien = nhanVien.MaNV;
                     existing.TinhThuongTru = "Không thay đổi so với app nhân sự";
                     existing.MaTinhThuongTru = "";
+
                     existing.XaPhuongThuongTru = "Không thay đổi so với app nhân sự";
                     existing.MaXaPhuongThuongTru = "";
+
                     existing.SoNhaThuongTru = "Không thay đổi so với app nhân sự";
                     existing.ThonPhoThuongTru = "Không thay đổi so với app nhân sự";
+
                     existing.TinhHienTai = "Không thay đổi so với app nhân sự";
                     existing.MaTinhHienTai = "";
                     existing.XaPhuongHienTai = "Không thay đổi so với app nhân sự";
                     existing.MaXaPhuongHienTai = "";
                     existing.SoNhaHienTai = "Không thay đổi so với app nhân sự";
                     existing.ThonPhoHienTai = "Không thay đổi so với app nhân sự";
+
                     existing.CoThayDoi = false;
-                    existing.NgayCapNhat = DateTime.Now;
-
-                    _context.Entry(existing).State = existing.Id > 0 ? EntityState.Modified : EntityState.Added;
                 }
-                else // Change
+                else
                 {
-                    if (existing != null)
+                    existing.TinhThuongTru = model.PermanentProvinceName;
+                    existing.MaTinhThuongTru = model.PermanentProvinceCode;
+
+                    existing.XaPhuongThuongTru = model.PermanentCommuneName;
+                    existing.MaXaPhuongThuongTru = model.PermanentCommuneCode;
+
+                    existing.SoNhaThuongTru = model.PermanentAddress01;
+                    existing.ThonPhoThuongTru = model.PermanentAddress02;
+
+                    existing.TinhHienTai = model.CurrentProvinceName;
+                    existing.MaTinhHienTai = model.CurrentProvinceCode;
+
+                    existing.XaPhuongHienTai = model.CurrentCommuneName;
+                    existing.MaXaPhuongHienTai = model.CurrentCommuneCode;
+
+                    existing.SoNhaHienTai = model.CurrentAddress01;
+                    existing.ThonPhoHienTai = model.CurrentAddress02;
+
+                    existing.CoThayDoi = true;
+                }
+
+                existing.SDTCaNhan = model.PhonePersonal;
+                existing.HoTenNguoiThan = model.RelativeName;
+                existing.SDTNguoiThan = model.RelativePhone;
+
+                existing.HoTenBo = model.FatherName;
+                existing.NamSinhBo = model.FatherYob;
+                existing.HoTenMe = model.MotherName;
+                existing.NamSinhMe = model.MotherYob;
+                existing.HoTenVoChong = model.SpouseName;
+                existing.NamSinhVoChong = model.SpouseYob;
+
+                _context.Entry(existing).State = isNew ? EntityState.Added : EntityState.Modified;
+
+                _context.SaveChanges();
+
+                var existingChildren = _context.KhaiBao_ThongTinCon
+                    .Where(x => x.KhaiBaoID == existing.Id)
+                    .ToList();
+
+                _context.KhaiBao_ThongTinCon.RemoveRange(existingChildren);
+
+                if (model.Children != null)
+                {
+                    foreach (var c in model.Children)
                     {
-                        existing.HoTen = nhanVien.HoTen;
-                        existing.MaNhanVien = nhanVien.MaNV;
-
-                        existing.TinhThuongTru = model.PermanentProvinceName;
-                        existing.MaTinhThuongTru = model.PermanentProvinceCode;
-                        existing.XaPhuongThuongTru = model.PermanentCommuneName;
-                        existing.MaXaPhuongThuongTru = model.PermanentCommuneCode;
-                        existing.SoNhaThuongTru = model.PermanentAddress01;
-                        existing.ThonPhoThuongTru = model.PermanentAddress02;
-
-                        existing.TinhHienTai = model.CurrentProvinceName;
-                        existing.MaTinhHienTai = model.CurrentProvinceCode;
-                        existing.XaPhuongHienTai = model.CurrentCommuneName;
-                        existing.MaXaPhuongHienTai = model.CurrentCommuneCode;
-                        existing.SoNhaHienTai = model.CurrentAddress01;
-                        existing.ThonPhoHienTai = model.CurrentAddress02;
-
-                        existing.CoThayDoi = true;
-
-                        existing.NgayCapNhat = DateTime.Now;
-
-                        _context.Entry(existing).State = EntityState.Modified;
-                    }
-                    else
-                    {
-                        var entity = new KhaiBao_ThongTinCuTru
+                        if (!string.IsNullOrEmpty(c.HoTen))
                         {
-                            NhanVienID = MyAuthentication.ID,
-                            HoTen = nhanVien.HoTen,
-                            MaNhanVien = nhanVien.MaNV,
-                            TinhThuongTru = model.PermanentProvinceName,
-                            MaTinhThuongTru = model.PermanentProvinceCode,
-                            XaPhuongThuongTru = model.PermanentCommuneName,
-                            MaXaPhuongThuongTru = model.PermanentCommuneCode,
-                            SoNhaThuongTru = model.PermanentAddress01,
-                            ThonPhoThuongTru = model.PermanentAddress02,
-                            TinhHienTai = model.CurrentProvinceName,
-                            MaTinhHienTai = model.CurrentProvinceCode,
-                            XaPhuongHienTai = model.CurrentCommuneName,
-                            MaXaPhuongHienTai = model.CurrentCommuneCode,
-                            SoNhaHienTai = model.CurrentAddress01,
-                            ThonPhoHienTai = model.CurrentAddress02,
-                            CoThayDoi = true,
-                            NgayCapNhat = DateTime.Now
-                        };
-                        _context.KhaiBao_ThongTinCuTru.Add(entity);
+                            _context.KhaiBao_ThongTinCon.Add(new KhaiBao_ThongTinCon
+                            {
+                                KhaiBaoID = existing.Id,
+                                HoTen = c.HoTen,
+                                NamSinh = c.NamSinh
+                            });
+                        }
                     }
                 }
 
                 _context.SaveChanges();
+
                 return Json(new { ok = true, message = "Lưu thông tin thành công!" });
             }
             catch (Exception ex)
@@ -192,6 +203,12 @@ namespace EPORTAL.Controllers
             {
                 return RedirectToAction("Index");
             }
+
+            var children = _context.KhaiBao_ThongTinCon
+               .Where(c => c.KhaiBaoID == data.Id)
+               .ToList();
+
+            ViewBag.Children = children;
 
             return View(data);
         }
@@ -227,7 +244,27 @@ namespace EPORTAL.Controllers
 
                             IsChange = (bool) r.CoThayDoi,
 
-                            UpdateDate = r.NgayCapNhat
+                            UpdateDate = r.NgayCapNhat,
+
+                            PhonePersonal = r.SDTCaNhan,
+                            RelativeName = r.HoTenNguoiThan,
+                            RelativePhone = r.SDTNguoiThan,
+
+                            FatherName = r.HoTenBo,
+                            FatherYob = r.NamSinhBo,
+                            MotherName = r.HoTenMe,
+                            MotherYob = r.NamSinhMe,
+                            SpouseName = r.HoTenVoChong,
+                            SpouseYob = r.NamSinhVoChong,
+
+                            Children = _context.KhaiBao_ThongTinCon
+                            .Where(c => c.KhaiBaoID == r.Id)
+                            .Select(c => new ChildModel
+                            {
+                                HoTen = c.HoTen,
+                                NamSinh = c.NamSinh
+                            })
+                            .ToList()
                         };
 
             if (!string.IsNullOrEmpty(search))
@@ -309,8 +346,23 @@ namespace EPORTAL.Controllers
                             r.ThonPhoHienTai,
 
                             r.CoThayDoi,
+                            r.NgayCapNhat,
 
-                            r.NgayCapNhat
+                            r.SDTCaNhan,
+                            r.HoTenNguoiThan,
+                            r.SDTNguoiThan,
+
+                            r.HoTenBo,
+                            r.NamSinhBo,
+                            r.HoTenMe,
+                            r.NamSinhMe,
+                            r.HoTenVoChong,
+                            r.NamSinhVoChong,
+
+                            Children = _context.KhaiBao_ThongTinCon
+                            .Where(c => c.KhaiBaoID == r.Id)
+                            .Select(c => new { c.HoTen, c.NamSinh })
+                            .ToList()
                         };
 
             if (!string.IsNullOrEmpty(search))
@@ -338,8 +390,19 @@ namespace EPORTAL.Controllers
                 ws.Cell(row, 11).Value = "Xã/Phường hiện tại";
                 ws.Cell(row, 12).Value = "Xóm/Số nhà hiện tại";
                 ws.Cell(row, 13).Value = "Thôn/Phố hiện tại";
+                ws.Cell(row, 14).Value = "SĐT cá nhân";
+                ws.Cell(row, 15).Value = "Họ tên người thân";
+                ws.Cell(row, 16).Value = "SĐT người thân";
+                ws.Cell(row, 17).Value = "Họ tên bố";
+                ws.Cell(row, 18).Value = "Năm sinh bố";
+                ws.Cell(row, 19).Value = "Họ tên mẹ";
+                ws.Cell(row, 20).Value = "Năm sinh mẹ";
+                ws.Cell(row, 21).Value = "Họ tên vợ/chồng";
+                ws.Cell(row, 22).Value = "Năm sinh vợ/chồng";
+                ws.Cell(row, 23).Value = "Họ tên con";
+                ws.Cell(row, 24).Value = "Năm sinh con";
 
-                var headerRange = ws.Range(row, 1, row, 13);
+                var headerRange = ws.Range(row, 1, row, 24);
                 headerRange.Style.Font.Bold = true;
                 headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                 headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
@@ -358,15 +421,15 @@ namespace EPORTAL.Controllers
                     if (item.CoThayDoi == false)
                     {
                         // No change
-                        for (int col = 6; col <= 13; col++)
+                        for (int col = 6; col <= 24; col++)
                         {
                             ws.Cell(row, col).Value = "Không thay đổi so với app nhân sự";
                         }
 
                         // Format
-                        ws.Range(row, 6, row, 13).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                        ws.Range(row, 6, row, 13).Style.Font.Italic = true;
-                        ws.Range(row, 6, row, 13).Style.Font.FontColor = XLColor.Gray;
+                        ws.Range(row, 6, row, 24).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        ws.Range(row, 6, row, 24).Style.Font.Italic = true;
+                        ws.Range(row, 6, row, 24).Style.Font.FontColor = XLColor.Gray;
                     }
                     else
                     {
@@ -379,6 +442,25 @@ namespace EPORTAL.Controllers
                         ws.Cell(row, 11).Value = item.XaPhuongHienTai;
                         ws.Cell(row, 12).Value = item.SoNhaHienTai;
                         ws.Cell(row, 13).Value = item.ThonPhoHienTai;
+                        ws.Cell(row, 14).Value = item.SDTCaNhan;
+                        ws.Cell(row, 15).Value = item.HoTenNguoiThan;
+                        ws.Cell(row, 16).Value = item.SDTNguoiThan;
+
+                        ws.Cell(row, 17).Value = item.HoTenBo;
+                        ws.Cell(row, 18).Value = item.NamSinhBo;
+                        ws.Cell(row, 19).Value = item.HoTenMe;
+                        ws.Cell(row, 20).Value = item.NamSinhMe;
+                        ws.Cell(row, 21).Value = item.HoTenVoChong;
+                        ws.Cell(row, 22).Value = item.NamSinhVoChong;
+
+                        if (item.Children != null && item.Children.Any())
+                        {
+                            ws.Cell(row, 23).Value = string.Join("\n", item.Children.Select(c => c.HoTen));
+                            ws.Cell(row, 24).Value = string.Join("\n", item.Children.Select(c => c.NamSinh));
+
+                            ws.Cell(row, 23).Style.Alignment.WrapText = true;
+                            ws.Cell(row, 24).Style.Alignment.WrapText = true;
+                        }
                     }
 
                     index++;

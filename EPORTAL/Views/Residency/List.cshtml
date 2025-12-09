@@ -86,21 +86,35 @@
                     <tr>
                         <th rowspan="2">#</th>
                         <th rowspan="2">Họ và tên</th>
-                        <th rowspan="2">Vị trí công việc</th>
+                        @*<th rowspan="2">Vị trí công việc</th>*@
                         <th rowspan="2">Đơn vị</th>
                         <th colspan="4">Hộ khẩu thường trú</th>
                         <th colspan="4">Nơi ở hiện tại</th>
+                        <th colspan="3">Thông tin liên lạc</th>
+                        <th colspan="8">Thông tin nhân thân</th>
                     </tr>
                     <tr>
                         <th>Tỉnh/Thành</th>
                         <th>Xã/Phường</th>
-                        <th>Xóm / Số nhà</th>
-                        <th>Thôn / Phố</th>
+                        <th>Xóm/Số nhà</th>
+                        <th>Thôn/Phố</th>
 
                         <th>Tỉnh/Thành</th>
                         <th>Xã/Phường</th>
-                        <th>Xóm / Số nhà</th>
-                        <th>Thôn / Phố</th>
+                        <th>Xóm/Số nhà</th>
+                        <th>Thôn/Phố</th>
+
+                        <th>SĐT cá nhân</th>
+                        <th>Họ tên người thân</th>
+                        <th>SĐT người thân</th>
+
+                        <th>Họ tên Bố</th>
+                        <th>Năm sinh Bố</th>
+                        <th>Họ tên Mẹ</th>
+                        <th>Năm sinh Mẹ</th>
+                        <th>Họ tên Vợ/Chồng</th>
+                        <th>Năm sinh Vợ/Chồng</th>
+                        <th>Họ tên/Năm sinh con</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -116,7 +130,6 @@
                             <tr>
                                 <td class="text-center">@index</td>
                                 <td>@item.EmployeeName - @item.MaNhanVien</td>
-                                <td>@item.TenViTri</td>
                                 <td>@item.TenPhongBan</td>
 
                                 @if (item.IsChange == false)
@@ -136,13 +149,32 @@
                                     <td>@item.CurrentCommuneName</td>
                                     <td>@item.CurrentAddress01</td>
                                     <td>@item.CurrentAddress02</td>
+                                    <td>@item.PhonePersonal</td>
+                                    <td>@item.RelativeName</td>
+                                    <td>@item.RelativePhone</td>
+
+                                    
+                                    <td>@item.FatherName</td>
+                                    <td>@item.FatherYob</td>
+                                    <td>@item.MotherName</td>
+                                    <td>@item.MotherYob</td>
+                                    <td>@item.SpouseName</td>
+                                    <td>@item.SpouseYob</td>
+
+                                    if (item.Children != null && item.Children.Any())
+                                    {
+                                        <td>
+                                            @Html.Raw(string.Join("<br/>",
+                                                item.Children.Select(c => $"{c.HoTen} - {c.NamSinh}")
+                                            ))
+                                        </td>
+                                    }
                                 }
                             </tr>
                             index++;
                         }
                     }
                 </tbody>
-
             </table>
 
             @{
@@ -212,6 +244,5 @@
             </div>
         </div>
     </div>
-
 </div>
 

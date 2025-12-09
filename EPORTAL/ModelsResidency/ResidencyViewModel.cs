@@ -13,6 +13,19 @@ namespace EPORTAL.ModelsResidency
         public string TenViTri { get; set; }
         public string TenPhongBan { get; set; }
 
+        public string PhonePersonal { get; set; }
+        public string RelativeName { get; set; }
+        public string RelativePhone { get; set; }
+
+        public string FatherName { get; set; }
+        public int? FatherYob { get; set; }
+        public string MotherName { get; set; }
+        public int? MotherYob { get; set; }
+        public string SpouseName { get; set; }
+        public int? SpouseYob { get; set; }
+
+        public List<ChildModel> Children { get; set; }
+
         public List<Province> Provinces { get; set; } = new List<Province>();
         public List<Commune> Communes { get; set; } = new List<Commune>();
 
@@ -38,7 +51,12 @@ namespace EPORTAL.ModelsResidency
         public bool IsChange { get; set; }
 
         public DateTime? UpdateDate { get; set; }
+    }
 
+    public class ChildModel
+    {
+        public string HoTen { get; set; }
+        public int? NamSinh { get; set; }
     }
 
     public class Province
