@@ -4,6 +4,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @model EPORTAL.ModelsResidency.ResidencyViewModel
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
 <div class="app-main__outer">
     <div class="app-main__inner">
 
@@ -257,7 +261,7 @@
             <div class="col-md-4">
                 <select name="Children[${childIndex}].NamSinh" class="form-control">
                     <option value="">--Chọn năm--</option>
-                    ${generateYearOptions(yob)}
+                    ${generateYearOptionsForChildren(yob)}
                 </select>
             </div>
 
@@ -273,7 +277,7 @@
         addChildRow();
     });
 
-    function generateYearOptions(selectedYear) {
+    function generateYearOptionsForChildren(selectedYear) {
         const currentYear = new Date().getFullYear();
         let html = "";
 
@@ -291,6 +295,18 @@
     $(document).on("click", ".remove-child", function () {
         $(this).closest(".child-row").remove();
     });
+
+    function validatePair(nameSelector, yobSelector, fieldLabel) {
+        let name = $(nameSelector).val().trim();
+        let yob = $(yobSelector).val();
+
+        if ((name !== "" && yob === "") || (name === "" && yob !== "")) {
+            alert(`Vui lòng nhập đầy đủ Họ tên và Năm sinh của ${fieldLabel}.`);
+            $(nameSelector).focus();
+            return false;
+        }
+        return true;
+    }
 
     function validateAndSave(e) {
         e.preventDefault();
@@ -347,6 +363,18 @@
             }
         }
 
+        if (!validatePair("#fatherName", "#fatherYob", "Bố")) {
+            return false;
+        }
+
+        if (!validatePair("#motherName", "#motherYob", "Mẹ")) {
+            return false;
+        }
+
+        if (!validatePair("#spouseName", "#spouseYob", "Vợ/Chồng")) {
+            return false;
+        }
+
         let validChildren = true;
 
         $(".child-row").each(function () {
@@ -394,6 +422,19 @@
 
             Children: []
         };
+
+        const pairs = [
+            ["PermanentProvinceCode", "PermanentProvinceName"],
+            ["PermanentCommuneCode", "PermanentCommuneName"],
+            ["CurrentProvinceCode", "CurrentProvinceName"],
+            ["CurrentCommuneCode", "CurrentCommuneName"]
+        ];
+
+        pairs.forEach(([codeField, nameField]) => {
+            if (data[codeField] === "") {
+                data[nameField] = "";
+            }
+        });
 
         $(".child-row").each(function () {
             let name = $(this).find("input[name*='HoTen']").val();
@@ -548,14 +589,8 @@
         generateYears("#spouseYob");
     });
 </script>
-
-<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
-<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
 <script type="text/javascript">
-
     $("#provincePermanent, #provinceCurrent, #communePermanent, #communeCurrent").chosen({
         width: "100%"
     });
-
 </script>
-
