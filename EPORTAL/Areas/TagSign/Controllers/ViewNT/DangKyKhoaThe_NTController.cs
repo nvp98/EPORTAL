@@ -666,7 +666,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             ViewBag.PageSize = pageSize;
             return View(pagedData);
         }
-        public ActionResult HPDQ_GetAll(DateTime? begind, DateTime? endd, string maPhieu, int? page)
+        public ActionResult HPDQ_GetAll(DateTime? begind, DateTime? endd, string maPhieu, int? tinhTrang, int? page)
         {
             int pageNumber = page ?? 1;
             int pageSize = 10;
@@ -686,9 +686,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
                new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
            ).ToList();
+
+            if (tinhTrang.HasValue)
+            {
+                data = data.Where(x => x.TinhTrang == tinhTrang.Value).ToList();
+            }
+
             var filtered = data.ToList();
 
             var pagedData = filtered.ToPagedList(pageNumber, pageSize);
+            ViewBag.TinhTrang = tinhTrang;
             ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
             ViewBag.MaPhieu = maPhieu;

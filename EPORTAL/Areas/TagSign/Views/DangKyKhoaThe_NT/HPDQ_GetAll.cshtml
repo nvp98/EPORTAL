@@ -50,41 +50,53 @@
             <div class="row">
                 <div class="card">
                     <div class="card-header">
-                        <div class="row" style="width:100%">
-                            <div class="col-md-10 col-lg-10">
-                                <div class="row">
-                                    <span class="text-center" style="margin-top: 8px">Từ ngày :</span>
-                                    <div class="col-md-2">
-                                        @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
-                                    </div>
-                                    <span class="text-center" style="margin-top: 8px">Đến ngày :</span>
-                                    <div class="col-md-2">
-                                        @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
-                                    </div>
-                                    <div class="col-md-3">
-                                        @Html.TextBox("maPhieu", ViewBag.MaPhieu as string, new { @id = "maPhieu", @class = "form-control", placeholder = "Nhập mã phiếu" })
+                        <div class="row align-items-center">
 
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
-                                    </div>
-                                </div>
+                            <div class="col-auto">
+                                <label class="mb-0">Từ ngày:</label>
                             </div>
-                            @*<div class="col-md-2">
+                            <div class="col-auto">
+                                @Html.TextBox("begind", null, new { @id = "begind", @type = "date", @class = "form-control" })
+                            </div>
 
-                                    <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
-                                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","TheXeCoDong_NT",new {area="TagSign"})' style="margin-top:50px"></div>
-                                </div>*@
-                            <div class="col-md-2">
+                            <div class="col-auto">
+                                <label class="mb-0">Đến ngày:</label>
+                            </div>
+                            <div class="col-auto">
+                                @Html.TextBox("endd", null, new { @id = "endd", @type = "date", @class = "form-control" })
+                            </div>
+
+                            <div class="col-2">
+                                @Html.TextBox("maPhieu", ViewBag.MaPhieu as string,
+                                    new { @id = "maPhieu", @class = "form-control", placeholder = "Nhập mã phiếu" })
+                            </div>
+
+                            <div class="col-2">
+                                <select id="tinhTrang" name="tinhTrang" class="form-control">
+                                    <option value="">-- Tình trạng --</option>
+                                    <option value="5" @(ViewBag.TinhTrang == 5 ? "selected" : "")>Chưa trình ký</option>
+                                    <option value="1" @(ViewBag.TinhTrang == 1 ? "selected" : "")>Đang chờ duyệt</option>
+                                    <option value="2" @(ViewBag.TinhTrang == 2 ? "selected" : "")>Đã duyệt</option>
+                                    <option value="4" @(ViewBag.TinhTrang == 4 ? "selected" : "")>Không đạt</option>
+                                </select>
+                            </div>
+
+                            <div class="col-auto">
+                                <button class="btn btn-primary" id="btn-search">
+                                    <i class="fa fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+
+                            <div class="col text-right">
                                 <a href="@Url.Action("TaoDonDangKy", "DangKyKhoaThe_NT", new { area = "TagSign" })"
-                                   class="btn btn-primary"
-                                   style="margin-left:10px;float:right">
+                                   class="btn btn-primary">
                                     <i class="fa fa-plus"></i> Thêm mới
                                 </a>
                             </div>
 
                         </div>
                     </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
                             <div class="table-responsive">
@@ -171,12 +183,13 @@
                                 </table>
                                 <div class="pager">
                                     @Html.PagedListPager(Model, page => Url.Action("HPDQ_GetAll", new
-                                    {
-                                        page,
-                                        begind = Request.QueryString["begind"],
-                                        endd = Request.QueryString["endd"],
-                                        maPhieu = Request.QueryString["maPhieu"]
-                                    }))
+                                   {
+                                       page,
+                                       begind = Request.QueryString["begind"],
+                                       endd = Request.QueryString["endd"],
+                                       maPhieu = Request.QueryString["maPhieu"],
+                                       tinhTrang = Request.QueryString["tinhTrang"]
+                                   }))
                                     <div class="text-right">
                                         Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount -  @Model.TotalItemCount
                                     </div>
@@ -214,10 +227,11 @@
     $("#btn-search").on('click', function () {
     var begind = $('#begind').val();
     var endd = $('#endd').val();
-        var maPhieu = $('#maPhieu').val();
-        console.log(maPhieu)
+    var maPhieu = $('#maPhieu').val();
+    var tinhTrang = $('#tinhTrang').val();
 
-         window.location.href = '@Url.Action("HPDQ_GetAll", "DangKyKhoaThe_NT", new { area = "TagSign" })?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu);
+
+        window.location.href = '@Url.Action("HPDQ_GetAll", "DangKyKhoaThe_NT", new { area = "TagSign" })?begind=' + encodeURIComponent(begind) + '&endd=' + encodeURIComponent(endd) + '&maPhieu=' + encodeURIComponent(maPhieu) + '&tinhTrang=' + encodeURIComponent(tinhTrang);
 
     });
     $(document).ready(function () {
