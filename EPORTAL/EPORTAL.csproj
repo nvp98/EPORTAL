@@ -4178,6 +4178,7 @@
     <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\HPDQ_Detail.cshtml" />
     <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\HPDQ_Index.cshtml" />
     <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\HPDQ_IndexAll.cshtml" />
+    <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\HPDQ_GetAll.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

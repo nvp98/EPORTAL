@@ -166,185 +166,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
-
-        //public ActionResult Update(string id)
-        //{
-        //    if (string.IsNullOrEmpty(id))
-        //    {
-        //        return HttpNotFound();
-        //    }
-
-        //    // Lấy thông tin đơn đăng ký
-        //    var donDangKy = db_dk.KTNT_DonDangKy.AsNoTracking().FirstOrDefault(x => x.MaDon == id);
-        //    if (donDangKy == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-
-        //    // Kiểm tra quyền chỉnh sửa
-        //    var currentUser = Models.MyAuthentication.Username ?? string.Empty;
-        //    var createdBy = (donDangKy.UserNameLogin ?? string.Empty);
-        //    if (!string.Equals(currentUser, createdBy, StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        TempData["msgError"] = "Bạn không có quyền chỉnh sửa đơn này.";
-        //        return RedirectToAction("Index_Test");
-        //    }
-
-        //    // Kiểm tra trạng thái đơn
-        //    if (donDangKy.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy)
-        //    {
-        //        TempData["msgError"] = "Đơn đã được duyệt, không thể chỉnh sửa";
-        //        return RedirectToAction("Index_Test");
-        //    }
-
-        //    // Lấy tên nhà thầu từ đơn
-        //    int? nhaThauID = donDangKy.ID_NhaThau;
-        //    string tenNhaThau = "";
-        //    if (nhaThauID.HasValue)
-        //    {
-        //        var nhaThau = db.NT_Partner.FirstOrDefault(x => x.ID == nhaThauID.Value);
-        //        tenNhaThau = nhaThau?.FullName ?? "";
-        //    }
-        //    // Truyền ra View để hiển thị+submit
-        //    ViewBag.NhaThau_ID = nhaThauID;
-        //    ViewBag.TenNhaThau = tenNhaThau;
-
-
-        //    // Lấy danh sách VP1C
-        //    var VP1C = (from au in db.AuthorizationContractors.Where(x => x.IDLKD == 3)
-        //                join a in db.NhanViens on au.IDNhanVien equals a.ID
-        //                select new CheckInforUser
-        //                {
-        //                    IDNhanVien = (int)au.IDNhanVien,
-        //                    HoTen = a.HoTen + " : " + a.MaNV,
-        //                }).ToList();
-        //    ViewBag.VP1C_List = new SelectList(VP1C, "IDNhanVien", "HoTen");
-
-
-        //    // ViewBag.VP1C_ID = .FirstOrDefault(x => x.CapDuyet == 3)?.NguoiDuyet_ID;
-
-        //    ViewBag.TenNhaThau = tenNhaThau;
-
-        //    // Lấy chi tiết theo MaDon
-        //    var chiTietList = db_dk.KTNT_ChiTiet
-        //                           .AsNoTracking()
-        //                           .Where(x => x.MaDon == id)
-        //                           .Select(x => new KTNT_ChiTietVM
-        //                           {
-        //                               ID = x.ID,
-        //                               MaDon = x.MaDon,
-        //                               TN_HoTen = x.TN_HoTen,
-        //                               TN_CCCD_HoChieu = x.TN_CCCD_HoChieu,
-        //                               TX_LoaiXeCoDong = x.TX_LoaiXeCoDong,
-        //                               TX_BienKiemSoat = x.TX_BienKiemSoat,
-        //                               PT_LoaiPhuongTien = x.PT_LoaiPhuongTien,
-        //                               PT_BienKiemSoat = x.PT_BienKiemSoat,
-        //                               GhiChu = x.GhiChu,
-        //                               NgayTao = x.NgayTao
-        //                           })
-        //                           .ToList();
-
-        //    var model = new TaoDonDangKyViewModel
-        //    {
-        //        ID = donDangKy.ID,
-        //        MaDon = donDangKy.MaDon,
-        //        NoiDung = donDangKy.NoiDung,
-        //        ID_NhaThau = donDangKy.ID_NhaThau,
-        //        BP_XuLy_ID = donDangKy.BP_XuLy_ID,
-        //        NgayTao = donDangKy.NgayTao,
-        //        ChiTiet = chiTietList ?? new List<KTNT_ChiTietVM>()
-        //    };
-
-        //    return View(model);
-        //}
-        //[HttpPost]
-        //public ActionResult Update(TaoDonDangKyViewModel model, string ChiTietJson)
-        //{
-        //    try
-        //    {
-        //        // Kiểm tra mã đơn
-        //        if (string.IsNullOrEmpty(model.MaDon))
-        //        {
-        //            return Json(new { success = false, message = "Mã đơn không hợp lệ" });
-        //        }
-
-        //        // Kiểm tra danh sách xe
-        //        if (model.ChiTiet == null || !model.ChiTiet.Any())
-        //        {
-        //            return Json(new { success = false, message = "Danh sách xe không được trống" });
-        //        }
-
-        //        // Kiểm tra phòng ban
-        //        if (!model.BP_XuLy_ID.HasValue)
-        //        {
-        //            return Json(new { success = false, message = "Vui lòng chọn phòng ban quản lý" });
-        //        }
-        //        // Tìm đơn đăng ký
-        //        var donDangKy = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == model.MaDon);
-        //        if (donDangKy == null)
-        //        {
-        //            return Json(new { success = false, message = "Không tìm thấy đơn đăng ký" });
-        //        }
-
-        //        // Kiểm tra quyền chỉnh sửa
-        //        if (donDangKy.UserNameLogin != Models.MyAuthentication.Username)
-        //        {
-        //            return Json(new { success = false, message = "Bạn không có quyền chỉnh sửa đơn này" });
-        //        }
-
-        //        // Kiểm tra trạng thái đơn
-        //        if (donDangKy.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChuaTrinhKy)
-        //        {
-        //            return Json(new { success = false, message = "Đơn đã được duyệt, không thể chỉnh sửa" });
-        //        }
-
-
-        //        // Cập nhật thông tin đơn
-        //        donDangKy.NoiDung = model.NoiDung;
-        //        donDangKy.ID_NhaThau = model.ID_NhaThau;
-        //        donDangKy.BP_XuLy_ID = model.BP_XuLy_ID;
-
-        //        // Xóa danh sách xe cũ
-        //        var oldChiTietDon = db_dk.KTNT_ChiTiet.Where(x => x.MaDon == model.MaDon).ToList();
-        //        foreach (var item in oldChiTietDon)
-        //        {
-        //            db_dk.KTNT_ChiTiet.Remove(item);
-        //        }
-
-        //        // Thêm danh sách xe mới
-        //        foreach (var item in model.ChiTiet)
-        //        {
-        //            // Validate dữ liệu xe
-
-        //            db_dk.KTNT_ChiTiet.Add(new KTNT_ChiTiet
-        //            {
-        //                MaDon = model.MaDon,
-        //                TN_HoTen = item.TN_HoTen,
-        //                TN_CCCD_HoChieu = item.TN_CCCD_HoChieu,
-        //                TX_LoaiXeCoDong = item.TX_LoaiXeCoDong,
-        //                TX_BienKiemSoat = item.TX_BienKiemSoat,
-        //                PT_LoaiPhuongTien = item.PT_LoaiPhuongTien,
-        //                PT_BienKiemSoat = item.PT_BienKiemSoat,
-        //                GhiChu = item.GhiChu,
-        //                NgayTao = DateTime.Now
-        //            });
-        //        }
-        //        // Lưu thay đổi
-        //        db_dk.SaveChanges();
-
-        //        return Json(new
-        //        {
-        //            success = true,
-        //            message = "Cập nhật đơn thành công",
-        //            maDon = model.MaDon
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
-        //    }
-        //}
- 
         public ActionResult Update(string id)
         {
             if (string.IsNullOrEmpty(id)) return HttpNotFound();
@@ -597,13 +418,44 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+        //[HttpPost]
+        //public ActionResult DuyetDon(string maDon, bool isApproved, string ghiChu = "")
+        //{
+        //    try
+        //    {
+        //        var userId = Models.MyAuthentication.ID;
+
+        //        var don = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == maDon);
+        //        if (don == null)
+        //            return Json(new { success = false, message = "Không tìm thấy đơn" });
+
+        //        if (don.BP_XuLy_ID != userId)
+        //            return Json(new { success = false, message = "Bạn không có quyền xử lý đơn này." });
+
+        //        if (don.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChoXuLy)
+        //            return Json(new { success = false, message = "Đơn không còn ở trạng thái chờ xử lý." });
+        //        don.TinhTrang = isApproved
+        //       ? (int)TinhTrangDonDangKyKhoaThe.DaXuLy
+        //       : (int)TinhTrangDonDangKyKhoaThe.KhongDatYeuCau;
+        //        don.GhiChu = ghiChu;
+
+        //        db_dk.SaveChanges();
+        //        string msg = isApproved ? "Đã duyệt đơn thành công." : "Đã từ chối đơn.";
+        //        return Json(new { success = true, message = msg });
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+        //    }
+
+        //}
         [HttpPost]
         public ActionResult DuyetDon(string maDon, bool isApproved, string ghiChu = "")
         {
             try
             {
                 var userId = Models.MyAuthentication.ID;
-
                 var don = db_dk.KTNT_DonDangKy.FirstOrDefault(x => x.MaDon == maDon);
                 if (don == null)
                     return Json(new { success = false, message = "Không tìm thấy đơn" });
@@ -613,21 +465,61 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
                 if (don.TinhTrang != (int)TinhTrangDonDangKyKhoaThe.ChoXuLy)
                     return Json(new { success = false, message = "Đơn không còn ở trạng thái chờ xử lý." });
+
                 don.TinhTrang = isApproved
-               ? (int)TinhTrangDonDangKyKhoaThe.DaXuLy
-               : (int)TinhTrangDonDangKyKhoaThe.KhongDatYeuCau;
+                    ? (int)TinhTrangDonDangKyKhoaThe.DaXuLy
+                    : (int)TinhTrangDonDangKyKhoaThe.KhongDatYeuCau;
                 don.GhiChu = ghiChu;
 
+                // Chỉ thực hiện cập nhật nhân viên khi đơn được duyệt
+                if (isApproved)
+                {
+                    // Lấy danh sách chi tiết đơn
+                    var lstChiTiet = db_dk.KTNT_ChiTiet.Where(x => x.MaDon == maDon).ToList();
+                    foreach (var item in lstChiTiet)
+                    {
+                        var cccd = item.TN_CCCD_HoChieu;
+                        if (!string.IsNullOrEmpty(cccd))
+                        {
+                            // Kết nối sang db nhân viên - giả định context là db_nv
+                            var nv = db_nt.NT_NhanVienNT.FirstOrDefault(n => n.CCCD == cccd);
+                            if (nv != null)
+                            {
+                                nv.TTLV = 2;
+                            }
+                        }
+                    }
+                    db_nt.SaveChanges();
+                    // Lấy danh sách các biển số xe từ chi tiết đơn
+                    foreach (var item in lstChiTiet)
+                    {
+                        string bienSoXe = item.TX_BienKiemSoat; // hoặc PT_BienKiemSoat, tuỳ thực tế
+
+                        if (!string.IsNullOrEmpty(bienSoXe))
+                        {
+                            // Tìm các bản ghi cần cập nhật trong CDNT_ChiTietDon
+                            var cdnt = db_dk.CDNT_ChiTietDon
+                                .Where(x => x.BienSoXe == bienSoXe)
+                                .ToList();
+
+                            foreach (var dong in cdnt)
+                            {
+                                // Cập nhật trạng thái
+                                dong.TTHD = 3;
+
+                            }
+                        }
+                    }
+                }
+              
                 db_dk.SaveChanges();
                 string msg = isApproved ? "Đã duyệt đơn thành công." : "Đã từ chối đơn.";
                 return Json(new { success = true, message = msg });
-
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
-
         }
         public ActionResult HPDQ_Detail(string maDon)
         {
@@ -774,14 +666,50 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             ViewBag.PageSize = pageSize;
             return View(pagedData);
         }
+        public ActionResult HPDQ_GetAll(DateTime? begind, DateTime? endd, string maPhieu, int? tinhTrang, int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 10;
+            // var userNameLogin = Models.MyAuthentication.Username;
+            int IDQuyenHT = EPORTAL.Models.MyAuthentication.IDQuyenHT;
+            string controll = "DangKyKhoaThe_NT";
+            var ListQuyen = new Models.MyAuthentication().GetPermisionCN(IDQuyenHT, controll);
+            ViewBag.QUYENCN = ListQuyen;
+            if (!ListQuyen.Contains("VIEW_ALL"))
+            {
+                TempData["msgError"] = "<div class='alert alert-danger'>Bạn không có quyền xem dữ liệu này.</div>";
+                return RedirectToAction("Logout", "Login", new { area = "" });
+            }
+            var data = db_dk.Database.SqlQuery<DonDangKyKhoaTheViewModel>(
+               "EXEC KTNT_DonDangKy_Search @p_BeginDate, @p_EndDate,@p_MaPhieu",
+               new SqlParameter("@p_BeginDate", (object)begind ?? DBNull.Value),
+               new SqlParameter("@p_EndDate", (object)endd ?? DBNull.Value),
+               new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
+           ).ToList();
 
+            if (tinhTrang.HasValue)
+            {
+                data = data.Where(x => x.TinhTrang == tinhTrang.Value).ToList();
+            }
+
+            var filtered = data.ToList();
+
+            var pagedData = filtered.ToPagedList(pageNumber, pageSize);
+            ViewBag.TinhTrang = tinhTrang;
+            ViewBag.BeginDate = begind?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endd?.ToString("yyyy-MM-dd");
+            ViewBag.MaPhieu = maPhieu;
+            ViewBag.Page = pageNumber;
+            ViewBag.PageSize = pageSize;
+            return View(pagedData);
+        }
         [HttpGet]
         public ActionResult SearchXeByNhaThau(
             int idNhaThau,
             string q = "",
             int page = 1,
             int pageSize = 20,
-            int? loaiPhuongTienId = null
+            int? loaiPhuongTienId = null  
         )
         {
             try
@@ -865,7 +793,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
 
         [HttpGet]
         public ActionResult GetNhanVienNTByCCCD(int idNT, string cccd)
-     {
+         {
             try
             {
                 // cccd null/empty => trả về TOÀN BỘ danh sách theo IDNT (TTLV=1)
