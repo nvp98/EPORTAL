@@ -72,7 +72,7 @@ namespace EPORTAL.Controllers
         }
         public ActionResult Sync()
         {
-            string MaNV, sMaNV;
+            string MaNV, sMaNV,sMaNVPY, sMaNV3;
             int IDViTri, IDPhongBan;
             int dtc = 0;
             string msg = "";
@@ -91,11 +91,13 @@ namespace EPORTAL.Controllers
                             {
                                 MaNV = item.manv;
                                 sMaNV = MaNV.Substring(0, 4);
+                                sMaNVPY = MaNV.Substring(0, 5);
+                                sMaNV3 = MaNV.Substring(0, 3);
 
-                                var rsnv = LNV.Where(x => x.MaNV == MaNV).FirstOrDefault();
+                            var rsnv = LNV.Where(x => x.MaNV == MaNV).FirstOrDefault();
                                 if (rsnv == null)
                                 {
-                                    if (sMaNV == "HPDQ" && MaNV.Length==9)
+                                    if (sMaNV == "HPDQ" || sMaNVPY == "CBGPY" || sMaNVPY == "KCNHT" || sMaNV3=="RAY")
                                     {
                                         ObjectParameter IDPhongBanout = new ObjectParameter("IDPhongBan", typeof(int));
                                         ObjectParameter IDViTriout = new ObjectParameter("IDViTri", typeof(int));
@@ -117,7 +119,7 @@ namespace EPORTAL.Controllers
                                 }
                                 else
                                 {
-                                    if (sMaNV == "HPDQ" && MaNV.Length == 9)
+                                    if (sMaNV == "HPDQ" || sMaNVPY == "CBGPY" || sMaNVPY == "KCNHT" || sMaNV3 == "RAY")
                                     {
                                         ObjectParameter IDPhongBanout = new ObjectParameter("IDPhongBan", typeof(int));
                                         ObjectParameter IDViTriout = new ObjectParameter("IDViTri", typeof(int));

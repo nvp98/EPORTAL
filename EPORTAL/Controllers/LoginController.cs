@@ -152,6 +152,8 @@ namespace EPORTAL.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                // Bỏ qua validation nếu cần
+                ModelState.Clear();
                 string mk = Encryptor.MD5Hash(model.MatKhauCu);
                 NhanVien Suser = db.NhanViens.SingleOrDefault(x => x.ID == Models.MyAuthentication.ID);
                 NhanVien user = db.NhanViens.SingleOrDefault(x => x.MaNV == Suser.MaNV && x.MatKhau == mk);
@@ -164,7 +166,7 @@ namespace EPORTAL.Controllers
                     Session.Clear();
                     Session.Abandon();
                     //TempData["msg"] = "<script>alert('Cập nhập thành công')</script>";
-                    ViewBag.Message = "<script>alert('Thay đổi mật khẩu thành công');window.location.href = '/Login</script>";
+                    ViewBag.Message = "<script>alert('Thay đổi mật khẩu thành công');window.location.href = '/Login'</script>";
                     //Page.ClientScript.RegisterClientScriptBlock(GetType(), "alerta", "alert('Save records with success')", true);
                     //return RedirectToAction("Index", "Login");
                     return RedirectToAction("Index", "ListProject", new { area = "View360" });

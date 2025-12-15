@@ -195,6 +195,12 @@
                                     360 View
                                 </a>
                             </li>
+                            <li>
+                                <a id="" href="https://bo-quy-tac-ung-xu-hpdq.vercel.app/" target="_blank">
+                                    <i class="metismenu-icon fa-brands fa-teamspeak"></i>
+                                    Bộ quy tắc ứng xử HPDQ
+                                </a>
+                            </li>
 
                             <li id="quanTri" style="display: none" class="app-sidebar__heading">Quản trị</li>
                             <li>
@@ -350,20 +356,20 @@
                                     Đăng ký
                                 </a>
                             </li>
-                           
-                            @*<li>
-                                <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
-                                    <i class="metismenu-icon fa-solid fa-list-ol"></i>
-                                    Khai báo thông tin Vợ/Chồng, Con
-                                </a>
 
-                            </li>*@
+                            @*<li>
+            <a href="@Url.Action("Index", "FamilyDeclaration", new { area = "Servey" })">
+                <i class="metismenu-icon fa-solid fa-list-ol"></i>
+                Khai báo thông tin Vợ/Chồng, Con
+            </a>
+
+        </li>*@
                             @if (listControll.Contains("FamilyDeclaration"))
                             {
                                 <li>
                                     <a href="@Url.Action("ListFamilyDeclarations", "FamilyDeclaration", new { area = "Servey" })">
                                         <i class="metismenu-icon fa-solid fa-list-ol"></i>
-                                        Danh sách Nhân viên khai báo thông tin Vợ/Chồng, Con
+                                        Thông tin Vợ/Chồng, Con
                                     </a>
 
                                 </li>
@@ -371,13 +377,13 @@
 
 
 
-                            <li class="app-sidebar__heading">DANH BẠ-ĐỐI TÁC</li>
-                            <li>
-                                <a id="HomeDBDT" href="@Url.Action("Index", "HomeDBDT", new {area="Publish"})">
-                                    <i class="metismenu-icon fa-solid fa-list-ol"></i>
-                                    Home
-                                </a>
-                            </li>
+                            @*<li class="app-sidebar__heading">DANH BẠ-ĐỐI TÁC</li>*@
+                            @*<li>
+            <a id="HomeDBDT" href="@Url.Action("Index", "HomeDBDT", new {area="Publish"})">
+                <i class="metismenu-icon fa-solid fa-list-ol"></i>
+                Home
+            </a>
+        </li>*@
                             <li class="app-sidebar__heading">  360°VIEW - VIDEO - DOCUMENT</li>
                             <li>
                                 @{
@@ -683,8 +689,8 @@
                                         </a>
                                         <ul id="Approve">
                                             @{
-                                                var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == EPORTAL.Models.MyAuthentication.ID).SingleOrDefault();
-                                                var idnv = db.NhanViens.Where(x => x.ID == nd.IDNhanVien).FirstOrDefault();
+                                                //var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == EPORTAL.Models.MyAuthentication.ID).SingleOrDefault();
+                                                //var idnv = db.NhanViens.Where(x => x.ID == nd.IDNhanVien).FirstOrDefault();
 
                                             }
                                             @*<li>
@@ -712,16 +718,17 @@
                             </a>
                         </li>*@
                                             <li>
-                                                @{ var TheNguoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 0 && x.TinhTrang_ID == 1 || x.TrinhKy_ID == null && x.TinhTrang_ID == 1).ToList();
+                                                @{
+                                                    var TheNguoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 0 && x.TinhTrang_ID == 1 || x.TrinhKy_ID == null && x.TinhTrang_ID == 1).ToList();
                                                     List<int> Sum_TheNguoi = new List<int>();
                                                     foreach (var thenguoi in TheNguoi_)
                                                     {
-                                                        var TheNguoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).ToList();
+                                                        var TheNguoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).ToList();
                                                         foreach (var item in TheNguoi)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_TheNguoi.Add(Count);
@@ -729,11 +736,11 @@
                                                             }
                                                             else
                                                             {
-                                                                int ID_Check = item.ID_TK_TN - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == ID_Check && x.TinhTrangID != 0).FirstOrDefault();
-                                                                if (Check != null)
+                                                                int Duyet_Check = (int)item.CapDuyet - 1;
+                                                                var Check = db_dk.SignOff_Flow.Where(x => x.CapDuyet <= Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == item.DKTN_ID).FirstOrDefault();
+                                                                if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == thenguoi.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_TheNguoi.Add(Count);
@@ -747,7 +754,7 @@
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 0})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Thẻ dài ngày
-                                                    <span style="color: red; margin-left: 5%;"> @*@Sum_TheNguoi.Sum()*@ </span>
+                                                    <span style="color: red; margin-left: 5%;"> @Sum_TheNguoi.Sum() </span>
                                                 </a>
                                             </li>
                                             <li>
@@ -756,12 +763,12 @@
                                                     List<int> Sum_CapMoi = new List<int>();
                                                     foreach (var capmoi in CapMoi_)
                                                     {
-                                                        var CapMoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).ToList();
+                                                        var CapMoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).ToList();
                                                         foreach (var item in CapMoi)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_CapMoi.Add(Count);
@@ -769,11 +776,11 @@
                                                             }
                                                             else
                                                             {
-                                                                int ID_Check = item.ID_TK_TN - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == ID_Check && x.TinhTrangID != 0).FirstOrDefault();
-                                                                if (Check != null)
+                                                                int Duyet_Check = (int)item.CapDuyet - 1;
+                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == item.DKTN_ID).FirstOrDefault();
+                                                                if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == capmoi.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_CapMoi.Add(Count);
@@ -790,7 +797,7 @@
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 1})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Cấp mới
-                                                    <span style="color: red; margin-left: 5%;"> @*@Sum_CapMoi.Sum()*@ </span>
+                                                    <span style="color: red; margin-left: 5%;"> @Sum_CapMoi.Sum() </span>
                                                 </a>
                                             </li>
                                             <li>
@@ -798,12 +805,12 @@
                                                     List<int> Sum_GiaHan = new List<int>();
                                                     foreach (var giahan in GiaHan_)
                                                     {
-                                                        var GiaHan = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == giahan.ID_DKTN).ToList();
+                                                        var GiaHan = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).ToList();
                                                         foreach (var item in GiaHan)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == giahan.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_GiaHan.Add(Count);
@@ -811,11 +818,11 @@
                                                             }
                                                             else
                                                             {
-                                                                int ID_Check = item.ID_TK_TN - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == ID_Check && x.TinhTrangID != 0).FirstOrDefault();
-                                                                if (Check != null)
+                                                                int Duyet_Check = (int)item.CapDuyet - 1;
+                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == giahan.ID_DKTN).FirstOrDefault();
+                                                                if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == giahan.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_GiaHan.Add(Count);
@@ -831,7 +838,7 @@
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 2})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Gia hạn
-                                                    <span style="color: red; margin-left: 5%;"> @*@Sum_GiaHan.Sum()*@ </span>
+                                                    <span style="color: red; margin-left: 5%;"> @Sum_GiaHan.Sum() </span>
                                                 </a>
                                             </li>
                                             <li>
@@ -839,12 +846,12 @@
                                                     List<int> Sum_BoSung = new List<int>();
                                                     foreach (var bosung in BoSung_)
                                                     {
-                                                        var BoSung = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == bosung.ID_DKTN).ToList();
+                                                        var BoSung = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).ToList();
                                                         foreach (var item in BoSung)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == bosung.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_BoSung.Add(Count);
@@ -852,11 +859,11 @@
                                                             }
                                                             else
                                                             {
-                                                                int ID_Check = item.ID_TK_TN - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == ID_Check && x.TinhTrangID != 0).FirstOrDefault();
-                                                                if (Check != null)
+                                                                int Duyet_Check = (int)item.CapDuyet - 1;
+                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == bosung.ID_DKTN).FirstOrDefault();
+                                                                if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == bosung.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_BoSung.Add(Count);
@@ -872,7 +879,7 @@
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 3})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Bổ sung cổng
-                                                    <span style="color: red; margin-left: 5%;"> @*@Sum_BoSung .Sum()*@ </span>
+                                                    <span style="color: red; margin-left: 5%;"> @Sum_BoSung.Sum() </span>
                                                 </a>
                                             </li>
                                             <li>
@@ -882,12 +889,12 @@
                                                     List<int> Sum_CapLai = new List<int>();
                                                     foreach (var caplai in CapLai_)
                                                     {
-                                                        var CapLai = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == caplai.ID_DKTN).ToList();
+                                                        var CapLai = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).ToList();
                                                         foreach (var item in CapLai)
                                                         {
                                                             if (item.CapDuyet == 1)
                                                             {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == caplai.ID_DKTN).Count();
+                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).Count();
                                                                 if (Count > 0)
                                                                 {
                                                                     Sum_CapLai.Add(Count);
@@ -895,11 +902,11 @@
                                                             }
                                                             else
                                                             {
-                                                                int ID_Check = item.ID_TK_TN - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == ID_Check && x.TinhTrangID != 0).FirstOrDefault();
-                                                                if (Check != null)
+                                                                int Duyet_Check = (int)item.CapDuyet - 1;
+                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == caplai.ID_DKTN).FirstOrDefault();
+                                                                if (Check == null)
                                                                 {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == idnv.ID && x.DKTN_ID == caplai.ID_DKTN).Count();
+                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).Count();
                                                                     if (Count > 0)
                                                                     {
                                                                         Sum_CapLai.Add(Count);
@@ -915,7 +922,7 @@
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 4})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Cấp lại
-                                                    <span style="color: red; margin-left: 5%;"> @*@Sum_CapLai.Sum()*@ </span>
+                                                    <span style="color: red; margin-left: 5%;"> @Sum_CapLai.Sum() </span>
                                                 </a>
                                             </li>
                                             @*<li>
@@ -1009,6 +1016,83 @@
                     </li>
                 }*@
 
+                                </ul>
+                            </li>
+                            @*đăng kí thẻ xe cơ động nhà thầu*@
+
+                            <li>
+                                <a href="#" id="CDNT">
+                                    <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
+                                    Đăng ký thẻ xe cơ động
+                                    <span id="cdnt-count" style="margin-left:6px;"></span>
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                                <ul id="listatld1">
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1"></i>
+                                            Hồ sơ đến tôi  <span id="duyetdon-label" class="text-danger"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index_DaXuLy", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Hồ sơ đã xử lý
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index_All", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Danh sách hồ sơ
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="@Url.Action("DanhSachXe", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Danh sách xe
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_DinhBienXinThem", "TheXeCoDong_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Định biên xe cơ động
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" id="KTNT">
+                                    <i class="metismenu-icon  fa fa-exclamation-triangle"></i>
+                                    Đăng ký khóa thẻ
+                                    <span id="ktnt-count" style="margin-left:6px;"></span>
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                                <ul id="listatld1">
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_Index", "DangKyKhoaThe_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1"></i>
+                                            Hồ sơ đến tôi  <span id="duyetdonkt-label" class="text-danger"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_IndexAll", "DangKyKhoaThe_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Hồ sơ đã xử lý
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("HPDQ_GetAll", "DangKyKhoaThe_NT", new {area="TagSign"})">
+                                            <i class="fa fa-file-archive p-lg-1 "></i>
+                                            Danh sách hồ sơ
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li>
@@ -1479,6 +1563,33 @@
         //        return false;
         //    }
         //};
+        $(document).ready(function () {
+            $.getJSON('/TagSign/TheXeCoDong_NT/HPDQ_Notify', function (data) {
+                $('#duyetdon-label').text(data.Total);
+                $('#cdnt-count').text(data.Total > 0 ? data.Total : '');
+                if (data.Total > 0) {
+                    // Đổi màu chữ sang đỏ
+                    $('#CDNT').addClass('text-danger');
+                } else {
+                    // Nếu không có đơn, giữ màu mặc định
+                    $('#CDNT').removeClass('text-danger');
+                }
+            });
+           $.getJSON('@Url.Action("HPDQ_KTNotify", "DangKyKhoaThe_NT", new { area="TagSign" })', function(data) {
+                $('#duyetdonkt-label').text(data.Total);
+                $('#ktnt-count').text(data.Total > 0 ? data.Total : '');
+                if (data.Total > 0) {
+                    // Đổi màu chữ sang đỏ
+                    $('#KTNT').addClass('text-danger');
+                } else {
+                    // Nếu không có đơn, giữ màu mặc định
+                    $('#KTNT').removeClass('text-danger');
+                }
+            });
+
+
+
+        });
     </script>
 
 </body>

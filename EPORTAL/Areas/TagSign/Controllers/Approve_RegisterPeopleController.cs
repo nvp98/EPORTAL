@@ -89,6 +89,26 @@ namespace EPORTAL.Areas.TagSign.Controllers
             var list = db_dk.SignOff_Flow.Where(x => x.NhanVienID == idnv.ID && x.TinhTrangID == 0).ToList();
             foreach (var item in list)
             {
+                var firtDuyet = (from kd in list.Where(x => x.DKTN_ID == item.DKTN_ID)
+                                                  join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
+                                                  select new Follow_RegisterPeopleValidation
+                                                  {
+                                                      ID_TK_TN = (int)kd.ID_TK_TN,
+                                                      DKTN_ID = (int)kd.DKTN_ID,
+                                                      NoiDung = ca.NoiDung,
+                                                      TrinhKy_ID = (int?)ca.TrinhKy_ID ?? default,
+                                                      LoaiNT_ID = (int)ca.LoaiNT_ID,
+                                                      NgayTrinh = (DateTime?)ca.NgayTrinhKy ?? default,
+                                                      NT_ID = (int?)ca.NhaThau_ID ?? default,
+                                                      HopDong = ca.HopDong,
+                                                      File_CCAT = ca.File_CCAT,
+                                                      CapDuyet = (int)kd.CapDuyet,
+                                                      TinhTrangID = (int)kd.TinhTrangID,
+                                                      NhanVienID = (int)kd.NhanVienID,
+                                                      NgayDuyet = (DateTime?)kd.NgayDuyet ?? default,
+                                                      GhiChu = kd.GhiChu
+                                                  }).FirstOrDefault();
+
                 if (item.CapDuyet == 1)
                 {
                     var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
@@ -140,6 +160,13 @@ namespace EPORTAL.Areas.TagSign.Controllers
                     {
                         data.Add(check_list.FirstOrDefault());
                     }
+                    else if (check_list.Count() == 0)
+                    {
+                        if (firtDuyet != null)
+                        {
+                            data.Add(firtDuyet);
+                        }
+                    }
                     //if (check_list != null)
                     //{
                     //    data.Add(check_list);
@@ -170,6 +197,13 @@ namespace EPORTAL.Areas.TagSign.Controllers
                     {
                         data.Add(check_list.FirstOrDefault());
                     }
+                    else if (check_list.Count() == 0)
+                    {
+                        if (firtDuyet != null)
+                        {
+                            data.Add(firtDuyet);
+                        }
+                    }
                     //if (check_list == null)
                     //{
                     //    data.Add(check_list);
@@ -199,6 +233,13 @@ namespace EPORTAL.Areas.TagSign.Controllers
                     if (check_list.Count() != 0 && check_list.Where(x => x.TinhTrangID == 0).Count() == 0)
                     {
                         data.Add(check_list.FirstOrDefault());
+                    }
+                    else if (check_list.Count() == 0)
+                    {
+                        if (firtDuyet != null)
+                        {
+                            data.Add(firtDuyet);
+                        }
                     }
                     //if (check_list == null)
                     //{
@@ -317,7 +358,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
                 }
                 else if (item.LuongXuLy == 8) //tổ cấp phát thẻ
                 {
-                    var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.CapDuyet <= 7  && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
+                    var check_list = (from kd in db_dk.SignOff_Flow.Where(x => x.LuongXuLy <= 7  && x.NhanVienID != null && x.DKTN_ID == item.DKTN_ID)
                                       join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
                                       select new Follow_RegisterPeopleValidation
                                       {
@@ -340,10 +381,13 @@ namespace EPORTAL.Areas.TagSign.Controllers
                     {
                         data.Add(check_list.FirstOrDefault());
                     }
-                    //if (check_list == null)
-                    //{
-                    //    data.Add(check_list);
-                    //}
+                    else if (check_list.Count() == 0)
+                    {
+                        if (firtDuyet != null)
+                        {
+                            data.Add(firtDuyet);
+                        }
+                    }
                 }
             }
 

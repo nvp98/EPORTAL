@@ -1,0 +1,134 @@
+﻿@using EPORTAL.ModelsTagSign.TheXeCoDongVM
+@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.KTNT_DonDangKy_Detail>
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+@{
+    var header = Model.FirstOrDefault();
+    ViewBag.Title = "Chi tiết đơn đăng ký";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+@if (header == null)
+{
+    <div class="alert alert-warning mt-2">Không tìm thấy dữ liệu đơn.</div>
+}
+else
+{
+    <div class="app-main__outer" style="margin-top: 1%;">
+        <div class="app-main__inner" style="display:block;padding-bottom:0;">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card">
+                        <div style="padding: 15px 20px 20px 20px;">
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
+                                    <h6 style="color: red;"><b>THÔNG TIN TRÌNH KÝ</b></h6>
+                                </div>
+                            </div>
+
+                            <!-- THÔNG TIN ĐƠN -->
+                            <table class="table table-bordered table-hover mt-3" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color:#f8f9fa;">
+                                        <th class="text-center" width="50%">Nội dung trích yếu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <textarea class="form-control" rows="2" readonly>@header.NoiDung</textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table table-bordered table-hover" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color:#f8f9fa;">
+                                        <th class="text-center" width="50%">Nhà thầu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control" value="@header.TenNhaThau" readonly /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- DANH SÁCH CHI TIẾT -->
+                            <div class="col-md-12 col-lg-12" style="padding-top:1%;">
+                                <h6 style="color:#d9534f;"><b>DANH SÁCH CHI TIẾT</b></h6>
+                            </div>
+
+                            <div class="table-responsive" style="width:100%;overflow-x:auto;">
+                                <table class="table table-bordered table-hover" id="tblChiTiet" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th rowspan="2" class="text-center align-middle" style="width:55px;">STT</th>
+                                            <th colspan="2" class="text-center">Thẻ người</th>
+                                            <th colspan="2" class="text-center">Thẻ xe cơ động</th>
+                                            <th colspan="2" class="text-center">Thẻ phương tiện</th>
+                                            <th rowspan="2" class="text-center align-middle" style="width:160px;">Ghi chú</th>
+                                        </tr>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center">Họ và tên</th>
+                                            <th class="text-center">CCCD/Hộ chiếu</th>
+                                            <th class="text-center">Loại xe cơ động</th>
+                                            <th class="text-center">Biển kiểm soát</th>
+                                            <th class="text-center">Loại phương tiện</th>
+                                            <th class="text-center">Mã phương tiện</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var details = Model.Where(r => r.ChiTiet_ID.HasValue || !string.IsNullOrWhiteSpace(r.TN_HoTen)).ToList();
+                                        }
+                                        @if (details.Any())
+                                        {
+                                            var stt = 0;
+                                            foreach (var d in details)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@(++stt)</td>
+                                                    <td>@d.TN_HoTen</td>
+                                                    <td>@d.TN_CCCD_HoChieu</td>
+                                                    <td class="text-center">
+                                                        @(
+                                                            d.TX_LoaiXeCoDong == 1 ? "XE MÁY"
+                                                            : d.TX_LoaiXeCoDong == 2 ? "XE BA GÁC"
+                                                            : d.TX_LoaiXeCoDong == 3 ? "XE Ô TÔ"
+                                                            : ""
+                                                        )
+                                                    </td>
+
+                                                    <td>@d.TX_BienKiemSoat</td>
+                                                    <td>@d.PT_LoaiPhuongTien</td>
+                                                    <td>@d.PT_BienKiemSoat</td>
+                                                    <td>@d.GhiChu</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="9" class="text-center text-muted">Không có dữ liệu chi tiết</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-end mt-3">
+                                <a class="btn btn-secondary" href="@Url.Action("Index_NT","DangKyKhoaThe_NT")">
+                                    <i class="fa fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+
+                        </div> <!-- end inner -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

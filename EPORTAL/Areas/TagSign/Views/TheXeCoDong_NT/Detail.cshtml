@@ -1,0 +1,235 @@
+﻿@model List<EPORTAL.ModelsTagSign.TheXeCoDongVM.CDNT_DonDangKyDetail>
+
+@{
+    ViewBag.Title = "Chi tiết đơn đăng ký";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+@using EPORTAL.ModelsTagSign
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    // var DSID = (NT_CardRegistrationInforValidation)ViewData["id"];
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+@Html.AntiForgeryToken()
+<div class="app-main__outer" style="margin-top: -4%;">
+    <div class="app-main__inner" style="display:block;padding-bottom: 0px;">
+        <div class="tab-content">
+          
+            <div class="row">
+                <div class="card">
+
+                    <div style="height: 500px;">
+                        <div class="row" style="width:100%">
+                            <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
+                                <h6 style="color: red;"><b>THÔNG TIN TRÌNH KÝ</b></h6>
+                            </div>
+
+
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th class="text-center" width="50px">Nội dung trích yếu <span style="color:red;">(*)</span> :  </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].NoiDung))
+                                            {
+                                                <span>@Model[0].NoiDung</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Không có nội dung</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="col-md-12 col-lg-12" style="text-transform: math-auto; margin: 1% 0% 1% 0%;">
+                                <span class="text-center" style="margin-top: 8px">Thông tin Nhà thầu <span style="color:red;">(*)</span> : </span>
+                            </div>
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th class="text-center" width="50px">Nhà thầu &nbsp;&nbsp;<span style="color:red;">(*)</span> : </th>
+                                        <th class="text-center" width="120px">Hồ sơ xe kèm theo &nbsp;&nbsp; <span style="color:red;">(*)</span> :</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 50%;">
+                                            @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].FullName))
+                                            {
+                                                <span>@Model[0].FullName</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Không có dữ liệu</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <fieldset id="SubmitForm">
+                                                <fieldset id="SubmitForm">
+                                                    <div class="form-group" style="margin-left: 13%;">
+                                                        @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].FileHoSoXe))
+                                                        {
+                                                            var filePath = Url.Content("~/UploadedFiles/XeCoDong/" + Model[0].FileHoSoXe);
+                                                            <a href="@filePath" download>@Model[0].FileHoSoXe</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>Không có dữ liệu</span>
+                                                        }
+                                                    </div>
+                                                </fieldset>
+                                            </fieldset>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th class="text-center" width="50px">BP Quản lý &nbsp;&nbsp; <span style="color:red;">(*)</span> : </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 50%;">
+                                            @if (Model != null && Model.Count > 0 && !string.IsNullOrEmpty(Model[0].TenPhongBan))
+                                            {
+                                                <span>@Model[0].TenPhongBan</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Không có dữ liệu</span>
+                                            }
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+
+                            <div class="col-md-12 col-lg-12" style="padding: 0% 0% 1% 1%;">
+                                <h6 style="color: red;"><b>NỘI DUNG TRÌNH KÝ</b></h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body" style="width:80vw;overflow-x:auto">
+                        <div class="table-responsive" style="width: 80vw; overflow-x: auto;">
+                            <table class="table table-bordered table-hover" id="table" style="width:85vw" cellpadding="0">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th class="text-center" rowspan="2" width="30px" style="vertical-align:middle">
+                                            <input type="checkbox" id="checkAll" />
+                                        </th>
+                                        <th class="text-center" rowspan="2" width="10px" rowspan="2" style="vertical-align:middle">TT</th>
+                                        <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
+                                        <th class="text-center" rowspan="2" width="60px" style="vertical-align:middle">Biển số xe</th>
+                                        <th class="text-center" colspan="3" width="100px" style="vertical-align:middle">Đánh dấu "X" vào những ô cần chọn</th>
+                                        <th class="text-center" rowspan="2" width="50px" style="vertical-align:middle">Thời hạn thẻ xe cơ động</th>
+                                        <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Ghi chú</th>
+                                        <th class="text-center" rowspan="2" width="70px" style="vertical-align:middle">Tình trạng</th>
+                                    </tr>
+                                    <tr style="background-color: #f8f9fa;">
+
+                                        <th width="30px" class="text-center">Xe máy</th>
+                                        <th width="30px" class="text-center">Xe ô tô</th>
+                                        <th width="30px" class="text-center">Xe 3 gác</th>
+
+                                        <th width="30px" class="text-center">Cấp mới</th>
+                                        <th width="30px" class="text-center">Cấp lại</th>
+                                        <th width="30px" class="text-center">Gia hạn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Count; i++)
+                                    {
+                                        var item = Model[i];
+                                        <tr>
+                                            <td class="text-center"><input class="rowCheckbox" type="checkbox" name="selectedItems" value="@item.BienSoXe" /></td>
+                                            <td>@(i + 1)</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 1) ? "X" : "")</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 3) ? "X" : "")</td>
+                                            <td class="text-center">@((item.ID_LoaiPhuongTien == 2) ? "X" : "")</td>
+                                            <td>@item.BienSoXe</td>
+                                            <td class="text-center">@((item.CapMoi == true) ? "X" : "")</td>
+                                            <td class="text-center">@((item.CapLai == true) ? "X" : "")</td>
+                                            <td class="text-center">@((item.GiaHan == true) ? "X" : "")</td>
+                                            <td class="text-center"> @(item.DenNgay.HasValue ? item.DenNgay.Value.ToString("dd/MM/yyyy") : "")</td>
+                                            <td>@item.GhiChu</td>
+                                            <td>
+                                                @if (item.TrangThaiDuyet_ID == 1)
+                                                {
+                                                    <span class="btn btn-outline-success">Đã duyệt</span>
+                                                }
+                                                else if (item.TrangThaiDuyet_ID == 2)
+                                                {
+                                                    <span class="btn btn-outline-danger">Từ chối</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="btn btn-outline-secondary">Chưa xử lý</span>
+                                                }
+
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer">
+            <div class="app-footer__inner">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $('#checkAll').on('change', function () {
+        $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+    });
+
+    // Nếu người dùng bỏ chọn 1 dòng, "Chọn tất cả" cũng bỏ tick
+    $('.rowCheckbox').on('change', function () {
+        const allChecked = $('.rowCheckbox').length === $('.rowCheckbox:checked').length;
+        $('#checkAll').prop('checked', allChecked);
+    });
+</script>

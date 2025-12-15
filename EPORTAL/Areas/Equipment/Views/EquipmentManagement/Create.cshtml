@@ -24,8 +24,12 @@
                                     <div class="form-group">
                                         <label class="small mb-1">Mã nhân viên</label>
                                         @* @Html.EditorFor(model => model.MaNV, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "MaNV", @text = "" } })*@
-                                        @Html.DropDownListFor(model => model.MaNV, ViewBag.Selected as SelectList, "--Chọn Nhân viên--", new { @id = "MaNV", @class = "form-control" })
+                                        @*@Html.DropDownListFor(model => model.MaNV, ViewBag.Selected as SelectList, "--Chọn Nhân viên--", new { @id = "MaNV", @class = "form-control" })*@
                                         @*@Html.EditorFor(model => model.MaNV, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "MaNV", @text = "", @value = EPORTAL.Models.MyAuthentication.Username, @readonly = "true" } })*@
+                                        @Html.DropDownListFor(model => model.MaNV,
+                                            new List<SelectListItem>(),
+                                            "--Chọn Nhân viên--",
+                                            new { @id = "MaNV", @class = "form-control" })
                                         <span id="ErrorMaNV" style="color: red; text-transform: none; font-weight: normal "></span>
                                     </div>
                                 }
@@ -80,5 +84,25 @@
     });
     $("#IDSC").chosen({
         width: "100%"
+    });
+    $("#IDPhongBan").change(function () {
+        var id = $(this).val();
+
+        $.getJSON('/EquipmentManagement/GetNhanVienByPhongBan', { idPhongBan: id }, function (data) {
+
+            var ddl = $("#MaNV");
+            ddl.empty();
+            ddl.append($("<option/>", { value: "", text: "--Chọn Nhân Viên--" }));
+
+            $.each(data, function (i, v) {
+                ddl.append($("<option/>", {
+                    value: v.MaNV,
+                    text: v.HoTen
+                }));
+            });
+
+            // rất quan trọng: cập nhật lại chosen
+            ddl.trigger("chosen:updated");
+        });
     });
 </script>

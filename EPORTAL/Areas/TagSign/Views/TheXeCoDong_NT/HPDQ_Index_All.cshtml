@@ -1,0 +1,222 @@
+﻿@model PagedList.IPagedList<EPORTAL.ModelsTagSign.TheXeCoDongVM.DonDangKyViewModel>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "HPDQ_Index_All";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+@if (TempData["msgSuccess"] != null)
+{@Html.Raw(TempData["msgSuccess"])}
+@if (TempData["msgError"] != null)
+{@Html.Raw(TempData["msgError"])}
+
+<div id="importOverlay" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-size:1.5rem;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Đang tải dữ liệu, vui lòng chờ...
+    </div>
+</div>
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon"><i class="pe-7s-portfolio icon-gradient bg-grow-early"></i></div>
+                    <div>
+                        ĐƠN ĐỀ NGHỊ CẤP THẺ DÀI NGÀY - DÀNH CHO XE CƠ ĐỘNG
+                        <div class="page-title-subheading"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row" style="width:100%">
+                            <div class="row align-items-center">
+                                <!-- Từ ngày -->
+                                <div class="col-lg-3 col-md-6 d-flex align-items-center mb-2">
+                                    <label for="begind" class="mb-0 mr-2" style="min-width: 80px;">Từ ngày:</label>
+                                    @Html.TextBox("begind", Request["begind"], new { id = "begind", type = "date", @class = "form-control" })
+                                </div>
+
+                                <!-- Đến ngày -->
+                                <div class="col-lg-3 col-md-6 d-flex align-items-center mb-2">
+                                    <label for="endd" class="mb-0 mr-2" style="min-width: 80px;">Đến ngày:</label>
+                                    @Html.TextBox("endd", Request["endd"], new { id = "endd", type = "date", @class = "form-control" })
+                                </div>
+
+                                <!-- Mã phiếu -->
+                                <div class="col-lg-3 col-md-6 mb-2">
+                                    @Html.TextBox("maPhieu", Request["maPhieu"], new { @class = "form-control", placeholder = "Nhập mã phiếu" })
+                                </div>
+
+                                <!-- Trạng thái -->
+                                <div class="col-lg-2 col-md-6 mb-2">
+                                    @Html.DropDownList(
+                                             "trangThai",
+                                             ViewBag.TrangThaiList as IEnumerable<SelectListItem>,
+                                             new { @class = "form-control", id = "trangThai" }
+                                         )
+                                </div>
+
+                                <!-- Nút tìm kiếm -->
+                                <div class="col-lg-1 col-md-12 mb-2">
+                                    <button class="btn btn-primary w-100" id="btn-search">
+                                        <i class="fa fa-search"></i> Tìm kiếm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th width="30px" class="text-center">STT</th>
+                                        <th class="text-center" width="120px">Thao tác</th>
+                                        <th class="text-center" width="200px">Mã đơn</th>
+                                        <th class="text-center" width="200px">Nội dung</th>
+                                        <th class="text-center" width="150px">Nhân viên NT</th>
+                                        <th class="text-center" width="200px">BP Quản lý</th>
+                                        <th class="text-center" width="200px">Nhà thầu</th>
+                                        <th class="text-center" width="150px">Hợp đồng</th>
+                                        <th class="text-center" width="150px">Ngày trình ký</th>
+                                        <th class="text-center" width="150px">File đính kèm</th>
+                                        <th class="text-center" width="120px">Tình trạng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        // Tính STT từ Model (tránh phụ thuộc ViewBag)
+                                        int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@stt</td>
+                                                <td class="text-center">
+                                                    <!-- Trang "All" chỉ xem tổng quan, không thao tác xử lý -->
+                                                    <a class="btn btn-outline-success"
+                                                       title="Chi tiết đơn"
+                                                       href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                        Xem
+                                                    </a>
+                                                </td>
+                                                <td>@item.Ma_Don</td>
+                                                <td>@item.NoiDung</td>
+                                                <td>@item.TenNhanVienNT</td>
+                                                <td>@item.TenBPQL</td>
+                                                <td>@item.TenNhaThau</td>
+                                                <td>@item.HopDong</td>
+                                                <td>@(item.NgayTrinhKy.HasValue ? item.NgayTrinhKy.Value.ToString("dd/MM/yyyy") : "")</td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(item.FileHoSoXe))
+                                                    {
+                                                        <a href="@Url.Content("~/UploadedFiles/XeCoDong/" + item.FileHoSoXe)" target="_blank" title="Xem hồ sơ">
+                                                            <i class="fa-solid fa-eye mr-1"></i> @item.FileHoSoXe
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @{
+                                                        string btnClass = "btn-secondary";
+                                                        string titleTip = "";
+                                                        switch (item.TinhTrang_ID)
+                                                        {
+                                                            case 1:
+                                                                btnClass = "btn-warning";
+                                                                titleTip = "Chờ xử lý";
+                                                                break;
+                                                            case 2:
+                                                                btnClass = "btn-info";
+                                                                titleTip = "Đã xử lý";
+                                                                break;
+                                                            case 3:
+                                                                btnClass = "btn-success";
+                                                                titleTip = "Hoàn thành";
+                                                                break;
+                                                            case 4:
+                                                                btnClass = "btn-danger";
+                                                                titleTip = "Không đạt / Từ chối";
+                                                                break;
+                                                            case 5:
+                                                                btnClass = "btn-secondary";
+                                                                titleTip = "Chưa trình ký";
+                                                                break;
+                                                            default:
+                                                                btnClass = "btn-light";
+                                                                titleTip = "Không xác định";
+                                                                break;
+                                                        }
+                                                    }
+                                                    <a href="@Url.Action("HPDQ_LuongTrinhKy", "TheXeCoDong_NT", new { Ma_Don = item.Ma_Don })" style="text-decoration:none;" title="@titleTip">
+                                                        <span class="btn @btnClass" style="min-width:140px;">@item.TenTinhTrang</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            stt++;
+                                        }}
+                                </tbody>
+                            </table>
+
+                            <div class="pager">
+                                @Html.PagedListPager(
+                                              Model,
+                                              p => Url.Action("HPDQ_Index_All", "TheXeCoDong_NT", new
+                                              {
+                                                  area = "TagSign",
+                                                  page = p,
+                                                  begind = Request["begind"],
+                                                  endd = Request["endd"],
+                                                  maPhieu = Request["maPhieu"]
+                                              })
+                                          )
+                                <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-wrapper-footer">
+        <div class="app-footer"><div class="app-footer__inner"></div></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  $("#btn-search").on('click', function () {
+    var begind = $('#begind').val();
+    var endd = $('#endd').val();
+    var maPhieu = $('#maPhieu').val();
+    var trangThai = $('#trangThai').val();
+    $("#importOverlay").show();
+    window.location.href = '@Url.Action("HPDQ_Index_All", "TheXeCoDong_NT")'
+      + '?begind=' + encodeURIComponent(begind || '')
+      + '&endd=' + encodeURIComponent(endd || '')
+      + '&maPhieu=' + encodeURIComponent(maPhieu || '')
+      + '&trangThai=' + encodeURIComponent(trangThai || '');
+  });
+
+  $(document).ready(function () {
+    // Auto fill range nếu trống
+    var today = new Date();
+    var firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    function toYYYYMMDD(d) {
+      const m = (d.getMonth() + 1).toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
+      return d.getFullYear() + '-' + m + '-' + day;
+    }
+    if (!$('#begind').val()) $('#begind').val(toYYYYMMDD(firstDay));
+    if (!$('#endd').val())   $('#endd').val(toYYYYMMDD(today));
+  });
+</script>

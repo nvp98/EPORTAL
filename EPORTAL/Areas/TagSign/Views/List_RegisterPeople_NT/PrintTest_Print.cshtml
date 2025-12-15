@@ -48,24 +48,24 @@
                     {
                         <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                             <span>BM.03A/QT.20</span>
-                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 30/11/2024 </p>
-                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 02 </p>
+                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025 </p>
+                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 03 </p>
                         </div>
                     }
                     else if (ID_DKTN.LoaiNT_ID == 2)
                     {
-                        <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
-                            <span>BM.03B/QT.20</span>
-                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 30/11/2024 </p>
-                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 02 </p>
-                        </div>
+                    <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
+                        <span>BM.03B/QT.20</span>
+                        <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025 </p>
+                        <p><span style="font-style:italic;">Lần sửa đổi:</span> 03 </p>
+                    </div>
                     }
                     else if (ID_DKTN.LoaiNT_ID == 3)
                     {
                         <div class="col-md-6" style="float:right;text-align:right; font-weight: bold; margin-left: auto;">
                             <span>BM.03C/QT.20</span>
-                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 30/11/2024 </p>
-                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 02 </p>
+                            <p><span style="font-style:italic;">Ngày hiệu lực:</span> 01/09/2025 </p>
+                            <p><span style="font-style:italic;">Lần sửa đổi:</span> 03 </p>
                         </div>
                     }
 
@@ -150,7 +150,7 @@
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Chức vụ</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Số điện thoại</th>
                                             <th class="text-center" colspan="3" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">Thông tin nhà thầu phụ <br /> ( Nếu thuộc NTP )</th>
-                                            <th class="text-center" colspan="5" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">
+                                            <th class="text-center" colspan="4" width="200px" style="vertical-align: middle; text-align: center !important; border: 1px solid black;">
                                                 Đánh dấu "X" vào
                                                 những ô cần chọn
                                             </th>
@@ -171,7 +171,7 @@
                                             <th width="70px" class="text-center" style="text-align: center !important; border: 1px solid black;">Gia hạn</th>
                                             <th width="70px" class="text-center" style="text-align: center !important; border: 1px solid black;">Bổ sung cổng</th>
                                             <th width="70px" class="text-center" style="text-align: center !important; border: 1px solid black;">Cấp lại</th>
-                                            <th width="70px" class="text-center" style="text-align: center !important; border: 1px solid black;">Chuyển đổi NT</th>
+                                           @* <th width="70px" class="text-center" style="text-align: center !important; border: 1px solid black;">Chuyển đổi NT</th>*@
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -241,14 +241,14 @@
                                                     {
                                                         <td style="padding-left: 5px; border: 1px solid black;"></td>
                                                     }
-                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                    @*@if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
                                                     {
                                                         <td style="padding-left: 5px; border: 1px solid black;">X</td>
                                                     }
                                                     else
                                                     {
                                                         <td style="padding-left: 5px; border: 1px solid black;"></td>
-                                                    }
+                                                    }*@
                                                     @if (item.DienThoaiDiDong == 1)
                                                     {
                                                         <td style="padding-left: 5px; border: 1px solid black;">X</td>
@@ -492,10 +492,10 @@
                                         Ghi chú:
                                     </b> <br />
 
-                                    1. NĐUQ/T/PBP liên quan chỉ ký duyệt trong trường hợp CBNV NT có nhu cầu đăng ký ra vào Cảng thường xuyên;<br />
-                                    2. Đại diện Nhà thầu cũ ký trong trường hợp chuyển đổi CBNV giữa các Nhà thầu.<br />
+                                    1.  Trường hợp nhà thầu đăng ký cho người ra/vào cảng CCD, CTH thì trình ký qua BP liên quan là BP.LOG, đăng ký ra/vào cổng các Công ty thành viên thì trình ký qua BP liên quan là Công ty thành viên.<br />
+                                    2.  Trường hợp cấp lại thẻ không thay đổi thông tin, thời hạn chỉ ký Nhà thầu và Tổ CPT (P.ATMT).<br />
                                     3. Trường hợp CBNV thuộc Nhà thầu phụ (NTP) trực tiếp của Nhà thầu, yêu cầu điền đầy đủ thông tin của NTP.<br />
-                                    4. Trường hợp cấp lại thẻ khi thẻ cũ đang còn hạn, chỉ ký đến Nhà thầu và Tổ CPT.<br />
+                                    @*4. Trường hợp cấp lại thẻ khi thẻ cũ đang còn hạn, chỉ ký đến Nhà thầu và Tổ CPT.<br />*@
 
                                 </p>
                             }
@@ -505,11 +505,13 @@
                                     <b>
                                         Ghi chú/Remarks:
                                     </b><br />
+                                    1. Trường hợp nhà thầu đăng ký cho người ra/vào cảng CCD, CTH thì trình ký qua BP liên quan là BP.LOGISTICS, đăng ký ra/vào cổng các Công ty thành viên thì trình ký qua BP liên quan là Công ty thành viên.<br />
+                                    In cases where the Contractor registers personnel for entry/exit at the Specialized and General ports, the approval must be obtained through the relevant department, which is the Logistics Department. For registration of entry/exit at the gates of member companies, approval must be obtained through the relevant member company’s department.<br />
+                                    2. Trường hợp cấp lại thẻ không thay đổi thông tin, thời hạn chỉ ký Nhà thầu và Tổ CPT (P.ATMT).<br />
+                                    For card reissuance without any changes to information or validity period, approval is only required from the Contractor and the Card Issuance Team.<br />
+                                    3. Trường hợp CBNV thuộc Nhà thầu phụ (NTP) trực tiếp của Nhà thầu, yêu cầu điền đầy đủ thông tin của NTP.<br />
+                                    For personnel belonging to a direct subcontractor of the Contractor, full information of the subcontractor must be provided.<br />
 
-                                    1. NĐUQ/T/PBP liên quan chỉ ký duyệt trong trường hợp CBNV NT có nhu cầu đăng ký ra vào Cảng thường xuyên;<br />
-                                    The relevant department manager/vice manager/the authorized person only to sign and approve in cases where contractor employees need to register to enter and leave the Port regularly<br />
-                                    2. Đại diện Nhà thầu cũ ký trong trường hợp chuyển đổi CBNV giữa các Nhà thầu.<br />
-                                    Representative of the former Contractor to sign in case of employee transfer between Contractors.<br />
                                 </p>
                             }
                             else if (ID_DKTN.LoaiNT_ID == 3)
@@ -518,11 +520,14 @@
                                     <b>
                                         Ghi chú 备注:
                                     </b> <br />
+                                    1. Trường hợp nhà thầu đăng ký cho người ra/vào cảng CCD, CTH thì trình ký qua BP liên quan là BP.LOGISTICS, đăng ký ra/vào cổng các Công ty thành viên thì trình ký qua BP liên quan là Công ty thành viên.承包商登记人员进出专用码头、综合码头时，必须通过相关部门（即物流部）提交签名。承包商登记人员进出成员公司大门时，必须通过相关部门（即成员公司）提交签名。<br />
+                                    2. Trường hợp cấp lại thẻ không thay đổi thông tin, thời hạn chỉ ký Nhà thầu và Tổ CPT (P.ATMT).若需重新发卡且不更改信息，则该条款仅由承包商和 发卡组（环安部）签署。<br />
+                                    3. Trường hợp CBNV thuộc Nhà thầu phụ (NTP) trực tiếp của Nhà thầu, yêu cầu điền đầy đủ thông tin của NTP.如果员工是承包商的直接分包商（分包），请填写所有分包信息。<br />
 
-                                    1. NĐUQ/T/PBP liên quan chỉ ký duyệt trong trường hợp CBNV NT có nhu cầu đăng ký ra vào Cảng thường xuyên;<br />
+                                    @*1. NĐUQ/T/PBP liên quan chỉ ký duyệt trong trường hợp CBNV NT có nhu cầu đăng ký ra vào Cảng thường xuyên;<br />
                                     相关部门领导/公司高管只针对承包商干部人员经常需要出入码头区域进行签名批准。<br />
                                     2. Đại diện Nhà thầu cũ ký trong trường hợp chuyển đổi CBNV giữa các Nhà thầu.<br />
-                                    旧承包商代表在干部人员换岗到新单位签名确认。<br />
+                                    旧承包商代表在干部人员换岗到新单位签名确认。<br />*@
                                 </p>
                             }
                         </div>

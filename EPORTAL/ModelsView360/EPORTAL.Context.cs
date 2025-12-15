@@ -2392,7 +2392,7 @@ public partial class EPORTALEntities : DbContext
     }
 
 
-    public virtual int NT_Gate_insert(string gate, Nullable<int> tinhtrang)
+    public virtual int NT_Gate_insert(string gate)
     {
 
         var gateParameter = gate != null ?
@@ -2400,12 +2400,7 @@ public partial class EPORTALEntities : DbContext
             new ObjectParameter("Gate", typeof(string));
 
 
-        var tinhtrangParameter = tinhtrang.HasValue ?
-            new ObjectParameter("tinhtrang", tinhtrang) :
-            new ObjectParameter("tinhtrang", typeof(int));
-
-
-        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("NT_Gate_insert", gateParameter, tinhtrangParameter);
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("NT_Gate_insert", gateParameter);
     }
 
 
@@ -2433,7 +2428,7 @@ public partial class EPORTALEntities : DbContext
     }
 
 
-    public virtual int NT_Gate_update(Nullable<int> iDGate, string gate, Nullable<int> tinhTrang)
+    public virtual int NT_Gate_update(Nullable<int> iDGate, string gate)
     {
 
         var iDGateParameter = iDGate.HasValue ?
@@ -2446,12 +2441,7 @@ public partial class EPORTALEntities : DbContext
             new ObjectParameter("Gate", typeof(string));
 
 
-        var tinhTrangParameter = tinhTrang.HasValue ?
-            new ObjectParameter("TinhTrang", tinhTrang) :
-            new ObjectParameter("TinhTrang", typeof(int));
-
-
-        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("NT_Gate_update", iDGateParameter, gateParameter, tinhTrangParameter);
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("NT_Gate_update", iDGateParameter, gateParameter);
     }
 
 

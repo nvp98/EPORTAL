@@ -85,7 +85,7 @@
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Chức vụ</th>
                                             <th class="text-center" rowspan="2" width="200px" style="vertical-align:middle">Số điện thoại</th>
                                             <th class="text-center" colspan="3" width="200px" style="vertical-align:middle">Thông tin nhà thầu phụ <br /> ( Nếu thuộc NTP )</th>
-                                            <th class="text-center" colspan="5" width="200px" style="vertical-align:middle">
+                                            <th class="text-center" colspan="4" width="200px" style="vertical-align:middle">
                                                 Đánh dấu "X" vào
                                                 những ô cần chọn
                                             </th>
@@ -107,7 +107,7 @@
                                             <th width="70px" class="text-center">Gia hạn</th>
                                             <th width="70px" class="text-center">Bổ sung cổng</th>
                                             <th width="70px" class="text-center">Cấp lại</th>
-                                            <th width="70px" class="text-center">Chuyển đổi NT</th>
+                                            @*<th width="70px" class="text-center">Chuyển đổi NT</th>*@
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -185,14 +185,14 @@
                                                     {
                                                         <td></td>
                                                     }
-                                                    @if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
+                                                    @*@if (item.ChuyenNT == "5" || item.ChuyenNT == "X" || item.ChuyenNT == "x")
                                                     {
                                                         <td>X</td>
                                                     }
                                                     else
                                                     {
                                                         <td></td>
-                                                    }
+                                                    }*@
                                                     @if (item.DienThoaiThongMinh == 1 )
                                                     {
                                                         <td>X</td>
@@ -377,10 +377,7 @@
                                             <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='CapLai_${i}'  name='CapLai_${i}' placeholder='' type='radio' value='4'>
                                             <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
                                         </td>
-                                        <td style=''>
-                                            <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='ChuyenNT_${i}'  name='ChuyenNT_${i}' placeholder='' type='radio' value='5'>
-                                            <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>
-                                        </td> 
+                                
                                         <td style=''>
                                             <input class='form-control' data-val='true' data-val-number='The field AccessCard must be a number.' id='DienThoaiDiDong_${i}'  name='DienThoaiDiDong_${i}' placeholder='' type='checkbox' value='1'>
                                             <span class='field-validation-valid text-danger' data-valmsg-for='AccessCard' data-valmsg-replace='true'></span>

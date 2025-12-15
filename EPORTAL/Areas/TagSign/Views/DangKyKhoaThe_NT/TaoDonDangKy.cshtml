@@ -1,0 +1,401 @@
+﻿@using EPORTAL.ModelsTagSign.TheXeCoDongVM
+@model TaoDonDangKyViewModel
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@{
+    ViewBag.Title = "Tạo đơn đăng ký";
+    Layout = "~/Views/Shared/LayoutNhaThau.cshtml";
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    <div class="alert alert-success mt-2">@Html.Raw(TempData["msgSuccess"])</div>
+}
+@if (TempData["msgError"] != null)
+{
+    <div class="alert alert-danger mt-2">@Html.Raw(TempData["msgError"])</div>
+}
+
+@using (Html.BeginForm("TaoDonDangKy", "DangKyKhoaThe_NT", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="app-main__outer" style="margin-top: -4%;">
+        <div class="app-main__inner" style="display:block;padding-bottom:0;">
+            <div class="tab-content">
+                <div class="row">
+                    <div class="card">
+                        <div style="padding: 15px 20px 50px 20px;">
+
+                            <!-- THÔNG TIN ĐƠN -->
+                            <div class="row" style="width:100%;">
+                                <div class="col-md-12 col-lg-12" style="padding-top: 1%;">
+                                    <h6 style="color:red;"><b>THÔNG TIN ĐƠN ĐĂNG KÝ</b></h6>
+                                </div>
+
+                                <table class="table table-bordered table-hover" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center" width="50%">Nội dung trích yếu <span style="color:red;">(*)</span></th>
+                                            <th class="text-center" width="50%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2">
+                                                <textarea class="form-control" id="NoiDung" name="NoiDung" rows="3" placeholder="Nhập nội dung tóm tắt..."></textarea>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered table-hover" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center" width="50%">Nhà thầu</th>
+                                            <th class="text-center" width="50%">Tổ cấp phát thẻ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" id="ID_NhaThau" name="ID_NhaThau" value="@(ViewBag.ID_NhaThau ?? "")" />
+                                                <input type="text" class="form-control" value="@Convert.ToString(ViewBag.TenNhaThau)" readonly />
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(m => m.BP_XuLy_ID,
+                                                    (SelectList)ViewBag.VP1C_List ?? new SelectList(Enumerable.Empty<SelectListItem>()),
+                                                    "--Chọn tổ cấp phát thẻ--",
+                                                    new { @class = "form-control" })
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- DANH SÁCH CHI TIẾT -->
+                            <div class="col-md-12 col-lg-12" style="padding-top:1%;">
+                                <h6 style="color:red;"><b>DANH SÁCH CHI TIẾT</b></h6>
+                            </div>
+
+                            <div class="table-responsive" style="width:100%;overflow-x:auto;">
+                                <table class="table table-bordered table-hover" id="tblChiTiet" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th rowspan="2" class="text-center align-middle" style="width:55px;">STT</th>
+                                            <th colspan="2" class="text-center">Thẻ người</th>
+                                            <th colspan="2" class="text-center">Thẻ xe cơ động</th>
+                                            <th colspan="2" class="text-center">Thẻ phương tiện</th>
+                                            <th rowspan="2" class="text-center align-middle" style="width:160px;">Ghi chú</th>
+                                            <th rowspan="2" class="text-center align-middle" style="width:70px;">Xóa</th>
+                                        </tr>
+                                        <tr style="background-color:#f8f9fa;">
+                                            <th class="text-center">Họ và tên</th>
+                                            <th class="text-center">CCCD/Hộ chiếu</th>
+                                            <th class="text-center">Loại xe cơ động</th>
+                                            <th class="text-center">Biển kiểm soát</th>
+                                            <th class="text-center">Loại phương tiện</th>
+                                            <th class="text-center">Mã phương tiện</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyChiTiet">
+                                        <!-- Dữ liệu thêm bằng JS -->
+                                    </tbody>
+                                </table>
+                                <div style="margin-top:10px;">
+                                    <button id="btnAddRow" type="button" class="btn btn-success">
+                                        <i class="fa fa-plus"></i> Thêm dòng
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- NÚT LƯU -->
+                            <div class="text-end mt-4">
+                                <a class="btn btn-secondary" href="@Url.Action("Index_NT","DangKyKhoaThe_NT")">
+                                    <i class="fa fa-arrow-left"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-save"></i> Lưu đơn
+                                </button>
+                            </div>
+
+                        </div> <!-- end inner -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+        $(document).ready(function () {
+            let rowIndex = 0;
+
+            $("#btnAddRow").click(function () {
+                rowIndex++;
+
+                const newRow = `
+                <tr>
+                    <td class="text-center">${rowIndex}</td>
+
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].TN_HoTen"
+                               class="form-control" placeholder="Nhập họ tên" />
+                    </td>
+
+                    <td>
+                        <select name="ChiTiet[${rowIndex}].TN_CCCD_HoChieu"
+                                class="form-control js-cccd-select"
+                                data-row="${rowIndex}"></select>
+                    </td>
+
+                    <td>
+                        <select name="ChiTiet[${rowIndex}].TX_LoaiXeCoDong"
+                                class="form-control">
+                            <option value="">--Chọn loại--</option>
+                            <option value="1">XE MÁY</option>
+                            <option value="2">XE BA GÁC</option>
+                            <option value="3">XE Ô TÔ</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <select name="ChiTiet[${rowIndex}].TX_BienKiemSoat"
+                                class="form-control js-bks-select"
+                                data-row="${rowIndex}"></select>
+                    </td>
+
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].PT_LoaiPhuongTien"
+                               class="form-control" placeholder="Nhập loại phương tiện" />
+                    </td>
+
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].PT_BienKiemSoat"
+                               class="form-control" placeholder="Biển kiểm soát - Số khung" />
+                    </td>
+
+                    <td>
+                        <input type="text" name="ChiTiet[${rowIndex}].GhiChu"
+                               class="form-control" placeholder="Ghi chú" />
+                    </td>
+
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm btnDeleteRow">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+                $("#tbodyChiTiet").append(newRow);
+
+                // --- Khởi tạo Select2 cho CCCD và Biển số ---
+                const $cccd = $(`#tbodyChiTiet select.js-cccd-select[data-row='${rowIndex}']`);
+                const $bks = $(`#tbodyChiTiet select.js-bks-select[data-row='${rowIndex}']`);
+
+                initCCCDSelect2($cccd);
+                initBienSoSelect2($bks);
+            });
+
+
+            // ====================== XÓA DÒNG ======================
+            $(document).on("click", ".btnDeleteRow", function () {
+                $(this).closest("tr").remove();
+                updateSTT();
+            });
+
+
+            // ====================== CẬP NHẬT STT SAU KHI XÓA ======================
+            function updateSTT() {
+                rowIndex = 0;
+                $("#tbodyChiTiet tr").each(function () {
+                    rowIndex++;
+                    $(this).find("td:first").text(rowIndex);
+                });
+            }
+            function getSafe(element) {
+                let v = element.val();
+                return v ? v.trim() : "";
+            }
+
+            // ====== Gửi form bằng AJAX ======
+            $("form").submit(function (e) {
+                e.preventDefault();
+
+                const chiTietList = [];
+                $("#tbodyChiTiet tr").each(function () {
+                    const row = $(this);
+                    const data = {
+                        TN_HoTen: getSafe(row.find("input[name*='TN_HoTen']")),
+                        TN_CCCD_HoChieu: getSafe(row.find("select[name*='TN_CCCD_HoChieu']")),
+                        TX_LoaiXeCoDong: row.find("select[name*='TX_LoaiXeCoDong']").val() || 0,
+                        TX_BienKiemSoat: getSafe(row.find("select[name*='TX_BienKiemSoat']")),
+                        PT_LoaiPhuongTien: getSafe(row.find("input[name*='PT_LoaiPhuongTien']")),
+                        PT_BienKiemSoat: getSafe(row.find("input[name*='PT_BienKiemSoat']")),
+                        GhiChu: getSafe(row.find("input[name*='GhiChu']"))
+                    };
+                    chiTietList.push(data);
+                });
+
+                const formData = new FormData(this);
+                formData.append("ChiTietJson", JSON.stringify(chiTietList));
+
+                $.ajax({
+                    url: '@Url.Action("TaoDonDangKy", "DangKyKhoaThe_NT")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        if (res.success) {
+                            alert("Lưu đơn thành công!");
+                            window.location.href = '@Url.Action("Index_NT", "DangKyKhoaThe_NT")';
+                        } else {
+                            alert("Lưu thất bại: " + res.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra khi gửi dữ liệu!");
+                    }
+                });
+            });
+        });
+
+ // ====================== CẤU HÌNH SELECT2 BIỂN KIỂM SOÁT ======================
+    function initBienSoSelect2($el) {
+        const idNhaThau = $("#ID_NhaThau").val();
+
+        $el.select2({
+            width: "100%",
+            placeholder: "Tìm biển kiểm soát...",
+            allowClear: true,
+            minimumInputLength: 0,
+            ajax: {
+                url: '@Url.Action("SearchXeByNhaThau", "DangKyKhoaThe_NT")',
+                dataType: "json",
+                delay: 250,
+                data: function (params) {
+                    const $row = $el.closest("tr");
+                    const loaiPhuongTienId = $row.find("select[name*='TX_LoaiXeCoDong']").val();
+
+                    return {
+                        idNhaThau: idNhaThau,
+                        q: params.term || "",
+                        page: params.page || 1,
+                        loaiPhuongTienId: loaiPhuongTienId || null
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: (data.results || []).map(x => ({
+                            id: x.id,
+                            text: x.text,
+                            loaiPhuongTienId: x.loaiPhuongTienId
+                        })),
+                        pagination: { more: data.pagination && data.pagination.more }
+                    };
+                },
+                cache: true
+            },
+            tags: true,
+            createTag: function (params) {
+                const term = (params.term || "").trim();
+                if (term === "") return null;
+                return { id: term, text: term, newOption: true };
+            },
+            templateResult: function (data) {
+                if (data.loading) return data.text;
+                if (data.newOption) return `Thêm mới: ${data.text}`;
+                return data.text;
+            }
+        });
+
+        // Khi chọn biển số → tự động set loại xe tương ứng
+        $el.on("select2:select", function (e) {
+            const selected = e.params.data;
+            const $row = $(this).closest("tr");
+            const $loaiXe = $row.find("select[name*='TX_LoaiXeCoDong']");
+
+            if (selected && selected.loaiPhuongTienId != null) {
+                // Change do code → tránh trigger sự kiện người dùng
+                $loaiXe.val(String(selected.loaiPhuongTienId)).trigger("change");
+            }
+        });
+
+        // Khi user đổi Loại xe → clear Biển số để filter lại
+        const $loaiXeTrongHang = $el.closest("tr").find("select[name*='TX_LoaiXeCoDong']");
+        $loaiXeTrongHang.off("change.bks").on("change.bks", function (e) {
+            if (!e.originalEvent) return; // bỏ qua nếu change do code
+            $el.val(null).trigger("change");
+        });
+    }
+
+
+
+    // ====================== CẤU HÌNH SELECT2 CCCD/HỘ CHIẾU ======================
+    const cccdCacheByNT = {}; // Cache: { idNhaThau: [{ id, text, hoTen }, ...] }
+
+    function initCCCDSelect2($el) {
+        const idNhaThau = $("#ID_NhaThau").val();
+        const rowIdx = $el.data("row");
+
+        // --- Khởi tạo Select2 từ dữ liệu local ---
+        function bindSelect2Local(data) {
+            $el.select2({
+                width: "100%",
+                placeholder: "Chọn hoặc tìm CCCD/Hộ chiếu...",
+                allowClear: true,
+                data: data,
+                matcher: function (params, dataObj) {
+                    if ($.trim(params.term) === '') return dataObj;
+                    if (!dataObj || !dataObj.text) return null;
+
+                    const term = params.term.toLowerCase();
+                    const hayText = (dataObj.text || '').toLowerCase();
+                    const hayId = (dataObj.id || '').toLowerCase();
+
+                    return (hayText.includes(term) || hayId.includes(term)) ? dataObj : null;
+                }
+            });
+
+            // Reset giá trị cũ khi khởi tạo
+            $el.val(null).trigger("change");
+
+            // Khi chọn CCCD → tự điền Họ tên
+            $el.on("select2:select", function (e) {
+                const selected = e.params.data;
+                $(`#tbodyChiTiet input[name='ChiTiet[${rowIdx}].TN_HoTen']`).val(selected.hoTen || "");
+            });
+
+            // Khi clear → xóa họ tên
+            $el.on("select2:clear", function () {
+                $(`#tbodyChiTiet input[name='ChiTiet[${rowIdx}].TN_HoTen']`).val("");
+            });
+        }
+
+        // --- Nếu có cache → dùng luôn ---
+        if (cccdCacheByNT[idNhaThau]) {
+            bindSelect2Local(cccdCacheByNT[idNhaThau]);
+            return;
+        }
+
+        // --- Nếu chưa có cache → tải toàn bộ danh sách 1 lần ---
+        $.ajax({
+            url: '/DangKyKhoaThe_NT/GetNhanVienNTByCCCD',
+            type: 'GET',
+            dataType: 'json',
+            data: { idNT: idNhaThau, cccd: '' },
+            success: function (res) {
+                const list = (res && res.results) ? res.results : [];
+                cccdCacheByNT[idNhaThau] = list; // cache lại theo nhà thầu
+                bindSelect2Local(list);
+            },
+            error: function () {
+                bindSelect2Local([]);
+            }
+        });
+    }
+</script>
+

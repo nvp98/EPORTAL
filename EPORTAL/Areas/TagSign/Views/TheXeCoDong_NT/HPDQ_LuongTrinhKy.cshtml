@@ -1,0 +1,170 @@
+﻿@model List<EPORTAL.ModelsTagSign.CDNT_TrinhKy_Detail_Result>
+
+@{
+    ViewBag.Title = "Show";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+@using EPORTAL.ModelsTagSign
+@*@model PagedList.IPagedList<CDNT_TrinhKy>*@
+@using PagedList.Mvc
+@using EPORTAL.ModelsView360;
+@using EPORTAL.ModelsTagSign;
+@{
+    EPORTALEntities db = new EPORTALEntities();
+    EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
+    // var nd = db.AuthorizationContractors.Where(x => x.IDNhanVien == MyAuthentication.ID).SingleOrDefault();
+}
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early"></i>
+                    </div>
+                    <div>
+                        Phân luồng xử lý
+                        <div class="page-title-subheading"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="row">
+                <div class="card col-lg-12">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="table" width="100%">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center" width="50px">STT</th>
+                                        <th class="text-center" width="150px">Người xử lý</th>
+                                        <th class="text-center" width="200px">Chức danh</th>
+                                        <th class="text-center" width="200px">Bộ phận</th>
+                                        <th class="text-center" width="150px">Ngày xử lý</th>
+                                        <th class="text-center" width="150px">Tình trạng</th>
+                                        <th class="text-center" width="300px">Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null)
+                                    {
+                                        int stt = 1;
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@stt</td>
+                                                <td>@item.NguoiDuyet</td>
+                                                <td>@item.ChucVu</td>
+                                                <td>@item.TenPhongBan</td>
+                                                <td class="text-center">@(item.NgayDuyet.HasValue? item.NgayDuyet.Value.ToString("dd/MM/yyyy"):"")</td>
+
+                                                <td class="text-center" >
+                                                    @{
+                                                        string text = "";
+                                                        string btnClass = "";
+
+                                                        switch (item.TinhTrang_ID)
+                                                        {
+                                                            case 0:
+                                                                text = "Chưa xử lý";
+                                                                btnClass = "btn-transition btn-secondary";
+                                                                break;
+                                                            case 1:
+                                                                text = "Chờ xử lý";
+                                                                btnClass = "btn-transition btn-warning";
+                                                                break;
+                                                            case 2:
+                                                                text = "Đã xử lý";
+                                                                btnClass = "btn-transition btn-primary";
+                                                                break;
+                                                            case 3:
+                                                                text = "Đã hoàn thành";
+                                                                btnClass = "btn-transition btn-success";
+                                                                break;
+                                                            case 4:
+                                                                text = "Không đạt yêu cầu";
+                                                                btnClass = "btn-transition btn-danger";
+                                                                break;
+                                                            default:
+                                                                text = "Chưa trình ký";
+                                                                btnClass = "btn-transition btn-dark";
+                                                                break;
+                                                        }
+                                                    }
+
+                                                    <span class="btn btn-sm @btnClass" style="width:120px;">@text</span>
+                                                </td>
+
+                                                <td>@item.GhiChu</td>
+                                            </tr>
+                                            stt++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">Không có dữ liệu</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    $('#btn-add').click(function () {
+        var url = $('#myModal').data('url');
+        console.log(url);
+        $.get(url, function (data) {
+            $("#myModal").html(data);
+            $("#ModalTitle").html("Thêm mới loại ký duyệt");
+            $("#myModal").modal('show');
+        });
+    });
+
+    $("#btsearch").on('click', function () {
+     var IDPhongBan = $('#IDPhongBan').val();
+
+     window.location.href = '@Url.Action("Index", "FollowTheSiger")?IDPhongBan=' + IDPhongBan;
+
+    });
+    $("#IDPhongBan").chosen({
+        width: "100%"
+    });
+</script>
+<style>
+    .d-flex {
+        display: flex !important;
+        flex-direction: row-reverse;
+    }
+</style>
+
+
+
+
+
+
+
+

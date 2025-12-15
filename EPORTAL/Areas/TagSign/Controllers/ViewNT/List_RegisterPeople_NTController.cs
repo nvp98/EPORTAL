@@ -909,7 +909,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                 string GiaHan = dt.Rows[i][11].ToString().Trim();
                                 string BoSungCong = dt.Rows[i][12].ToString().Trim();
                                 string CapLai = dt.Rows[i][13].ToString().Trim();
-                                string ChuyenDoiNT = dt.Rows[i][14].ToString().Trim();
+                                string ChuyenDoiNT = ""; // Bỏ Chuyển đổi NT
 
                                 if(CapMoi == "" && GiaHan == "" && BoSungCong == "" && CapLai == "" && ChuyenDoiNT=="")
                                 {
@@ -1279,7 +1279,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                             var GiaHan = collection["GiaHan_" + key.Split('_')[1]];
                             var BoSungCong = collection["BoSungCong_" + key.Split('_')[1]];
                             var CapLai = collection["CapLai_" + key.Split('_')[1]];
-                            var ChuyenNT = collection["ChuyenNT_" + key.Split('_')[1]];
+                            var ChuyenNT = ""; // bỏ
                             if ( String.IsNullOrEmpty(CapMoi)  && String.IsNullOrEmpty(GiaHan) && String.IsNullOrEmpty(BoSungCong) && String.IsNullOrEmpty(CapLai) && String.IsNullOrEmpty(ChuyenNT))
                             {
 
@@ -1358,7 +1358,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         if (item.CapMoi != null)
                         {
                             var CheckVP = db_nt.NT_NhanVienVP.Where(x => x.CCCD == item.CCCD && x.TinhTrang == 0).FirstOrDefault();
-                            var CheckNVNT = db_nt.NT_NhanVienNT.Where(x => x.CCCD.Contains(item.CCCD) || x.CCCD == item.CCCD && x.TTLV == 1).FirstOrDefault();
+                            var CheckNVNT = db_nt.NT_NhanVienNT.Where(x => x.CCCD.Contains(item.CCCD) && x.TTLV == 1 || x.CCCD == item.CCCD && x.TTLV == 1).FirstOrDefault();
                             if (item.HoVaTen != "" && item.CCCD != "" && CheckVP != null)
                             {
                                 TempData["msgSuccess"] = "<script>alert('Nhân viên nằm trong danh sách vi phạm.  Nhân viên : " + item.HoVaTen + "');</script>";
@@ -1484,33 +1484,33 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                                  item.DienThoaiDiDong,
                                  "");
                         }
-                        else if (item.ChuyenNT != null)
-                        {
-                            var insert = db_dk.Detail_RegisterPeople_Insert
-                               (DKTN_ID,
-                                 item.HoVaTen,
-                                  item.NgaySinh,
-                                 item.CCCD,
-                                 item.HoKhau,
-                                 item.CV_ID,
-                                 item.SoDienThoai,
-                                 item.Ten_NTP,
-                                 item.HoTen_QuanLy,
-                                 item.SoDienThoai_QuanLy,
-                                 null,
-                                 null,
-                                 null,
-                                 null,
-                                 LoaiCap,
-                                 item.ThoiHanThe,
-                                 item.KhuVucLamViec,
-                                 item.CongLamViec,
-                                  /*item.NhomNT,*/
-                                  null,
-                                  item.GhiChu,
-                                 item.DienThoaiDiDong,
-                                 "");
-                        }
+                        //else if (item.ChuyenNT != null )
+                        //{
+                        //    var insert = db_dk.Detail_RegisterPeople_Insert
+                        //       (DKTN_ID,
+                        //         item.HoVaTen,
+                        //          item.NgaySinh,
+                        //         item.CCCD,
+                        //         item.HoKhau,
+                        //         item.CV_ID,
+                        //         item.SoDienThoai,
+                        //         item.Ten_NTP,
+                        //         item.HoTen_QuanLy,
+                        //         item.SoDienThoai_QuanLy,
+                        //         null,
+                        //         null,
+                        //         null,
+                        //         null,
+                        //         LoaiCap,
+                        //         item.ThoiHanThe,
+                        //         item.KhuVucLamViec,
+                        //         item.CongLamViec,
+                        //          /*item.NhomNT,*/
+                        //          null,
+                        //          item.GhiChu,
+                        //         item.DienThoaiDiDong,
+                        //         "");
+                        //}
 
                         TempData["msgSuccess"] = "<script>alert('Thêm mới thành công dòng');</script>";
 
@@ -2070,7 +2070,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     }
                 }
 
-                int CapDuyet = 1;
+                //int CapDuyet = 1;
                 List = List.OrderBy(x => x.LuongXuLY).ToList();
                 foreach (var item in List)
                 {
@@ -2084,9 +2084,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     }
                     if(item.LuongXuLY != 4 && item.LuongXuLY != 5)
                     {
-                        db_dk.SignOff_Flow_Insert(id, CapDuyet, item.LuongXuLY, item.ID_NV, null, 0, null);
+                        db_dk.SignOff_Flow_Insert(id, item.LuongXuLY, item.LuongXuLY, item.ID_NV, null, 0, null);
                     }
-                    CapDuyet++;
+                    //CapDuyet++;
 
                 }
                 db_dk.RegisterPeople_UpdateFlow(id, 1);
@@ -2104,7 +2104,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         [HttpGet]
         public JsonResult GetListBP()
         {
-            var model = db.PhongBans.Where(x=>x.status ==1).Select(x => new { x.IDPhongBan, x.TenPhongBan }).ToList();
+            var dsPhongBan = new List<string> { "BDA Sản xuất ray đường sắt và thép đặc biệt Hòa Phát Dung Quất", "Công ty Cổ phần Ray và Thép đặc biệt Hòa Phát Dung Quất", "Công ty TNHH Chế tạo thiết bị Hòa Phát Dung Quất" };
+            var model = db.PhongBans.Where(x=> dsPhongBan.Contains(x.TenPhongBan) && x.status ==1).Select(x => new { x.IDPhongBan, x.TenPhongBan }).ToList();
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }

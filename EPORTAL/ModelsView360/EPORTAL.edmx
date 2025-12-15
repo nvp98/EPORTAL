@@ -182,6 +182,31 @@
           <Property Name="NamSinhVoChong" Type="int" />
           <Property Name="MaNhanVien" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="NhanVien">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaNV" Type="varchar" MaxLength="11" />
+          <Property Name="MatKhau" Type="nvarchar" MaxLength="50" />
+          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
+          <Property Name="HoTenKhongDau" Type="nvarchar" MaxLength="50" />
+          <Property Name="NgaySinh" Type="date" />
+          <Property Name="DiaChi" Type="nvarchar" MaxLength="150" />
+          <Property Name="DienThoai" Type="varchar" MaxLength="11" />
+          <Property Name="NgayVaoLam" Type="date" />
+          <Property Name="IDPhongBan" Type="int" />
+          <Property Name="IDTinhTrangLV" Type="int" />
+          <Property Name="IDViTri" Type="int" />
+          <Property Name="IsGV" Type="bit" />
+          <Property Name="IDQuyen" Type="int" />
+          <Property Name="Chukynhay" Type="nvarchar" MaxLength="100" />
+          <Property Name="Chukychinh" Type="nvarchar" MaxLength="100" />
+          <Property Name="IDQuyenHT" Type="int" />
+          <Property Name="GroupQuyen" Type="nvarchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="50" />
+          <Property Name="CCCD" Type="varchar" MaxLength="15" />
+        </EntityType>
         <EntityType Name="NT_Authority">
           <Key>
             <PropertyRef Name="ID" />
@@ -360,30 +385,13 @@
           <Property Name="IDKV" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TenKV" Type="nvarchar" MaxLength="100" />
         </EntityType>
-        <EntityType Name="NhanVien">
+        <EntityType Name="PhongBan">
           <Key>
-            <PropertyRef Name="ID" />
+            <PropertyRef Name="IDPhongBan" />
           </Key>
-          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="MaNV" Type="varchar" MaxLength="10" />
-          <Property Name="MatKhau" Type="nvarchar" MaxLength="50" />
-          <Property Name="HoTen" Type="nvarchar" MaxLength="50" />
-          <Property Name="HoTenKhongDau" Type="nvarchar" MaxLength="50" />
-          <Property Name="NgaySinh" Type="date" />
-          <Property Name="DiaChi" Type="nvarchar" MaxLength="150" />
-          <Property Name="DienThoai" Type="varchar" MaxLength="11" />
-          <Property Name="NgayVaoLam" Type="date" />
-          <Property Name="IDPhongBan" Type="int" />
-          <Property Name="IDTinhTrangLV" Type="int" />
-          <Property Name="IDViTri" Type="int" />
-          <Property Name="IsGV" Type="bit" />
-          <Property Name="IDQuyen" Type="int" />
-          <Property Name="Chukynhay" Type="nvarchar" MaxLength="100" />
-          <Property Name="Chukychinh" Type="nvarchar" MaxLength="100" />
-          <Property Name="IDQuyenHT" Type="int" />
-          <Property Name="GroupQuyen" Type="nvarchar" MaxLength="50" />
-          <Property Name="Email" Type="varchar" MaxLength="50" />
-          <Property Name="CCCD" Type="varchar" MaxLength="15" />
+          <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TenPhongBan" Type="nvarchar" MaxLength="100" />
+          <Property Name="status" Type="int" />
         </EntityType>
         <EntityType Name="Projects">
           <Key>
@@ -405,14 +413,6 @@
           </Key>
           <Property Name="IDGroup" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="GroupName" Type="nvarchar" MaxLength="500" />
-        </EntityType>
-        <EntityType Name="PhongBan">
-          <Key>
-            <PropertyRef Name="IDPhongBan" />
-          </Key>
-          <Property Name="IDPhongBan" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="TenPhongBan" Type="nvarchar" MaxLength="50" />
-          <Property Name="status" Type="int" />
         </EntityType>
         <EntityType Name="Quyen">
           <Key>
@@ -445,16 +445,9 @@
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="IPAdress" Type="varchar" MaxLength="50" />
-          <Property Name="TenVT" Type="varchar(max)" />
+          <Property Name="TenVT" Type="nvarchar(max)" />
           <Property Name="IDCong" Type="int" />
           <Property Name="TinhTrang" Type="int" />
-        </EntityType>
-        <EntityType Name="TinhTrangLV">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
-          <Property Name="TinhTrangLV" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ThongTinCaNhan">
           <Key>
@@ -467,6 +460,13 @@
           <Property Name="FileHinh" Type="nvarchar" MaxLength="300" />
           <Property Name="XacNhan" Type="bit" />
           <Property Name="NgayKhai" Type="smalldatetime" />
+        </EntityType>
+        <EntityType Name="TinhTrangLV">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="TinhTrangLV" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Video">
           <Key>
@@ -1143,7 +1143,6 @@
         </Function>
         <Function Name="NT_Gate_insert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Gate" Type="nvarchar" Mode="In" />
-          <Parameter Name="tinhtrang" Type="int" Mode="In" />
         </Function>
         <Function Name="NT_Gate_searchByID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="IDGate" Type="int" Mode="In" />
@@ -1154,7 +1153,6 @@
         <Function Name="NT_Gate_update" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="IDGate" Type="int" Mode="In" />
           <Parameter Name="Gate" Type="nvarchar" Mode="In" />
-          <Parameter Name="TinhTrang" Type="int" Mode="In" />
         </Function>
         <Function Name="NT_Partner_Additional" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="ID" Type="int" Mode="In" />
@@ -1428,6 +1426,7 @@
           <EntitySet Name="KhaiBao_ConCai" EntityType="Self.KhaiBao_ConCai" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="KhaiBao_NhanVien" EntityType="Self.KhaiBao_NhanVien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="KhaiBao_VoChong" EntityType="Self.KhaiBao_VoChong" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NhanVien" EntityType="Self.NhanVien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Authority" EntityType="Self.NT_Authority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_CardRegistrationInfor" EntityType="Self.NT_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Confirm" EntityType="Self.NT_Confirm" Schema="dbo" store:Type="Tables" />
@@ -1442,16 +1441,15 @@
           <EntitySet Name="NT_Position" EntityType="Self.NT_Position" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Workingtime" EntityType="Self.NT_Workingtime" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="NT_Workplace" EntityType="Self.NT_Workplace" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="NhanVien" EntityType="Self.NhanVien" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PhongBan" EntityType="Self.PhongBan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Projects" EntityType="Self.Projects" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProjectsGroup" EntityType="Self.ProjectsGroup" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="PhongBan" EntityType="Self.PhongBan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Quyen" EntityType="Self.Quyen" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Register_Gate" EntityType="Self.Register_Gate" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Signingstatus" EntityType="Self.Signingstatus" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Terminal" EntityType="Self.Terminal" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="TinhTrangLV" EntityType="Self.TinhTrangLV" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ThongTinCaNhan" EntityType="Self.ThongTinCaNhan" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TinhTrangLV" EntityType="Self.TinhTrangLV" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Video" EntityType="Self.Video" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Virtual" EntityType="Self.Virtual" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="VirtualGroup" EntityType="Self.VirtualGroup" Schema="dbo" store:Type="Tables" />
@@ -1648,7 +1646,7 @@
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="MaNV" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="MaNV" Type="String" MaxLength="11" FixedLength="false" Unicode="false" />
           <Property Name="MatKhau" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="HoTen" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="HoTenKhongDau" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
@@ -1857,7 +1855,7 @@
             <PropertyRef Name="IDPhongBan" />
           </Key>
           <Property Name="IDPhongBan" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TenPhongBan" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TenPhongBan" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="NhanViens" Relationship="Self.FK_NhanVien_PhongBan" FromRole="PhongBan" ToRole="NhanVien" />
           <Property Name="status" Type="Int32" />
         </EntityType>
@@ -2693,7 +2691,6 @@
           </FunctionImport>
           <FunctionImport Name="NT_Gate_insert">
             <Parameter Name="Gate" Mode="In" Type="String" />
-            <Parameter Name="tinhtrang" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="NT_Gate_searchByID" ReturnType="Collection(EPORTALModel.NT_Gate_searchByID_Result)">
           <Parameter Name="IDGate" Mode="In" Type="Int32" />
@@ -2704,7 +2701,6 @@
           <FunctionImport Name="NT_Gate_update">
             <Parameter Name="IDGate" Mode="In" Type="Int32" />
             <Parameter Name="Gate" Mode="In" Type="String" />
-            <Parameter Name="TinhTrang" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="NT_Partner_Additional">
             <Parameter Name="ID" Mode="In" Type="Int32" />
@@ -3336,7 +3332,7 @@
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="IPAdress" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="TenVT" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="TenVT" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="IDCong" Type="Int32" />
           <Property Name="TinhTrang" Type="Int32" />
         </EntityType>
