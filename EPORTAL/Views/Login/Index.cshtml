@@ -3,7 +3,6 @@
 }
 @model EPORTAL.Models.LoginValidation
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -14,9 +13,9 @@
 </head>
 <body class="bg-login" onselectstart="return false" oncontextmenu="return false">
     @if (TempData["msgSuccess"] != null)
-        {
-            @Html.Raw(TempData["msgSuccess"])
-        }
+    {
+        @Html.Raw(TempData["msgSuccess"])
+    }
     @if (TempData["msgError"] != null)
     {
         @Html.Raw(TempData["msgError"])
@@ -36,6 +35,7 @@
                         <div class="card-body">
                             <p class="text-center" style="margin:0 auto;padding:0">CÔNG TY CỔ PHẦN THÉP HÒA PHÁT </p>
                             <p class="text-center" style="margin: 0 auto; padding: 0px 0px 10px 0px; font-size: 25px; color: #027bb9">DUNG QUẤT</p>
+                            <p id="formTitle" class="text-center" style="margin:0 auto;padding:0">Đăng nhập Portal</p>
                             @using (Html.BeginForm("LoginUser", "Login", new { id = "myForm" }))
                             {
                                 <input type="hidden" name="returnUrl" value="@Request.QueryString["ReturnUrl"]" />
@@ -59,6 +59,12 @@
                                 </div>
                                 <div class="form-group">
                                     <button id="LoginUser" type="submit" class="form-control submit px-3"><strong>Đăng Nhập</strong></button>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" id="toggleLoginMode"
+                                            class="form-control btn btn-outline-secondary submit px-3" style="background-color: #808080 ">
+                                        <strong>Đăng nhập bằng Time365</strong>
+                                    </button>
                                 </div>
                                 <div class="form-group" style="margin-bottom:0px">
                                     <div class="custom-control custom-checkbox">
@@ -84,3 +90,26 @@
     </div>
 </body>
 </html>
+<script src="~/Content/jquery-3.0.0.min.js"></script>
+<script type="text/javascript">
+    // Biến theo dõi chế độ đăng nhập hiện tại
+    var isTime365Mode = false;
+
+    // Xử lý chuyển đổi chế độ đăng nhập
+    $("#toggleLoginMode").on('click', function (e) {
+        e.preventDefault();
+        isTime365Mode = !isTime365Mode;
+
+        if (isTime365Mode) {
+            // Chuyển sang chế độ Time365
+            $("#formTitle").text("Đăng nhập bằng Time365");
+            $("#toggleLoginMode").html("<strong>Quay lại đăng nhập Portal</strong>");
+            $("#toggleLoginMode").removeClass("btn-outline-secondary").addClass("btn-warning");
+        } else {
+            // Chuyển về chế độ Portal
+            $("#formTitle").text("Đăng nhập Portal");
+            $("#toggleLoginMode").html("<strong>Đăng nhập bằng Time365</strong>");
+            $("#toggleLoginMode").removeClass("btn-warning").addClass("btn-outline-secondary");
+        }
+    });
+</script>

@@ -2,16 +2,15 @@
 using EPORTAL.Models;
 using EPORTAL.ModelsPartner;
 using EPORTAL.ModelsServey;
-using EPORTAL.ModelsTagSign;
 using EPORTAL.ModelsView360;
+using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Web.Mvc;
 using System.Web.Security;
-using EPORTAL.Models;
 namespace EPORTAL.Controllers
 {
     public class LoginController : Controller
@@ -62,10 +61,25 @@ namespace EPORTAL.Controllers
 
             NhanVien user1 = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.CCCD.Substring(x.CCCD.Length - 5,5) == u.MatKhau).FirstOrDefault();
 
-
             string mk = Common.Encryptor.MD5Hash(u.MatKhau);
             NhanVien user = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.MatKhau == mk ).FirstOrDefault();
             var checkUser = dbNT.NT_UserTemp.Where(x => x.UserName == u.MaNV && x.MatKhau == mk && x.TinhTrang == 1).FirstOrDefault();
+
+            var apiLoginResult = LoginViaAPI(u.MaNV, u.MatKhau);
+            if (apiLoginResult != null && apiLoginResult.Success)
+            {
+                user = db.NhanViens.FirstOrDefault(x => x.MaNV == u.MaNV && x.IDTinhTrangLV == 1);
+                if (user != null)
+                {
+                    string Cookie = string.Format("{0};{1};{2};{3};{4};{5};{6}",
+                        user.ID, user.MaNV, user.HoTen, user.IDPhongBan,
+                        user.IDQuyen, user.IDQuyenHT, user.GroupQuyen);
+
+                    FormsAuthentication.SetAuthCookie(Cookie, false);
+                    return RedirectToAction("Index", "UserServey", new { area = "Servey" });
+                }
+            }
+
             if (user != null || user1 != null)
             {
                 if (user == null) user = user1;
@@ -282,6 +296,92 @@ namespace EPORTAL.Controllers
             }
 
               return RedirectToAction("Index", "ListProject", new { area = "View360" });
+        }
+
+        private APILoginResult LoginViaAPI(string username, string password)
+        {
+            var result = new APILoginResult { Success = false };
+
+            try
+            {
+                string token = GetTokenFromAPI(username, password);
+                if (string.IsNullOrEmpty(token))
+                {
+                    result.Message = "Không thể lấy token từ API";
+                    return result;
+                }
+
+                // Nếu có token, coi như đăng nhập thành công
+                // Có thể thêm logic kiểm tra token với API khác tại đây
+                result.Success = true;
+                result.Token = token;
+                result.Message = "Đăng nhập API thành công";
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Lỗi đăng nhập API: " + ex.Message;
+                System.Diagnostics.Debug.WriteLine("LoginViaAPI Exception: " + ex.Message);
+            }
+
+            return result;
+        }
+
+        private string GetTokenFromAPI(string username, string password)
+        {
+            try
+            {
+                string url = ConfigurationManager.AppSettings["LinkToken"];
+                if (string.IsNullOrEmpty(url))
+                    return "";
+
+                var httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                httpRequest.Method = "POST";
+                httpRequest.ContentType = "application/json";
+                httpRequest.Timeout = 30000;
+
+                var data = @"{
+                              ""username"":""" + username + @""",
+                              ""password"":""" + password + @"""
+                            }";
+
+                using (var streamWriter = new StreamWriter(httpRequest.GetRequestStream()))
+                {
+                    streamWriter.Write(data);
+                }
+
+                WebResponse httpResponse = httpRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    JObject json = JObject.Parse(result);
+                    var checkdata = json["data"].ToString();
+
+                    // Kiểm tra xem có thành công không
+                    if (checkdata != "")
+                    {
+                        var token = json["data"]["tokenLogin"]?.ToString();
+                        return token ?? "";
+                    }
+                }
+            }
+            catch (WebException webex)
+            {
+                // Ghi log lỗi nếu cần
+                System.Diagnostics.Debug.WriteLine("GetTokenFromAPI Error: " + webex.Message);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("GetTokenFromAPI Exception: " + ex.Message);
+            }
+
+            return "";
+        }
+
+        private class APILoginResult
+        {
+            public bool Success { get; set; }
+            public string Token { get; set; }
+            public string Message { get; set; }
         }
     }
 }

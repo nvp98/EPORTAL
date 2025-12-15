@@ -1,16 +1,17 @@
 ﻿using EPORTAL.Models;
 using EPORTAL.ModelsView360;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity.Core.Objects;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Mvc;
 
 namespace EPORTAL.Controllers
@@ -24,6 +25,48 @@ namespace EPORTAL.Controllers
 
             return View();
         }
+
+        public String GetToken()
+        {
+            string url = ConfigurationManager.AppSettings["LinkToken"];
+            string username = ConfigurationManager.AppSettings["Username"];
+            string password = ConfigurationManager.AppSettings["Password"];
+            var httpRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpRequest.Method = "POST";
+            httpRequest.ContentType = "application/json";
+            var data = @"{
+                          ""username"":""" + username + @""",
+                          ""password"":""" + password + @"""
+                        }";
+            using (var streamWriter = new StreamWriter(httpRequest.GetRequestStream()))
+            {
+                streamWriter.Write(data);
+            }
+            var token = "";
+            try
+            {
+                WebResponse httpResponse = httpRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+
+                    var result = streamReader.ReadToEnd();
+                    JObject json = JObject.Parse(result);
+                    var a = json["data"]["tokenLogin"].ToString();
+                    token = a;
+                }
+            }
+            catch (WebException webex)
+            {
+                WebResponse errResp = webex.Response;
+                using (Stream respStream = errResp.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(respStream);
+                    string text = reader.ReadToEnd();
+                }
+            }
+            return token;
+        }
+
         List<Employees_API.Employee> GetAPI()
         {
             string link = ConfigurationManager.AppSettings["LinkAPI"];
