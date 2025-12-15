@@ -15,6 +15,7 @@ namespace EPORTAL.ModelsResidency
 
         public string PhonePersonal { get; set; }
         public string RelativeName { get; set; }
+        public string RelativeRelation { get; set; }
         public string RelativePhone { get; set; }
 
         public string FatherName { get; set; }

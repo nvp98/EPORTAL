@@ -19,7 +19,7 @@
                         </i>
                     </div>
                     <div>
-                        Cập nhật Thông tin cư trú
+                        PHIẾU BỔ TÚC THÔNG TIN CÁ NHÂN
                         <div class="page-title-subheading">
                         </div>
                     </div>
@@ -136,25 +136,26 @@
                             </div>
                             <div class="card-body">
                                 <div class="row g-3">
-
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="phonePersonal" class="form-label fw-bold">SĐT cá nhân</label>
                                         <input type="text" id="phonePersonal" class="form-control"
                                                placeholder="Nhập số điện thoại cá nhân" />
                                     </div>
-
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="relativeName" class="form-label fw-bold">Họ tên người thân</label>
                                         <input type="text" id="relativeName" class="form-control"
                                                placeholder="Nhập họ tên người thân" />
                                     </div>
-
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <label for="relativeRelation" class="form-label fw-bold">Mối quan hệ</label>
+                                        <input type="text" id="relativeRelation" class="form-control"
+                                               placeholder="Mối quan hệ với người thân" />
+                                    </div>
+                                    <div class="col-md-3">
                                         <label for="relativePhone" class="form-label fw-bold">SĐT người thân</label>
                                         <input type="text" id="relativePhone" class="form-control"
                                                placeholder="Nhập số điện thoại người thân" />
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -363,6 +364,27 @@
             }
         }
 
+        const relativeName = $("#relativeName").val().trim();
+        const relativeRelation = $("#relativeRelation").val().trim();
+        const relativePhone = $("#relativePhone").val().trim();
+
+        const hasAnyRelativeInfo =
+            relativeName !== "" ||
+            relativeRelation !== "" ||
+            relativePhone !== "";
+
+        if (hasAnyRelativeInfo) {
+            if (relativeName === "" || relativeRelation === "" || relativePhone === "") {
+                alert("Vui lòng nhập đầy đủ Họ tên người thân, Mối quan hệ và SĐT người thân.");
+
+                if (relativeName === "") $("#relativeName").focus();
+                else if (relativeRelation === "") $("#relativeRelation").focus();
+                else $("#relativePhone").focus();
+
+                return false;
+            }
+        }
+
         if (!validatePair("#fatherName", "#fatherYob", "Bố")) {
             return false;
         }
@@ -412,6 +434,7 @@
             PhonePersonal: $('#phonePersonal').val(),
             RelativeName: $('#relativeName').val(),
             RelativePhone: $('#relativePhone').val(),
+            RelativeRelation: $('#relativeRelation').val(),
 
             FatherName: $('#fatherName').val(),
             FatherYob: $('#fatherYob').val(),

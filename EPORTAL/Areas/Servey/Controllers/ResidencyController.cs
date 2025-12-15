@@ -148,6 +148,7 @@ namespace EPORTAL.Controllers
 
                 existing.SDTCaNhan = model.PhonePersonal;
                 existing.HoTenNguoiThan = model.RelativeName;
+                existing.MoiQuanHeNguoiThan = model.RelativeRelation;
                 existing.SDTNguoiThan = model.RelativePhone;
 
                 existing.HoTenBo = model.FatherName;
@@ -248,6 +249,7 @@ namespace EPORTAL.Controllers
 
                             PhonePersonal = r.SDTCaNhan,
                             RelativeName = r.HoTenNguoiThan,
+                            RelativeRelation = r.MoiQuanHeNguoiThan,
                             RelativePhone = r.SDTNguoiThan,
 
                             FatherName = r.HoTenBo,
@@ -350,6 +352,7 @@ namespace EPORTAL.Controllers
 
                             r.SDTCaNhan,
                             r.HoTenNguoiThan,
+                            r.MoiQuanHeNguoiThan,
                             r.SDTNguoiThan,
 
                             r.HoTenBo,
@@ -392,15 +395,15 @@ namespace EPORTAL.Controllers
                 ws.Cell(row, 13).Value = "Thôn/Phố hiện tại";
                 ws.Cell(row, 14).Value = "SĐT cá nhân";
                 ws.Cell(row, 15).Value = "Họ tên người thân";
-                ws.Cell(row, 16).Value = "SĐT người thân";
-                ws.Cell(row, 17).Value = "Họ tên bố";
-                ws.Cell(row, 18).Value = "Năm sinh bố";
-                ws.Cell(row, 19).Value = "Họ tên mẹ";
-                ws.Cell(row, 20).Value = "Năm sinh mẹ";
-                ws.Cell(row, 21).Value = "Họ tên vợ/chồng";
-                ws.Cell(row, 22).Value = "Năm sinh vợ/chồng";
-                ws.Cell(row, 23).Value = "Họ tên con";
-                ws.Cell(row, 24).Value = "Năm sinh con";
+                ws.Cell(row, 16).Value = "Mối quan hệ người thân";
+                ws.Cell(row, 17).Value = "SĐT người thân";
+                ws.Cell(row, 18).Value = "Họ tên bố";
+                ws.Cell(row, 19).Value = "Năm sinh bố";
+                ws.Cell(row, 20).Value = "Họ tên mẹ";
+                ws.Cell(row, 21).Value = "Năm sinh mẹ";
+                ws.Cell(row, 22).Value = "Họ tên vợ/chồng";
+                ws.Cell(row, 23).Value = "Năm sinh vợ/chồng";
+                ws.Cell(row, 24).Value = "Họ tên/Năm sinh con";
 
                 var headerRange = ws.Range(row, 1, row, 24);
                 headerRange.Style.Font.Bold = true;
@@ -444,22 +447,27 @@ namespace EPORTAL.Controllers
                         ws.Cell(row, 13).Value = item.ThonPhoHienTai;
                         ws.Cell(row, 14).Value = item.SDTCaNhan;
                         ws.Cell(row, 15).Value = item.HoTenNguoiThan;
-                        ws.Cell(row, 16).Value = item.SDTNguoiThan;
-
-                        ws.Cell(row, 17).Value = item.HoTenBo;
-                        ws.Cell(row, 18).Value = item.NamSinhBo;
-                        ws.Cell(row, 19).Value = item.HoTenMe;
-                        ws.Cell(row, 20).Value = item.NamSinhMe;
-                        ws.Cell(row, 21).Value = item.HoTenVoChong;
-                        ws.Cell(row, 22).Value = item.NamSinhVoChong;
+                        ws.Cell(row, 16).Value = item.MoiQuanHeNguoiThan;
+                        ws.Cell(row, 17).Value = item.SDTNguoiThan;
+                        ws.Cell(row, 18).Value = item.HoTenBo;
+                        ws.Cell(row, 19).Value = item.NamSinhBo;
+                        ws.Cell(row, 20).Value = item.HoTenMe;
+                        ws.Cell(row, 21).Value = item.NamSinhMe;
+                        ws.Cell(row, 22).Value = item.HoTenVoChong;
+                        ws.Cell(row, 23).Value = item.NamSinhVoChong;
 
                         if (item.Children != null && item.Children.Any())
                         {
-                            ws.Cell(row, 23).Value = string.Join("\n", item.Children.Select(c => c.HoTen));
-                            ws.Cell(row, 24).Value = string.Join("\n", item.Children.Select(c => c.NamSinh));
+                            ws.Cell(row, 24).Value = string.Join(
+                                "\n",
+                                item.Children.Select(c => $"{c.HoTen} - {c.NamSinh}")
+                            );
 
-                            ws.Cell(row, 23).Style.Alignment.WrapText = true;
                             ws.Cell(row, 24).Style.Alignment.WrapText = true;
+                        }
+                        else
+                        {
+                            ws.Cell(row, 24).Value = "";
                         }
                     }
 
