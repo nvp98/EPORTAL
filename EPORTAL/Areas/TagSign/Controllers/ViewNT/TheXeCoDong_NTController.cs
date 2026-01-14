@@ -1676,6 +1676,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             int pageNumber = page ?? 1;
             int pageSize = 30;
+            
+            // Kiểm tra quyền Import Excel
+            var userId = Models.MyAuthentication.ID;
+            var hasImportPermission = db_dk.CDNT_QuyenHoanThanhDon.Any(x => x.NguoiDung_ID == userId && x.IsActive);
+            ViewBag.HasImportPermission = hasImportPermission;
+            
             // Lấy danh sách nhà thầu cho dropdown
             var listNhaThau = db.NT_Partner
                 .OrderBy(x => x.FullName)
@@ -2411,7 +2417,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     // Kiểm tra xem tất cả các bước đều đã duyệt (TinhTrang_ID = 2)
                     var allStepsApproved = stepGt0.Any() && stepGt0.All(s => s.TinhTrang_ID == 2);
 
-                    // Kiểm tra xem đã có xe nào được xử lý hoàn thành chưa (TTHD != null)
+                    //// Kiểm tra xem đã có xe nào được xử lý hoàn thành chưa (TTHD != null)
                     var hasProcessedVehicle = db_dk.CDNT_ChiTietDon
                         .Any(ct => ct.Ma_Don == don.Ma_Don && ct.TTHD != null);
 
