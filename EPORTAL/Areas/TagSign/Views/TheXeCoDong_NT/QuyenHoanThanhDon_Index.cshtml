@@ -1,0 +1,337 @@
+﻿@using PagedList.Mvc
+@using PagedList
+@using EPORTAL.ModelsTagSign.TheXeCoDongVM
+@model IPagedList<QuyenHoanThanhDonViewModel>
+
+@{
+    ViewBag.Title = "Quản lý quyền hoàn thành đơn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-shield icon-gradient bg-grow-early"></i>
+                    </div>
+                    <div>
+                        QUẢN LÝ QUYỀN HOÀN THÀNH ĐƠN
+                        <div class="page-title-subheading">
+                            Danh sách người dùng có quyền hoàn thành đơn xe cơ động
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        <i class="header-icon lnr-license icon-gradient bg-plum-plate"></i>
+                        Danh sách quyền hoàn thành đơn
+                            <div class="btn-actions-pane-right">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalThemQuyen">
+                                    <i class="fa fa-plus"></i> Thêm quyền
+                                </button>
+                            </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Form tìm kiếm -->
+                        <form method="get" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="search"
+                                               value="@ViewBag.Search" placeholder="Tìm theo tên hoặc mã nhân viên..." />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fa fa-search"></i> Tìm kiếm
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Bảng dữ liệu -->
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">STT</th>
+                                        <th>Mã NV</th>
+                                        <th>Tên nhân viên</th>
+                                        <th style="width: 120px;">Trạng thái</th>
+                                        <th style="width: 150px;">Ngày tạo</th>
+                                        <th style="width: 150px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        int index = (Model.PageNumber - 1) * Model.PageSize + 1;
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@index</td>
+                                                <td>@item.MaNV</td>
+                                                <td>@item.TenNhanVien</td>
+                                                <td class="text-center">
+                                                    @if (item.IsActive)
+                                                    {
+                                                        <span class="badge badge-success">Kích hoạt</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">Vô hiệu</span>
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @(item.NgayTao != null ? ((DateTime)item.NgayTao).ToString("dd/MM/yyyy HH:mm") : "")
+                                                </td>
+                                                    <td class="text-center">
+                                                            <button class="btn btn-sm btn-danger btn-delete" data-id="@item.ID">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                    </td>
+                                                
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center">Không có dữ liệu</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Phân trang -->
+                        @if (Model != null && Model.PageCount > 1)
+                        {
+                            <div class="text-center">
+                                @Html.PagedListPager(Model, page => Url.Action("QuyenHoanThanhDon_Index", new { page, search = ViewBag.Search }))
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm quyền -->
+<div class="modal fade" id="modalThemQuyen" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm quyền hoàn thành đơn</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Chọn nhân viên <span class="text-danger">*</span></label>
+                    <select id="ddlNhanVien" class="form-control chosen-select" data-placeholder="-- Chọn nhân viên --" style="width: 100%;">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btnSaveNew">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Sửa quyền -->
+<div class="modal fade" id="modalSuaQuyen" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật quyền</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId" />
+                <div class="form-group">
+                    <label>Nhân viên</label>
+                    <input type="text" id="editNhanVien" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Trạng thái</label>
+                    <select id="editIsActive" class="form-control">
+                        <option value="true">Kích hoạt</option>
+                        <option value="false">Vô hiệu</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btnSaveEdit">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var danhSachNhanVien = [];
+
+    // Load danh sách nhân viên
+    function loadDanhSachNhanVien() {
+        $.ajax({
+            url: '@Url.Action("GetDanhSachNhanVien", "TheXeCoDong_NT")',
+            type: 'GET',
+            data: { search: '' },
+            success: function(data) {
+                danhSachNhanVien = data;
+                var $select = $('#ddlNhanVien');
+                $select.empty();
+                $select.append('<option value=""></option>');
+                $.each(data, function(index, item) {
+                    $select.append($('<option></option>').val(item.id).text(item.text));
+                });
+                
+                // Khởi tạo Chosen
+                $select.chosen({
+                    width: '100%',
+                    no_results_text: 'Không tìm thấy:',
+                    placeholder_text_single: '-- Chọn nhân viên --',
+                    allow_single_deselect: true
+                });
+            },
+            error: function() {
+                alert('Không thể tải danh sách nhân viên');
+            }
+        });
+    }
+
+    // Mở modal thêm
+    $('#modalThemQuyen').on('show.bs.modal', function() {
+        if (danhSachNhanVien.length === 0) {
+            loadDanhSachNhanVien();
+        } else {
+            $('#ddlNhanVien').val('').trigger('chosen:updated');
+        }
+    });
+
+    // Lưu thêm mới
+    $('#btnSaveNew').click(function() {
+        var nguoiDungId = $('#ddlNhanVien').val();
+
+        if (!nguoiDungId || nguoiDungId === '') {
+            alert('Vui lòng chọn nhân viên');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ThemQuyenHoanThanhDon", "TheXeCoDong_NT")',
+            type: 'POST',
+            data: {
+                nguoiDungId: nguoiDungId
+            },
+            success: function(result) {
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra');
+            }
+        });
+    });
+
+    // Mở modal sửa
+    $('.btn-edit').click(function() {
+        var id = $(this).data('id');
+        var nhanvien = $(this).data('nhanvien');
+        var active = $(this).data('active');
+
+        $('#editId').val(id);
+        $('#editNhanVien').val(nhanvien);
+        $('#editIsActive').val(active.toString());
+
+        $('#modalSuaQuyen').modal('show');
+    });
+
+    // Lưu cập nhật
+    $('#btnSaveEdit').click(function() {
+        var id = $('#editId').val();
+        var isActive = $('#editIsActive').val() === 'true';
+
+        $.ajax({
+            url: '@Url.Action("CapNhatQuyenHoanThanhDon", "TheXeCoDong_NT")',
+            type: 'POST',
+            data: {
+                id: id,
+                isActive: isActive
+            },
+            success: function(result) {
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra');
+            }
+        });
+    });
+
+    // Xóa quyền
+    $('.btn-delete').click(function() {
+        if (!confirm('Bạn có chắc chắn muốn xóa quyền này?')) {
+            return;
+        }
+
+        var id = $(this).data('id');
+
+        $.ajax({
+            url: '@Url.Action("XoaQuyenHoanThanhDon", "TheXeCoDong_NT")',
+            type: 'POST',
+            data: { id: id },
+            success: function(result) {
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra');
+            }
+        });
+    });
+});
+</script>

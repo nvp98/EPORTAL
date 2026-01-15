@@ -102,6 +102,27 @@
                                             <tr>
                                                 <td class="text-center">@stt</td>
                                                 <td class="text-center">
+                                                    @if (item.TinhTrang_ID == 2)
+                                                    {
+                                                        @* Nếu đã duyệt thì cho phép tải PDF *@
+                                                        <a href="@Url.Action("ExportDonDangKyPdf", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                                                            <i class="fa fa-download text-success"></i>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <!-- Nếu chưa duyệt hoặc từ chối thì hiển thị icon cấm -->
+                                                        <i class="fa-solid fa-ban text-primary" title="Đơn chưa được duyệt, không thể tải PDF"></i>
+                                                    }
+                                                    @* Chỉ hiển thị nút Hoàn thành nếu user có quyền trong bảng CDNT_QuyenHoanThanhDon *@
+                                                    @if (ViewBag.HasPermissionHoanThanh == true && item.CanHoanThanh)
+                                                    {
+                                                        <a class="btn btn-sm btn-outline-success btn-hoanthanh"
+                                                           data-madon="@item.Ma_Don"
+                                                           title="Hoàn thành đơn và kích hoạt xe">
+                                                            <i class="fa fa-check"></i> Hoàn thành
+                                                        </a>
+                                                    }
                                                     <!-- Trang "All" chỉ xem tổng quan, không thao tác xử lý -->
                                                     <a class="btn btn-outline-success"
                                                        title="Chi tiết đơn"
@@ -218,5 +239,41 @@
     }
     if (!$('#begind').val()) $('#begind').val(toYYYYMMDD(firstDay));
     if (!$('#endd').val())   $('#endd').val(toYYYYMMDD(today));
+  });
+
+  $(document).on('click', '.btn-hoanthanh', function (e) {
+    e.preventDefault();
+
+    var $btn = $(this);
+    var maDon = $btn.data('madon');
+
+    if (!maDon) {
+        alert("Không xác định được mã đơn.");
+        return;
+    }
+
+    if (!confirm("Xác nhận hoàn thành đơn và kích hoạt xe?"))
+        return;
+
+    $btn.prop('disabled', true);
+
+    $.ajax({
+        url: '/TheXeCoDong_NT/HoanThanhDon',
+        type: 'POST',
+        data: { maDon: maDon },
+        success: function (res) {
+            if (res.success) {
+                alert(res.message);
+                location.reload();
+            } else {
+                alert("Lỗi: " + res.message);
+                $btn.prop('disabled', false);
+            }
+        },
+        error: function () {
+            alert("Có lỗi xảy ra khi hoàn thành đơn.");
+            $btn.prop('disabled', false);
+        }
+    });
   });
 </script>
