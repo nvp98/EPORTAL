@@ -597,22 +597,62 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     return Json(new { success = false, message = "Danh sách xe không được trống" });
                 }
+
+                foreach (var xe in danhSachXe)
+                {
+                    xe.BienSoXe = NormalizeBienSo(xe.BienSoXe, xe.ID_LoaiPhuongTien);
+                    if (xe.BienSoXe == null)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Biển số xe không hợp lệ"
+                        });
+                    }
+                }
                 var bienSoList = danhSachXe.Select(x => x.BienSoXe?.Trim().ToUpper()).ToList();
                 if (bienSoList.Count != bienSoList.Distinct().Count())
                 {
                     return Json(new { success = false, message = "Không được phép có hai biển số xe trùng nhau!" });
                 }
+                model.JsonDanhSachXe = JsonConvert.SerializeObject(danhSachXe);
+                var xeCanCheck = danhSachXe
+                  .Where(x => x.CapLai || x.GiaHan)
+                  .Select(x => x.BienSoXe.Trim().ToUpper())
+                  .Distinct()
+                  .ToList();
 
-                // 2. Xử lý file upload (nếu có)
-                //if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
-                //{
-                //    var fileName = Path.GetFileName(FileHoSoXe.FileName);
-                //    var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
-                //    FileHoSoXe.SaveAs(filePath);
+                if (xeCanCheck.Any())
+                {
+                    var xeDaTonTai = (
+                        from ct in db_dk.CDNT_ChiTietDon
+                        join don in db_dk.CDNT_DonDangKy
+                            on ct.Ma_Don equals don.Ma_Don into gj
+                        from don in gj.DefaultIfEmpty()
+                        where
+                            xeCanCheck.Contains(ct.BienSoXe.ToUpper()) &&
+                            (
+                                ct.ID_NhaThau == model.NhaThau_ID ||
+                                (don != null && don.NhaThau_ID == model.NhaThau_ID)
+                            )
+                        select ct.BienSoXe.ToUpper()
+                    ).Distinct().ToList();
 
-                //    // Lưu tên file (đường dẫn tương đối)
-                //    model.FileHoSoXe = fileName;
-                //}
+
+                    var xeKhongHopLe = xeCanCheck
+                        .Except(xeDaTonTai, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    if (xeKhongHopLe.Any())
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Không thể Gia hạn / Cấp lại cho các xe chưa từng đăng ký: "
+                                      + string.Join(", ", xeKhongHopLe)
+                        });
+                    }
+                }
                 if (FileHoSoXe != null && FileHoSoXe.ContentLength > 0)
                 {
                     var originalName = Path.GetFileNameWithoutExtension(FileHoSoXe.FileName);
@@ -971,15 +1011,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     while (!string.IsNullOrWhiteSpace(ws.Cell(row, 5).GetString()))
                     {
                         DateTime? denNgay = ParseExcelDate(ws.Cell(row, 9));
+                        var loaiPT =
+                            ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
+                            ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 3 :
+                            ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 2 : (int?)null;
 
                         var vm = new ChiTietDonVM
                         {
-                            ID_LoaiPhuongTien =
-                                ws.Cell(row, 2).GetString().Trim().ToUpper() == "X" ? 1 :
-                                ws.Cell(row, 3).GetString().Trim().ToUpper() == "X" ? 3 :
-                                ws.Cell(row, 4).GetString().Trim().ToUpper() == "X" ? 2 : (int?)null,
+                            ID_LoaiPhuongTien = loaiPT,
 
-                            BienSoXe = NormalizeBienSo(ws.Cell(row, 5).GetString()),
+                            BienSoXe = NormalizeBienSo(ws.Cell(row, 5).GetString(), loaiPT),
                             CapMoi = ws.Cell(row, 6).GetString().Trim().ToUpper() == "X",
                             CapLai = ws.Cell(row, 7).GetString().Trim().ToUpper() == "X",
                             GiaHan = ws.Cell(row, 8).GetString().Trim().ToUpper() == "X",
@@ -1217,6 +1258,16 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Danh sách xe không được trống" });
                 }
 
+                // Áp dụng chuẩn hóa biển số
+                foreach (var xe in model.DanhSachXe)
+                {
+                    xe.BienSoXe = NormalizeBienSo(xe.BienSoXe, xe.ID_LoaiPhuongTien);
+                    if (xe.BienSoXe == null)
+                    {
+                        return Json(new { success = false, message = "Biển số xe không hợp lệ: " + xe.BienSoXe });
+                    }
+                }
+
                 // Kiểm tra phòng ban
                 if (!model.BPQL_ID.HasValue)
                 {
@@ -1233,6 +1284,73 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 if (bienSoList.Count != bienSoList.Distinct().Count())
                 {
                     return Json(new { success = false, message = "Không được phép có hai biển số xe trùng nhau trong cùng một đơn!" });
+                }
+
+                // Kiểm tra định biên xe cấp mới
+                if (model.NhaThau_ID.HasValue)
+                {
+                    var dinhBien = DinhBienPhuongTienService.LayDinhBienTheoNhaThau(model.NhaThau_ID.Value);
+
+                    int soXeMayMoi = model.DanhSachXe.Count(x => x.ID_LoaiPhuongTien == 1 && x.CapMoi);
+                    int soXe3GacMoi = model.DanhSachXe.Count(x => x.ID_LoaiPhuongTien == 2 && x.CapMoi);
+
+                    int availXeMay = dinhBien.XeMay_ToiDa + dinhBien.DinhBienXinThem_XeMay - dinhBien.XeMay_DaCap;
+                    int availXe3Gac = dinhBien.Xe3Gac_ToiDa + dinhBien.DinhBienXinThem_Xe3Gac - dinhBien.Xe3Gac_DaCap;
+
+                    if (soXeMayMoi > 0 && soXeMayMoi > availXeMay)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = $@"Vượt định biên:
+                            Xe máy (còn lại {availXeMay}, đăng ký {soXeMayMoi})"
+                        });
+                    }
+
+                    if (soXe3GacMoi > 0 && soXe3GacMoi > availXe3Gac)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = $@"Vượt định biên:
+                            Xe 3 gác (còn lại {availXe3Gac}, đăng ký {soXe3GacMoi})"
+                        });
+                    }
+                }
+
+                // Kiểm tra xe gia hạn/cấp lại phải đã tồn tại
+                var xeCanCheck = model.DanhSachXe
+                    .Where(x => x.CapLai || x.GiaHan)
+                    .Select(x => x.BienSoXe.Trim().ToUpper())
+                    .Distinct()
+                    .ToList();
+
+                if (xeCanCheck.Any())
+                {
+                    var xeDaTonTai = (
+                        from ct in db_dk.CDNT_ChiTietDon
+                        join don in db_dk.CDNT_DonDangKy
+                        on ct.Ma_Don equals don.Ma_Don into gj
+                        from don in gj.DefaultIfEmpty()
+                        where
+                            xeCanCheck.Contains(ct.BienSoXe.ToUpper()) &&
+                            (ct.ID_NhaThau == model.NhaThau_ID || don.NhaThau_ID == model.NhaThau_ID)
+                        select ct.BienSoXe.ToUpper()
+                    ).Distinct().ToList();
+
+                    var xeKhongHopLe = xeCanCheck
+                        .Except(xeDaTonTai, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    if (xeKhongHopLe.Any())
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Không thể Gia hạn / Cấp lại cho các xe chưa từng đăng ký: "
+                                      + string.Join(", ", xeKhongHopLe)
+                        });
+                    }
                 }
 
                 // Tìm đơn đăng ký
@@ -1311,6 +1429,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     {
                         Ma_Don = model.Ma_Don,
                         ID_LoaiPhuongTien = xe.ID_LoaiPhuongTien,
+                        ID_NhaThau = model.NhaThau_ID,
                         BienSoXe = xe.BienSoXe,
                         CapMoi = xe.CapMoi,
                         CapLai = xe.CapLai,
@@ -1517,7 +1636,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     else
                     {
                         xe.TrangThaiDuyet_ID = 1; // Được duyệt
-                        xe.TTHD = 1;              // YÊU CẦU MỚI: đánh dấu hoạt động = 1 khi xe được duyệt
+                      //  xe.TTHD = 1;              // YÊU CẦU MỚI: đánh dấu hoạt động = 1 khi xe được duyệt
                     }
                 }
             }
@@ -1557,6 +1676,12 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
         {
             int pageNumber = page ?? 1;
             int pageSize = 30;
+            
+            // Kiểm tra quyền Import Excel
+            var userId = Models.MyAuthentication.ID;
+            var hasImportPermission = db_dk.CDNT_QuyenHoanThanhDon.Any(x => x.NguoiDung_ID == userId && x.IsActive);
+            ViewBag.HasImportPermission = hasImportPermission;
+            
             // Lấy danh sách nhà thầu cho dropdown
             var listNhaThau = db.NT_Partner
                 .OrderBy(x => x.FullName)
@@ -2085,7 +2210,6 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 )
                 .OrderByDescending(d => d.NgayTrinhKy ?? DateTime.MinValue)
                 .ToList();
-
             if (!filtered.Any())
             {
                 SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
@@ -2132,12 +2256,8 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         }
                     }
 
-                    var bienSoXe = NormalizeBienSo(row.Cell(2).GetString().Trim());     // Cột B: BIỂN KIỂM SOÁT
                     var loaiPTStr = row.Cell(3).GetString().Trim();    // Cột C: LOẠI PHƯƠNG TIỆN
-                    var tuNgay = ParseExcelDate(row.Cell(4));          // Cột D: NGÀY CẤP
-                    var denNgay = ParseExcelDate(row.Cell(5));         // Cột E: THỜI HẠN
-                    var ttHD = row.Cell(6).GetString().Trim();           // Cột F: TRẠNG THÁI HOẠT ĐỘNG
-
+                    
                     int? idLoaiPhuongTien = null;
                     switch (loaiPTStr.ToUpper())
                     {
@@ -2145,6 +2265,11 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                         case "XE BA GÁC": idLoaiPhuongTien = 2; break;
                         case "XE Ô TÔ": idLoaiPhuongTien = 3; break;
                     }
+                    
+                    var bienSoXe = NormalizeBienSo(row.Cell(2).GetString().Trim(), idLoaiPhuongTien);     // Cột B: BIỂN KIỂM SOÁT
+                    var tuNgay = ParseExcelDate(row.Cell(4));          // Cột D: NGÀY CẤP
+                    var denNgay = ParseExcelDate(row.Cell(5));         // Cột E: THỜI HẠN
+                    var ttHD = row.Cell(6).GetString().Trim();           // Cột F: TRẠNG THÁI HOẠT ĐỘNG
                     int? idTrangThaiHoatDong = null;
                     switch (ttHD.ToUpper())
                     {
@@ -2236,9 +2361,14 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 new SqlParameter("@p_MaPhieu", (object)maPhieu ?? DBNull.Value)
             ).ToList();
 
+            // Kiểm tra quyền hoàn thành đơn
+            var userId = Models.MyAuthentication.ID;
+            var hasPermission = db_dk.CDNT_QuyenHoanThanhDon.Any(x => x.NguoiDung_ID == userId && x.IsActive);
+
             if (!data.Any())
             {
                 SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+                ViewBag.HasPermissionHoanThanh = hasPermission;
                 return View(new List<DonDangKyViewModel>().ToPagedList(pageNumber, pageSize));
             }
 
@@ -2280,6 +2410,20 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     don.TinhTrang_ID = 1; don.TenTinhTrang = "Chờ xử lý";
                 }
+
+                // Kiểm tra nếu user có quyền hoàn thành
+                if (hasPermission)
+                {
+                    // Kiểm tra xem tất cả các bước đều đã duyệt (TinhTrang_ID = 2)
+                    var allStepsApproved = stepGt0.Any() && stepGt0.All(s => s.TinhTrang_ID == 2);
+
+                    //// Kiểm tra xem đã có xe nào được xử lý hoàn thành chưa (TTHD != null)
+                    var hasProcessedVehicle = db_dk.CDNT_ChiTietDon
+                        .Any(ct => ct.Ma_Don == don.Ma_Don && ct.TTHD != null);
+
+                    // Chỉ cho phép hoàn thành nếu tất cả bước đã duyệt và chưa từng được hoàn thành
+                    don.CanHoanThanh = allStepsApproved && !hasProcessedVehicle;
+                }
             }
 
             // 3) Combobox Trạng thái
@@ -2313,6 +2457,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 .ToPagedList(pageNumber, pageSize);
 
             SetFilters(begind, endd, maPhieu, pageNumber, pageSize);
+            ViewBag.HasPermissionHoanThanh = hasPermission;
             return View(paged);
         }
 
@@ -2324,27 +2469,68 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             string pattern = $"[{Regex.Escape(invalidChars)}]";
             return Regex.Replace(input, pattern, "_");
         }
-        private static string NormalizeBienSo(string input)
+        private static string NormalizeBienSo(string input, int? loaiPhuongTien)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input) || loaiPhuongTien == null)
+                return null;
 
-            var s = input.Normalize(NormalizationForm.FormKC).Trim();
+            // Chuẩn hóa input
+            var raw = Regex.Replace(input.Trim().ToUpperInvariant(), @"[^A-Z0-9]", "");
 
-            // Thay NBSP -> space rồi sẽ xử lý qua regex
-            s = s.Replace('\u00A0', ' '); // NBSP
-                                          // Chuẩn hóa các loại gạch ngang về '-'
-            s = s.Replace('–', '-').Replace('—', '-');
+            switch (loaiPhuongTien)
+            {
+                // XE MÁY / XE BA GÁC
+                //case 1:
+                //case 2:
+                //    {
+                //        var m = Regex.Match(
+                //            raw,
+                //            @"^(?<prefix>(\d{2}[A-Z]\d|\d{2}[A-Z]{2}))(?<num>\d{4,5})$"
+                //        );
+                //        if (!m.Success) return null;
 
-            // Bỏ khoảng trắng quanh dấu '-' -> còn lại một dấu '-'
-            s = Regex.Replace(s, @"\s*-\s*", "-");
+                //        return $"{m.Groups["prefix"].Value}-{m.Groups["num"].Value}";
+                //    }
+                case 1:
+                case 2:
+                    {
+                        Match m;
 
-            // Bỏ mọi khoảng trắng còn lại (space, tab, …)
-            s = Regex.Replace(s, @"\s+", "");
+                        // CASE A: 75-698FK  →  75 + 3 số + 2 chữ
+                        m = Regex.Match(raw, @"^(?<p>\d{2})(?<n>\d{3})(?<s>[A-Z]{2})$");
+                        if (m.Success)
+                            return $"{m.Groups["p"].Value}-{m.Groups["n"].Value}{m.Groups["s"].Value}";
 
-            // Đưa về uppercase
-            s = s.ToUpperInvariant();
+                        // CASE B: 32823F1  →  5 số + chữ + số
+                        m = Regex.Match(raw, @"^(?<n>\d{5})(?<s>[A-Z]\d)$");
+                        if (m.Success)
+                            return $"{m.Groups["n"].Value}{m.Groups["s"].Value}";
 
-            return s;
+                        // CASE C: chuẩn xe máy hiện tại
+                        m = Regex.Match(
+                            raw,
+                            @"^(?<prefix>(\d{2}[A-Z]\d|\d{2}[A-Z]{2}))(?<num>\d{4,5})$"
+                        );
+                        if (!m.Success) return null;
+
+                        return $"{m.Groups["prefix"].Value}-{m.Groups["num"].Value}";
+                    }
+
+                // XE Ô TÔ (bao gồm LD)
+                case 3:
+                    {
+                        var m = Regex.Match(
+                            raw,
+                            @"^(?<prefix>\d{2}(LD|R|[A-Z]))(?<num>\d{4,5})$"
+                        );
+                        if (!m.Success) return null;
+
+                        return $"{m.Groups["prefix"].Value}-{m.Groups["num"].Value}";
+                    }
+
+                default:
+                    return null;
+            }
         }
 
         // trong TheXeCoDong_NTController.cs
@@ -2582,7 +2768,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Không tìm thấy bản ghi." });
 
                 // CHỈ cập nhật những cột yêu cầu
-                xe.BienSoXe = string.IsNullOrWhiteSpace(BienSoXe) ? xe.BienSoXe : BienSoXe.Trim();
+                xe.BienSoXe = NormalizeBienSo(BienSoXe, ID_LoaiPhuongTien);
                 xe.TuNgay = TuNgay;
                 xe.DenNgay = DenNgay;
                 xe.ID_LoaiPhuongTien = ID_LoaiPhuongTien;
@@ -2625,6 +2811,316 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             }
         }
 
+        [HttpPost]
+        public ActionResult HoanThanhDon(string maDon)
+        {
+            using (var tran = db_dk.Database.BeginTransaction())
+            {
+                try
+                {
+                    var userId = Models.MyAuthentication.ID;
+
+                    // 0. Kiểm tra đơn tồn tại
+                    var don = db_dk.CDNT_DonDangKy.FirstOrDefault(x => x.Ma_Don == maDon);
+                    if (don == null)
+                    {
+                        return Json(new { success = false, message = "Không tìm thấy đơn." });
+                    }
+
+                    /* =====================================================
+                       1. CHECK ĐỦ CÁC CẤP DUYỆT (ĐỘNG 2 / 3 / N)
+                       ===================================================== */
+
+                    var tongCapCanDuyet = db_dk.CDNT_TrinhKy
+                        .Count(x => x.Ma_Don == maDon);
+
+                    if (tongCapCanDuyet == 0)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Đơn chưa có cấu hình luồng duyệt."
+                        });
+                    }
+
+                    var capChuaDuyet = db_dk.CDNT_TrinhKy
+                        .Where(x => x.Ma_Don == maDon
+                                 && x.TinhTrang_ID != (int)TinhTrangDonDangKy.DaXuLy)
+                        .Select(x => x.CapDuyet)
+                        .ToList();
+
+                    if (capChuaDuyet.Any())
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Đơn chưa duyệt xong các cấp: "
+                                      + string.Join(", ", capChuaDuyet)
+                        });
+                    }
+
+                    /* =====================================================
+                       2. LẤY XE ĐƯỢC DUYỆT
+                       ===================================================== */
+
+                    var dsXe = db_dk.CDNT_ChiTietDon
+                        .Where(x => x.Ma_Don == maDon && x.TrangThaiDuyet_ID == 1)
+                        .ToList();
+
+                    if (!dsXe.Any())
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Không có xe nào được duyệt."
+                        });
+                    }
+
+                    /* =====================================================
+                       3. XỬ LÝ XE (CẤP MỚI / GIA HẠN / CẤP LẠI)
+                       ===================================================== */
+
+                    foreach (var xe in dsXe)
+                    {
+                        var nhaThauXe = xe.ID_NhaThau
+                      ?? db_dk.CDNT_DonDangKy
+                          .Where(d => d.Ma_Don == xe.Ma_Don)
+                          .Select(d => d.NhaThau_ID)
+                          .FirstOrDefault();
+
+                        // ===== CẤP MỚI =====
+                        if (xe.CapMoi == true)
+                        {
+                            xe.TTHD = 1;
+                            xe.User_Edit = userId;
+                        }
+
+                        // ===== GIA HẠN =====
+                        else if (xe.GiaHan == true)
+                        {
+                            var xeCu =
+                               (
+                                   from ct in db_dk.CDNT_ChiTietDon
+                                   join dk in db_dk.CDNT_DonDangKy
+                                       on ct.Ma_Don equals dk.Ma_Don into dkJoin
+                                   from dk in dkJoin.DefaultIfEmpty()   // LEFT JOIN
+                                   where
+                                       ct.BienSoXe == xe.BienSoXe &&
+                                       ct.Ma_Don != maDon &&
+                                       (
+                                           ct.ID_NhaThau != null
+                                               ? ct.ID_NhaThau == nhaThauXe
+                                               : dk != null && dk.NhaThau_ID == nhaThauXe
+                                       )
+                                   orderby ct.DenNgay descending
+                                   select ct
+                               ).FirstOrDefault();
+
+                            if (xeCu != null)
+                            {
+                                // cập nhật thời hạn xe cũ
+                                //xeCu.TuNgay = xe.TuNgay;
+                                //xeCu.DenNgay = xe.DenNgay;
+                                //xeCu.User_Edit = userId;
+
+                                // bản ghi trong đơn chỉ lưu vết
+                                xe.TTHD = 3;
+                                xe.User_Edit = userId;
+                            }
+                            else
+                            {
+                                // fallback an toàn
+                                xe.TTHD = 1;
+                                xe.User_Edit = userId;
+                            }
+                        }
+
+                        // ===== CẤP LẠI =====
+                        else if (xe.CapLai == true)
+                        {
+                            var xeCu =
+                                (
+                                    from ct in db_dk.CDNT_ChiTietDon
+                                    join dk in db_dk.CDNT_DonDangKy
+                                        on ct.Ma_Don equals dk.Ma_Don into dkJoin
+                                    from dk in dkJoin.DefaultIfEmpty()   // LEFT JOIN
+                                    where
+                                        ct.BienSoXe == xe.BienSoXe &&
+                                        ct.Ma_Don != maDon &&
+                                        (
+                                            ct.ID_NhaThau != null
+                                                ? ct.ID_NhaThau == nhaThauXe
+                                                : dk != null && dk.NhaThau_ID == nhaThauXe
+                                        )
+                                    orderby ct.DenNgay descending
+                                    select ct
+                                ).FirstOrDefault();
+
+
+                            if (xeCu != null)
+                            {
+                                xeCu.TTHD = 3;
+                                xeCu.User_Edit = userId;
+                            }
+
+                            xe.TTHD = 1;
+                            xe.User_Edit = userId;
+                        }
+                    }
+
+                    db_dk.SaveChanges();
+                    tran.Commit();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Hoàn thành xử lý xe thành công."
+                    });
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Lỗi khi hoàn thành đơn: " + ex.Message
+                    });
+                }
+            }
+        }
+
+        // QUẢN LÝ QUYỀN HOÀN THÀNH ĐƠN
+        // ============================================================
+
+        public ActionResult QuyenHoanThanhDon_Index(string search, int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 20;
+
+            // Lấy danh sách quyền từ db_dk (ToList để thực thi query)
+            var danhSachQuyen = db_dk.CDNT_QuyenHoanThanhDon.ToList();
+
+            // Lấy danh sách ID nhân viên
+            var nguoiDungIds = danhSachQuyen.Select(x => x.NguoiDung_ID).Distinct().ToList();
+
+            // Lấy thông tin nhân viên từ db
+            var danhSachNhanVien = db.NhanViens
+                .Where(x => nguoiDungIds.Contains(x.ID))
+                .Select(x => new { x.ID, x.MaNV, x.HoTen })
+                .ToList();
+
+            // Join trong memory - sử dụng ViewModel cụ thể
+            var result = (from q in danhSachQuyen
+                         join nv in danhSachNhanVien on q.NguoiDung_ID equals nv.ID
+                         select new QuyenHoanThanhDonViewModel
+                         {
+                             ID = q.ID,
+                             NguoiDung_ID = q.NguoiDung_ID,
+                             MaNV = nv.MaNV,
+                             TenNhanVien = nv.HoTen,
+                             IsActive = q.IsActive,
+                             NgayTao = q.NgayTao
+                         }).ToList();
+
+            // Tìm kiếm theo tên hoặc mã nhân viên
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchTerm = search.Trim().ToLower();
+                result = result.Where(x =>
+                    (x.TenNhanVien != null && x.TenNhanVien.ToLower().Contains(searchTerm)) ||
+                    (x.MaNV != null && x.MaNV.ToLower().Contains(searchTerm))
+                ).ToList();
+            }
+
+            // Sắp xếp và phân trang
+            var ordered = result.OrderByDescending(x => x.NgayTao).ToList();
+            var pagedList = ordered.ToPagedList(pageNumber, pageSize);
+
+            ViewBag.Search = search;
+            return View(pagedList);
+        }
+
+        [HttpGet]
+        public JsonResult GetDanhSachNhanVien(string search)
+        {
+            var query = db.NhanViens.Where(x => x.IDTinhTrangLV == 1);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchTerm = search.Trim().ToLower();
+                query = query.Where(x =>
+                    x.HoTen.ToLower().Contains(searchTerm) ||
+                    x.MaNV.ToLower().Contains(searchTerm)
+                );
+            }
+
+            var result = query
+                .OrderBy(x => x.ID)
+                .Select(x => new
+                {
+                    id = x.ID,
+                    text = x.HoTen + " - " + x.MaNV
+                })
+                .ToList();
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ThemQuyenHoanThanhDon(int nguoiDungId)
+        {
+            try
+            {
+                // Kiểm tra xem nhân viên đã có quyền chưa
+                var exists = db_dk.CDNT_QuyenHoanThanhDon.Any(x => x.NguoiDung_ID == nguoiDungId);
+                if (exists)
+                {
+                    return Json(new { success = false, message = "Nhân viên này đã có quyền hoàn thành đơn." });
+                }
+
+                // Sử dụng SQL trực tiếp vì entity có DefiningQuery
+                var sql = @"INSERT INTO CDNT_QuyenHoanThanhDon (NguoiDung_ID, IsActive, NgayTao) 
+                            VALUES (@NguoiDung_ID, @IsActive, @NgayTao)";
+
+                db_dk.Database.ExecuteSqlCommand(sql,
+                    new SqlParameter("@NguoiDung_ID", nguoiDungId),
+                    new SqlParameter("@IsActive", true),
+                    new SqlParameter("@NgayTao", DateTime.Now)
+                );
+
+                return Json(new { success = true, message = "Thêm quyền thành công." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }    
+        [HttpPost]
+        public JsonResult XoaQuyenHoanThanhDon(int id)
+        {
+            try
+            {
+                // Kiểm tra tồn tại
+                var exists = db_dk.CDNT_QuyenHoanThanhDon.Any(x => x.ID == id);
+                if (!exists)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi." });
+                }
+
+                // Sử dụng SQL trực tiếp vì entity có DefiningQuery
+                var sql = "DELETE FROM CDNT_QuyenHoanThanhDon WHERE ID = @ID";
+
+                db_dk.Database.ExecuteSqlCommand(sql,
+                    new SqlParameter("@ID", id)
+                );
+
+                return Json(new { success = true, message = "Xóa quyền thành công." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
     }
 }
 

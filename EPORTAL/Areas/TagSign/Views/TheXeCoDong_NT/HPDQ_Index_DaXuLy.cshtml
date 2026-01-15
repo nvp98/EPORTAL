@@ -132,6 +132,11 @@
                                                             <a href="@Url.Action("ExportDonDangKyPdf", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
                                                                 <i class="fa fa-download text-success"></i>
                                                             </a>
+
+                                                            <a class="btn btn-outline-success btn-hoanthanh"
+                                                               data-madon="@item.Ma_Don">
+                                                                <i class="fa fa-check"></i> Hoàn thành
+                                                            </a>
                                                         }
                                                         else
                                                         {
@@ -139,11 +144,11 @@
                                                             <i class="fa-solid fa-ban text-primary" title="Đơn chưa được duyệt, không thể tải PDF"></i>
                                                         }
 
-                                                        @*<a class="btn-action"
-                                                           title="Chi tiết danh sách"
-                                                           href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
-                                                            <i class="fa-solid fa-bars"></i>
-                                                        </a>*@
+                                                                        @*<a class="btn-action"
+                           title="Chi tiết danh sách"
+                           href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
+                            <i class="fa-solid fa-bars"></i>
+                        </a>*@
                                                         <a class="btn btn-outline-success"
                                                            title="Chi tiết đơn"
                                                            href="@Url.Action("HPDQ_Detail", "TheXeCoDong_NT", new { maDon = item.Ma_Don })">
@@ -341,6 +346,43 @@
             }
         });
     });
+    $(document).on('click', '.btn-hoanthanh', function (e) {
+    e.preventDefault();
+
+    var $btn = $(this);
+    var maDon = $btn.data('madon');
+
+    if (!maDon) {
+        alert("Không xác định được mã đơn.");
+        return;
+    }
+
+    if (!confirm("Xác nhận hoàn thành đơn và kích hoạt xe?"))
+        return;
+
+    $btn.prop('disabled', true);
+
+    $.ajax({
+        url: '/TheXeCoDong_NT/HoanThanhDon',
+        type: 'POST',
+        data: { maDon: maDon },
+        success: function (res) {
+            if (res.success) {
+                alert(res.message);
+                location.reload();
+            } else {
+                alert("Lỗi: " + res.message);
+                $btn.prop('disabled', false);
+            }
+        },
+        error: function () {
+            alert("Có lỗi xảy ra khi hoàn thành đơn.");
+            $btn.prop('disabled', false);
+        }
+    });
+});
+
+
 </script>
 
 

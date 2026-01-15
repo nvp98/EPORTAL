@@ -282,6 +282,28 @@
     }
 
     let danhSachData = [];
+    
+    // Hàm lưu dữ liệu từ form vào mảng trước khi render lại
+    function saveDanhSachFromForm() {
+        const tempData = [];
+        $("#tbodyImportExcel tr").each(function (index) {
+            var row = $(this);
+            tempData.push({
+                ID_LoaiPhuongTien: row.find(".loai-may").is(":checked") ? 1 :
+                                   row.find(".loai-oto").is(":checked") ? 3 :
+                                   row.find(".loai-3gac").is(":checked") ? 2 : null,
+                BienSoXe: row.find("input[name*='BienSoXe']").val() || "",
+                CapMoi: row.find("input[name*='CapMoi']").is(":checked"),
+                CapLai: row.find("input[name*='CapLai']").is(":checked"),
+                GiaHan: row.find("input[name*='GiaHan']").is(":checked"),
+                TuNgay: "",
+                DenNgay: row.find("input[type=date]").val() || "",
+                GhiChu: row.find("input[name*='GhiChu']").val() || ""
+            });
+        });
+        return tempData;
+    }
+    
     function renderDanhSach(data) {
 
         let html = "";
@@ -321,6 +343,11 @@
         setupSingleSelectCheckboxes("cb-cap");
     }
     $("#btnAddRow").on("click", function () {
+        // Lưu dữ liệu hiện tại trước khi thêm dòng mới
+        if (danhSachData.length > 0) {
+            danhSachData = saveDanhSachFromForm();
+        }
+        
         const newItem = {
             ID_LoaiPhuongTien: null,
             BienSoXe: "",
@@ -337,6 +364,9 @@
     $("#tbodyImportExcel").on("click", ".btnRemoveRow", function () {
         const index = $(this).data("index");
         if (index !== undefined) {
+            // Lưu dữ liệu hiện tại trước khi xóa
+            danhSachData = saveDanhSachFromForm();
+            // Xóa dòng theo index
             danhSachData.splice(index, 1);
             renderDanhSach(danhSachData);
         }

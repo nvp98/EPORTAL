@@ -23,6 +23,7 @@ namespace EPORTAL.ModelsTagSign.TheXeCoDongVM
 
         public int PerUserStatusCode { get; set; }
         public string PerUserStatusText { get; set; }
+        public bool CanHoanThanh { get; set; }
     }
     public class ChiTietDonVM
     {
@@ -208,4 +209,14 @@ public enum TrangThaiHoatDong
     HoatDong = 1,
     HetHan = 2,
     DaKhoa = 3,
+}
+
+public class QuyenHoanThanhDonViewModel
+{
+    public int ID { get; set; }
+    public int? NguoiDung_ID { get; set; }
+    public string MaNV { get; set; }
+    public string TenNhanVien { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime? NgayTao { get; set; }
 }
