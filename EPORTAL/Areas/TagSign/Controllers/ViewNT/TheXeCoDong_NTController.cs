@@ -2480,10 +2480,34 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             switch (loaiPhuongTien)
             {
                 // XE MÁY / XE BA GÁC
+                //case 1:
+                //case 2:
+                //    {
+                //        var m = Regex.Match(
+                //            raw,
+                //            @"^(?<prefix>(\d{2}[A-Z]\d|\d{2}[A-Z]{2}))(?<num>\d{4,5})$"
+                //        );
+                //        if (!m.Success) return null;
+
+                //        return $"{m.Groups["prefix"].Value}-{m.Groups["num"].Value}";
+                //    }
                 case 1:
                 case 2:
                     {
-                        var m = Regex.Match(
+                        Match m;
+
+                        // CASE A: 75-698FK  →  75 + 3 số + 2 chữ
+                        m = Regex.Match(raw, @"^(?<p>\d{2})(?<n>\d{3})(?<s>[A-Z]{2})$");
+                        if (m.Success)
+                            return $"{m.Groups["p"].Value}-{m.Groups["n"].Value}{m.Groups["s"].Value}";
+
+                        // CASE B: 32823F1  →  5 số + chữ + số
+                        m = Regex.Match(raw, @"^(?<n>\d{5})(?<s>[A-Z]\d)$");
+                        if (m.Success)
+                            return $"{m.Groups["n"].Value}{m.Groups["s"].Value}";
+
+                        // CASE C: chuẩn xe máy hiện tại
+                        m = Regex.Match(
                             raw,
                             @"^(?<prefix>(\d{2}[A-Z]\d|\d{2}[A-Z]{2}))(?<num>\d{4,5})$"
                         );
@@ -2497,7 +2521,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     {
                         var m = Regex.Match(
                             raw,
-                            @"^(?<prefix>\d{2}(LD|[A-Z]))(?<num>\d{4,5})$"
+                            @"^(?<prefix>\d{2}(LD|R|[A-Z]))(?<num>\d{4,5})$"
                         );
                         if (!m.Success) return null;
 
@@ -2744,7 +2768,7 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                     return Json(new { success = false, message = "Không tìm thấy bản ghi." });
 
                 // CHỈ cập nhật những cột yêu cầu
-                xe.BienSoXe = string.IsNullOrWhiteSpace(BienSoXe) ? xe.BienSoXe : BienSoXe.Trim();
+                xe.BienSoXe = NormalizeBienSo(BienSoXe, ID_LoaiPhuongTien);
                 xe.TuNgay = TuNgay;
                 xe.DenNgay = DenNgay;
                 xe.ID_LoaiPhuongTien = ID_LoaiPhuongTien;
