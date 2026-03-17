@@ -78,7 +78,7 @@ namespace EPORTAL.Areas.TagSign.Controllers
 
 
             DateTime Now = DateTime.Now;
-            DateTime startDay = new DateTime(Now.Year, Now.Month, 1);
+            DateTime startDay = new DateTime(Now.Year, Now.Month, 1).AddMonths(-1);
             DateTime endDay = startDay.AddMonths(1).AddDays(-1);
 
             List<Follow_RegisterPeopleValidation> data = new List<Follow_RegisterPeopleValidation>();
