@@ -297,7 +297,7 @@
     $(document).ready(function () {
         var dateNewFormat, onlyDate, today = new Date();
 
-        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        var prevMonthLastDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
 
         dateLastDate = prevMonthLastDate.getFullYear() + '-';
         if (prevMonthLastDate.getMonth() >= 9) {

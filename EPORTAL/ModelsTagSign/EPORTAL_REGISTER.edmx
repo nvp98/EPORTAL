@@ -64,6 +64,18 @@
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="LoaiPhuongTien" Type="nvarchar" MaxLength="50" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'EPORTAL_REGISTER.dbo.CDNT_QuyenHoanThanhDon' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="CDNT_QuyenHoanThanhDon">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="IsActive" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NguoiDung_ID" Type="int" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="NgayTao" Type="datetime" />
+        </EntityType>
         <EntityType Name="CDNT_TinhTrang">
           <Key>
             <PropertyRef Name="TinhTrang_ID" />
@@ -701,6 +713,14 @@
           <EntitySet Name="SignOff_Flow" EntityType="Self.SignOff_Flow" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TK_CardExtend" EntityType="Self.TK_CardExtend" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TK_CardRegistrationInfor" EntityType="Self.TK_CardRegistrationInfor" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CDNT_QuyenHoanThanhDon" EntityType="Self.CDNT_QuyenHoanThanhDon" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [CDNT_QuyenHoanThanhDon].[ID] AS [ID], 
+    [CDNT_QuyenHoanThanhDon].[NguoiDung_ID] AS [NguoiDung_ID], 
+    [CDNT_QuyenHoanThanhDon].[IsActive] AS [IsActive], 
+    [CDNT_QuyenHoanThanhDon].[NgayTao] AS [NgayTao]
+    FROM [dbo].[CDNT_QuyenHoanThanhDon] AS [CDNT_QuyenHoanThanhDon]</DefiningQuery>
+          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -1349,6 +1369,7 @@
           <EntitySet Name="KTNT_DonDangKy" EntityType="EPORTAL_REGISTERModel.KTNT_DonDangKy" />
           <EntitySet Name="KTNT_ChiTiet" EntityType="EPORTAL_REGISTERModel.KTNT_ChiTiet" />
           <EntitySet Name="CDNT_DonDangKy" EntityType="EPORTAL_REGISTERModel.CDNT_DonDangKy" />
+          <EntitySet Name="CDNT_QuyenHoanThanhDon" EntityType="EPORTAL_REGISTERModel.CDNT_QuyenHoanThanhDon" />
         </EntityContainer>
         <ComplexType Name="CDNT_ChiTietDon_Search_Result">
           <Property Type="Int32" Name="ID" Nullable="false" />
@@ -1581,6 +1602,16 @@
           <Property Name="TinhTrangDuyet_ID" Type="Int32" />
           <Property Name="ThoiGianDuyet" Type="DateTime" Precision="3" />
           <Property Name="UserNameLogin" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CDNT_QuyenHoanThanhDon">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="IsActive" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NguoiDung_ID" Type="Int32" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="NgayTao" Type="DateTime" Precision="3" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -2125,6 +2156,16 @@
                 <ScalarProperty Name="BPQL_ID" ColumnName="BPQL_ID" />
                 <ScalarProperty Name="NoiDung" ColumnName="NoiDung" />
                 <ScalarProperty Name="Ma_Don" ColumnName="Ma_Don" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CDNT_QuyenHoanThanhDon">
+            <EntityTypeMapping TypeName="EPORTAL_REGISTERModel.CDNT_QuyenHoanThanhDon">
+              <MappingFragment StoreEntitySet="CDNT_QuyenHoanThanhDon">
+                <ScalarProperty Name="NgayTao" ColumnName="NgayTao" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="NguoiDung_ID" ColumnName="NguoiDung_ID" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

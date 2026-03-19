@@ -22,7 +22,7 @@ namespace EPORTAL.Areas.Servey.Controllers
         {
             DateTime ts = DateTime.Now;
             ts = new DateTime(ts.Year, ts.Month, ts.Day, 0, 0, 0);
-            var res = (from a in dbSV.OptionServeys.Where(x=>x.IDSV ==IDSV)
+            var res = (from a in dbSV.OptionServeys.Where(x => x.IDSV == IDSV)
                        select new OptionValidation
                        {
                            IDOT = a.IDOT,
@@ -36,12 +36,12 @@ namespace EPORTAL.Areas.Servey.Controllers
 
             var aa = res.Count > 0 ? res[0].ContentSV : null;
 
-           var employ = dbSV.EmployeeServeys.Where(x=>x.IDNV == MyAuthentication.ID && x.IDSV == IDSV).FirstOrDefault();
+            var employ = dbSV.EmployeeServeys.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV).FirstOrDefault();
             var ctks = dbSV.CTKhaoSats.ToList();
             ViewBag.TenDK = dbSV.ListServeys.Where(x => x.IDSV == IDSV).FirstOrDefault().ContentSV;
-            ViewBag.TinhTrangDK = employ != null?employ.OTID : null;
-            ViewBag.checkShowDK = ctks.Where(x=>x.IDNV == MyAuthentication.ID && x.IDSV ==IDSV && x.IDOT ==48 ).Count() != 0 ? "true" : "false";
-            ViewBag.DKKhong = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 49).Count() != 0 ? "true" : "false";
+            ViewBag.TinhTrangDK = employ != null ? employ.OTID : null;
+            ViewBag.checkShowDK = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 70).Count() != 0 ? "true" : "false";
+            ViewBag.DKKhong = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 71).Count() != 0 ? "true" : "false";
             ViewBag.IDSV = IDSV;
             var group = (from a in dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV)
                          let CtKS = dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault()
@@ -54,7 +54,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                              OptionList = new OptionList
                              {
                                  ID = a.ID,
-                                 GhiChu = CtKS != null? CtKS.GhiChu:"",
+                                 GhiChu = CtKS != null ? CtKS.GhiChu : "",
                                  Answer = (int?)dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().IDOT ?? default,
                                  OptionLS = (from ks in dbSV.OptionServeys.Where(x => x.IDSV == IDSV && x.MaOT == a.MaNhom)
                                              select new OptionValidation
@@ -76,7 +76,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             List<OptionSelect> ops = new List<OptionSelect>();
             List<OptionSelect> ops1 = new List<OptionSelect>();
             List<OptionSelect> ops2 = new List<OptionSelect>();
-            ops.Add(new OptionSelect { option="Vợ",name="Vợ"});
+            ops.Add(new OptionSelect { option = "Vợ", name = "Vợ" });
             ops.Add(new OptionSelect { option = "Chồng", name = "Chồng" });
             ops.Add(new OptionSelect { option = "Con", name = "Con" });
             ops.Add(new OptionSelect { option = "Khác", name = "Khác" });
@@ -129,7 +129,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             {
                 columnHeaders.Add(item.TenNhom);
                 ListIDgroup.Add(item.ID);
-                if(item.isShowRe != 0)
+                if (item.isShowRe != 0)
                 {
                     columnHeaderRE.Add(item.TenNhom);
                     ListMagroup.Add(item.MaNhom);
@@ -141,20 +141,20 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.Magroup = ListMagroup;
 
             //ds đki nguoi cung cty
-            var listCom = (from a in dknt.Where(x => x.IDNV == IDNV  && x.isCom ==1 && x.IDSV == IDSV)
-                           join b in LSNV  on a.IDNguoiThan equals b.ID into ul
+            var listCom = (from a in dknt.Where(x => x.IDNV == IDNV && x.isCom == 1 && x.IDSV == IDSV)
+                           join b in LSNV on a.IDNguoiThan equals b.ID into ul
                            from b in ul.DefaultIfEmpty()
                            select new PartTogetherValidation
                            {
                                ID = a.ID,
                                HoTen = b.HoTen,
-                               MaNV =b.MaNV,
+                               MaNV = b.MaNV,
                                IDNguoiThan = a.IDNguoiThan,
-                               IDSV =a.IDSV,
-                               PhongBan =pb.Where(x=>x.IDPhongBan == b.IDPhongBan).FirstOrDefault().TenPhongBan,
+                               IDSV = a.IDSV,
+                               PhongBan = pb.Where(x => x.IDPhongBan == b.IDPhongBan).FirstOrDefault().TenPhongBan,
                                NamSinh = a.NamSinh,
-                               QuanHe =a.QuanHe,
-                               Note =a.GhiChu
+                               QuanHe = a.QuanHe,
+                               Note = a.GhiChu
                                //ListSelect = 
                                //GioiTinhStr = a.GioiTinh ==1 &&  ?"Nam":"Nữ",
                                //TenNhom = a.TenNhom,
@@ -185,27 +185,27 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.DSCty = listCom;
 
             //ds đki người khác cty
-            var listKhac = (from a in dknt.Where(x => x.IDNV == IDNV && x.isCom == 0 && x.IDSV ==IDSV)
-                           select new PartTogetherValidation
-                           {
-                               ID = a.ID,
-                               HoTen = a.HoTen,
-                               DienThoai =a.DienThoai,
-                               GioiTinhStr = a.GioiTinh ==1?"Nam":"Nữ",
-                               IDNguoiThan = a.IDNguoiThan,
-                               IDSV = a.IDSV,
-                               NamSinh = a.NamSinh,
-                               QuanHe = a.QuanHe,
-                               Note =a.GhiChu
-                               //PhongBan = db.PhongBans.Where(x => x.IDPhongBan == b.IDPhongBan).FirstOrDefault().TenPhongBan,
-                               //GioiTinhStr = a.GioiTinh ==1 &&  ?"Nam":"Nữ",
-                               //TenNhom = a.TenNhom,
-                               //CuLy = dbSV.OptionServeys.Where(x=>x.ID)
-                               //CuLy = ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 1).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 1).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
-                               //MauAo = ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 2).FirstOrDefault() != null? option.Where(x => x.IDSV == IDSV && x.IDOT == ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 2).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
-                               //Size = ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 3).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 3).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
-                               //DiaChi = Diachi.Where(x => x.ID == a.IDDC ).FirstOrDefault().TenDC,
-                           }).ToList();
+            var listKhac = (from a in dknt.Where(x => x.IDNV == IDNV && x.isCom == 0 && x.IDSV == IDSV)
+                            select new PartTogetherValidation
+                            {
+                                ID = a.ID,
+                                HoTen = a.HoTen,
+                                DienThoai = a.DienThoai,
+                                GioiTinhStr = a.GioiTinh == 1 ? "Nam" : "Nữ",
+                                IDNguoiThan = a.IDNguoiThan,
+                                IDSV = a.IDSV,
+                                NamSinh = a.NamSinh,
+                                QuanHe = a.QuanHe,
+                                Note = a.GhiChu
+                                //PhongBan = db.PhongBans.Where(x => x.IDPhongBan == b.IDPhongBan).FirstOrDefault().TenPhongBan,
+                                //GioiTinhStr = a.GioiTinh ==1 &&  ?"Nam":"Nữ",
+                                //TenNhom = a.TenNhom,
+                                //CuLy = dbSV.OptionServeys.Where(x=>x.ID)
+                                //CuLy = ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 1).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 1).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
+                                //MauAo = ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 2).FirstOrDefault() != null? option.Where(x => x.IDSV == IDSV && x.IDOT == ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 2).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
+                                //Size = ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 3).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ChiTietDKNT.Where(m => m.IDSV == IDSV && m.IDNguoiThan == a.ID && m.IDGroup == 3).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
+                                //DiaChi = Diachi.Where(x => x.ID == a.IDDC ).FirstOrDefault().TenDC,
+                            }).ToList();
             foreach (var item in listKhac)
             {
                 List<string> columnSelectCom = new List<string> { };
@@ -229,7 +229,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.DSKhac = listKhac;
 
 
-         
+
             List<PhongBan> dt = db.PhongBans.ToList();
             ViewBag.IDPB = new SelectList(dt, "IDPhongBan", "TenPhongBan");
 
@@ -239,11 +239,11 @@ namespace EPORTAL.Areas.Servey.Controllers
 
 
             var ListNV = new List<EmployeeValidation>();
-           
-            var kk =  dbSV.EmployeeServeys.Where(x => x.IDSV == IDSV).ToList();
+
+            var kk = dbSV.EmployeeServeys.Where(x => x.IDSV == IDSV).ToList();
             var LS = (from a in kk
-                     join b in LSNV on a.IDNV equals b.ID
-                     select b).ToList();
+                      join b in LSNV on a.IDNV equals b.ID
+                      select b).ToList();
 
             if (LS.Count > 0)
             {
@@ -256,28 +256,28 @@ namespace EPORTAL.Areas.Servey.Controllers
             //thong tin dk
             var employdk = dbSV.EmployeeServeys.Where(x => x.IDNV == IDNV && x.IDSV == IDSV).ToList();
 
-            var thongtindk = (from a in employdk.Where(x=>x.OTID != null)
-                            select new PartTogetherValidation
-                            {
-                                IDSV = a.IDSV,
-                                //PhongBan = db.PhongBans.Where(x => x.IDPhongBan == b.IDPhongBan).FirstOrDefault().TenPhongBan,
-                                //GioiTinhStr = a.GioiTinh ==1 &&  ?"Nam":"Nữ",
-                                //TenNhom = a.TenNhom,
-                                //CuLy = dbSV.OptionServeys.Where(x=>x.ID)
-                                //CuLy = ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 1).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 1).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
-                                //MauAo = ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 2).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 2).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
-                                //Size = ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 3).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 3).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
-                                //DiaChi = Diachi.Where(x => x.ID == a.IDDC).FirstOrDefault().TenDC,
-                            }).FirstOrDefault();
+            var thongtindk = (from a in employdk.Where(x => x.OTID != null)
+                              select new PartTogetherValidation
+                              {
+                                  IDSV = a.IDSV,
+                                  //PhongBan = db.PhongBans.Where(x => x.IDPhongBan == b.IDPhongBan).FirstOrDefault().TenPhongBan,
+                                  //GioiTinhStr = a.GioiTinh ==1 &&  ?"Nam":"Nữ",
+                                  //TenNhom = a.TenNhom,
+                                  //CuLy = dbSV.OptionServeys.Where(x=>x.ID)
+                                  //CuLy = ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 1).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 1).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
+                                  //MauAo = ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 2).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 2).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
+                                  //Size = ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 3).FirstOrDefault() != null ? option.Where(x => x.IDSV == IDSV && x.IDOT == ctks.Where(m => m.IDSV == IDSV && m.IDNV == a.IDNV && m.IDGroup == 3).FirstOrDefault().IDOT).FirstOrDefault().ContentOT : "",
+                                  //DiaChi = Diachi.Where(x => x.ID == a.IDDC).FirstOrDefault().TenDC,
+                              }).FirstOrDefault();
             ViewBag.ThongTinDK = thongtindk;
 
-          
+
 
             List<string> columnSelect = new List<string> { };
             foreach (var item in listND)
             {
-                var ctksNV = ctks.Where(x=>x.IDNV == IDNV && x.IDSV ==IDSV && x.IDGroup == item.ID).ToList();
-               if(ctksNV.Count() != 0)
+                var ctksNV = ctks.Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == item.ID).ToList();
+                if (ctksNV.Count() != 0)
                 {
                     var ot = option.Where(x => x.IDOT == ctksNV.FirstOrDefault().IDOT).FirstOrDefault().ContentOT;
                     columnSelect.Add(ot);
@@ -288,8 +288,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                     columnSelect.Add("");
                 }
             }
-            var ctksNVend = ctks.Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDOT ==49).ToList();
-            if(ctksNVend.Count() != 0)
+            var ctksNVend = ctks.Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDOT == 49).ToList();
+            if (ctksNVend.Count() != 0)
             {
                 columnSelect.Add(ctksNVend.FirstOrDefault().GhiChu);
             }
@@ -301,7 +301,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             return View(group.ToList());
         }
         [HttpPost]
-        public ActionResult Confirm(List<GroupKhaoSatView> ListGR,FormCollection collection)
+        public ActionResult Confirm(List<GroupKhaoSatView> ListGR, FormCollection collection)
         {
             //var kq = ListSV.FirstOrDefault();
             var IDSV = ListGR[0].IDSV;
@@ -309,8 +309,8 @@ namespace EPORTAL.Areas.Servey.Controllers
             try
             {
                 var a = ListGR;
-               
-                var gr = dbSV.GroupKhaoSats.Where(x=>x.IDSV == IDSV).ToList();
+
+                var gr = dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV).ToList();
                 var grChoose = gr.Where(x => x.isChon != 0).ToList();
                 dbSV.CTKhaoSat_delete(ListGR[0].IDSV, MyAuthentication.ID);
                 var keysToRemove = new List<string>();
@@ -327,7 +327,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                         keysSelectChoose.Add(sl);
                     }
                 }
-                if (keysSelectChoose.Count != 0 || keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("49") || keysToRemove.Contains("49")) { // 25 OTID server lựa chọn 0
+                if (keysSelectChoose.Count != 0 || keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("49") || keysToRemove.Contains("49"))
+                { // 25 OTID server lựa chọn 0
                     foreach (var key in gr)
                     {
                         var sl = collection["gr.OptionList.Answer[" + key.ID + "]"];
@@ -338,7 +339,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                             int IDOT = int.Parse(sl);
                             int idsv = int.Parse(ListGR[0].IDSV.ToString());
                             var ketqua = dbSV.CTKhaoSats.Where(x => x.IDSV == idsv && x.IDOT == IDOT && x.IDNV == MyAuthentication.ID && x.IDGroup == key.ID).FirstOrDefault();
-                            if(ketqua.IDOT == 49)
+                            if (ketqua.IDOT == 49)
                             {
                                 ketqua.GhiChu = collection["LyDo"];
                                 dbSV.SaveChanges();
@@ -346,10 +347,10 @@ namespace EPORTAL.Areas.Servey.Controllers
                         }
                     }
                     // check trường hợp chọn không xóa kết quả
-                    var kk = dbSV.CTKhaoSats.Where(x=>x.IDOT ==49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
-                    if(kk.Count != 0)
+                    var kk = dbSV.CTKhaoSats.Where(x => x.IDOT == 49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
+                    if (kk.Count != 0)
                     {
-                        var recordToDelete = dbSV.CTKhaoSats.Where(x=> x.IDOT != 49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
+                        var recordToDelete = dbSV.CTKhaoSats.Where(x => x.IDOT != 49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
                         var recordToDelete2 = dbSV.CTDKNguoiThans.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList();
                         dbSV.CTKhaoSats.RemoveRange(recordToDelete);
                         dbSV.CTDKNguoiThans.RemoveRange(recordToDelete2);
@@ -371,11 +372,11 @@ namespace EPORTAL.Areas.Servey.Controllers
                     {
                         if (key.Split('_')[0] == "IDNV")
                         {
-                            if(collection[key] != "null")
+                            if (collection[key] != "null")
                             {
                                 ListVT.Add(new DKNguoiThan() { IDNguoiThan = int.Parse(collection[key]), QuanHe = collection["reCung_" + key.Split('_')[1]], GhiChu = collection["noteCung_" + key.Split('_')[1]] });
                             }
-                           
+
 
                         }
                         if (key.Split('_')[0] == "nameKhac")
@@ -384,11 +385,11 @@ namespace EPORTAL.Areas.Servey.Controllers
                             {
                                 ListVTKhac.Add(new DKNguoiThan() { HoTen = collection[key], QuanHe = collection["reKhac_" + key.Split('_')[1]], DienThoai = collection["sdtKhac_" + key.Split('_')[1]], GioiTinh = int.Parse(collection["gioitinhKhac_" + key.Split('_')[1]]), NamSinh = collection["nsKhac_" + key.Split('_')[1]], GhiChu = collection["noteKhac_" + key.Split('_')[1]] });
                             }
-                                
+
                         }
                         if (key.Split('_')[0] == "slectCung")
                         {
-                            if(collection[key] != "null" && collection[key] != null)
+                            if (collection[key] != "null" && collection[key] != null)
                             {
                                 ListSelc.Add(int.Parse(collection[key]));
                             }
@@ -405,19 +406,19 @@ namespace EPORTAL.Areas.Servey.Controllers
                     foreach (var item in ListVT)
                     {
                         ObjectParameter IDNguoiThan = new ObjectParameter("ID", typeof(int));
-                        dbSV.CTDKNguoiThan_insert(MyAuthentication.ID, item.IDNguoiThan, null, null,IDSV, 1,null, null, null,item.QuanHe,item.GhiChu, IDNguoiThan);
+                        dbSV.CTDKNguoiThan_insert(MyAuthentication.ID, item.IDNguoiThan, null, null, IDSV, 1, null, null, null, item.QuanHe, item.GhiChu, IDNguoiThan);
                         int IDNT = 0;
                         IDNT = Convert.ToInt32(IDNguoiThan.Value);
                         dbSV.ChiTietDKNT_delete(IDNT);
-                        if(ListSelc.Count > 0)
+                        if (ListSelc.Count > 0)
                         {
                             foreach (var ot in ListSelc)
                             {
-                                var sls = dbSV.OptionServeys.Where(x=>x.IDOT == ot).FirstOrDefault();
+                                var sls = dbSV.OptionServeys.Where(x => x.IDOT == ot).FirstOrDefault();
                                 dbSV.ChiTietDKNT_insert(IDSV, ot, IDNT, sls.MaOT);
                             }
                         }
-                       
+
                     }
                     // thêm người thân khác cty
 
@@ -429,7 +430,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                         {
                             item.NamSinh = dateTime.ToString("dd/MM/yyyy");
                         }
-                        dbSV.CTDKNguoiThan_insert(MyAuthentication.ID, null, item.HoTen,item.DienThoai, IDSV, 0, item.GioiTinh, null, item.NamSinh.ToString(), item.QuanHe, item.GhiChu, IDNguoiThan);
+                        dbSV.CTDKNguoiThan_insert(MyAuthentication.ID, null, item.HoTen, item.DienThoai, IDSV, 0, item.GioiTinh, null, item.NamSinh.ToString(), item.QuanHe, item.GhiChu, IDNguoiThan);
                         int IDNT = 0;
                         IDNT = Convert.ToInt32(IDNguoiThan.Value);
                         dbSV.ChiTietDKNT_delete(IDNT);
@@ -451,15 +452,15 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     TempData["msgSuccess"] = "<script>alert('Vui lòng chọn đầy đủ thông tin đăng ký?');</script>";
                 }
-               
-               
+
+
 
             }
             catch (Exception e)
             {
                 TempData["msgError"] = "<script>alert('Có lỗi khi gửi: " + e.Message + "');</script>";
             }
-            return RedirectToAction("Index", "ServeyID",new { IDSV = IDSV });
+            return RedirectToAction("Index", "ServeyID", new { IDSV = IDSV });
         }
 
 
@@ -468,9 +469,9 @@ namespace EPORTAL.Areas.Servey.Controllers
             //var listDB = db.DinhBienVTs.ToList();
             var pb = db.PhongBans.ToList();
             var LSNV = db.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
-            var dknt = dbSV.CTDKNguoiThans.Where(x=>x.ID ==id).FirstOrDefault();
+            var dknt = dbSV.CTDKNguoiThans.Where(x => x.ID == id).FirstOrDefault();
             var option = dbSV.OptionServeys.ToList();
-            var ChiTietDKNT = dbSV.ChiTietDKNTs.Where(x=>x.IDNguoiThan == id).ToList();
+            var ChiTietDKNT = dbSV.ChiTietDKNTs.Where(x => x.IDNguoiThan == id).ToList();
             var Diachi = dbSV.DiaDiems.ToList();
             var res = (from a in dbSV.CTDKNguoiThans.Where(x => x.ID == id)
                        select new PartTogetherValidation
@@ -487,7 +488,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             var listCuLy = option.Where(x => x.IDSV == dknt.IDSV && x.MaOT == 1).ToList();
             var listMau = option.Where(x => x.IDSV == dknt.IDSV && x.MaOT == 2).ToList();
             var listSize = option.Where(x => x.IDSV == dknt.IDSV && x.MaOT == 3).ToList();
-            var idcly = ChiTietDKNT.Where(x=>x.IDGroup ==1).FirstOrDefault().IDOT;
+            var idcly = ChiTietDKNT.Where(x => x.IDGroup == 1).FirstOrDefault().IDOT;
             var idMau = ChiTietDKNT.Where(x => x.IDGroup == 2).FirstOrDefault().IDOT;
             var idSize = ChiTietDKNT.Where(x => x.IDGroup == 3).FirstOrDefault().IDOT;
             ViewBag.LSCuLy = new SelectList(listCuLy, "IDOT", "ContentOT", idcly);
@@ -496,14 +497,14 @@ namespace EPORTAL.Areas.Servey.Controllers
             return PartialView(res);
         }
 
-        public ActionResult XNServey(int? IDNV,int? IDSV)
+        public ActionResult XNServey(int? IDNV, int? IDSV)
         {
             try
             {
                 var check = dbSV.EmployeeServey_selectNV(IDNV, IDSV).First();
                 if (check != null)
                 {
-                    var a = dbSV.EmployeeServey_updateOtion(check.IDNV, check.IDSV, check.OTID, true,check.MenuOT);
+                    var a = dbSV.EmployeeServey_updateOtion(check.IDNV, check.IDSV, check.OTID, true, check.MenuOT);
                     TempData["msgSuccess"] = "<script>alert('Hoàn thành khảo sát');</script>";
                 }
             }
@@ -542,14 +543,14 @@ namespace EPORTAL.Areas.Servey.Controllers
                              IDSV = a.IDSV,
                              MaNhom = a.MaNhom,
                              TenNhom = a.TenNhom,
-                             IsChecked =true,
+                             IsChecked = true,
                              OptionList = new OptionList
                              {
                                  ID = a.ID,
                                  //IDNV = aaa.IDNV,
                                  Answer = (int?)dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault().IDOT ?? default,
                                  //ContentSV = aa,
-                                 
+
                                  //XNSV = a.XNSV,
                                  //IDSV = IDSV,
                                  //Status = dbSV.ListServeys.Where(x => x.StartTime <= ts && x.EndTime >= ts).ToList().Count() > 0 ? true : false,
@@ -566,11 +567,11 @@ namespace EPORTAL.Areas.Servey.Controllers
                                              }).OrderBy(x => x.OrderBy).ToList()
                                  //MenuOT = a.MenuOT,
                              }
-                         }).OrderBy(x=>x.MaNhom).ToList();
+                         }).OrderBy(x => x.MaNhom).ToList();
 
             var res1 = new DKNguoiThan();
             res1.listGroup = group;
-            
+
             List<OptionSelect> ops = new List<OptionSelect>();
             List<OptionSelect> ops2 = new List<OptionSelect>();
             ops.Add(new OptionSelect { option = "1", name = "Nam" });
@@ -591,7 +592,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             var LSNV = db.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
             var kk = dbSV.EmployeeServeys.ToList();
 
-            List<GhiChu> nt = dbSV.GhiChus.Where(x=>x.IDSV == IDSV).ToList();
+            List<GhiChu> nt = dbSV.GhiChus.Where(x => x.IDSV == IDSV).ToList();
             ViewBag.GhiChu = new SelectList(nt, "NoiDung", "NoiDung");
 
             var LS = (from a in kk
@@ -622,9 +623,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                 var a = ListGR;
                 ObjectParameter IDNguoiThan = new ObjectParameter("ID", typeof(int));
                 int IDNT = 0;
-                
+
                 var gr = dbSV.GroupKhaoSats.Where(x => x.IDSV == ListGR.IDSV).ToList();
-               
+
                 var keysToRemove = new List<string>();
                 foreach (var item in gr)
                 {
@@ -644,7 +645,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                     if (ListGR.IsChecked == true)
                     {
-                        dbSV.CTDKNguoiThan_insert(MyAuthentication.ID, ListGR.IDNV, null, null, ListGR.IDSV, 1, ListGR.GioiTinh, ListGR.IDDC,ListGR.NamSinh.ToString(),ListGR.QuanHe,ListGR.GhiChu, IDNguoiThan);
+                        dbSV.CTDKNguoiThan_insert(MyAuthentication.ID, ListGR.IDNV, null, null, ListGR.IDSV, 1, ListGR.GioiTinh, ListGR.IDDC, ListGR.NamSinh.ToString(), ListGR.QuanHe, ListGR.GhiChu, IDNguoiThan);
                     }
                     else
                     {
@@ -670,7 +671,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     TempData["msgSuccess"] = "<script>alert('Vui lòng chọn đầy đủ thông tin đăng ký?');</script>";
                 }
-              
+
 
             }
             catch (Exception e)
@@ -682,17 +683,17 @@ namespace EPORTAL.Areas.Servey.Controllers
 
 
 
-        public JsonResult AddRe(string HoTen, DateTime? NS, int? IDNV, string Re,bool isCom, string note, int? IDSV, int? answer)
+        public JsonResult AddRe(string HoTen, DateTime? NS, int? IDNV, string Re, bool isCom, string note, int? IDSV, int? answer)
         {
             //var a = dbSV.EmployeeServey_selectNV(MyAuthentication.ID, IDSV).First().OTID;
             if (isCom == true)
             {
-                if (answer != 4 && HoTen != "") dbSV.PartTogether_insert(null, HoTen, NS, MyAuthentication.ID, Re, false,note);
+                if (answer != 4 && HoTen != "") dbSV.PartTogether_insert(null, HoTen, NS, MyAuthentication.ID, Re, false, note);
             }
             else
             {
                 var check = dbSV.PartTogethers.Where(x => x.IDNV == IDNV && x.IDESV == MyAuthentication.ID).ToList();
-                if (check.Count ==0 && IDNV != null   && answer != 4) dbSV.PartTogether_insert(IDNV, null, null, MyAuthentication.ID, Re, true,note);
+                if (check.Count == 0 && IDNV != null && answer != 4) dbSV.PartTogether_insert(IDNV, null, null, MyAuthentication.ID, Re, true, note);
             }
             //RedirectToAction("Index", "ViTriKNL");
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -700,28 +701,28 @@ namespace EPORTAL.Areas.Servey.Controllers
         public List<PartTogetherValidation> PartTogether(int? ESVID)
         {
             var LSPart = dbSV.PartTogethers.Where(x => x.IDESV == ESVID).ToList();
-            var LSNV = db.NhanViens.Where(x=>x.IDTinhTrangLV ==1).ToList();
+            var LSNV = db.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
             List<PartTogetherValidation> Ls = (from a in LSPart
                                                join b in LSNV on a.IDNV equals b.ID into ulk
                                                from b in ulk.DefaultIfEmpty()
                                                select new PartTogetherValidation
                                                {
-                                                   ID =a.ID,
-                                                   HoTen =a.HoTen,
-                                                   IDESV =a.IDESV,
-                                                   IDNV =a.IDNV,
-                                                   MaNV = a.IDNV != null ? b.MaNV:"",
-                                                   HoTenNV = a.IDNV != null ? b.HoTen:"",
+                                                   ID = a.ID,
+                                                   HoTen = a.HoTen,
+                                                   IDESV = a.IDESV,
+                                                   IDNV = a.IDNV,
+                                                   MaNV = a.IDNV != null ? b.MaNV : "",
+                                                   HoTenNV = a.IDNV != null ? b.HoTen : "",
                                                    //NamSinh =(DateTime?)a.NamSinh??default,
-                                                   Re =a.Re,
-                                                   isCom =a.isCom,
-                                                   TenNV = a.IDNV != null? b.MaNV+"-"+ b.HoTen:"",
-                                                   PhongBan = a.IDNV != null? b.PhongBan.TenPhongBan:"",
-                                                   Note =a.Note
+                                                   Re = a.Re,
+                                                   isCom = a.isCom,
+                                                   TenNV = a.IDNV != null ? b.MaNV + "-" + b.HoTen : "",
+                                                   PhongBan = a.IDNV != null ? b.PhongBan.TenPhongBan : "",
+                                                   Note = a.Note
                                                }).ToList();
             return Ls;
         }
-        public ActionResult Delete(int? id,int? IDSV)
+        public ActionResult Delete(int? id, int? IDSV)
         {
             //var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.DELETE).First();
             //if (check == 0)
@@ -752,7 +753,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             try
             {
                 var listNT = dbSV.CTDKNguoiThans.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList();
-                if(listNT != null)
+                if (listNT != null)
                 {
                     foreach (var item in listNT)
                     {
@@ -760,9 +761,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                         dbSV.CTDKNguoiThan_delete(item.ID);
                     }
                 }
-                dbSV.CTKhaoSat_delete(IDSV,MyAuthentication.ID);
-                dbSV.EmployeeServey_updateDC(MyAuthentication.ID,IDSV,null);
-                dbSV.EmployeeServey_updateOT(MyAuthentication.ID,IDSV,null);
+                dbSV.CTKhaoSat_delete(IDSV, MyAuthentication.ID);
+                dbSV.EmployeeServey_updateDC(MyAuthentication.ID, IDSV, null);
+                dbSV.EmployeeServey_updateOT(MyAuthentication.ID, IDSV, null);
                 //dbSV.ChiTietDKNT_delete(id);
                 //dbSV.CTDKNguoiThan_delete(id);
             }
@@ -774,7 +775,7 @@ namespace EPORTAL.Areas.Servey.Controllers
         }
 
 
-        public ActionResult DeletePart(int? id,int? IDSV)
+        public ActionResult DeletePart(int? id, int? IDSV)
         {
             //var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.DELETE).First();
             //if (check == 0)
@@ -790,7 +791,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             {
                 TempData["msgSuccess"] = "<script>alert('Xóa dữ liệu thất bại: " + e.Message + "');</script>";
             }
-            return RedirectToAction("Index", "ServeyID",new { IDSV =IDSV});
+            return RedirectToAction("Index", "ServeyID", new { IDSV = IDSV });
         }
 
     }

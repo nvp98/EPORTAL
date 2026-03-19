@@ -701,22 +701,23 @@ $(document).ready(function () {
 
     $("form .questions input:radio").change(function () {
         op = $(this).val();
-        if ( $(this).val() ==48) { // thay 25 bằng ID lựa chọn
+        if ( $(this).val() ==70) { // thay 25 bằng ID lựa chọn
             // Disable your roomnumber element here
             $('.formPart').show();
             $('.formLyDo').hide();
-            $('.LuaChon_7').show(); // ẩn hiện theo IDOT
-            $('.LuaChon_8').show();
-            $('.LuaChon_12').show();
-            $('.LuaChon_13').show();
+            $('.LuaChon_16').show(); // ẩn hiện theo IDOT
+            $('.LuaChon_17').show();
+            $('.LuaChon_18').show();
+            $('.LuaChon_19').show();
 
-        } else if ($(this).val() == 49) {
+        } else if ($(this).val() == 71) {
             // Re-enable here I guess
             $('.formPart').hide();
             $('.formLyDo').show();
-            $('.LuaChon_7').hide(); // ẩn hiện theo IDOT
-            $('.LuaChon_8').hide();
-            $('.LuaChon_13').hide();
+            $('.LuaChon_16').hide(); // ẩn hiện theo IDOT
+            $('.LuaChon_17').hide();
+            $('.LuaChon_18').hide();
+            $('.LuaChon_19').hide();
         }
     });
 
