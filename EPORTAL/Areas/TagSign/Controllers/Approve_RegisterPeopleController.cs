@@ -265,8 +265,8 @@ namespace EPORTAL.Areas.TagSign.Controllers
                                             LuongXuLy = (int)kd.LuongXuLy,
                                         }
                                         ).ToList();
-                    // thiết lập điều kiện cấp duyệt KTV BP đó đã duyệt thì được ký
-                    SignOff_Flow = SignOff_Flow.Where(x => x.CapDuyet < 4 || (x.CapDuyet == 4 && x.IDPhongBan == MyAuthentication.IDPhongban)).ToList();
+                    // thiết lập điều kiện cấp duyệt KTV BP đó đã duyệt thì được ký hoặc nếu k có cấp duyệt nào thì cũng được ký
+                    SignOff_Flow = SignOff_Flow.Where(x => x.CapDuyet <= 4 || (x.CapDuyet == 4 && x.IDPhongBan == MyAuthentication.IDPhongban)).ToList();
 
                     var check_list = (from kd in SignOff_Flow.Where(x => x.CapDuyet <= 4 && x.NhanVienID != 0 && x.DKTN_ID == item.DKTN_ID)
                                       join ca in db_dk.RegisterPeoples.Where(x => x.TinhTrang_ID == 1) on kd.DKTN_ID equals ca.ID_DKTN
