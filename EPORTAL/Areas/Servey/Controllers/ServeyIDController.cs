@@ -70,7 +70,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                              },
                          }).OrderBy(x => x.MaNhom).ToList();
 
-            var khongtgia = dbSV.CTKhaoSats.Where(x => x.IDNV == MyAuthentication.ID && x.IDOT == 49).FirstOrDefault();
+            var khongtgia = dbSV.CTKhaoSats.Where(x => x.IDNV == MyAuthentication.ID && x.IDOT == 71).FirstOrDefault();
 
             var res1 = new List<OptionList>();
             List<OptionSelect> ops = new List<OptionSelect>();
@@ -281,14 +281,14 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     var ot = option.Where(x => x.IDOT == ctksNV.FirstOrDefault().IDOT).FirstOrDefault().ContentOT;
                     columnSelect.Add(ot);
-                    //if (ctksNV.FirstOrDefault().IDOT == 49) columnSelect.Add(ctksNV.FirstOrDefault().GhiChu);
+                    //if (ctksNV.FirstOrDefault().IDOT == 71) columnSelect.Add(ctksNV.FirstOrDefault().GhiChu);
                 }
                 else
                 {
                     columnSelect.Add("");
                 }
             }
-            var ctksNVend = ctks.Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDOT == 49).ToList();
+            var ctksNVend = ctks.Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDOT == 71).ToList();
             if (ctksNVend.Count() != 0)
             {
                 columnSelect.Add(ctksNVend.FirstOrDefault().GhiChu);
@@ -327,7 +327,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                         keysSelectChoose.Add(sl);
                     }
                 }
-                if (keysSelectChoose.Count != 0 || keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("49") || keysToRemove.Contains("49"))
+                if (keysSelectChoose.Count != 0 || keysSelectChoose.Count >= grChoose.Count() && !keysToRemove.Contains("71") || keysToRemove.Contains("71"))
                 { // 25 OTID server lựa chọn 0
                     foreach (var key in gr)
                     {
@@ -339,7 +339,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                             int IDOT = int.Parse(sl);
                             int idsv = int.Parse(ListGR[0].IDSV.ToString());
                             var ketqua = dbSV.CTKhaoSats.Where(x => x.IDSV == idsv && x.IDOT == IDOT && x.IDNV == MyAuthentication.ID && x.IDGroup == key.ID).FirstOrDefault();
-                            if (ketqua.IDOT == 49)
+                            if (ketqua.IDOT == 71)
                             {
                                 ketqua.GhiChu = collection["LyDo"];
                                 dbSV.SaveChanges();
@@ -347,10 +347,10 @@ namespace EPORTAL.Areas.Servey.Controllers
                         }
                     }
                     // check trường hợp chọn không xóa kết quả
-                    var kk = dbSV.CTKhaoSats.Where(x => x.IDOT == 49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
+                    var kk = dbSV.CTKhaoSats.Where(x => x.IDOT == 71 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
                     if (kk.Count != 0)
                     {
-                        var recordToDelete = dbSV.CTKhaoSats.Where(x => x.IDOT != 49 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
+                        var recordToDelete = dbSV.CTKhaoSats.Where(x => x.IDOT != 71 && x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList(); // thay đổi ID
                         var recordToDelete2 = dbSV.CTDKNguoiThans.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID).ToList();
                         dbSV.CTKhaoSats.RemoveRange(recordToDelete);
                         dbSV.CTDKNguoiThans.RemoveRange(recordToDelete2);
