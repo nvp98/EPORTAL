@@ -118,7 +118,7 @@
 
                                                         @if (item.TinhTrang_ID == 5) // 5 = nháp
                                                         {
-                                                            <a title="Xóa" href="javascript:void(0);" class="btn-action" onclick="xoaDon('@item.Ma_Don', '@item.NoiDung')">
+                                                            <a title="Xóa" href="javascript:void(0);" class="btn-action" onclick="xoaDon('@item.Ma_Don', '@Html.Raw(HttpUtility.JavaScriptStringEncode(item.NoiDung ?? ""))')" >
                                                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                                             </a>
                                                         }
