@@ -46,7 +46,7 @@
             <div class="row">
                 <div class="card col-lg-12">
                     @{
-                        var deadline = new DateTime(2025, 5, 20);
+                        var deadline = new DateTime(2026, 5, 25);
                         var today = DateTime.Today;
                         var daysLeft = (deadline - today).Days;
                     }
@@ -118,7 +118,7 @@
                                         @if (ViewBag.DataNhanVien != null)
                                         {
                                             <div class="alert alert-info text-center" role="alert">
-                                                Bạn đã khai báo vào @((ViewBag.NgayKhaiBao as DateTime?)?.ToString("dd/MM/yyyy HH:mm:ss"))
+                                                Bạn đã khai báo vào @((ViewBag.NgayKhaiBao != null) ? ((DateTime)ViewBag.NgayKhaiBao).ToString("dd/MM/yyyy HH:mm:ss") : "")
                                             </div>
 
                                         }
