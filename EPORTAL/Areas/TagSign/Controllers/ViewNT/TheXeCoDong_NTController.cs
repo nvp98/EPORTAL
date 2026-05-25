@@ -570,6 +570,50 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
             return View(danhSach ?? new List<ChiTietDonVM>());
         }
 
+        public static string RemoveSpecialCharacter(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return "FILE";
+
+            // chuẩn hóa unicode
+            text = text.Normalize(NormalizationForm.FormD);
+
+            // bỏ dấu tiếng Việt
+            var sb = new StringBuilder();
+
+            foreach (char c in text)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            text = sb.ToString().Normalize(NormalizationForm.FormC);
+
+            // thay đ/Đ
+            text = text.Replace('đ', 'd')
+                       .Replace('Đ', 'D');
+
+            // chỉ giữ chữ + số
+            text = Regex.Replace(text, @"[^a-zA-Z0-9]", "_");
+
+            // bỏ nhiều dấu _
+            text = Regex.Replace(text, @"_+", "_");
+
+            // bỏ _ đầu cuối
+            text = text.Trim('_');
+
+            // tránh tên rỗng
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                text = "FILE";
+            }
+
+            return text;
+        }
         [HttpPost]
         public ActionResult Create(DonDangKyInsertModel model, HttpPostedFileBase FileHoSoXe, int? KTV_ID, int? TP_ID, int? VP1C_ID)
         {
@@ -657,9 +701,9 @@ namespace EPORTAL.Areas.TagSign.Controllers.ViewNT
                 {
                     var originalName = Path.GetFileNameWithoutExtension(FileHoSoXe.FileName);
                     var extension = Path.GetExtension(FileHoSoXe.FileName);
-
+                    originalName = RemoveSpecialCharacter(originalName);
                     // Tạo tên file mới: TenGoc_GUID.extension
-                   // var fileName = $"{originalName}_{Guid.NewGuid()}{extension}";
+                    // var fileName = $"{originalName}_{Guid.NewGuid()}{extension}";
                     var fileName = $"{originalName}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";                    
                     var filePath = Path.Combine(Server.MapPath("~/UploadedFiles/XeCoDong/"), fileName);
                     FileHoSoXe.SaveAs(filePath);
