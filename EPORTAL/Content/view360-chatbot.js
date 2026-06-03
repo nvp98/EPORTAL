@@ -58,7 +58,11 @@
             '<div class="v360cb__icon-wrap">' +
                 '<div class="v360cb__icon"><i class="fa fa-robot"></i></div>' +
             '</div>' +
-            '<div class="v360cb__title">Trợ lý ảo' +
+            '<div class="v360cb__title">' +
+                '<div class="v360cb__title-row">' +
+                    '<span>Trợ lý ảo</span>' +
+                    '<span class="v360cb__experiment"><i class="fa fa-flask"></i> Hệ thống thử nghiệm</span>' +
+                '</div>' +
                 '<div class="v360cb__subtitle">P.CNTT&CĐS - HPDQ</div>' +
             '</div>' +
             '<button type="button" class="v360cb__close" title="Đóng"><i class="fa fa-times"></i></button>' +
