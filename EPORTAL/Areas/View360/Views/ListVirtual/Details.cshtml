@@ -1,55 +1,1923 @@
-﻿
 @{
-    ViewBag.Title = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Model.Title ?? "Virtual Tour";
+
+    // Admin mode (Calibrate / Featured admin) -> dung _Layout.cshtml chung de co
+    //   sidebar + topbar admin (de quan ly), KHONG dung showcase.
+    // User mode (xem 360 thong thuong) -> showcase fullwidth + viewer.
+    bool _isAdmin = (ViewBag.AdminMode == true || ViewBag.FeaturedAdminMode == true || ViewBag.ChatbotAdminMode == true);
+    if (Request.QueryString["nolayout"] == "1")
+    {
+        Layout = null;
+    }
+    else if (_isAdmin)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutV360Showcase.cshtml";
+        ViewBag.BodyClass = "v360-sc-fullwidth v360-sc-viewer";
+        ViewBag.HideSearch = true;
+        ViewBag.BackLabel = "Trở lại Intro";
+        ViewBag.BackHref  = Url.Action("Intro", "ListVirtual", new { area = "View360", id = Model.ID });
+    }
 }
 @model EPORTAL.ModelsView360.VirtualValidation
-<div class="app-main__outer">
-    <div class="app-main__inner">
-        <div class="tab-content">
-            <div class="card">
+@{
+    var mapImg = string.IsNullOrEmpty(Model.Images)
+        ? Url.Content("~/Content/assets/images/bg9.jpg")
+        : Url.Content("~/Images/" + System.IO.Path.GetFileName(Model.Images));
 
-                <div style="padding:10px 20px;float:left;width:100%">
-                    <div style="display: flex;">
-                        <div>
-                            <img style="width: 40%;padding-top:6.5%" src="/Images/360.png">
+    // Option B: chromeless Kuula + custom UI ngoai iframe.
+    // Theo demo https://static.kuula.io/demo/basic.html
+    //   - chromeless=1: tat UI Kuula
+    //   - logo=-1 / thumbs=-1 / fs=-1 / info=-1: an cac element (Kuula dung -1, khong phai 0)
+    //   - enablejs=1: bat JS API postMessage event (KHONG phai 'js-api=1')
+    var iframeUrl = Model.URL ?? "";
+    var isKuula = iframeUrl.IndexOf("kuula", StringComparison.OrdinalIgnoreCase) >= 0
+                 || iframeUrl.IndexOf("viewin360", StringComparison.OrdinalIgnoreCase) >= 0;
+
+    // Deep-link: server-side resolve uuid -> Kuula short Id. Neu co, rewrite iframe URL
+    // tu .../share/collection/<colId> -> .../share/<sceneId>/collection/<colId> de Kuula
+    // load THANG scene do, KHONG can postMessage switch (cach cu gay WebGL CONTEXT_LOST).
+    var startSceneId = ViewBag.IframeStartSceneId as string;
+    if (isKuula && !string.IsNullOrEmpty(startSceneId))
+    {
+        var collIndex = iframeUrl.IndexOf("/share/collection/", StringComparison.OrdinalIgnoreCase);
+        if (collIndex > 0)
+        {
+            iframeUrl = iframeUrl.Substring(0, collIndex)
+                      + "/share/" + startSceneId + "/collection/"
+                      + iframeUrl.Substring(collIndex + "/share/collection/".Length);
+        }
+    }
+
+    if (isKuula)
+    {
+        // Giu Kuula native chrome (audio + fullscreen buttons) nhung an cac element thua.
+        //   enablejs=1     enable postMessage JS API (REQUIRED cho orientation events)
+        //   cusdomwrap=1   custom wrapper protocol (REQUIRED cho postMessage)
+        //   thumbs=-1      hide thumbnail strip / scene picker
+        //   logo=-1        hide Kuula watermark logo
+        //   info=-1        hide info / "Danh sách khu vực" / location panel
+        //   card=-1        hide card popup overlays
+        //   nav=-1         hide left/right nav arrows giua iframe
+        //   gyro=-1        hide gyro/orientation toggle (mobile)
+        //   vr=-1          hide VR mode toggle (Cardboard)
+        //   floorplan=-1   hide built-in floor plan (custom minimap thay)
+        //   autopvideo=0   khong autoplay video
+        //   GIU LAI:
+        //     fs            -> fullscreen button (Kuula default)
+        //     audio control -> built-in audio play/mute
+        var extra = "enablejs=1&cusdomwrap=1"
+                  + "&thumbs=-1&logo=-1&info=-1&card=-1&nav=-1&gyro=-1&vr=-1&floorplan=-1"
+                  + "&autopvideo=0";
+        iframeUrl += (iframeUrl.Contains("?") ? "&" : "?") + extra;
+    }
+}
+
+<link href="~/Content/view360-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+@if (ViewBag.ChatbotEnabled == true)
+{
+    <link href="~/Content/view360-chatbot.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+}
+@if (ViewBag.ChatbotAdminMode == true)
+{
+    <link href="~/Content/view360-chatbot-admin.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+}
+@* Leaflet for real-GPS minimap with satellite tiles *@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<div class="app-main__outer v360-app-outer">
+    <div class="app-main__inner v360-app-inner" style="padding:0;">
+        <div class="v360-area v360-area--viewer">
+            <div class="v360-viewer v360-viewer--custom">
+
+                <!-- Stage: iframe full bleed + minimap overlay (no header, no thumbs) -->
+                <div class="v360-viewer__stage">
+                    <iframe id="v360-iframe"
+                            class="v360-viewer__iframe"
+                            src="@iframeUrl"
+                            frameborder="0"
+                            allowfullscreen
+                            allow="xr-spatial-tracking; gyroscope; accelerometer; microphone; autoplay"
+                            loading="eager"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+
+                    <aside class="v360-minimap" id="v360-minimap">
+                        <div class="v360-minimap__body" id="v360-minimap-body">
+                            <div id="v360-leaflet-map" style="width:100%;height:100%;"></div>
                         </div>
-                        <div class="page-title-actions" style="margin-left:-4%;">
-                            <b>@Model.Title</b>
+                        <div class="v360-minimap__grip" id="v360-minimap-grip" title="Kéo để giãn"></div>
+                        <div class="v360-minimap__ctrls">
+                            <button type="button" class="v360-minimap__ctrl-btn" id="v360-minimap-fs" title="Toàn màn hình">
+                                <i class="fa fa-expand"></i>
+                            </button>
+                            <button type="button" class="v360-minimap__ctrl-btn" id="v360-minimap-min" title="Thu nhỏ">
+                                <i class="fa fa-window-minimize"></i>
+                            </button>
                         </div>
+                    </aside>
+
+                    <div class="v360-loading" id="v360-loading">
+                        <div class="v360-loading__orbit">
+                            <div class="v360-loading__orbit-ring"></div>
+                            <div class="v360-loading__orbit-ring v360-loading__orbit-ring--reverse"></div>
+                            <div class="v360-loading__orbit-core">360°</div>
+                        </div>
+                        <div class="v360-loading__text">
+                            <h3 class="v360-loading__title">Virtual Tour 360°</h3>
+                            <p class="v360-loading__sub">Đang tải ảnh 360° ...</p>
+                        </div>
+                        <div class="v360-loading__bar">
+                            <div class="v360-loading__bar-fill"></div>
+                        </div>
+                        <button type="button" id="v360-loading-reload" class="v360-loading__reload" style="display:none;">
+                            <i class="fa fa-redo"></i> Tải lại
+                        </button>
                     </div>
 
-                    <iframe class="ku-embed" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="@Model.URL" width="100%" height="800px"></iframe>
+@if (ViewBag.AdminMode == true)
+{
+    @Html.AntiForgeryToken()
+                    <aside class="v360-admin">
+                        <div class="v360-admin__head">
+                            <h3><i class="fa fa-compass"></i> Cấu hình hướng</h3>
+                            <div class="v360-admin__stats">
+                                <b id="v360-admin-saved">0</b> đã lưu / <b id="v360-admin-total">@ViewBag.SceneGpsCount</b> điểm có GPS
+                            </div>
+                        </div>
+                        <div class="v360-admin__body">
+                            <!-- ============ PER-SCENE CARD ============ -->
+                            <div class="v360-admin__card v360-admin__card--scene">
+                                <div class="v360-admin__card-head">
+                                    <i class="fa fa-map-pin"></i>
+                                    <span>Điểm hiện tại</span>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Scene</label>
+                                    <div class="v360-admin__val" id="v360-admin-scene-name">— chưa chọn scene —</div>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>UUID</label>
+                                    <code class="v360-admin__uuid" id="v360-admin-scene-uuid">—</code>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Hướng nhìn Kuula (live)</label>
+                                    <div class="v360-admin__val"><b id="v360-admin-current-h">0</b>°</div>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Offset (độ) <span class="v360-admin__hint">Auto: <span id="v360-admin-auto-offset">—</span>°</span></label>
+                                    <div class="v360-admin__input-group">
+                                        <button type="button" data-delta="-10" class="v360-admin__btn">−10</button>
+                                        <button type="button" data-delta="-1" class="v360-admin__btn">−1</button>
+                                        <input type="number" id="v360-admin-offset" value="0" step="0.5" />
+                                        <button type="button" data-delta="1" class="v360-admin__btn">+1</button>
+                                        <button type="button" data-delta="10" class="v360-admin__btn">+10</button>
+                                    </div>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Title hover (override)</label>
+                                    <input type="text" id="v360-admin-title" placeholder="(trống = dùng Kuula default)" />
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label class="v360-admin__check">
+                                        <input type="checkbox" id="v360-admin-hidepin" />
+                                        <span>Ẩn điểm này khỏi map</span>
+                                    </label>
+                                    <div class="v360-admin__hint">Điểm ẩn vẫn hiện trong trang admin (mờ + viền đứt) để bật lại.</div>
+                                </div>
+                                <div class="v360-admin__actions">
+                                    <button type="button" id="v360-admin-save" class="v360-admin__primary"><i class="fa fa-save"></i> Lưu</button>
+                                    <button type="button" id="v360-admin-reset" class="v360-admin__secondary"><i class="fa fa-undo"></i> Reset</button>
+                                </div>
+                                <div class="v360-admin__msg" id="v360-admin-msg"></div>
+                            </div>
+
+                            <!-- ============ TOUR-GLOBAL CARD ============ -->
+                            <div class="v360-admin__card v360-admin__card--tour">
+                                <div class="v360-admin__card-head">
+                                    <i class="fa fa-globe-asia"></i>
+                                    <span>Toàn bộ tour</span>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Size điểm (px)</label>
+                                    <input type="number" id="v360-cfg-pinsize" min="6" max="32" step="1" />
+                                </div>
+                                <div class="v360-admin__row v360-admin__row--colors">
+                                    <div>
+                                        <label>Màu điểm thường</label>
+                                        <input type="color" id="v360-cfg-pincolor" />
+                                    </div>
+                                    <div>
+                                        <label>Màu điểm hiện tại</label>
+                                        <input type="color" id="v360-cfg-selcolor" />
+                                    </div>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Màu radar</label>
+                                    <input type="color" id="v360-cfg-conecolor" />
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Độ xoè radar: <span id="v360-cfg-fan-val">60</span>°</label>
+                                    <input type="range" id="v360-cfg-fan" min="20" max="160" step="5" />
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Bán kính radar: <span id="v360-cfg-radius-val">40</span>px</label>
+                                    <input type="range" id="v360-cfg-radius" min="15" max="100" step="1" />
+                                </div>
+                                <div class="v360-admin__actions">
+                                    <button type="button" id="v360-cfg-save" class="v360-admin__primary"><i class="fa fa-save"></i> Lưu</button>
+                                    <button type="button" id="v360-cfg-reset" class="v360-admin__secondary"><i class="fa fa-undo"></i> Reset</button>
+                                </div>
+                                <div class="v360-admin__msg" id="v360-cfg-msg"></div>
+                            </div>
+                        </div>
+                    </aside>
+}
+
+@if (ViewBag.FeaturedAdminMode == true)
+{
+    @Html.AntiForgeryToken()
+                    <aside class="v360-admin v360-admin--featured">
+                        <div class="v360-admin__head">
+                            <h3><i class="fa fa-star"></i> Khu vực tham quan</h3>
+                            <div class="v360-admin__stats">
+                                <b id="v360-feat-count">0</b> / <b id="v360-feat-total">0</b>
+                            </div>
+                        </div>
+                        <div class="v360-admin__body">
+                            <!-- ============ CURRENT SCENE CARD ============ -->
+                            <div class="v360-admin__card v360-feat-current">
+                                <div class="v360-feat-current__hdr">
+                                    <span class="v360-feat-current__pill" id="v360-feat-status-pill" data-state="none">Chưa thêm</span>
+                                </div>
+                                <div class="v360-feat-current__name" id="v360-feat-scene-name">— chưa chọn scene —</div>
+                                <code class="v360-feat-current__uuid" id="v360-feat-scene-uuid">—</code>
+
+                                <div class="v360-admin__row">
+                                    <label>Tên hiển thị</label>
+                                    <input type="text" id="v360-feat-title" placeholder="(trống = dùng tên Kuula)" />
+                                    <div class="v360-admin__hint">Dùng chung tên với tooltip trên minimap</div>
+                                </div>
+
+                                <div class="v360-admin__row">
+                                    <label>Ảnh hiển thị trên card</label>
+                                    <label class="v360-feat-img" id="v360-feat-img-preview" title="Bấm để đổi ảnh">
+                                        <div class="v360-feat-img__empty">
+                                            <i class="fa fa-image"></i>
+                                            <span>Bấm để chọn ảnh</span>
+                                        </div>
+                                        <div class="v360-feat-img__overlay">
+                                            <i class="fa fa-camera"></i> Đổi ảnh
+                                        </div>
+                                        <input type="file" id="v360-feat-img-input" accept="image/*" hidden />
+                                    </label>
+                                    <div class="v360-admin__hint" id="v360-feat-img-status"></div>
+                                </div>
+
+                                <button type="button" id="v360-feat-toggle" class="v360-admin__primary v360-feat-toggle">
+                                    <i class="fa fa-plus"></i><span id="v360-feat-toggle-text">Thêm vào danh sách</span>
+                                </button>
+                                <div class="v360-admin__msg" id="v360-feat-msg"></div>
+                            </div>
+
+                            <!-- ============ FEATURED LIST CARD ============ -->
+                            <div class="v360-admin__card">
+                                <div class="v360-admin__card-head">
+                                    <i class="fa fa-list-ol"></i>
+                                    <span>Thứ tự ở Intro</span>
+                                    <a href="@Url.Action("Intro", "ListVirtual", new { area = "View360", id = Model.ID })"
+                                       target="_blank" class="v360-feat-preview-link" title="Mở trang Intro">
+                                        <i class="fa fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                                <div class="v360-feat-list" id="v360-feat-list">
+                                    <div class="v360-feat-list__empty">Chưa có khu vực nào.<br/>Bấm "Thêm vào danh sách".</div>
+                                </div>
+                                <button type="button" id="v360-feat-save-all" class="v360-admin__primary">
+                                    <i class="fa fa-save"></i> Lưu thay đổi
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+}
+
+@if (ViewBag.ChatbotAdminMode == true)
+{
+    @Html.AntiForgeryToken()
+    var _ti = ViewBag.ChatbotTourInfo as EPORTAL.Common.ChatbotTourInfo
+              ?? new EPORTAL.Common.ChatbotTourInfo { IsEnabled = true };
+                    <aside class="v360-admin v360-admin--chatbot">
+                        <div class="v360-admin__head">
+                            <h3><i class="fa fa-robot"></i> Cấu hình Chatbot AI</h3>
+                            <div class="v360-admin__stats">
+                                <b id="v360-cb-count">@(ViewBag.ChatbotConfiguredCount ?? 0)</b> / <b id="v360-cb-total">@(ViewBag.SceneGpsCount ?? 0)</b> điểm đã cấu hình
+                            </div>
+                        </div>
+
+                        <div class="v360-cb-tabs">
+                            <button type="button" class="v360-cb-tab is-active" data-tab="tour"><i class="fa fa-globe-asia"></i> Tổng quan tour</button>
+                            <button type="button" class="v360-cb-tab" data-tab="scene"><i class="fa fa-map-pin"></i> Scene hiện tại</button>
+                        </div>
+
+                        <div class="v360-admin__body">
+                            <!-- ===== TAB: tour overview ===== -->
+                            <div class="v360-cb-pane is-active" data-pane="tour">
+                                <div class="v360-admin__row">
+                                    <label class="v360-admin__check">
+                                        <input type="checkbox" id="v360-cb-enabled" @(_ti.IsEnabled ? "checked" : "") />
+                                        <span>Bật chatbot cho tour này</span>
+                                    </label>
+                                    <div class="v360-admin__hint">Tắt = chatbot KHÔNG hiển thị khi user xem tour</div>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Giới thiệu tổng quan
+                                        <span class="v360-admin__hint" style="display:inline">(KLH HPDQ, lịch sử, quy mô, các phân khu chính...)</span>
+                                    </label>
+                                    <textarea id="v360-cb-overview" rows="8"
+                                              placeholder="Vd: Khu liên hợp HPDQ được thành lập năm... có diện tích... gồm các phân khu A/B/C...">@(_ti.Overview ?? "")</textarea>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <details>
+                                        <summary>Chỉ dẫn nâng cao cho AI (tuỳ chọn)</summary>
+                                        <textarea id="v360-cb-prompt" rows="4"
+                                                  placeholder="Hướng dẫn riêng cho AI: phong cách, từ ngữ cấm...">@(_ti.SystemPrompt ?? "")</textarea>
+                                    </details>
+                                </div>
+                                <div class="v360-admin__actions">
+                                    <button type="button" id="v360-cb-tour-save" class="v360-admin__primary"><i class="fa fa-save"></i> Lưu tour</button>
+                                </div>
+                                <div class="v360-admin__msg" id="v360-cb-tour-msg"></div>
+                            </div>
+
+                            <!-- ===== TAB: scene ===== -->
+                            <div class="v360-cb-pane" data-pane="scene">
+                                <div class="v360-admin__card">
+                                    <div class="v360-admin__row">
+                                        <label>Scene đang chọn</label>
+                                        <div class="v360-admin__val" id="v360-cb-scene-name">— chưa chọn scene —</div>
+                                    </div>
+                                    <div class="v360-admin__row">
+                                        <label>UUID</label>
+                                        <code class="v360-admin__uuid" id="v360-cb-scene-uuid">—</code>
+                                    </div>
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Tên điểm
+                                        <span class="v360-admin__hint" style="display:inline">(dùng cho hover minimap + AI navigate)</span>
+                                    </label>
+                                    <input type="text" id="v360-cb-title" maxlength="500"
+                                           placeholder="Vd: Cảng Hòa Phát Dung Quất" disabled />
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Giới thiệu ngắn (1-2 câu)</label>
+                                    <input type="text" id="v360-cb-short" maxlength="500"
+                                           placeholder="Vd: Khu vực sản xuất chính, vận hành từ 2020..." disabled />
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label>Nội dung chi tiết
+                                        <span class="v360-admin__hint" style="display:inline">(AI dùng để trả lời câu hỏi sâu)</span>
+                                    </label>
+                                    <textarea id="v360-cb-detail" rows="10"
+                                              placeholder="Vd: Khu A có diện tích 5,000m². Công suất 1000 tấn/tháng. Lắp đặt năm 2020..." disabled></textarea>
+                                </div>
+                                <div class="v360-admin__actions">
+                                    <button type="button" id="v360-cb-scene-save" class="v360-admin__primary" disabled><i class="fa fa-save"></i> Lưu scene</button>
+                                    <button type="button" id="v360-cb-scene-clear" class="v360-admin__secondary" disabled><i class="fa fa-trash"></i> Xoá</button>
+                                </div>
+                                <div class="v360-admin__msg" id="v360-cb-scene-msg"></div>
+                            </div>
+                        </div>
+                    </aside>
+}
+
                 </div>
 
-
-
-            </div>
-        </div>
-    </div>
-    <div class="app-wrapper-footer">
-        <div class="app-footer">
-            <div class="app-footer__inner">
-                <div class="footer_content d-flex justify-content-between">
-                    <div class="footer_item">
-                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
-                    </div>
-                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
-                        <ul class="d-flex justify-content-center">
-
-                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
-                    <div class="footer_item_copy d-flex">
-                        <span class="copyright">Copyright</span>
-                        <ul class="copyright_ul">
-                            <li>Ban công nghệ thông tin</li>
-                            <li>Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+(function () {
+    // ====== SCENE_GPS: postId -> [lat, lng] tu Kuula share page (server-side fetch, cached 24h) ======
+    // Khong can calibrate - data tu window.KUULA_COLLECTION.data trong HTML cua kuula.co
+    // Backend: EPORTAL.Common.KuulaCollectionFetcher
+    var SCENE_GPS = @Html.Raw(ViewBag.SceneGpsJson ?? "{}");
+    console.log('[v360] SCENE_GPS loaded from server: ' + Object.keys(SCENE_GPS).length + ' scenes có GPS');
+
+    // Shift+click vao Leaflet van work nhu calibration override (neu Kuula data sai).
+
+    // KLH HPDQ bounds (lay tu Google Maps API trong iframe Kuula)
+    var MAP_BOUNDS_SW = [15.239008, 108.609660];
+    var MAP_BOUNDS_NE = [15.530438, 108.976299];
+    var MAP_CENTER    = [(MAP_BOUNDS_SW[0] + MAP_BOUNDS_NE[0]) / 2,
+                         (MAP_BOUNDS_SW[1] + MAP_BOUNDS_NE[1]) / 2];
+
+    // Hieu chinh huong cua cone (Kuula heading != huong bac thuc te)
+    // HEADING_INVERT=false: pan-trai (Kuula heading giam) => cone xoay counter-clockwise (trai) - dung sense.
+    var HEADING_OFFSET = 0;
+    var HEADING_INVERT = false;
+
+    // Per-scene calibration:
+    //   - SCENE_HEADING_OFFSET[postId] = offset deg
+    //   - SCENE_HEADING_INVERT[postId] = bool dao chieu xoay
+    // Auto-calibrated server-side tu hotspot bearings (KuulaCollectionFetcher) khi co du data;
+    // manual override: nut flip header + Alt+wheel.
+    var SCENE_HEADING_OFFSET = @Html.Raw(ViewBag.SceneHeadingOffsetJson ?? "{}");
+    var SCENE_CALIB_DIAG     = @Html.Raw(ViewBag.SceneCalibDiagJson ?? "{}");
+    // Admin mode: data DB-saved (uuid -> { Offset, Invert, HideCone }) + collection id
+    var ADMIN_MODE      = @(((bool?)ViewBag.AdminMode == true) ? "true" : "false");
+    var FEATURED_ADMIN_MODE = @(((bool?)ViewBag.FeaturedAdminMode == true) ? "true" : "false");
+    var CHATBOT_ADMIN_MODE = @(((bool?)ViewBag.ChatbotAdminMode == true) ? "true" : "false");
+    var CHATBOT_SCENE_INFO = @Html.Raw(ViewBag.ChatbotSceneInfoJson ?? "{}");
+    var COLLECTION_ID   = '@(ViewBag.CollectionId ?? "")';
+    var SCENE_DB_CALIB  = @Html.Raw(ViewBag.SceneDbCalibJson ?? "{}");
+    var SCENE_HIDE_PIN  = @Html.Raw(ViewBag.SceneHidePinJson ?? "{}");
+    var SCENE_CUSTOM_TITLE = @Html.Raw(ViewBag.SceneCustomTitleJson ?? "{}");
+    var TOUR_CONFIG     = @Html.Raw(ViewBag.TourConfigJson ?? "{}");
+    var FEATURED_LIST   = @Html.Raw(ViewBag.FeaturedListJson ?? "[]");
+    var APP_ROOT        = '@Url.Content("~/")';
+    // Pending scene uuid de jump sau khi iframe ban 'frameloaded' (tu ?scene=<uuid> trong URL,
+    // thuong la Intro card click). One-shot - clear sau khi dispatch.
+    // PENDING_GO_SCENE giu nguyen tu URL. JS deep-link code se check "alreadyThere":
+    //   - Iframe da load dung scene (server resolve shortId thanh cong) -> no-op
+    //   - Iframe load default scene (server khong resolve duoc) -> fallback postMessage switch
+    var PENDING_GO_SCENE = @Html.Raw(EPORTAL.Common.JsonForHtml.Serialize(ViewBag.SceneHash ?? ""));
+
+    // Apply tour visual config (CSS vars) - mau, kich thuoc pin/cone
+    function hexToRgba(hex, alpha) {
+        if (!hex) return null;
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+        var r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+        return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    }
+    function applyTourConfig(cfg) {
+        var root = document.documentElement;
+        if (!cfg) cfg = {};
+        if (cfg.PinSize) root.style.setProperty('--v360-pin-size', cfg.PinSize + 'px');
+        if (cfg.PinColor) root.style.setProperty('--v360-pin-color', cfg.PinColor);
+        if (cfg.SelectedColor) root.style.setProperty('--v360-selected-color', cfg.SelectedColor);
+        if (cfg.ConeColor) {
+            root.style.setProperty('--v360-cone-color', cfg.ConeColor);
+            root.style.setProperty('--v360-cone-gradient',
+                'linear-gradient(to bottom, ' + hexToRgba(cfg.ConeColor, 0.85) + ' 0%, '
+                + hexToRgba(cfg.ConeColor, 0.05) + ' 100%)');
+            root.style.setProperty('--v360-cone-shadow', hexToRgba(cfg.ConeColor, 0.55));
+        }
+        // Cone geometry: width = 2*radius*tan(fanDeg/2), height = radius
+        var fan = cfg.ConeFanDeg || 60, r = cfg.ConeRadius || 40;
+        var w = 2 * r * Math.tan(fan * Math.PI / 360);
+        root.style.setProperty('--v360-cone-w', w + 'px');
+        root.style.setProperty('--v360-cone-h', r + 'px');
+        root.style.setProperty('--v360-cone-half-w', (-w/2) + 'px');
+    }
+    applyTourConfig(TOUR_CONFIG);
+    console.log('[v360] AUTO calibration: '
+        + Object.keys(SCENE_HEADING_OFFSET).length + ' offsets loaded (tu DB + auto)');
+
+    // Diagnostic helper - go vao console de dump samples cua scene hien tai
+    window.v360Diag = function (postKey) {
+        var id = postKey || currentPostKey;
+        if (!id) { console.warn('[v360] Chua co scene de diag'); return; }
+        var diag = SCENE_CALIB_DIAG[id];
+        if (!diag) {
+            console.log('[v360] DIAG ' + id + ': KHONG co data (0 hotspot voi GPS) - dung default global');
+            return;
+        }
+        console.log('[v360] DIAG ' + id + ':\n'
+            + '  samples = ' + diag.SampleCount + '\n'
+            + '  sense   = ' + diag.Sense + (diag.Sense === -1 ? ' (INVERTED)' : ' (normal)') + '\n'
+            + '  offset  = ' + diag.Offset + '°\n'
+            + '  current_offset=' + (id in SCENE_HEADING_OFFSET ? SCENE_HEADING_OFFSET[id] : '(default)') + '\n'
+            + '  lastHeading=' + lastHeading.toFixed(1) + ', currentDeg=' + currentDeg.toFixed(1));
+        console.table(diag.Samples.map(function (s, i) {
+            // expected_bearing tu cone: sense * yaw + c (where c = offset + 180)
+            var c = diag.Offset + 180;
+            var predicted = ((diag.Sense * s.Yaw + c) % 360 + 360) % 360;
+            return {
+                idx: i,
+                target: s.TargetId,
+                yaw_kuula: s.Yaw,
+                bearing_real: s.Bearing,
+                predicted_by_fit: Math.round(predicted * 10) / 10,
+                residual: Math.round(shortestDelta(s.Bearing, predicted) * 10) / 10
+            };
+        }));
+    };
+    console.log('[v360] DIAGNOSTIC: go `v360Diag()` trong console de xem samples + residual cua scene hien tai');
+
+    // ============================================================
+    //  ADMIN PANEL - cau hinh offset/invert/hideCone, save vao DB
+    // ============================================================
+    if (ADMIN_MODE) {
+        var aSceneName  = document.getElementById('v360-admin-scene-name');
+        var aSceneUuid  = document.getElementById('v360-admin-scene-uuid');
+        var aOffset     = document.getElementById('v360-admin-offset');
+        var aHidePin    = document.getElementById('v360-admin-hidepin');
+        var aTitle      = document.getElementById('v360-admin-title');
+        var aAuto       = document.getElementById('v360-admin-auto-offset');
+        var aSaved      = document.getElementById('v360-admin-saved');
+        var aMsg        = document.getElementById('v360-admin-msg');
+        var aBtnSave    = document.getElementById('v360-admin-save');
+        var aBtnReset   = document.getElementById('v360-admin-reset');
+        var aDeltaBtns  = document.querySelectorAll('[data-delta]');
+        var autoOffsetCache = {};
+        for (var k in SCENE_HEADING_OFFSET) autoOffsetCache[k] = SCENE_HEADING_OFFSET[k];
+
+        function adminUpdateSavedCount() {
+            aSaved.textContent = Object.keys(SCENE_DB_CALIB).length;
+        }
+        adminUpdateSavedCount();
+
+        function adminSetMsg(text, color) {
+            aMsg.textContent = text || '';
+            aMsg.style.color = color || '';
+            if (text) setTimeout(function () { aMsg.textContent = ''; }, 3000);
+        }
+
+        window.__adminOnSceneChange = function () {
+            if (!currentPostKey) return;
+            // Get post object de show title goc
+            var post = null;
+            for (var i = 0; i < allPosts.length; i++) {
+                if (postKey(allPosts[i]) === currentPostKey) { post = allPosts[i]; break; }
+            }
+            aSceneName.textContent = (post && post.title) || '(no title)';
+            aSceneUuid.textContent = currentPostKey;
+            var curOffset = (currentPostKey in SCENE_HEADING_OFFSET) ? SCENE_HEADING_OFFSET[currentPostKey] : 0;
+            aOffset.value = curOffset.toFixed(1);
+            aHidePin.checked = !!SCENE_HIDE_PIN[currentPostKey];
+            aTitle.value     = SCENE_CUSTOM_TITLE[currentPostKey] || '';
+            aAuto.textContent = (autoOffsetCache[currentPostKey] !== undefined)
+                ? autoOffsetCache[currentPostKey].toFixed(1) : '—';
+        };
+
+        function adminApplyAndRedraw() {
+            var off = parseFloat(aOffset.value);
+            if (!isFinite(off)) off = 0;
+            SCENE_HEADING_OFFSET[currentPostKey] = off;
+            if (aHidePin.checked) SCENE_HIDE_PIN[currentPostKey] = true;
+            else delete SCENE_HIDE_PIN[currentPostKey];
+            if (aTitle.value.trim()) SCENE_CUSTOM_TITLE[currentPostKey] = aTitle.value.trim();
+            else delete SCENE_CUSTOM_TITLE[currentPostKey];
+            moveCurrentMarker(currentPostKey);
+            renderScenePins();
+        }
+
+        aDeltaBtns.forEach(function (b) {
+            b.addEventListener('click', function () {
+                var d = parseFloat(b.getAttribute('data-delta')) || 0;
+                aOffset.value = (parseFloat(aOffset.value) + d).toFixed(1);
+                adminApplyAndRedraw();
+            });
+        });
+        aOffset.addEventListener('input', adminApplyAndRedraw);
+        aHidePin.addEventListener('change', adminApplyAndRedraw);
+        aTitle.addEventListener('input', adminApplyAndRedraw);
+
+        function adminPost(url, payload, onOk, msgEl) {
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            var fd = new FormData();
+            for (var k in payload) {
+                if (payload[k] !== null && payload[k] !== undefined) fd.append(k, payload[k]);
+            }
+            if (token) fd.append('__RequestVerificationToken', token.value);
+            return fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' })
+                .then(function (r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function (j) {
+                    var target = msgEl || aMsg;
+                    if (j && j.ok) { onOk && onOk(); }
+                    else {
+                        target.style.color = '#ff8888';
+                        target.textContent = 'Lỗi lưu: ' + ((j && j.error) || 'unknown');
+                        console.error('[v360] Save failed:', j);
+                    }
+                })
+                .catch(function (e) {
+                    var target = msgEl || aMsg;
+                    target.style.color = '#ff8888';
+                    target.textContent = 'Network/Server error: ' + e.message;
+                    console.error('[v360] Save network err:', e);
+                });
+        }
+
+        aBtnSave.addEventListener('click', function () {
+            if (!currentPostKey) { adminSetMsg('Chưa chọn scene', '#ffaa55'); return; }
+            var off = parseFloat(aOffset.value); if (!isFinite(off)) off = 0;
+            var ct = aTitle.value.trim();
+            adminPost('@Url.Action("SaveCalibration", "ListVirtual", new { area = "View360" })', {
+                collectionId: COLLECTION_ID,
+                uuid: currentPostKey,
+                offset: off,
+                hidePin: aHidePin.checked,
+                customTitle: ct
+            }, function () {
+                SCENE_DB_CALIB[currentPostKey] = {
+                    Offset: off, HidePin: aHidePin.checked, CustomTitle: ct
+                };
+                adminUpdateSavedCount();
+                adminSetMsg('Đã lưu ✓', '#5fdc7c');
+            });
+        });
+
+        aBtnReset.addEventListener('click', function () {
+            if (!currentPostKey) return;
+            adminPost('@Url.Action("SaveCalibration", "ListVirtual", new { area = "View360" })', {
+                collectionId: COLLECTION_ID, uuid: currentPostKey,
+                offset: '', hidePin: false, customTitle: ''
+            }, function () {
+                delete SCENE_DB_CALIB[currentPostKey];
+                if (autoOffsetCache[currentPostKey] !== undefined) {
+                    SCENE_HEADING_OFFSET[currentPostKey] = autoOffsetCache[currentPostKey];
+                } else { delete SCENE_HEADING_OFFSET[currentPostKey]; }
+                delete SCENE_HIDE_PIN[currentPostKey];
+                delete SCENE_CUSTOM_TITLE[currentPostKey];
+                moveCurrentMarker(currentPostKey);
+                renderScenePins();
+                window.__adminOnSceneChange();
+                adminUpdateSavedCount();
+                adminSetMsg('Đã reset về auto', '#5fdc7c');
+            });
+        });
+
+        // === Global tour config (visual) ===
+        var cfgPinSize   = document.getElementById('v360-cfg-pinsize');
+        var cfgPinColor  = document.getElementById('v360-cfg-pincolor');
+        var cfgSelColor  = document.getElementById('v360-cfg-selcolor');
+        var cfgConeColor = document.getElementById('v360-cfg-conecolor');
+        var cfgFan       = document.getElementById('v360-cfg-fan');
+        var cfgFanVal    = document.getElementById('v360-cfg-fan-val');
+        var cfgRadius    = document.getElementById('v360-cfg-radius');
+        var cfgRadiusVal = document.getElementById('v360-cfg-radius-val');
+        var cfgBtnSave   = document.getElementById('v360-cfg-save');
+        var cfgBtnReset  = document.getElementById('v360-cfg-reset');
+        var cfgMsg       = document.getElementById('v360-cfg-msg');
+        var CFG_DEFAULTS = { PinSize: 11, PinColor: '#f5b400', SelectedColor: '#2cc1e8',
+            ConeColor: '#2cc1e8', ConeFanDeg: 60, ConeRadius: 40 };
+
+        function cfgPopulate(c) {
+            c = c || {};
+            cfgPinSize.value   = c.PinSize       || CFG_DEFAULTS.PinSize;
+            cfgPinColor.value  = c.PinColor      || CFG_DEFAULTS.PinColor;
+            cfgSelColor.value  = c.SelectedColor || CFG_DEFAULTS.SelectedColor;
+            cfgConeColor.value = c.ConeColor     || CFG_DEFAULTS.ConeColor;
+            cfgFan.value       = c.ConeFanDeg    || CFG_DEFAULTS.ConeFanDeg;
+            cfgRadius.value    = c.ConeRadius    || CFG_DEFAULTS.ConeRadius;
+            cfgFanVal.textContent    = cfgFan.value;
+            cfgRadiusVal.textContent = cfgRadius.value;
+        }
+        cfgPopulate(TOUR_CONFIG);
+
+        function cfgCurrent() {
+            return {
+                PinSize: parseInt(cfgPinSize.value, 10) || CFG_DEFAULTS.PinSize,
+                PinColor: cfgPinColor.value,
+                SelectedColor: cfgSelColor.value,
+                ConeColor: cfgConeColor.value,
+                ConeFanDeg: parseFloat(cfgFan.value),
+                ConeRadius: parseInt(cfgRadius.value, 10)
+            };
+        }
+        function cfgApplyLive() {
+            cfgFanVal.textContent = cfgFan.value;
+            cfgRadiusVal.textContent = cfgRadius.value;
+            var c = cfgCurrent();
+            TOUR_CONFIG = c;
+            applyTourConfig(c);
+            renderScenePins();   // pin size co the doi
+            if (currentPostKey) moveCurrentMarker(currentPostKey);
+        }
+        [cfgPinSize, cfgPinColor, cfgSelColor, cfgConeColor, cfgFan, cfgRadius].forEach(function (el) {
+            el.addEventListener('input', cfgApplyLive);
+        });
+        cfgBtnSave.addEventListener('click', function () {
+            var c = cfgCurrent();
+            adminPost('@Url.Action("SaveTourConfig", "ListVirtual", new { area = "View360" })', {
+                collectionId: COLLECTION_ID,
+                pinSize: c.PinSize, pinColor: c.PinColor, selectedColor: c.SelectedColor,
+                coneColor: c.ConeColor, coneFanDeg: c.ConeFanDeg, coneRadius: c.ConeRadius
+            }, function () { cfgMsg.style.color = '#5fdc7c'; cfgMsg.textContent = 'Đã lưu ✓'; setTimeout(function() { cfgMsg.textContent = ''; }, 2500); }, cfgMsg);
+        });
+        cfgBtnReset.addEventListener('click', function () {
+            adminPost('@Url.Action("SaveTourConfig", "ListVirtual", new { area = "View360" })', {
+                collectionId: COLLECTION_ID,
+                pinSize: '', pinColor: '', selectedColor: '',
+                coneColor: '', coneFanDeg: '', coneRadius: ''
+            }, function () {
+                TOUR_CONFIG = {};
+                cfgPopulate({});
+                applyTourConfig({});
+                renderScenePins();
+                if (currentPostKey) moveCurrentMarker(currentPostKey);
+                cfgMsg.style.color = '#5fdc7c'; cfgMsg.textContent = 'Đã reset';
+                setTimeout(function() { cfgMsg.textContent = ''; }, 2500);
+            }, cfgMsg);
+        });
+
+        console.log('[v360] ADMIN MODE ON - panel cau hinh hien thi');
+    }
+
+    // ============================================================
+    //  FEATURED ADMIN PANEL - cau hinh khu vuc tham quan chinh
+    // ============================================================
+    if (FEATURED_ADMIN_MODE) {
+        var fSceneName  = document.getElementById('v360-feat-scene-name');
+        var fSceneUuid  = document.getElementById('v360-feat-scene-uuid');
+        var fTitle      = document.getElementById('v360-feat-title');
+        var fImgInput   = document.getElementById('v360-feat-img-input');
+        var fImgPrev    = document.getElementById('v360-feat-img-preview');
+        var fImgStat    = document.getElementById('v360-feat-img-status');
+        var fToggle     = document.getElementById('v360-feat-toggle');
+        var fToggleText = document.getElementById('v360-feat-toggle-text');
+        var fStatusPill = document.getElementById('v360-feat-status-pill');
+        var fMsg        = document.getElementById('v360-feat-msg');
+        var fListEl     = document.getElementById('v360-feat-list');
+        var fCount      = document.getElementById('v360-feat-count');
+        var fTotal      = document.getElementById('v360-feat-total');
+        var fBtnSave    = document.getElementById('v360-feat-save-all');
+
+        // State: copy cua server-side featured list. Tat ca thao tac modify state, save commit toan bo.
+        var featState = (FEATURED_LIST || []).map(function (f) {
+            return {
+                SceneUuid: f.SceneUuid,
+                ImagePath: f.ImagePath || ''
+            };
+        });
+
+        function resolveImg(p) {
+            if (!p) return '';
+            return p.replace(/^~\//, APP_ROOT);
+        }
+        function setMsg(text, color) {
+            fMsg.textContent = text || '';
+            fMsg.style.color = color || '';
+            if (text) setTimeout(function () { fMsg.textContent = ''; }, 3000);
+        }
+        function findIdx(uuid) {
+            for (var i = 0; i < featState.length; i++)
+                if (featState[i].SceneUuid === uuid) return i;
+            return -1;
+        }
+        function getSceneTitle(uuid) {
+            // Reuse calibration title resolver - priority: DB CustomTitle -> Kuula post.title
+            if (uuid in SCENE_CUSTOM_TITLE && SCENE_CUSTOM_TITLE[uuid]) return SCENE_CUSTOM_TITLE[uuid];
+            // Kuula scene metadata not directly available here - fall back to "Khu vuc"
+            // (calibration store always has titles for featured scenes since admin sets them)
+            return '';
+        }
+
+        function escHtml(s) { return String(s || '').replace(/[<>&"]/g, function (c) {
+            return { '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;' }[c];
+        }); }
+        function renderList() {
+            fCount.textContent = featState.length;
+            if (fTotal) fTotal.textContent = Object.keys(SCENE_GPS).length;
+            if (featState.length === 0) {
+                fListEl.innerHTML = '<div class="v360-feat-list__empty">Chưa có khu vực nào.<br/>Bấm "Thêm vào danh sách".</div>';
+                return;
+            }
+            var html = '';
+            featState.forEach(function (it, idx) {
+                var title = getSceneTitle(it.SceneUuid) || '(chưa có tên)';
+                var img = resolveImg(it.ImagePath);
+                var isCurrent = (currentPostKey === it.SceneUuid);
+                html +=
+                    '<div class="v360-feat-list__item' + (isCurrent ? ' is-current' : '') + '" data-idx="' + idx + '" title="' + escHtml(it.SceneUuid) + '">' +
+                        '<div class="v360-feat-list__num">' + String(idx + 1).padStart(2, '0') + '</div>' +
+                        '<div class="v360-feat-list__thumb">' +
+                            (img ? '<img src="' + img + '" alt="" />' : '<i class="fa fa-image"></i>') +
+                        '</div>' +
+                        '<div class="v360-feat-list__title">' + escHtml(title) + '</div>' +
+                        '<div class="v360-feat-list__ctrl">' +
+                            '<button type="button" data-act="up"   title="Lên" ' + (idx === 0 ? 'disabled' : '') + '><i class="fa fa-chevron-up"></i></button>' +
+                            '<button type="button" data-act="down" title="Xuống" ' + (idx === featState.length - 1 ? 'disabled' : '') + '><i class="fa fa-chevron-down"></i></button>' +
+                            '<button type="button" data-act="del"  title="Xóa khỏi danh sách"><i class="fa fa-times"></i></button>' +
+                        '</div>' +
+                    '</div>';
+            });
+            fListEl.innerHTML = html;
+        }
+
+        function setImgPreview(imgUrl) {
+            // Lay div empty + overlay co san; chi inject/remove <img> de tranh re-render layout
+            var existingImg = fImgPrev.querySelector('img.v360-feat-img__photo');
+            if (imgUrl) {
+                if (existingImg) {
+                    existingImg.src = imgUrl;
+                } else {
+                    var img = document.createElement('img');
+                    img.className = 'v360-feat-img__photo';
+                    img.alt = '';
+                    img.src = imgUrl;
+                    fImgPrev.insertBefore(img, fImgPrev.firstChild);
+                }
+                fImgPrev.classList.add('has-image');
+            } else {
+                if (existingImg) existingImg.remove();
+                fImgPrev.classList.remove('has-image');
+            }
+        }
+        function refreshCurrentScenePanel() {
+            if (!currentPostKey) {
+                fSceneName.textContent = '— chưa chọn scene —';
+                fSceneUuid.textContent = '—';
+                fTitle.value = '';
+                setImgPreview('');
+                fImgStat.textContent = '';
+                fToggle.disabled = true;
+                fStatusPill.textContent = 'Chưa chọn';
+                fStatusPill.setAttribute('data-state', 'none');
+                fToggleText.textContent = 'Thêm vào danh sách';
+                fToggle.classList.remove('v360-admin__danger');
+                fToggle.classList.add('v360-admin__primary');
+                return;
+            }
+            fToggle.disabled = false;
+            fSceneUuid.textContent = currentPostKey;
+            fTitle.value = SCENE_CUSTOM_TITLE[currentPostKey] || '';
+            var displayName = SCENE_CUSTOM_TITLE[currentPostKey] || '(chưa đặt tên)';
+            fSceneName.textContent = displayName;
+
+            var idx = findIdx(currentPostKey);
+            if (idx >= 0) {
+                fStatusPill.textContent = 'Đã thêm';
+                fStatusPill.setAttribute('data-state', 'added');
+                fToggleText.textContent = 'Xóa khỏi danh sách';
+                fToggle.querySelector('i').className = 'fa fa-times';
+                fToggle.classList.remove('v360-admin__primary');
+                fToggle.classList.add('v360-admin__danger');
+                var img = resolveImg(featState[idx].ImagePath);
+                setImgPreview(img);
+                fImgStat.textContent = featState[idx].ImagePath ? 'Đã có ảnh — bấm để đổi' : 'Bấm vào khung trên để chọn ảnh';
+                fImgPrev.style.pointerEvents = '';
+                fImgPrev.style.opacity = '';
+            } else {
+                fStatusPill.textContent = 'Chưa thêm';
+                fStatusPill.setAttribute('data-state', 'none');
+                fToggleText.textContent = 'Thêm vào danh sách';
+                fToggle.querySelector('i').className = 'fa fa-plus';
+                fToggle.classList.add('v360-admin__primary');
+                fToggle.classList.remove('v360-admin__danger');
+                setImgPreview('');
+                fImgStat.textContent = 'Thêm điểm vào danh sách trước, sau đó upload ảnh';
+                fImgPrev.style.pointerEvents = 'none';
+                fImgPrev.style.opacity = '0.5';
+            }
+            renderList();
+        }
+        window.__featOnSceneChange = refreshCurrentScenePanel;
+
+        // Toggle add/remove
+        fToggle.addEventListener('click', function () {
+            if (!currentPostKey) return;
+            var idx = findIdx(currentPostKey);
+            if (idx >= 0) { featState.splice(idx, 1); }
+            else          { featState.push({ SceneUuid: currentPostKey, ImagePath: '' }); }
+            refreshCurrentScenePanel();
+        });
+
+        // Title input -> save to V360_SceneCalibration.CustomTitle (single source of truth)
+        var titleSaveTimer = null;
+        fTitle.addEventListener('input', function () {
+            if (!currentPostKey) return;
+            var newTitle = fTitle.value;
+            if (titleSaveTimer) clearTimeout(titleSaveTimer);
+            titleSaveTimer = setTimeout(function () {
+                var fd = new FormData();
+                fd.append('collectionId', COLLECTION_ID);
+                fd.append('uuid', currentPostKey);
+                fd.append('customTitle', newTitle);
+                // Preserve existing calibration values - offset + hidePin
+                var existing = SCENE_DB_CALIB[currentPostKey] || {};
+                if (existing.Offset != null) fd.append('offset', existing.Offset);
+                fd.append('hidePin', existing.HidePin ? 'true' : 'false');
+                fd.append('__RequestVerificationToken', document.querySelector('input[name=__RequestVerificationToken]').value);
+                fetch('@Url.Action("SaveCalibration", "ListVirtual", new { area = "View360" })',
+                      { method: 'POST', body: fd, credentials: 'same-origin' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (j) {
+                        if (j.ok) {
+                            SCENE_CUSTOM_TITLE[currentPostKey] = newTitle || '';
+                            if (newTitle) { SCENE_DB_CALIB[currentPostKey] = SCENE_DB_CALIB[currentPostKey] || {}; SCENE_DB_CALIB[currentPostKey].CustomTitle = newTitle; }
+                            fSceneName.textContent = newTitle || '(chưa có tên — dùng Kuula default)';
+                            renderList();
+                            // Cap nhat tooltip pin tren minimap
+                            if (typeof window.__refreshPinTooltip === 'function')
+                                window.__refreshPinTooltip(currentPostKey);
+                            setMsg('Đã lưu tên', '#5fdc7c');
+                        } else {
+                            setMsg('Lưu tên lỗi: ' + (j.error || ''), '#ff8a80');
+                        }
+                    })
+                    .catch(function (e) { setMsg('Lỗi: ' + e.message, '#ff8a80'); });
+            }, 600);
+        });
+
+        // Image upload
+        fImgInput.addEventListener('change', function () {
+            if (!currentPostKey) return;
+            var idx = findIdx(currentPostKey);
+            if (idx < 0) { setMsg('Thêm vào danh sách trước khi upload ảnh', '#ff8a80'); fImgInput.value = ''; return; }
+            var file = fImgInput.files && fImgInput.files[0];
+            if (!file) return;
+            fImgStat.textContent = 'Đang upload...';
+            var fd = new FormData();
+            fd.append('collectionId', COLLECTION_ID);
+            fd.append('sceneUuid', currentPostKey);
+            fd.append('file', file);
+            fd.append('__RequestVerificationToken', document.querySelector('input[name=__RequestVerificationToken]').value);
+            fetch('@Url.Action("UploadFeaturedImage", "ListVirtual", new { area = "View360" })',
+                  { method: 'POST', body: fd, credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    if (j.ok) {
+                        featState[idx].ImagePath = j.path;
+                        setImgPreview(j.url);
+                        fImgStat.textContent = 'Đã upload — nhớ bấm "Lưu thay đổi" bên dưới';
+                        renderList();
+                    } else {
+                        fImgStat.textContent = 'Upload lỗi: ' + (j.error || '');
+                    }
+                    fImgInput.value = '';
+                })
+                .catch(function (e) { fImgStat.textContent = 'Lỗi: ' + e.message; fImgInput.value = ''; });
+        });
+
+        // List actions (delegate)
+        fListEl.addEventListener('click', function (e) {
+            var item = e.target.closest('.v360-feat-list__item');
+            if (!item) return;
+            var idx = parseInt(item.dataset.idx, 10);
+            var act = e.target.closest('button[data-act]');
+            if (act) {
+                var a = act.dataset.act;
+                if (a === 'del') { featState.splice(idx, 1); refreshCurrentScenePanel(); }
+                else if (a === 'up' && idx > 0) { var t = featState[idx-1]; featState[idx-1] = featState[idx]; featState[idx] = t; refreshCurrentScenePanel(); }
+                else if (a === 'down' && idx < featState.length - 1) { var t2 = featState[idx+1]; featState[idx+1] = featState[idx]; featState[idx] = t2; refreshCurrentScenePanel(); }
+                return;
+            }
+            // Click vao item body (khong phai button) -> jump iframe sang scene do.
+            // Reverse lookup: tim post.id co idToUuid[postId] === uuid.
+            var uuid = featState[idx] && featState[idx].SceneUuid;
+            if (!uuid) return;
+            var target = String(uuid).toLowerCase();
+            var targetId = null;
+            for (var pid in idToUuid) {
+                if (String(idToUuid[pid] || '').toLowerCase() === target) { targetId = pid; break; }
+            }
+            if (!targetId) {
+                for (var pid2 in idToUuid) {
+                    if (String(pid2).toLowerCase() === target) { targetId = pid2; break; }
+                }
+            }
+            if (targetId && typeof kuulaSend === 'function') {
+                kuulaSend('load', { id: targetId });
+            } else {
+                console.warn('[feat] scene uuid ' + uuid + ' khong match post nao trong iframe');
+            }
+        });
+
+        // Save all
+        fBtnSave.addEventListener('click', function () {
+            fBtnSave.disabled = true;
+            fBtnSave.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang lưu...';
+            var payload = featState.map(function (f) {
+                return { SceneUuid: f.SceneUuid, ImagePath: f.ImagePath || '', CustomTitle: '' };
+            });
+            var fd = new FormData();
+            fd.append('collectionId', COLLECTION_ID);
+            fd.append('itemsJson', JSON.stringify(payload));
+            fd.append('__RequestVerificationToken', document.querySelector('input[name=__RequestVerificationToken]').value);
+            fetch('@Url.Action("SaveFeatured", "ListVirtual", new { area = "View360" })',
+                  { method: 'POST', body: fd, credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    fBtnSave.disabled = false;
+                    fBtnSave.innerHTML = '<i class="fa fa-save"></i> Lưu toàn bộ';
+                    if (j.ok) setMsg('Đã lưu ' + j.count + ' khu vực', '#5fdc7c');
+                    else setMsg('Lưu lỗi: ' + (j.error || ''), '#ff8a80');
+                })
+                .catch(function (e) {
+                    fBtnSave.disabled = false;
+                    fBtnSave.innerHTML = '<i class="fa fa-save"></i> Lưu toàn bộ';
+                    setMsg('Lỗi: ' + e.message, '#ff8a80');
+                });
+        });
+
+        renderList();
+        console.log('[v360] FEATURED ADMIN MODE ON - ' + featState.length + ' khu vuc da chon');
+    }
+
+    // ============================================================
+    //  CHATBOT ADMIN PANEL - cau hinh noi dung cho AI nam thong tin
+    // ============================================================
+    if (CHATBOT_ADMIN_MODE) {
+        var cbTabs   = document.querySelectorAll('.v360-cb-tab');
+        var cbPanes  = document.querySelectorAll('.v360-cb-pane');
+        var cbName   = document.getElementById('v360-cb-scene-name');
+        var cbUuid   = document.getElementById('v360-cb-scene-uuid');
+        var cbTitle  = document.getElementById('v360-cb-title');
+        var cbShort  = document.getElementById('v360-cb-short');
+        var cbDetail = document.getElementById('v360-cb-detail');
+        var cbSave   = document.getElementById('v360-cb-scene-save');
+        var cbClear  = document.getElementById('v360-cb-scene-clear');
+        var cbMsg    = document.getElementById('v360-cb-scene-msg');
+        var cbCount  = document.getElementById('v360-cb-count');
+        var cbTourSave = document.getElementById('v360-cb-tour-save');
+        var cbTourMsg  = document.getElementById('v360-cb-tour-msg');
+
+        // Tab switching
+        cbTabs.forEach(function (t) {
+            t.addEventListener('click', function () {
+                cbTabs.forEach(function (x) { x.classList.remove('is-active'); });
+                cbPanes.forEach(function (p) { p.classList.remove('is-active'); });
+                t.classList.add('is-active');
+                document.querySelector('.v360-cb-pane[data-pane="' + t.dataset.tab + '"]').classList.add('is-active');
+            });
+        });
+
+        function cbSetMsg(el, text, color) {
+            el.textContent = text || '';
+            el.style.color = color || '';
+            if (text) setTimeout(function () { el.textContent = ''; }, 3000);
+        }
+        function cbPost(url, payload, onOk, msgEl) {
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            var fd = new FormData();
+            for (var k in payload) {
+                if (payload[k] !== null && payload[k] !== undefined) fd.append(k, payload[k]);
+            }
+            if (token) fd.append('__RequestVerificationToken', token.value);
+            return fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    if (j && j.ok) onOk && onOk(j);
+                    else cbSetMsg(msgEl, 'Lỗi: ' + ((j && j.error) || 'unknown'), '#ff8a80');
+                })
+                .catch(function (e) { cbSetMsg(msgEl, 'Lỗi mạng: ' + e.message, '#ff8a80'); });
+        }
+
+        window.__chatbotOnSceneChange = function () {
+            if (!currentPostKey) return;
+            var post = null;
+            for (var i = 0; i < allPosts.length; i++) {
+                if (postKey(allPosts[i]) === currentPostKey) { post = allPosts[i]; break; }
+            }
+            var savedTitle = SCENE_CUSTOM_TITLE[currentPostKey] || '';
+            var displayName = savedTitle || (post && post.title) || '(chưa có tên)';
+            cbName.textContent = displayName;
+            cbUuid.textContent = currentPostKey;
+            cbTitle.value = savedTitle;   // empty neu chua dat -> admin se nhap
+            var info = CHATBOT_SCENE_INFO[currentPostKey] || {};
+            cbShort.value  = info.ShortIntro    || '';
+            cbDetail.value = info.DetailContent || '';
+            [cbTitle, cbShort, cbDetail, cbSave, cbClear].forEach(function (el) { el.disabled = false; });
+            var sceneTab = document.querySelector('.v360-cb-tab[data-tab="scene"]');
+            if (sceneTab && !sceneTab.classList.contains('is-active')) sceneTab.click();
+        };
+
+        cbSave.addEventListener('click', function () {
+            if (!currentPostKey) return;
+            var title = cbTitle.value.trim();
+            cbPost('@Url.Action("SaveSceneInfo", "Chatbot", new { area = "View360" })', {
+                collectionId: COLLECTION_ID,
+                uuid: currentPostKey,
+                customTitle: title,
+                shortIntro: cbShort.value,
+                detailContent: cbDetail.value
+            }, function (j) {
+                CHATBOT_SCENE_INFO[currentPostKey] = {
+                    ShortIntro: cbShort.value,
+                    DetailContent: cbDetail.value
+                };
+                // Update CustomTitle in client cache - cho hover minimap + cb display
+                if (title) SCENE_CUSTOM_TITLE[currentPostKey] = title;
+                else delete SCENE_CUSTOM_TITLE[currentPostKey];
+                cbName.textContent = title || (function () {
+                    for (var i = 0; i < allPosts.length; i++) {
+                        if (postKey(allPosts[i]) === currentPostKey) return allPosts[i].title || '(chưa có tên)';
+                    }
+                    return '(chưa có tên)';
+                })();
+                // Refresh pin tooltip o minimap
+                if (typeof window.__refreshPinTooltip === 'function')
+                    window.__refreshPinTooltip(currentPostKey);
+                if (typeof j.configuredCount === 'number') cbCount.textContent = j.configuredCount;
+                cbSetMsg(cbMsg, 'Đã lưu ✓', '#5fdc7c');
+            }, cbMsg);
+        });
+
+        cbClear.addEventListener('click', function () {
+            if (!currentPostKey) return;
+            if (!confirm('Xoá toàn bộ nội dung chatbot + tên hover của scene này?')) return;
+            cbPost('@Url.Action("SaveSceneInfo", "Chatbot", new { area = "View360" })', {
+                collectionId: COLLECTION_ID,
+                uuid: currentPostKey,
+                customTitle: '', shortIntro: '', detailContent: ''
+            }, function (j) {
+                delete CHATBOT_SCENE_INFO[currentPostKey];
+                delete SCENE_CUSTOM_TITLE[currentPostKey];
+                cbTitle.value = ''; cbShort.value = ''; cbDetail.value = '';
+                if (typeof j.configuredCount === 'number') cbCount.textContent = j.configuredCount;
+                cbSetMsg(cbMsg, 'Đã xoá ✓', '#5fdc7c');
+            }, cbMsg);
+        });
+
+        cbTourSave.addEventListener('click', function () {
+            cbPost('@Url.Action("SaveTourInfo", "Chatbot", new { area = "View360" })', {
+                collectionId: COLLECTION_ID,
+                overview: document.getElementById('v360-cb-overview').value,
+                systemPrompt: document.getElementById('v360-cb-prompt').value,
+                isEnabled: document.getElementById('v360-cb-enabled').checked
+            }, function () { cbSetMsg(cbTourMsg, 'Đã lưu ✓', '#5fdc7c'); }, cbTourMsg);
+        });
+
+        console.log('[v360] CHATBOT ADMIN MODE ON');
+    }
+
+    var lastHeading = 0;
+    var currentDeg   = 0;   // rotation luy ke - unwrap khi wrap qua bien 0/360 de transition di duong ngan
+
+    function getHeadingOffset() {
+        if (currentPostKey && (currentPostKey in SCENE_HEADING_OFFSET)) {
+            return SCENE_HEADING_OFFSET[currentPostKey];
+        }
+        return HEADING_OFFSET;
+    }
+    function logCalibration() {
+        console.log('[v360] === CALIBRATION DATA ===\n'
+            + 'SCENE_HEADING_OFFSET = ' + JSON.stringify(SCENE_HEADING_OFFSET, null, 2));
+    }
+
+    function shortestDelta(target, current) {
+        // Tra ve delta trong [-180, 180] de transition luon di duong ngan
+        return ((target - current) % 360 + 540) % 360 - 180;
+    }
+
+    function applyConeRotation() {
+        if (!coneEl) return;
+        var target = (HEADING_INVERT ? -lastHeading : lastHeading) + getHeadingOffset();
+        currentDeg += shortestDelta(target, currentDeg);
+        coneEl.style.transform = 'rotate(' + currentDeg + 'deg)';
+    }
+    function snapConeRotation() {
+        if (!coneEl) return;
+        var target = (HEADING_INVERT ? -lastHeading : lastHeading) + getHeadingOffset();
+        currentDeg = target;
+        coneEl.style.transition = 'none';
+        coneEl.style.transform = 'rotate(' + currentDeg + 'deg)';
+        void coneEl.offsetHeight;
+        coneEl.style.transition = '';
+    }
+
+    var iframe        = document.getElementById('v360-iframe');
+    var loading       = document.getElementById('v360-loading');
+    var minimap       = document.getElementById('v360-minimap');
+    var stage         = document.querySelector('.v360-viewer__stage');
+    var autorotateOn  = false;
+    var autorotTimer  = null;
+
+    var kuulaFrame    = null;
+    var currentPostId = null;   // Kuula iframe runtime id - dung de postMessage load(id)
+    var currentPostKey = null;  // Uuid (tu cover URL) - khoa chung SCENE_GPS/OFFSET (match server)
+    var allPosts      = [];
+    var idToUuid      = {};     // map iframe id -> uuid (build tu frameloaded posts list)
+
+    // ====== Leaflet map state ======
+    var lmap          = null;       // L.Map instance
+    var sceneMarkers  = {};         // postId -> L.Marker (pins for all scenes with GPS)
+    var currentMarker = null;       // L.Marker for current scene (with rotating cone)
+    var coneEl        = null;       // DOM <div> inside currentMarker icon (cho rotate)
+
+    // ===== Helper: center map o vi tri scene hien tai (dieu kien co GPS) =====
+    function recenterOnCurrent() {
+        if (!lmap || !currentPostKey) return;
+        var ll = SCENE_GPS[currentPostKey];
+        if (ll) lmap.panTo(ll, { animate: false });
+    }
+
+    // ===== Minimap states: normal / fullscreen / minimized =====
+    function setMinimapState(state) {
+        minimap.classList.remove('is-fullscreen', 'is-minimized');
+        if (state === 'fullscreen') minimap.classList.add('is-fullscreen');
+        else if (state === 'minimized') minimap.classList.add('is-minimized');
+        if (lmap) {
+            // CSS transition khi switch state co the chiem 100-300ms. Setting nay danh
+            // bao toan: compute applyMinZoomAndFit 2 lan - lan dau ngay (snap to state cu),
+            // lan 2 sau 200ms (CSS xong, viewport size da chinh xac -> minZoom dung).
+            // Tranh truong hop minZoom set theo viewport CU lam user bi khoa zoom.
+            var apply = function () {
+                if (window._v360ApplyMinZoomAndFit) window._v360ApplyMinZoomAndFit();
+                else lmap.invalidateSize({ pan: false, animate: false });
+                recenterOnCurrent();
+                refreshKmzTilesDebounced();
+            };
+            setTimeout(apply, 30);
+            setTimeout(apply, 220);  // sau CSS transition typical 200ms
+        }
+    }
+    var miniFsBtn  = document.getElementById('v360-minimap-fs');
+    var miniMinBtn = document.getElementById('v360-minimap-min');
+    if (miniFsBtn) miniFsBtn.addEventListener('click', function () {
+        setMinimapState(minimap.classList.contains('is-fullscreen') ? 'normal' : 'fullscreen');
+    });
+    if (miniMinBtn) miniMinBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setMinimapState(minimap.classList.contains('is-minimized') ? 'normal' : 'minimized');
+    });
+    // Click vao minimap khi minimized -> mo lai
+    minimap.addEventListener('click', function (e) {
+        if (minimap.classList.contains('is-minimized')) {
+            setMinimapState('normal');
+        }
+    });
+
+    // Auto-fullscreen khi vao trang voi ?mapMode=full (tu nut "XEM BAN DO KLH" Intro page)
+    if (/[?&]mapMode=full/.test(window.location.search)) {
+        // Doi Leaflet init xong moi apply
+        setTimeout(function () { setMinimapState('fullscreen'); }, 100);
+    }
+
+    // ===== Minimap resize via grip - rAF throttle, invalidateSize chi o mouseup =====
+    var grip = document.getElementById('v360-minimap-grip');
+    if (grip) {
+        grip.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var sx = e.clientX, sy = e.clientY;
+            var sw = minimap.offsetWidth, sh = minimap.offsetHeight;
+            var pendingW = sw, pendingH = sh;
+            var rafPending = false;
+            // Flag: ResizeObserver skip heavy Leaflet ops trong khi user keo
+            window.__minimapDragActive = true;
+            function applyFrame() {
+                rafPending = false;
+                minimap.style.width = pendingW + 'px';
+                minimap.style.height = pendingH + 'px';
+                // KHONG call invalidateSize trong frame - rat ton, doi mouseup
+            }
+            function onMove(ev) {
+                var dx = ev.clientX - sx;
+                var dy = ev.clientY - sy;
+                pendingW = Math.max(220, Math.min(window.innerWidth * 0.9, sw - dx));
+                pendingH = Math.max(160, Math.min(window.innerHeight * 0.9, sh - dy));
+                if (!rafPending) {
+                    rafPending = true;
+                    requestAnimationFrame(applyFrame);
+                }
+            }
+            function onUp() {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                window.__minimapDragActive = false;
+                // 1 lan duy nhat cuoi drag - apply min zoom + recompute (truoc do bi block boi flag)
+                if (window._v360ApplyMinZoomAndFit) window._v360ApplyMinZoomAndFit();
+                else if (lmap) lmap.invalidateSize({ pan: false, animate: false });
+                recenterOnCurrent();
+                refreshKmzTilesDebounced();
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        });
+    }
+    // Browser resize: debounce de tranh nhieu invalidateSize lien tuc
+    var winResizeTimer = null;
+    window.addEventListener('resize', function () {
+        if (winResizeTimer) clearTimeout(winResizeTimer);
+        winResizeTimer = setTimeout(function () {
+            if (lmap) { lmap.invalidateSize({ pan: false, animate: false }); recenterOnCurrent(); }
+        }, 180);
+    });
+
+    // ===== Calibrate heading offset: Alt+wheel (capture phase de an truoc Leaflet zoom) =====
+    minimap.addEventListener('wheel', function (e) {
+        if (!e.altKey) return;
+        if (!currentPostKey) { console.warn('[v360] Chua co scene de calibrate'); return; }
+        e.preventDefault();
+        e.stopPropagation();
+        var cur = SCENE_HEADING_OFFSET[currentPostKey] || 0;
+        var step = e.shiftKey ? 1 : 5;
+        var delta = e.deltaY > 0 ? -step : step;
+        SCENE_HEADING_OFFSET[currentPostKey] = cur + delta;
+        applyConeRotation();
+        console.log('[v360] OFFSET[' + currentPostKey + '] = ' + SCENE_HEADING_OFFSET[currentPostKey] + '°');
+        logCalibration();
+    }, { capture: true, passive: false });
+
+    console.log('[v360] MANUAL OVERRIDE:\n'
+        + '  - Alt + scroll wheel tren minimap = xoay cone +/- 5°\n'
+        + '  - Shift + Alt + wheel = +/- 1° (tinh chinh)\n'
+        + '  - v360HideCone() = an cone cua scene hien tai (huong sai/khong tin)\n'
+        + '  - v360HideCone(false) = bat lai cone\n'
+        + '  - Tinh chinh nhanh: dung admin page /Calibrate/{id} (UI day du, luu DB).');
+
+    // ===== Init Leaflet map (KMZ drone imagery overlays + Esri fallback) =====
+    var KMZ_TILES = @Html.Raw(ViewBag.KmzManifestJson ?? "[]");
+    var KMZ_BASE  = '@Url.Content("~/Content/view360-imagery/")';
+    var kmzActive = {};   // href -> L.imageOverlay hien dang tren map
+
+    // Max LOD letter cho moi zoom level - lod cao hon = chi tiet hon, tile nho hon.
+    // Khi zoom out (xa) chi can a/b; zoom in (gan) moi can f (chi tiet nhat, ~0.3m/px).
+    function maxLodForZoom(z) {
+        if (z >= 18) return 'f';
+        if (z >= 17) return 'e';
+        if (z >= 16) return 'd';
+        if (z >= 15) return 'c';
+        if (z >= 14) return 'b';
+        return 'a';
+    }
+
+    function refreshKmzTiles() {
+        if (!lmap || !KMZ_TILES.length) return;
+        var bounds = lmap.getBounds();
+        var maxLod = maxLodForZoom(lmap.getZoom());
+        var needed = {};
+        KMZ_TILES.forEach(function (t) {
+            if (t.lod > maxLod) return;
+            var tb = L.latLngBounds([[t.south, t.west], [t.north, t.east]]);
+            if (!bounds.intersects(tb)) return;
+            needed[t.href] = t;
+        });
+        Object.keys(kmzActive).forEach(function (href) {
+            if (!needed[href]) {
+                lmap.removeLayer(kmzActive[href]);
+                delete kmzActive[href];
+            }
+        });
+        Object.keys(needed).forEach(function (href) {
+            if (kmzActive[href]) return;
+            var t = needed[href];
+            kmzActive[href] = L.imageOverlay(KMZ_BASE + href,
+                [[t.south, t.west], [t.north, t.east]],
+                {
+                    opacity: 1,
+                    interactive: false,
+                    pane: 'kmz-lod-' + t.lod,
+                    className: 'v360-kmz-tile v360-kmz-tile--' + (t.lod || 'x')
+                }
+            ).addTo(lmap);
+        });
+    }
+    // Debounce de tranh spam khi user resize/pan/zoom lien tuc (549 tiles iterate ton cpu)
+    var kmzRefreshTimer = null;
+    function refreshKmzTilesDebounced() {
+        if (kmzRefreshTimer) clearTimeout(kmzRefreshTimer);
+        kmzRefreshTimer = setTimeout(refreshKmzTiles, 180);
+    }
+
+    function initLeafletMap() {
+        if (!window.L) { console.warn('[v360] Leaflet chua load'); return; }
+        // 2 bounds: TIGHT cho fullscreen fit, WIDE cho small mode cover.
+        // - Small (cover): WIDE = union all tiles -> khong bi zoom in qua sau
+        // - Fullscreen (contain): TIGHT = P10-P90 percentile -> drop outliers, fit factory
+        // Fallback LOD: f -> e -> d -> c
+        // KMZ overlay extent = vung drone SCAN that su, tinh tu LOD f tile coverage.
+        // LOD a/b/c bao roi nhung co transparent pixels outside scanned area - khong phai
+        // visible KMZ. LOD f tiles chi co o vung drone da scan -> union LOD f = actual KMZ shape.
+        var detailBounds = null;
+        if (KMZ_TILES && KMZ_TILES.length) {
+            var lodF = KMZ_TILES.filter(function (t) { return t.lod === 'f'; });
+            var srcTiles = lodF.length > 0 ? lodF : KMZ_TILES; // fallback if no LOD f
+
+            // Union of LOD f tile bboxes = visible KMZ rectangle (4 goc cua KMZ overlay).
+            detailBounds = L.latLngBounds([]);
+            srcTiles.forEach(function (t) {
+                detailBounds.extend([[t.south, t.west], [t.north, t.east]]);
+            });
+
+            console.log('[v360] KMZ visible bounds (' + (lodF.length > 0 ? 'LOD f union' : 'all tiles fallback') + '): ' +
+                ((detailBounds.getNorth() - detailBounds.getSouth()) * 111).toFixed(1) + 'km x ' +
+                ((detailBounds.getEast() - detailBounds.getWest()) * 111).toFixed(1) + 'km ' +
+                '[N=' + detailBounds.getNorth().toFixed(5) + ', S=' + detailBounds.getSouth().toFixed(5) +
+                ', E=' + detailBounds.getEast().toFixed(5) + ', W=' + detailBounds.getWest().toFixed(5) + ']');
+        }
+        var detailBoundsWide = detailBounds; // single source of truth
+        var initCenter = detailBounds ? detailBounds.getCenter() : MAP_CENTER;
+        lmap = L.map('v360-leaflet-map', {
+            center: initCenter,
+            zoom: 15,
+            maxZoom: 21,                       // cho phep zoom sau cho LOD f
+            zoomControl: true,
+            attributionControl: false,
+            maxBounds: detailBounds || null,     // pan trong KMZ visible bounds only
+            maxBoundsViscosity: 1.0,           // hard limit, khong cho keo ra
+            zoomSnap: 0,                       // free fractional zoom - tranh round lam cover==contain
+                                                // (gay tinh trang user khoa zoom o min level)
+            zoomDelta: 0.5                     // user click +/- zoom 0.5 buoc
+        });
+        // Pane per LOD - z-index tang dan, LOD cao chi tiet hon nam tren cung
+        ['a','b','c','d','e','f'].forEach(function (letter, idx) {
+            lmap.createPane('kmz-lod-' + letter);
+            lmap.getPane('kmz-lod-' + letter).style.zIndex = 410 + idx;
+            lmap.getPane('kmz-lod-' + letter).style.pointerEvents = 'none';
+        });
+        // Base: Esri (low-zoom backdrop ngoai vung KMZ)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            maxNativeZoom: 19,                 // beyond zoom 19, Leaflet upscale tile thay vi 404
+            attribution: 'Esri'
+        }).addTo(lmap);
+
+        // Aspect ratio cua KLH bounds (mercator-aware: dx = dlng, dy = dlat / cos(lat))
+        // Dung WIDE bounds (full KMZ extent) de fullscreen container fit khit KMZ overlay,
+        // khong thay area beyond KLH o canh viewport.
+        var aspectSrc = detailBoundsWide || detailBounds;
+        if (aspectSrc) {
+            var bw = aspectSrc.getEast() - aspectSrc.getWest();
+            var bh = aspectSrc.getNorth() - aspectSrc.getSouth();
+            var latC = (aspectSrc.getNorth() + aspectSrc.getSouth()) / 2;
+            var klhAspect = (bw * Math.cos(latC * Math.PI / 180)) / bh;
+            if (isFinite(klhAspect) && klhAspect > 0.1 && klhAspect < 10) {
+                document.documentElement.style.setProperty('--v360-klh-aspect', klhAspect.toFixed(4));
+            }
+        }
+
+        // KMZ dynamic loader - listen move/zoom
+        if (detailBounds) {
+            // Cover vs contain phu thuoc state minimap:
+            //  - Normal/minimized (small): COVER (inside=true) - khong thay ocean/bien o canh
+            //  - Fullscreen (big landscape viewport): CONTAIN (inside=false) - thay het KLH
+            // Truoc khi compute zoom phai invalidateSize de Leaflet dung size hien tai (sau khi
+            // CSS resize/fullscreen toggle, internal size cu, getBoundsZoom tra value sai)
+            window._v360ApplyMinZoomAndFit = function () {
+                if (!detailBounds || !lmap) return;
+                // Wait 2 rAF for browser to fully complete layout + paint after CSS state change.
+                // Vital sau setMinimapState transition - tranh invalidateSize/getBoundsZoom
+                // do viewport stale (size cu cua state truoc) -> minZoom wrong -> user khoa zoom.
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        lmap.invalidateSize({ pan: false, animate: false });
+                        var coverZoom = lmap.getBoundsZoom(detailBounds, true);
+                        var containZoom = lmap.getBoundsZoom(detailBounds, false);
+                        // Safety margin: minZoom = containZoom - 0.5. Khi viewport aspect khop bounds
+                        // aspect, cover ≈ contain -> minZoom = current zoom -> user stuck. Margin
+                        // 0.5 cho user 0.5 cap zoom out them (xem padding tu khoang khong KMZ).
+                        var minZoom = Math.max(0, containZoom - 0.5);
+                        console.log('[v360] applyMinZoom: viewport ' +
+                            lmap.getSize().x + 'x' + lmap.getSize().y +
+                            ', cover=' + coverZoom.toFixed(3) +
+                            ', contain=' + containZoom.toFixed(3) +
+                            ', minZoom=' + minZoom.toFixed(3) +
+                            ', currentZoom=' + lmap.getZoom().toFixed(3));
+                        lmap.setMinZoom(minZoom);
+                        if (lmap.getZoom() < minZoom || lmap.getZoom() > 20) {
+                            lmap.setView(detailBounds.getCenter(), coverZoom, { animate: false });
+                        }
+                    });
+                });
+            };
+            window._v360ApplyMinZoomAndFit();
+            lmap.on('moveend', refreshKmzTilesDebounced);
+            lmap.on('zoomend', refreshKmzTilesDebounced);
+            // Re-compute khi minimap doi size (resize grip / window resize).
+            // Fullscreen toggle goi truc tiep tu setMinimapState - khong cho ResizeObserver
+            // timing-race lam minZoom sai sau khi exit fullscreen.
+            if (window.ResizeObserver && minimap) {
+                var rzTimer = null;
+                new ResizeObserver(function () {
+                    // Bo qua khi user dang keo grip - tranh heavy Leaflet ops moi 80ms
+                    // lam lag chuot. mouseup handler se goi 1 lan o cuoi.
+                    if (window.__minimapDragActive) return;
+                    if (rzTimer) clearTimeout(rzTimer);
+                    rzTimer = setTimeout(window._v360ApplyMinZoomAndFit, 80);
+                }).observe(minimap);
+            }
+            refreshKmzTiles();
+            console.log('[v360] KMZ drone: ' + KMZ_TILES.length + ' tiles - cover (small) / contain (fullscreen)');
+        } else {
+            lmap.fitBounds([MAP_BOUNDS_SW, MAP_BOUNDS_NE]);
+        }
+
+        // ===== Shift+click = calibrate current scene =====
+        lmap.on('click', function (e) {
+            if (!e.originalEvent.shiftKey || !currentPostKey) return;
+            var lat = +e.latlng.lat.toFixed(6);
+            var lng = +e.latlng.lng.toFixed(6);
+            SCENE_GPS[currentPostKey] = [lat, lng];
+            console.log('[v360] CALIBRATED', currentPostKey, '→ [' + lat + ', ' + lng + ']');
+            renderScenePins();
+            moveCurrentMarker(currentPostKey);
+        });
+
+        // Hint cursor when holding Shift
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Shift' && lmap) lmap.getContainer().style.cursor = 'crosshair';
+        });
+        document.addEventListener('keyup', function (e) {
+            if (e.key === 'Shift' && lmap) lmap.getContainer().style.cursor = '';
+        });
+    }
+
+    // Trich uuid tu cover URL. Kuula CDN co the doi format theo thoi gian - thu nhieu pattern.
+    function uuidFromCover(coverUrl) {
+        if (!coverUrl) return null;
+        // Pattern 1: files.kuula.io/<uuid>/...   (current)
+        // Pattern 2: cdn.kuula.io/<uuid>/...     (alternative CDN)
+        // Pattern 3: media.kuula.io/<uuid>/...   (media files)
+        // Pattern 4: any *.kuula.* host with hex-dashed uuid segment
+        var m = coverUrl.match(/(?:files|cdn|media)\.kuula\.[a-z]+\/([a-f0-9-]{8,})\//i)
+             || coverUrl.match(/kuula\.[a-z]+\/[^/]*\/([a-f0-9-]{8,})\//i)
+             || coverUrl.match(/([a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4})/i);  // bare uuid pattern
+        return m ? m[1].toLowerCase() : null;
+    }
+    // Kuula dung Id khac giua share page (server fetch) va iframe runtime,
+    // chi Uuid (extract tu cover URL) match duoc.
+    function postKey(post) {
+        return post._uuid || (post._uuid = uuidFromCover(post.cover)) || post.id;
+    }
+
+    // ===== Render pins for all scenes that have GPS =====
+    function renderScenePins() {
+        // Clear old pins
+        Object.keys(sceneMarkers).forEach(function (id) {
+            lmap.removeLayer(sceneMarkers[id]);
+        });
+        sceneMarkers = {};
+
+        var withGps = 0;
+        var pinSize = (TOUR_CONFIG && TOUR_CONFIG.PinSize) || 11;
+        allPosts.forEach(function (post) {
+            var key = postKey(post);
+            var ll = SCENE_GPS[key];
+            if (!ll) return;
+            var hidden = !!SCENE_HIDE_PIN[key];
+            // User thuong: an thuc su. Admin: van hien (dim + dashed) de tim lai duoc.
+            if (hidden && !ADMIN_MODE) return;
+            withGps++;
+            var pinSizeFinal = hidden ? Math.max(pinSize, 14) : pinSize; // hidden pin to hon de de click
+            var icon = L.divIcon({
+                className: 'v360-leaf-pin'
+                    + (key === currentPostKey ? ' is-current' : '')
+                    + (hidden ? ' is-hidden' : ''),
+                html: '',
+                iconSize: [pinSizeFinal, pinSizeFinal],
+                iconAnchor: [pinSizeFinal / 2, pinSizeFinal / 2]
+            });
+            var m = L.marker(ll, { icon: icon });
+            var label = SCENE_CUSTOM_TITLE[key]
+                     || (post.title && post.title.trim())
+                     || post.id;
+            m.bindTooltip(label, {
+                direction: 'top',
+                offset: [0, -4],
+                className: 'v360-leaf-tooltip',
+                opacity: 1
+            });
+            m.on('click', (function (pid) {
+                return function () {
+                    kuulaSend('load', { id: pid });
+                    // Nguoi dung click pin tu mini map fullscreen -> shrink ve normal de tham quan
+                    if (minimap.classList.contains('is-fullscreen')) setMinimapState('normal');
+                };
+            })(post.id));
+            m.addTo(lmap);
+            sceneMarkers[key] = m;
+        });
+        console.log('[v360] Rendered ' + withGps + '/' + allPosts.length + ' scene pins on Leaflet');
+
+        // Auto-fit bounds if we have multiple pins
+        if (withGps > 1) {
+            var llArr = Object.values(SCENE_GPS).map(function (p) { return L.latLng(p[0], p[1]); });
+            lmap.fitBounds(L.latLngBounds(llArr).pad(0.15));
+        }
+    }
+
+    function moveCurrentMarker(postKey) {
+        var ll = SCENE_GPS[postKey];
+        if (!ll || !lmap) return;
+        if (currentMarker) lmap.removeLayer(currentMarker);
+        var icon = L.divIcon({
+            className: 'v360-leaf-current',
+            html: '<div class="v360-leaf-cone" id="v360-leaf-cone"></div>'
+                + '<div class="v360-leaf-dot"></div>',
+            iconSize: [60, 60],
+            iconAnchor: [30, 30]
+        });
+        currentMarker = L.marker(ll, { icon: icon, interactive: false, zIndexOffset: 1000 });
+        currentMarker.addTo(lmap);
+        setTimeout(function () {
+            coneEl = document.getElementById('v360-leaf-cone');
+            snapConeRotation();
+        }, 0);
+        Object.keys(sceneMarkers).forEach(function (k) {
+            var el = sceneMarkers[k].getElement();
+            if (el) el.classList.toggle('is-current', k === postKey);
+        });
+    }
+
+    // Init Leaflet after DOM ready (script load order)
+    if (window.L) initLeafletMap();
+    else window.addEventListener('load', initLeafletMap);
+
+    // ===== Kuula iframe FS: KHONG intercept (chap nhan minimap an trong FS) =====
+    // Theo Fullscreen API spec, khi 1 element vao FS chi rieng element do + descendants render
+    // -> minimap (sibling cua iframe) bi browser an cung. Khong workaround duoc cross-origin.
+    // Redirect (exit roi request stage) khong on dinh vi user activation expire khi promise resolve.
+    // Lua chon: Kuula FS hoaạt dong native, user ESC de quay lai trang co minimap.
+
+    // ===== Build Leaflet pins from posts list =====
+    function buildPostsList(posts) {
+        console.log('[v360] First post structure:', JSON.stringify(posts[0], null, 2));
+        allPosts = posts.slice();
+        // Build iframeId -> uuid map de postloaded (co the khong co cover) van resolve duoc
+        idToUuid = {};
+        posts.forEach(function (p) {
+            var u = uuidFromCover(p.cover);
+            if (u) { idToUuid[p.id] = u; p._uuid = u; }
+        });
+        console.log('[v360] idToUuid map: ' + Object.keys(idToUuid).length + ' / ' + posts.length + ' posts co cover URL');
+
+        if (lmap) renderScenePins();
+
+        var withGps = Object.keys(SCENE_GPS).filter(function (id) {
+            return posts.some(function (p) { return p.id === id; });
+        }).length;
+        console.log('[v360] ' + posts.length + ' posts, ' + withGps + ' co GPS');
+        if (withGps === 0) {
+            console.warn('[v360] SCENE_GPS rong. Shift+click vao map de calibrate diem.');
+        }
+    }
+
+    function moveMarkerToScene(postKey, postTitle) {
+        if (lmap && SCENE_GPS[postKey]) {
+            moveCurrentMarker(postKey);
+            lmap.panTo(SCENE_GPS[postKey], { animate: true, duration: 0.5 });
+        }
+    }
+
+@if (isKuula)
+{
+    <text>
+    // ===== Manual postMessage protocol (bypass api.js strict src matching) =====
+    // Kuula player tu append fid/cusdomwrap vao URL, lam api.js's
+    // querySelector('iframe[src=...]') fail. Tu handle protocol thay vi dung api.js.
+    //
+    // Protocol (decode tu api.js source):
+    //   FROM iframe: { kuula:true, cmd:'frameloaded'|'postloaded'|'orientation'|'hotspot',
+    //                  uuid:'<fid>', src?:'...', data:{...} }
+    //   TO iframe:   iframe.contentWindow.postMessage({ kuula:true, uuid:'<fid>',
+    //                  cmd:'load'|'heading'|'pitch'|'zoom'|'autorotate'|'hotspotclick'|'closecard',
+    //                  ... }, '*')
+
+    function kuulaSend(cmd, extras) {
+        if (!kuulaFrame || !iframe.contentWindow) return;
+        var msg = extras || {};
+        msg.kuula = true;
+        msg.uuid = kuulaFrame;
+        msg.cmd = cmd;
+        iframe.contentWindow.postMessage(msg, '*');
+    }
+
+    function deriveTitle(description) {
+        if (!description) return '';
+        var first = description.split('\n')[0].replace(/\*/g, '');
+        var i = first.indexOf('.');
+        return i > -1 ? first.substring(0, i) : first;
+    }
+
+    window.addEventListener('message', function (ev) {
+        var d = ev.data;
+        if (!d || d.kuula !== true) return;
+
+        switch (d.cmd) {
+            case 'frameloaded':
+                console.log('[v360] frameloaded', d);
+                window.__v360FrameloadedFired = true;
+                kuulaFrame = d.uuid;
+                // Hide loading CHI KHI khong co deep-link pending - tranh user thay default
+                // scene flash truoc khi switch sang target. Voi pending, loading screen stay
+                // visible cho den khi target scene load xong (xu ly o postloaded ben duoi).
+                if (loading && !PENDING_GO_SCENE) loading.classList.add('is-hidden');
+                if (d.data && d.data.posts && d.data.posts.length) {
+                    d.data.posts.forEach(function (p) { if (!p.title) p.title = deriveTitle(p.description); });
+                    buildPostsList(d.data.posts);
+                } else {
+                    console.warn('[v360] frameloaded khong co posts array');
+                }
+                break;
+
+            case 'postloaded':
+                var p = d.data || {};
+                if (!p.title) p.title = deriveTitle(p.description);
+                currentPostId  = p.id;
+                // Resolve uuid: uu tien cover URL trong event, fallback map tu frameloaded.
+                currentPostKey = uuidFromCover(p.cover) || idToUuid[p.id] || p.id;
+                console.log('[v360] postloaded: id=' + p.id + ' uuid=' + currentPostKey
+                    + ' (mapHit=' + (idToUuid[p.id] ? 'Y' : 'N') + ') title=' + p.title);
+                moveMarkerToScene(currentPostKey, p.title || p.id);
+                var dg = SCENE_CALIB_DIAG[currentPostKey];
+                if (dg) {
+                    console.log('[v360]   calib: ' + dg.SampleCount + ' hotspots, sense=' + dg.Sense + ', offset=' + dg.Offset + '°');
+                } else {
+                    console.log('[v360]   calib: KHONG co (scene khong co GPS hoac khong match uuid)');
+                }
+                if (ADMIN_MODE && typeof window.__adminOnSceneChange === 'function') {
+                    window.__adminOnSceneChange();
+                }
+                if (FEATURED_ADMIN_MODE && typeof window.__featOnSceneChange === 'function') {
+                    window.__featOnSceneChange();
+                }
+                if (CHATBOT_ADMIN_MODE && typeof window.__chatbotOnSceneChange === 'function') {
+                    window.__chatbotOnSceneChange();
+                }
+                // Deep-link dispatch: chi dispatch sau 'postloaded' dau tien (Kuula viewer
+                // da stable). Neu dispatch som hon (vi du o frameloaded) thi viewer crash.
+                // Loading screen LUON HIEN cho den target's postloaded - user khong thay
+                // default scene flash.
+                if (PENDING_GO_SCENE) {
+                    var target = String(PENDING_GO_SCENE).toLowerCase();
+                    var alreadyThere = String(currentPostKey || '').toLowerCase() === target;
+                    if (alreadyThere) {
+                        console.log('[v360] deep-link: da o scene ' + PENDING_GO_SCENE);
+                        PENDING_GO_SCENE = null;
+                        if (loading) loading.classList.add('is-hidden');
+                    } else {
+                        var targetId = null;
+                        for (var pid in idToUuid) {
+                            if (String(idToUuid[pid] || '').toLowerCase() === target) { targetId = pid; break; }
+                        }
+                        if (!targetId) {
+                            for (var pid2 in idToUuid) {
+                                if (String(pid2).toLowerCase() === target) { targetId = pid2; break; }
+                            }
+                        }
+                        if (targetId) {
+                            console.log('[v360] deep-link: load post ' + targetId + ' (uuid=' + PENDING_GO_SCENE + ')');
+                            // Cap nhat loading text neu co - feedback ro rang dang switch
+                            var subEl = document.querySelector('.v360-loading__sub');
+                            if (subEl) subEl.textContent = 'Đang chuyển tới khu vực được chọn…';
+                            var idToLoad = targetId;
+                            // Move PENDING -> awaiting flag: target scene's postloaded se hide loading
+                            window.__awaitingDeepLinkPost = target;
+                            PENDING_GO_SCENE = null;
+                            setTimeout(function () { kuulaSend('load', { id: idToLoad }); }, 250);
+                        } else {
+                            console.warn('[v360] deep-link: uuid ' + PENDING_GO_SCENE
+                                + ' khong match post nao - ' + Object.keys(idToUuid).length + ' posts loaded');
+                            PENDING_GO_SCENE = null;
+                            if (loading) loading.classList.add('is-hidden');
+                        }
+                    }
+                } else if (window.__awaitingDeepLinkPost) {
+                    // Target scene's postloaded da fire - hide loading khi dung target reached
+                    var awaiting = window.__awaitingDeepLinkPost;
+                    if (String(currentPostKey || '').toLowerCase() === awaiting) {
+                        window.__awaitingDeepLinkPost = null;
+                        if (loading) loading.classList.add('is-hidden');
+                        // Clean ?scene tu URL de refresh khong re-trigger deep-link
+                        try {
+                            var u = new URL(window.location.href);
+                            if (u.searchParams.has('scene')) {
+                                u.searchParams.delete('scene');
+                                window.history.replaceState(null, '', u.toString());
+                            }
+                        } catch (e) { /* IE compat - bo qua */ }
+                    }
+                }
+                break;
+
+            case 'orientation':
+                var o = d.data || {};
+                if (typeof o.heading === 'number') {
+                    lastHeading = o.heading;
+                    applyConeRotation();
+                    if (ADMIN_MODE) {
+                        var hEl = document.getElementById('v360-admin-current-h');
+                        if (hEl) hEl.textContent = Math.round(o.heading);
+                    }
+                }
+                break;
+
+            case 'hotspot':
+                console.log('[v360] hotspot click:', d.data);
+                break;
+
+            case 'cardclosed':
+                console.log('[v360] card closed');
+                break;
+        }
+    });
+
+    // ===== Autorotate cone sync =====
+    // Kuula khong fire orientation event deu trong luc autorotate -> simulate local de cone tren minimap
+    // van xoay theo. Kuula autorotate value 3 ≈ 3 RPM (~18°/s); tune AUTOROT_DEG_PER_SEC neu thay drift.
+    var AUTOROT_DEG_PER_SEC = 18;
+    function startAutoRotSim() {
+        if (autorotTimer) return;
+        var lastTick = (window.performance && performance.now) ? performance.now() : Date.now();
+        autorotTimer = setInterval(function () {
+            var now = (window.performance && performance.now) ? performance.now() : Date.now();
+            var dt = (now - lastTick) / 1000;
+            lastTick = now;
+            lastHeading = (lastHeading + AUTOROT_DEG_PER_SEC * dt + 360) % 360;
+            applyConeRotation();
+        }, 50);
+    }
+    function stopAutoRotSim() {
+        if (autorotTimer) { clearInterval(autorotTimer); autorotTimer = null; }
+    }
+    // Console helper: bat/tat autorotate
+    window.v360AutoRotate = function (on, speed) {
+        autorotateOn = !!on;
+        if (typeof speed === 'number') AUTOROT_DEG_PER_SEC = speed;
+        kuulaSend('autorotate', { value: autorotateOn ? 3 : 0 });
+        if (autorotateOn) startAutoRotSim(); else stopAutoRotSim();
+        console.log('[v360] AutoRotate ' + (autorotateOn ? 'ON @@ ' + AUTOROT_DEG_PER_SEC + '°/s' : 'OFF'));
+    };
+
+    // Shim KuulaPlayerAPI cho cac caller noi bo
+    window.KuulaPlayerAPI = {
+        load: function (frame, postId) { kuulaSend('load', { id: postId }); },
+        setHeading: function (frame, v) { kuulaSend('heading', { value: v }); },
+        setPitch: function (frame, v) { kuulaSend('pitch', { value: v }); },
+        setZoom: function (frame, v) { kuulaSend('zoom', { value: v }); },
+        setAutoRotate: function (frame, v) { kuulaSend('autorotate', { value: v }); },
+        hotspotClick: function (frame, uid) { kuulaSend('hotspotclick', { uid: uid }); },
+        closeCard: function (frame) { kuulaSend('closecard'); }
+    };
+
+    // Safety: phat hien Kuula iframe load HTTP 200 nhung khong fire 'frameloaded' (Kuula app bi
+    // ket - co the do mang cham, viewport ki la, race condition...). Auto-retry 1 lan, neu van
+    // fail -> hien nut "Tai lai" cho user thu thu cong.
+    var iframeRetried = false;
+    var reloadBtn = document.getElementById('v360-loading-reload');
+    function reloadIframe() {
+        if (!iframe) return;
+        console.log('[v360] reload iframe...');
+        if (reloadBtn) reloadBtn.style.display = 'none';
+        if (loading) loading.classList.remove('is-hidden');
+        var src = iframe.src;
+        iframe.src = 'about:blank';
+        window.__v360FrameloadedFired = false;
+        setTimeout(function () { iframe.src = src; }, 150);
+    }
+    if (reloadBtn) reloadBtn.addEventListener('click', reloadIframe);
+
+    setTimeout(function () {
+        if (window.__v360FrameloadedFired) return;
+        if (!iframeRetried) {
+            iframeRetried = true;
+            console.warn('[v360] frameloaded khong fire sau 8s - auto retry');
+            reloadIframe();
+            // Sau retry, doi them 10s, neu van khong fire -> hien nut manual reload
+            setTimeout(function () {
+                if (window.__v360FrameloadedFired) return;
+                console.error('[v360] frameloaded VAN khong fire sau retry - hien nut manual reload');
+                if (loading) {
+                    loading.classList.remove('is-hidden');
+                    var sub = loading.querySelector('.v360-loading__sub');
+                    if (sub) sub.textContent = 'Tour 360° không tải được. Hãy thử tải lại.';
+                }
+                if (reloadBtn) reloadBtn.style.display = 'inline-flex';
+            }, 10000);
+        } else {
+            if (loading) loading.classList.add('is-hidden');
+        }
+    }, 8000);
+    </text>
+}
+else
+{
+    <text>
+    iframe.addEventListener('load', function () { if (loading) loading.classList.add('is-hidden'); });
+    </text>
+}
+
+@* Chatbot widget: expose state cho view360-chatbot.js (mount o duoi). Chi enable khi admin bat. *@
+@if (ViewBag.ChatbotEnabled == true && !((bool?)ViewBag.AdminMode == true) && !((bool?)ViewBag.FeaturedAdminMode == true))
+{
+    <text>
+    window.V360CB_COLLECTION_ID = COLLECTION_ID;
+    window.V360CB_ASK_URL       = '@Url.Action("AskStream", "Chatbot", new { area = "View360" })';
+    window.V360CB_VOICE_URL     = '@Url.Action("RealtimeSession", "Chatbot", new { area = "View360" })';
+    window.V360CB_TTS_URL       = '@Url.Action("Speak", "Chatbot", new { area = "View360" })';
+    window.V360CB_STT_URL       = '@Url.Action("Transcribe", "Chatbot", new { area = "View360" })';
+    window.kuulaSend            = kuulaSend;
+    window.SCENE_CUSTOM_TITLE   = SCENE_CUSTOM_TITLE;
+    // Getter pattern - idToUuid + allPosts bi REASSIGN trong buildPostsList.
+    window.__v360GetIdToUuid    = function () { return idToUuid; };
+    window.__v360GetAllPosts    = function () { return allPosts; };
+    window.__v360CurrentScene   = function () {
+        return {
+            uuid: currentPostKey || null,
+            name: (currentPostKey && SCENE_CUSTOM_TITLE[currentPostKey]) || null
+        };
+    };
+    </text>
+}
+})();
+</script>
+@if (ViewBag.ChatbotEnabled == true && !((bool?)ViewBag.AdminMode == true) && !((bool?)ViewBag.FeaturedAdminMode == true))
+{
+    <script src="~/Content/view360-chatbot.js?v=@(DateTime.UtcNow.Ticks)"></script>
+}

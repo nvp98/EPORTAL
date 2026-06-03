@@ -1,0 +1,3709 @@
+/* ============================================================
+   view360-modern.css
+   Design system + components cho area View360 (Intro, ListProject, ListVirtual).
+   Style refresh: hero, pill tabs, modern cards, glass effect.
+   ============================================================ */
+
+:root {
+    --v360-primary: #0d3b66;
+    --v360-primary-light: #4a90e2;
+    --v360-primary-dark: #062952;
+    --v360-accent: #2cc1e8;
+    --v360-bg: #f6f9fc;
+    --v360-surface: #ffffff;
+    --v360-text: #1a2940;
+    --v360-text-muted: #5a6b85;
+    --v360-border: #e3eaf2;
+    --v360-shadow-sm: 0 1px 3px rgba(13, 59, 102, 0.08);
+    --v360-shadow-md: 0 4px 14px rgba(13, 59, 102, 0.10);
+    --v360-shadow-lg: 0 12px 36px rgba(13, 59, 102, 0.16);
+    --v360-radius: 12px;
+    --v360-radius-lg: 20px;
+    --v360-radius-pill: 999px;
+    --v360-trans: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.v360-area * { box-sizing: border-box; }
+
+/* No-scroll single-viewport layout cho Intro page.
+   BG image phu toan area; cac section la sibling, khong long vao hero. */
+.v360-area--fit {
+    position: relative;
+    /* Fixed single-viewport - dung dvh (dynamic viewport height) thay vi vh de handle
+       mobile browser chrome (URL bar) chinh xac. NO SCROLL - moi section fit trong
+       container, sizing chinh xac qua cqh/cqw o ben duoi.
+       --hdr-h: chieu cao app-header (~60px o BS dashboard template). Tang/giam neu
+       header thuc khac. */
+    --hdr-h: 60px;
+    height: calc(100dvh - var(--hdr-h));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: #fff;
+    isolation: isolate;
+}
+/* container-type: size - kich hoat cqh/cqw units cho moi descendant.
+   Day la chuan modern (2023+) - sizing relative voi container nay (= viewport - 80px),
+   khong phai voi viewport. Cho phep page giu nguyen ti le du sidebar an/hien. */
+.v360-intro {
+    container-type: size;
+    container-name: intro;
+    overflow: hidden; /* chan ngang scroll do content overflow */
+}
+.v360-area--fit__bg {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+/* Intro page (light theme): KHONG dark overlay - background da co light/blur san o ben tren */
+.v360-intro .v360-area--fit__bg { filter: none; }
+/* Legacy dark-theme rule giu lai cho cac trang khac van dung .v360-area--fit__overlay */
+.v360-area--fit__overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(125deg, rgba(6,41,82,0.85) 0%, rgba(6,41,82,0.45) 50%, rgba(6,41,82,0.15) 100%);
+    z-index: 1;
+}
+.v360-area--fit > section,
+.v360-area--fit > div:not(.v360-area--fit__bg):not(.v360-area--fit__overlay):not(.v360-area--fit__veil) {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===== Shared container - bao quanh moi section de align dong nhat ===== */
+.v360-section {
+    max-width: 1500px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 4vw;
+    box-sizing: border-box;
+}
+
+/* ===== Hero content (title section, just header padding) ============= */
+/* Hero content - tat ca dimension dung min(vw, vh)-based clamp de scale dong thoi
+   theo chieu rong VA chieu cao, dam bao fit khi them card list (Intro page co fixed-height
+   container, overflow hidden, moi section phai compress dong nhat khi screen thap). */
+.v360-hero-content {
+    padding: clamp(10px, 2vh, 26px) 0 clamp(4px, 0.8vh, 12px);
+    flex-shrink: 1;
+    min-height: 0;
+}
+.v360-hero-content .v360-hero__brand { display: flex; align-items: center; gap: 12px; margin-bottom: clamp(6px, 1.2vh, 16px); }
+.v360-hero-content .v360-hero__brand img { height: clamp(28px, 3.6vh, 44px); }
+.v360-hero-content .v360-hero__eyebrow { font-size: clamp(10px, 0.85vw, 16px); letter-spacing: 3px; font-weight: 600; color: var(--v360-accent); text-transform: uppercase; margin-bottom: clamp(4px, 0.9vh, 12px); }
+.v360-hero-content .v360-hero__title {
+    /* Truoc: clamp(28px, 4vw, 90px) qua to tren FHD - title chiem 160px+ chieu cao. */
+    font-size: clamp(22px, min(3.4vw, 5.4vh), 64px);
+    font-weight: 800; line-height: 1.05; margin: 0 0 clamp(6px, 1vh, 12px); letter-spacing: -0.02em;
+}
+.v360-hero-content .v360-hero__title span { display: block; }
+.v360-hero-content .v360-hero__divider { width: clamp(38px, 4vh, 60px); height: 4px; background: var(--v360-accent); margin: 0 0 clamp(6px, 1vh, 14px); border-radius: 2px; }
+.v360-hero-content .v360-hero__desc {
+    font-size: clamp(12px, min(1vw, 1.6vh), 18px); line-height: 1.5;
+    color: rgba(255,255,255,0.85);
+    max-width: clamp(420px, 35vw, 720px);
+    margin: 0 0 clamp(8px, 1.3vh, 16px);
+}
+.v360-hero-content .v360-hero__cta { display: flex; gap: clamp(8px, 1vw, 14px); flex-wrap: wrap; }
+
+/* ============================================================
+   FONTS - iCiel Avenir LT Std Black self-hosted cho hero title
+   font-display: swap -> tranh FOIT, hien fallback truoc khi font load xong.
+   unicode-range: latin extended de cover Vietnamese diacritics. */
+@font-face {
+    font-family: "iCiel Avenir LT Std";
+    src: url("assets/fonts/AvenirLTStd-Black.ttf") format("truetype");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================================
+   INTRO LIGHT THEME - Virtual Tour 360 landing
+   ============================================================ */
+/* Color tokens local cho intro - tranh dung CSS var global de scope ro rang.
+   Cream tones cho background placeholder (cho design team gui anh moi). */
+.v360-intro {
+    --intro-navy: #002B5C;
+    --intro-navy-deep: #002048;
+    --intro-blue: #0078D4;
+    --intro-blue-accent: #00AEEF;
+    --intro-text-sub: #425A75;
+    --intro-cream-top: #f7eeda;
+    --intro-cream-bot: #ede0c2;
+    --intro-panel-bg: rgba(255, 255, 255, 0.82);
+    --intro-panel-border: rgba(0, 90, 180, 0.12);
+    --intro-divider: rgba(0, 90, 180, 0.16);
+    color: var(--intro-navy);
+    /* Font: Be Vietnam Pro - Google Fonts free, designed for Vietnamese.
+       Dau thanh ti?ng Vi?t render dep nhat, 9 weights cho linh hoat
+       (corporate industrial brand: HPDQ - thep nang). */
+    font-family: "Be Vietnam Pro",
+                 -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* Background Intro - 'cover' scale anh fill khit container ma van giu ratio
+   (crop sides neu can, KHONG distort). Explicit dimensions + position absolute
+   inset: 0 dam bao bg luon = 100% container, khong bi scrollbar gutter chiem cho. */
+.v360-intro .v360-area--fit__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color: #062952;
+}
+/* White veil overlay - fade gradient tu trang manh ben trai (text area readable)
+   -> trong suot ben phai (anh visible ro). Combine linear (trai->phai) + radial
+   (focus o text zone) cho effect tu nhien. */
+.v360-intro .v360-area--fit__veil {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            ellipse 55% 70% at 22% 42%,
+            rgba(255, 255, 255, 0.55) 0%,
+            rgba(255, 255, 255, 0.20) 55%,
+            rgba(255, 255, 255, 0) 85%
+        ),
+        linear-gradient(
+            100deg,
+            rgba(255, 255, 255, 0.78) 0%,
+            rgba(255, 255, 255, 0.55) 20%,
+            rgba(255, 255, 255, 0.28) 45%,
+            rgba(255, 255, 255, 0.08) 65%,
+            rgba(255, 255, 255, 0) 80%
+        );
+}
+/* Body khong scroll tren Intro - tranh scrollbar lam canh phai bi hut. Container
+   .v360-area--fit da co fixed height + overflow hidden, content fit hoan toan. */
+html:has(.v360-intro), body:has(.v360-intro) {
+    overflow: hidden !important;
+}
+/* Sizing dung cqh (1cqh = 1% chieu cao cua container .v360-intro).
+   Container height = calc(100dvh - 80px) ~ viewport height. Tat ca size lay theo %
+   chieu cao container -> page giu nguyen ti le tren moi viewport.
+   clamp() voi px min/max chi de safety o edge cases (cuc nho/cuc to). */
+
+/* Hero brand logo - logo da co mau goc (navy + cyan), render truc tiep.
+   Negative margin-left compensate transparent padding ben trai cua source PNG
+   -> visual content (icon + "HOA PHAT") align voi text canh duoi. */
+.v360-intro .v360-hero__brand {
+    display: inline-block;
+    height: clamp(28px, 5cqh, 60px);
+    margin-bottom: 2cqh;
+    margin-left: clamp(-12px, -1cqh, -4px);
+}
+.v360-intro .v360-hero__brand img {
+    display: block;
+    height: 100%;
+    width: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+/* Eyebrow: VIRTUAL TOUR 360° */
+.v360-intro .v360-hero__eyebrow {
+    color: var(--intro-blue);
+    letter-spacing: 0.3em;
+    font-weight: 700;
+    font-size: clamp(10px, 1.8cqh, 18px);
+    margin-bottom: 1.4cqh;
+}
+/* Hero title - iCiel Avenir LT Std Black (self-hosted, weight 900) */
+.v360-intro .v360-hero__title {
+    font-family: "iCiel Avenir LT Std", "Avenir Next", "Avenir",
+                 "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 900;
+    color: var(--intro-navy);
+    font-size: clamp(22px, 6.8cqh, 80px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 0 0 1.6cqh;
+}
+/* Divider line ngan duoi title */
+.v360-intro .v360-hero__divider {
+    width: clamp(40px, 7cqh, 82px);
+    height: 0.45cqh;
+    min-height: 3px;
+    background: linear-gradient(90deg, var(--intro-blue), var(--intro-blue-accent));
+    border-radius: 999px;
+    margin: 0 0 1.8cqh;
+}
+/* Hero description */
+.v360-intro .v360-hero__desc {
+    color: var(--intro-text-sub);
+    font-size: clamp(11px, 1.95cqh, 20px);
+    line-height: 1.55;
+    max-width: 52cqw;
+    min-width: 280px;
+    margin: 0 0 2.8cqh;
+}
+.v360-intro .v360-hero__desc strong { color: var(--intro-navy); font-weight: 700; }
+
+/* CTA buttons - pill, primary blue gradient + ghost white */
+.v360-intro .v360-btn {
+    height: clamp(38px, 5.8cqh, 64px);
+    padding: 0 clamp(18px, 3.2cqh, 36px);
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: clamp(11px, 1.55cqh, 16px);
+    letter-spacing: 0.6px;
+    display: inline-flex; align-items: center; gap: clamp(8px, 1.3cqh, 14px);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+.v360-intro .v360-btn--primary {
+    background: linear-gradient(135deg, var(--intro-blue) 0%, var(--intro-blue-accent) 100%);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(0, 120, 212, 0.32);
+}
+.v360-intro .v360-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 120, 212, 0.42);
+    color: #fff;
+}
+.v360-intro .v360-btn__icon {
+    width: clamp(22px, 3.4cqh, 36px); height: clamp(22px, 3.4cqh, 36px);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: clamp(9px, 1.2cqh, 13px);
+    margin-left: -8px;
+}
+.v360-intro .v360-btn--ghost {
+    background: rgba(255,255,255,0.92);
+    color: var(--intro-navy);
+    border-color: rgba(0, 90, 180, 0.18);
+    box-shadow: 0 6px 18px rgba(0, 40, 90, 0.12);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+.v360-intro .v360-btn--ghost:hover {
+    transform: translateY(-2px);
+    background: #fff;
+    color: var(--intro-navy);
+    box-shadow: 0 10px 24px rgba(0, 40, 90, 0.18);
+}
+.v360-intro .v360-btn--ghost i { color: var(--intro-blue); }
+
+/* === Usage panel - tinh te hon: padding mong, border nhe, shadow soft === */
+.v360-intro .v360-usage {
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    border-radius: clamp(8px, 1.4cqh, 18px);
+    box-shadow: 0 0.5cqh 1.6cqh rgba(0, 40, 90, 0.06);
+    padding: 1.4cqh 1.8cqw;
+}
+.v360-intro .v360-usage__header {
+    margin-bottom: 1cqh;
+}
+.v360-intro .v360-usage__title {
+    color: var(--intro-navy);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    font-size: clamp(11px, 1.7cqh, 16px);
+}
+.v360-intro .v360-usage__underline {
+    background: linear-gradient(90deg, var(--intro-blue), var(--intro-blue-accent));
+    width: clamp(32px, 5cqh, 56px); height: 2px;
+    border-radius: 999px;
+    margin-top: 0.5cqh;
+}
+.v360-intro .v360-usage__item {
+    border-right-color: var(--intro-divider);
+    padding: 0.3cqh 1.2cqw;
+    gap: 1.2cqw;
+}
+.v360-intro .v360-usage__item-icon {
+    background: rgba(0, 120, 212, 0.10);
+    color: var(--intro-blue);
+    border: 1px solid rgba(0, 120, 212, 0.22);
+    box-shadow: none;
+    width: clamp(32px, 5.4cqh, 60px);
+    height: clamp(32px, 5.4cqh, 60px);
+    font-size: clamp(12px, 2.2cqh, 22px);
+}
+.v360-intro .v360-usage__item-title {
+    color: var(--intro-navy);
+    font-weight: 800;
+    font-size: clamp(10px, 1.55cqh, 16px);
+}
+.v360-intro .v360-usage__item-sub {
+    color: var(--intro-text-sub);
+    font-size: clamp(9px, 1.3cqh, 14px);
+    margin-top: 0.3cqh;
+}
+
+/* === Featured strip - tinh te + buttons FLOAT OUTSIDE panel border === */
+.v360-intro .v360-feat-strip {
+    position: relative;           /* containing block cho arrows positioned outside */
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    border-radius: clamp(8px, 1.4cqh, 18px);
+    box-shadow: 0 0.5cqh 1.6cqh rgba(0, 40, 90, 0.06);
+    padding: 1.2cqh 1.4cqw;
+    overflow: visible;            /* cho phep arrow extend outside */
+}
+.v360-intro .v360-feat-strip__head {
+    display: flex; align-items: center; gap: 0.8cqw;
+    color: var(--intro-blue);
+    font-weight: 800;
+    font-size: clamp(10px, 1.55cqh, 15px);
+    letter-spacing: 1px;
+    margin-bottom: 1cqh;
+}
+.v360-intro .v360-feat-strip__head i {
+    background: rgba(0, 120, 212, 0.10);
+    color: var(--intro-blue);
+    width: clamp(18px, 2.6cqh, 28px); height: clamp(18px, 2.6cqh, 28px);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: clamp(9px, 1.3cqh, 13px);
+}
+.v360-intro .v360-feat-strip__title { color: var(--intro-navy); }
+.v360-intro .v360-feat-strip__scroll {
+    position: static;             /* arrows reference .v360-feat-strip thay vi day */
+    padding: 0;                   /* cards extend flush den panel inner edge */
+}
+.v360-intro .v360-feat-strip__track {
+    display: flex; gap: clamp(8px, 1cqw, 16px);
+    overflow-x: auto; overflow-y: hidden;
+    scroll-behavior: smooth;
+    padding: 2px 0;
+    /* Hide scrollbar - da co arrows + scroll-snap, scrollbar visual khong can */
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE/Edge legacy */
+    /* Scroll-snap: align card edges -> arrow scroll 1 trang day du */
+    scroll-snap-type: x mandatory;
+}
+.v360-intro .v360-feat-strip__track::-webkit-scrollbar {
+    display: none;                  /* Chrome/Safari/Opera */
+    width: 0; height: 0;
+}
+.v360-intro .v360-feat-strip__card {
+    scroll-snap-align: start;
+}
+.v360-intro .v360-feat-strip__track::-webkit-scrollbar { height: 6px; }
+.v360-intro .v360-feat-strip__track::-webkit-scrollbar-thumb {
+    background: rgba(0, 120, 212, 0.3); border-radius: 6px;
+}
+/* Card aspect ratio 4:5 (nhe portrait) - accommodate ca anh landscape va portrait
+   tot hon landscape rectangle. Width theo flex (JS set), height theo aspect-ratio. */
+.v360-intro .v360-feat-strip__card {
+    position: relative;
+    flex: 0 0 clamp(130px, 14cqw, 220px);
+    aspect-ratio: 4 / 5;
+    border-radius: clamp(8px, 1.2cqh, 14px);
+    overflow: hidden;
+    background: #0d2440;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: 0 0.6cqh 1.8cqh rgba(0, 40, 90, 0.18);
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    scroll-snap-align: start;
+}
+.v360-intro .v360-feat-strip__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0, 40, 90, 0.28);
+    color: #fff;
+    text-decoration: none;
+}
+.v360-intro .v360-feat-strip__img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    transition: transform 0.4s ease;
+}
+.v360-intro .v360-feat-strip__card:hover .v360-feat-strip__img { transform: scale(1.04); }
+.v360-intro .v360-feat-strip__card::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.10) 55%, rgba(0,30,70,0.78) 100%);
+    pointer-events: none;
+}
+.v360-intro .v360-feat-strip__num {
+    position: absolute; top: 1cqh; left: 0.8cqw;
+    z-index: 2;
+    background: var(--intro-blue);
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(10px, 1.4cqh, 14px);
+    padding: 0.4cqh 0.8cqw;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    letter-spacing: 0.5px;
+}
+.v360-intro .v360-feat-strip__label {
+    position: absolute;
+    left: 0.6cqw; right: 0.6cqw;
+    bottom: 1cqh;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(10px, 1.4cqh, 14px);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.55);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+/* Arrow buttons - FLOAT outside panel border (vao section padding area).
+   position absolute reference .v360-feat-strip (relative). Negative left/right de
+   day buttons ra ngoai panel -> cards ben trong khong bi day vao.
+   Top offset: 50% + (head + head margin)/2 ~ canh giua khu vuc cards (khong tinh head). */
+.v360-intro .v360-feat-strip__arrow {
+    position: absolute;
+    top: calc(50% + 1cqh);          /* compensate head height ~25-30px */
+    transform: translateY(-50%);
+    width: clamp(30px, 3.8cqh, 44px);
+    height: clamp(30px, 3.8cqh, 44px);
+    border-radius: 50%;
+    border: 1px solid rgba(0, 90, 180, 0.12);
+    background: #fff;
+    color: var(--intro-blue);
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 0.5cqh 1.6cqh rgba(0, 40, 90, 0.14);
+    font-size: clamp(10px, 1.3cqh, 13px);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.v360-intro .v360-feat-strip__arrow:hover {
+    background: #f4faff;
+    transform: translateY(-50%) scale(1.06);
+    box-shadow: 0 0.8cqh 2cqh rgba(0, 40, 90, 0.22);
+}
+/* -2.2cqw offset = nho hon section padding (4cqw) nen khong vuot ra ngoai section.
+   Half cua arrow width nam ngoai panel, half phia trong viewport panel space. */
+.v360-intro .v360-feat-strip__arrow--prev { left: -2.2cqw; }
+.v360-intro .v360-feat-strip__arrow--next { right: -2.2cqw; }
+@media (max-width: 767px) {
+    .v360-intro .v360-feat-strip__arrow { display: none; }
+}
+
+/* === Footer band - polished HUD style === */
+.v360-intro .v360-footer-band {
+    position: relative;
+    background:
+        radial-gradient(ellipse at 50% -20%, rgba(44, 193, 232, 0.18), transparent 60%),
+        linear-gradient(180deg, var(--intro-navy-deep) 0%, #050e1e 100%);
+    color: rgba(255, 255, 255, 0.92);
+    padding: 1.6cqh 3.6cqw;
+    gap: 2.4cqw;
+    font-size: clamp(10px, 1.4cqh, 13.5px);
+    border-top: 1px solid rgba(95, 220, 255, 0.18);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+/* Accent line glowing tren cung */
+.v360-intro .v360-footer-band::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 8%; right: 8%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(95, 220, 255, 0.7), transparent);
+    pointer-events: none;
+}
+
+/* Item: shrink-fit + center + nowrap, position relative cho ::after divider */
+.v360-intro .v360-footer-band > div {
+    display: flex;
+    align-items: center;
+    gap: 0.9cqw;
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    position: relative;
+    transition: transform .2s;
+}
+.v360-intro .v360-footer-band > div span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+}
+
+/* Icon trong vong tron radial glow */
+.v360-intro .v360-footer-band > div > i {
+    width: clamp(28px, 3cqh, 36px);
+    height: clamp(28px, 3cqh, 36px);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(95, 220, 255, 0.2), rgba(6, 30, 60, 0.6) 70%);
+    border: 1px solid rgba(95, 220, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--intro-blue-accent);
+    font-size: clamp(13px, 1.6cqh, 16px) !important;
+    box-shadow:
+        inset 0 0 10px rgba(95, 220, 255, 0.12),
+        0 0 8px rgba(44, 193, 232, 0.18);
+    flex-shrink: 0;
+    transition: all .2s;
+}
+.v360-intro .v360-footer-band > div:hover {
+    transform: translateY(-1px);
+}
+.v360-intro .v360-footer-band > div:hover > i {
+    border-color: rgba(95, 220, 255, 0.6);
+    box-shadow:
+        inset 0 0 12px rgba(95, 220, 255, 0.28),
+        0 0 14px rgba(44, 193, 232, 0.4);
+}
+
+/* Divider mong sang giua items - khong dung border-right (de can chinh khoang trang dep hon) */
+.v360-intro .v360-footer-band > div:not(:last-child):not(.v360-footer-band__cnpm) {
+    border-right: 0;
+    padding-right: 0;
+}
+.v360-intro .v360-footer-band > div:not(:last-child):not(.v360-footer-band__cnpm)::after {
+    content: '';
+    position: absolute;
+    right: -1.2cqw;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: linear-gradient(180deg, transparent, rgba(95, 220, 255, 0.45) 50%, transparent);
+}
+
+/* So dien thoai noi bat */
+.v360-intro .v360-footer-band > div:has(> i.fa-headset) span {
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 6px rgba(95, 220, 255, 0.35);
+    letter-spacing: 0.5px;
+}
+
+/* "PHÒNG CNTT & CDS" -> pill style sat phai */
+.v360-intro .v360-footer-band__cnpm {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 0.55cqh 1.3cqw;
+    background: linear-gradient(135deg, rgba(95, 220, 255, 0.2), rgba(44, 193, 232, 0.08));
+    border: 1px solid rgba(95, 220, 255, 0.4);
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-size: 0.92em;
+    box-shadow:
+        0 0 14px rgba(44, 193, 232, 0.25),
+        inset 0 0 8px rgba(95, 220, 255, 0.15);
+    text-shadow: 0 0 6px rgba(95, 220, 255, 0.4);
+    transition: all .2s;
+}
+.v360-intro .v360-footer-band__cnpm:hover {
+    border-color: rgba(95, 220, 255, 0.7);
+    box-shadow:
+        0 0 20px rgba(44, 193, 232, 0.5),
+        inset 0 0 10px rgba(95, 220, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Fallback container hep: wrap + center, CNTT pill xuong dong rieng */
+@container intro (max-width: 900px) {
+    .v360-intro .v360-footer-band { flex-wrap: wrap; justify-content: center; row-gap: 1.2cqh; }
+    .v360-intro .v360-footer-band > div { white-space: normal; }
+    .v360-intro .v360-footer-band > div:not(:last-child):not(.v360-footer-band__cnpm)::after {
+        display: none;   /* tat divider khi wrap */
+    }
+    .v360-intro .v360-footer-band__cnpm {
+        margin-left: 0;
+    }
+}
+
+/* === Section flex behavior ===
+   Hero co flex-grow:1 -> EXPAND chiem het free space -> day usage + featured + footer
+   xuong cum o bottom (footer's legacy margin-top:auto khong gay split vi khong con
+   free space). KHONG dung margin-top:auto tren section nao khac. */
+.v360-intro > .v360-section:has(.v360-hero-content) {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 5cqh;
+}
+.v360-intro > .v360-section:has(.v360-usage),
+.v360-intro > .v360-section:has(.v360-feat-strip) {
+    flex-shrink: 0;
+}
+/* Khoang giua featured va footer */
+.v360-intro > .v360-section:has(.v360-feat-strip) {
+    margin-bottom: clamp(14px, 2cqh, 32px);
+}
+.v360-intro .v360-hero-content {
+    width: 100%;
+    padding: 0;
+    /* Flex column - guarantee tat ca children stack vertically (logo, eyebrow, title,
+       desc, buttons). Tranh truong hop inline-block brand bi flow inline voi eyebrow div.
+       align-items: flex-start -> tat ca canh trai. */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+/* Section spacing nho - khoang cach proportional voi container */
+.v360-intro .v360-section + .v360-section { margin-top: 1.2cqh; }
+
+/* Container width - su dung cqw cho consistent padding tren moi viewport. */
+.v360-intro .v360-section {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 4cqw;
+    box-sizing: border-box;
+}
+
+/* ===== Hero (Intro) ====================================== */
+.v360-hero {
+    position: relative;
+    flex: 1.7;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 4vw 0;
+    color: #fff;
+    overflow: hidden;
+    background-color: var(--v360-primary-dark);
+}
+.v360-hero__bg {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.04);
+    filter: brightness(0.85) saturate(1.05);   /* Sang hon - nhin ro bg drone shot */
+    z-index: 0;
+}
+.v360-hero__overlay {
+    position: absolute; inset: 0;
+    /* Lighter overlay - cho phep nhin thay bg image clearer (theo mockup). */
+    background: linear-gradient(120deg, rgba(6, 41, 82, 0.78) 0%, rgba(6, 41, 82, 0.42) 50%, rgba(6, 41, 82, 0.10) 100%);
+    z-index: 1;
+}
+.v360-hero__inner {
+    position: relative; z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 1500px;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 0;
+}
+.v360-hero__inner--single { max-width: 1500px; }
+.v360-hero__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+}
+.v360-hero__brand {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 32px;
+}
+.v360-hero__brand img { height: 44px; width: auto; }
+.v360-hero__eyebrow {
+    display: inline-block;
+    font-size: 13px; letter-spacing: 3px; font-weight: 600;
+    color: var(--v360-accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.v360-hero__title {
+    font-size: clamp(32px, 4vw, 54px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0 0 18px;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+.v360-hero__title span { display: block; }      /* moi span 1 dong */
+.v360-hero__divider { width: 60px; height: 4px; background: var(--v360-accent); margin: 0 0 18px; border-radius: 2px; }
+.v360-hero__desc { font-size: 16px; line-height: 1.55; color: rgba(255,255,255,0.85); max-width: 620px; margin: 0 0 24px; }
+.v360-hero__title span { display: block; }
+.v360-hero__desc {
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.82);
+    max-width: 620px;
+    margin: 0 0 36px;
+}
+.v360-hero__divider {
+    width: 60px; height: 4px;
+    background: var(--v360-accent);
+    margin: 0 0 24px;
+    border-radius: 2px;
+}
+.v360-hero__cta { display: flex; gap: 16px; flex-wrap: wrap; }
+
+.v360-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    /* Vh-aware so Intro hero CTAs khong an het space khi them card list o duoi */
+    padding: clamp(8px, min(0.9vw, 1.5vh), 16px) clamp(16px, min(1.8vw, 3vh), 34px);
+    border-radius: var(--v360-radius-pill);
+    font-size: clamp(11px, min(0.95vw, 1.6vh), 17px); font-weight: 600;
+    text-decoration: none;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--v360-trans);
+    white-space: nowrap;
+}
+.v360-btn--primary {
+    background: linear-gradient(135deg, var(--v360-primary-light), var(--v360-accent));
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(44, 193, 232, 0.45);
+}
+.v360-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(44, 193, 232, 0.55);
+    color: #fff;
+}
+.v360-btn--ghost {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(6px);
+}
+.v360-btn--ghost:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+    color: #fff;
+}
+.v360-btn i { font-size: 14px; }
+
+/* ===== Voice AI side card (Intro) ========================= */
+.v360-ai-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--v360-radius-lg);
+    padding: 28px;
+    backdrop-filter: blur(10px);
+    color: #fff;
+}
+.v360-ai-card__head { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.v360-ai-card__icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--v360-accent), var(--v360-primary-light));
+    border-radius: 14px;
+    display: grid; place-items: center;
+    color: #fff; font-size: 22px;
+}
+.v360-ai-card__label { font-size: 11px; letter-spacing: 2px; color: var(--v360-accent); text-transform: uppercase; }
+.v360-ai-card__title { font-size: 18px; font-weight: 700; line-height: 1.2; margin: 2px 0 0; }
+.v360-ai-card__msg { font-size: 14px; color: rgba(255,255,255,0.75); margin: 16px 0; line-height: 1.5; }
+.v360-ai-card__action {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    background: #fff; color: var(--v360-primary);
+    border-radius: var(--v360-radius-pill);
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+}
+.v360-ai-card__action:hover { background: var(--v360-accent); color: #fff; }
+
+/* ===== Usage instructions strip (white glass, title top-left + items row) ====== */
+.v360-usage {
+    margin: 0 0 clamp(4px, 0.8vh, 12px);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--v360-radius-lg);
+    box-shadow: 0 12px 32px rgba(15, 76, 129, 0.22);
+    padding: clamp(8px, 1.4vh, 18px) clamp(14px, 2vw, 26px) clamp(8px, 1.6vh, 22px);
+    color: var(--v360-primary);
+    flex-shrink: 0;
+}
+.v360-usage__header {
+    display: flex; flex-direction: column;
+    margin-bottom: clamp(6px, 1.2vh, 16px);
+}
+.v360-usage__title {
+    font-size: clamp(12px, 1vw, 20px);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--v360-primary);
+}
+.v360-usage__underline {
+    width: 56px; height: 3px;
+    background: linear-gradient(90deg, #1976d2, #00bcd4);
+    border-radius: 2px;
+    margin-top: 6px;
+}
+.v360-usage__items {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    align-items: center;
+}
+.v360-usage__item {
+    display: flex; gap: 14px; align-items: center;
+    padding: 6px 16px;
+    border-right: 1px solid rgba(25, 118, 210, 0.14);
+    min-width: 0;
+}
+.v360-usage__item:first-child { padding-left: 0; }
+.v360-usage__item:last-child { border-right: none; padding-right: 0; }
+.v360-usage__item-icon {
+    width: clamp(36px, 2.8vw, 60px); height: clamp(36px, 2.8vw, 60px);
+    border-radius: 50%;
+    background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+    color: #fff;
+    display: grid; place-items: center;
+    font-size: clamp(14px, 1.2vw, 24px);
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.4);
+    flex-shrink: 0;
+}
+.v360-usage__item-text { display: flex; flex-direction: column; min-width: 0; }
+.v360-usage__item-title {
+    font-size: clamp(11px, 0.9vw, 17px);
+    font-weight: 800;
+    color: var(--v360-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+}
+.v360-usage__item-sub {
+    font-size: clamp(10px, 0.78vw, 15px);
+    color: #546e7a;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+@media (max-width: 991px) {
+    .v360-hero__inner { grid-template-columns: 1fr; }
+    .v360-ai-card { max-width: 480px; margin: 0 auto; }
+    .v360-usage__items { grid-template-columns: 1fr 1fr; gap: 12px 0; }
+    .v360-usage__item:nth-child(odd) { padding-left: 0; }
+    .v360-usage__item:nth-child(even) { border-right: none; padding-right: 0; }
+}
+@media (max-width: 560px) {
+    .v360-usage__items { grid-template-columns: 1fr; }
+    .v360-usage__item { border-right: none; padding: 6px 0; border-bottom: 1px solid rgba(25,118,210,0.1); }
+    .v360-usage__item:last-child { border-bottom: none; }
+}
+
+/* ===== Featured strip (Intro page) - "Cac khu vuc tham quan chinh" ============= */
+/* Compact vh-based sizing - section nay duoi cung trong fit-screen layout, phai scale
+   theo vertical space con lai. min(vw,vh) clamp dam bao card khong qua to khi screen
+   thap (FHD 1080 vs WQHD 1440) ma van nhin ro tren wide screens. */
+.v360-feat-strip {
+    margin-top: clamp(6px, 1vh, 18px);
+    width: 100%;
+    flex-shrink: 0;
+}
+.v360-feat-strip__head {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--v360-accent);
+    font-weight: 700;
+    font-size: clamp(11px, min(0.9vw, 1.5vh), 15px);
+    letter-spacing: 0.4px;
+    margin-bottom: clamp(4px, 0.7vh, 10px);
+}
+.v360-feat-strip__head i { font-size: clamp(12px, 1.6vh, 16px); }
+.v360-feat-strip__scroll {
+    position: relative;
+}
+.v360-feat-strip__track {
+    display: flex; gap: clamp(8px, 0.9vw, 14px);
+    overflow-x: auto; overflow-y: hidden;
+    scroll-behavior: smooth;
+    padding: 3px 2px 8px;
+    scrollbar-width: thin;
+}
+.v360-feat-strip__track::-webkit-scrollbar { height: 5px; }
+.v360-feat-strip__track::-webkit-scrollbar-thumb { background: rgba(25,118,210,0.35); border-radius: 6px; }
+.v360-feat-strip__card {
+    flex: 0 0 clamp(120px, min(13vw, 22vh), 180px);
+    height: clamp(85px, min(10vw, 16vh), 140px);
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0d2440;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.v360-feat-strip__card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+    text-decoration: none;
+    color: #fff;
+}
+.v360-feat-strip__img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    transition: transform 0.4s ease;
+}
+.v360-feat-strip__card:hover .v360-feat-strip__img { transform: scale(1.08); }
+.v360-feat-strip__card::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+}
+.v360-feat-strip__num {
+    position: absolute; top: 8px; left: 8px;
+    z-index: 2;
+    background: var(--v360-accent, #1976d2);
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(11px, 0.78vw, 14px);
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.v360-feat-strip__label {
+    position: absolute; left: 10px; right: 10px; bottom: 10px;
+    z-index: 2;
+    font-weight: 700;
+    font-size: clamp(11px, 0.82vw, 14px);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    line-height: 1.25;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.v360-feat-strip__arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(15, 76, 129, 0.95);
+    color: #fff;
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.v360-feat-strip__arrow:hover { background: var(--v360-accent); transform: translateY(-50%) scale(1.06); }
+.v360-feat-strip__arrow--prev { left: -6px; }
+.v360-feat-strip__arrow--next { right: -6px; }
+
+@media (max-width: 767px) {
+    .v360-feat-strip__arrow { display: none; }
+}
+
+/* ===== Featured admin page (Featured.cshtml) ============= */
+.v360-feat-wrap {
+    padding: clamp(16px, 1.6vw, 28px);
+    max-width: 1400px; margin: 0 auto;
+    color: #1c2b3a;
+}
+.v360-feat-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+.v360-feat-head h1 {
+    margin: 6px 0 2px;
+    font-size: clamp(20px, 1.6vw, 28px);
+    color: var(--v360-accent);
+}
+.v360-feat-head h1 i { margin-right: 6px; }
+.v360-feat-sub { color: #546e7a; margin: 0; font-size: 13px; max-width: 720px; }
+.v360-feat-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: #1976d2; text-decoration: none; font-size: 13px;
+}
+.v360-feat-back:hover { text-decoration: underline; }
+.v360-feat-actions { display: flex; gap: 10px; align-items: center; }
+
+.v360-feat-grid {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 18px;
+    min-height: 540px;
+}
+@media (max-width: 991px) {
+    .v360-feat-grid { grid-template-columns: 1fr; }
+}
+
+.v360-feat-col {
+    background: #fff;
+    border: 1px solid rgba(25,118,210,0.16);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    min-height: 520px;
+}
+.v360-feat-col__head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #f4f9ff 0%, #e8f1fb 100%);
+    border-bottom: 1px solid rgba(25,118,210,0.16);
+}
+.v360-feat-col__head h2 {
+    margin: 0;
+    font-size: 14px; font-weight: 700; color: #062952;
+    display: flex; align-items: center; gap: 6px;
+}
+.v360-feat-col__head input {
+    padding: 5px 10px;
+    border: 1px solid rgba(25,118,210,0.25); border-radius: 6px;
+    font-size: 12px; outline: none;
+    width: 180px;
+}
+.v360-feat-col__head input:focus { border-color: var(--v360-accent, #1976d2); }
+.v360-feat-counter { font-size: 12px; color: #546e7a; }
+.v360-feat-counter b { color: var(--v360-accent); }
+
+/* Pool: all available scenes */
+.v360-feat-pool {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+.v360-feat-pool__item {
+    position: relative;
+    padding: 8px 38px 8px 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #fafbfc;
+    transition: background 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+}
+.v360-feat-pool__item:hover { background: #eef5fd; border-color: rgba(25,118,210,0.25); }
+.v360-feat-pool__item.is-added { opacity: 0.4; }
+.v360-feat-pool__title { font-weight: 600; font-size: 13px; color: #062952; line-height: 1.3; }
+.v360-feat-pool__uuid { font-size: 10px; color: #90a4ae; margin-top: 2px; font-family: monospace; }
+.v360-feat-pool__add {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: var(--v360-accent, #1976d2);
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+.v360-feat-pool__add:hover { transform: translateY(-50%) scale(1.12); background: #0d5fa3; }
+.v360-feat-pool__item.is-added .v360-feat-pool__add { background: #b0bec5; pointer-events: none; }
+
+/* Selected list */
+.v360-feat-selected {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+.v360-feat-empty {
+    padding: 40px 20px; text-align: center;
+    color: #90a4ae; font-size: 13px;
+}
+.v360-feat-empty i { font-size: 36px; margin-bottom: 10px; display: block; opacity: 0.5; }
+
+.v360-feat-item {
+    display: grid;
+    grid-template-columns: 30px 100px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 8px;
+    cursor: move;
+}
+.v360-feat-item.is-dragging { opacity: 0.5; }
+.v360-feat-item.is-drop-target { border-color: var(--v360-accent); background: #eef5fd; }
+.v360-feat-item__num {
+    font-weight: 800;
+    color: var(--v360-accent);
+    text-align: center;
+    font-size: 13px;
+}
+.v360-feat-item__thumb {
+    position: relative;
+    width: 100px; height: 70px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0f4f8;
+}
+.v360-feat-item__thumb img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.v360-feat-item__no-img {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: #90a4ae; font-size: 10px; gap: 2px;
+}
+.v360-feat-item__no-img i { font-size: 20px; }
+.v360-feat-item__upload {
+    position: absolute; right: 4px; bottom: 4px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.72);
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background 0.12s ease;
+}
+.v360-feat-item__upload:hover { background: var(--v360-accent); }
+.v360-feat-item__fields {
+    display: flex; flex-direction: column; gap: 4px;
+    min-width: 0;
+}
+.v360-feat-item__title-input {
+    padding: 6px 10px;
+    border: 1px solid rgba(0,0,0,0.12); border-radius: 5px;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+}
+.v360-feat-item__title-input:focus { border-color: var(--v360-accent); }
+.v360-feat-item__uuid {
+    font-size: 10px; color: #90a4ae; font-family: monospace;
+    text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
+}
+.v360-feat-item__ctrl {
+    display: flex; flex-direction: column; gap: 3px;
+}
+.v360-feat-item__ctrl button {
+    width: 26px; height: 22px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: #f5f8fa;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #455a64;
+    font-size: 10px;
+    transition: background 0.12s ease;
+}
+.v360-feat-item__ctrl button:hover { background: #e3edf6; }
+.v360-feat-item__del:hover { background: #ffebee !important; color: #c62828; }
+
+/* ===== List page header (pill tabs + search) ============= */
+/* Index page: kill scroll body/html, layout fit chinh xac viewport.
+   Dung explicit class .v360-list-page (set tu JS) thay vi :has() de support browser cu. */
+html.v360-list-page,
+body.v360-list-page {
+    overflow: hidden !important;
+    height: 100vh;
+}
+body.v360-list-page .app-main .app-main__inner {
+    padding: 0 !important;
+}
+/* ===== Container query setup: .v360-list-wrap la size container ====
+   Tat ca descendant size theo container nay (sidebar dong/mo -> container width thay
+   doi -> layout tu adapt). Single-mode layout: fixed height + grid scroll ben trong. */
+.v360-list-wrap {
+    container-type: size;
+    container-name: list;
+    --hdr-h: 60px;
+    --list-inset: clamp(8px, 3cqi, 44px);   /* horizontal inset cho grid/pagination/empty */
+    --list-pad-x: clamp(12px, 3cqi, 48px);  /* wrap outer padding */
+    --list-pad-y: clamp(10px, 2cqh, 22px);
+    padding: var(--list-pad-y) var(--list-pad-x);
+    background: var(--v360-bg);
+    height: calc(100dvh - var(--hdr-h));
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.v360-list-wrap > .v360-list-header { flex-shrink: 0; margin-bottom: clamp(8px, 1.4cqh, 18px); }
+.v360-list-wrap > .v360-tabs-wrap,
+.v360-list-wrap > .v360-tabs-dots { flex-shrink: 0; }
+.v360-list-wrap > .v360-tabs-dots { margin-bottom: clamp(8px, 1.4cqh, 18px); }
+.v360-list-wrap > .v360-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    align-content: start;
+    padding-left: var(--list-inset);
+    padding-right: var(--list-inset);
+}
+.v360-list-wrap > .v360-pagination {
+    flex-shrink: 0;
+    margin-top: clamp(8px, 1.4cqh, 18px);
+    padding: 0 var(--list-inset);
+}
+.v360-list-wrap > .v360-empty {
+    flex: 1 1 auto;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 var(--list-inset);
+}
+.v360-list-header {
+    display: flex; justify-content: space-between; gap: clamp(12px, 2cqi, 28px);
+    align-items: center; flex-wrap: wrap;
+    margin-bottom: clamp(14px, 2cqh, 28px);
+}
+.v360-list-title h1 { font-size: clamp(18px, 2.4cqi, 36px); font-weight: 800; color: var(--v360-text); margin: 0; letter-spacing: -0.01em; }
+.v360-list-title p { font-size: clamp(11px, 1.25cqi, 17px); color: var(--v360-text-muted); margin: 4px 0 0; }
+
+.v360-search {
+    position: relative;
+    width: clamp(200px, 22cqi, 360px); max-width: 100%;
+}
+.v360-search input {
+    width: 100%;
+    padding: clamp(8px, 1.3cqh, 14px) 44px clamp(8px, 1.3cqh, 14px) clamp(12px, 1.5cqi, 22px);
+    border: 1px solid var(--v360-border);
+    border-radius: var(--v360-radius-pill);
+    background: var(--v360-surface);
+    font-size: clamp(12px, 1.2cqi, 16px);
+    color: var(--v360-text);
+    outline: none;
+    transition: all var(--v360-trans);
+}
+.v360-search input:focus {
+    border-color: var(--v360-primary-light);
+    box-shadow: 0 0 0 3px rgba(74,144,226,0.12);
+}
+.v360-search button {
+    position: absolute; right: 4px; top: 4px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--v360-primary);
+    color: #fff;
+    cursor: pointer;
+    display: grid; place-items: center;
+}
+.v360-search button:hover { background: var(--v360-primary-light); }
+
+/* Pill tabs carousel wrapper: dung CSS Grid de col width co dinh.
+   prev (auto) | nav (1fr fill) | counter (auto) | next (auto). */
+.v360-tabs-wrap {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: clamp(6px, 0.8cqi, 10px);
+    margin-bottom: clamp(14px, 2cqh, 28px);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.v360-tabs-arrow {
+    flex-shrink: 0;
+    width: clamp(28px, 3.2cqi, 38px); height: clamp(28px, 3.2cqi, 38px);
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: var(--v360-surface);
+    border: 1px solid var(--v360-border);
+    color: var(--v360-primary);
+    cursor: pointer;
+    font-size: clamp(10px, 1.1cqi, 13px);
+    box-shadow: var(--v360-shadow-sm);
+    transition: all var(--v360-trans);
+    padding: 0;
+}
+.v360-tabs-arrow:hover {
+    background: var(--v360-primary);
+    color: #fff;
+    border-color: var(--v360-primary);
+    transform: scale(1.06);
+}
+.v360-tabs-arrow:active { transform: scale(0.96); }
+
+/* Counter "X / N" inline truoc nut next */
+.v360-tabs-counter {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--v360-text-muted);
+    padding: 0 6px;
+    min-width: 36px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+/* Dots indicator hien duoi nav - cho biet vi tri page + clickable */
+.v360-tabs-dots {
+    display: flex; justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+    margin-bottom: 24px;
+}
+.v360-tabs-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--v360-border);
+    cursor: pointer;
+    padding: 0;
+    transition: all var(--v360-trans);
+}
+.v360-tabs-dot:hover { background: var(--v360-primary-light); transform: scale(1.2); }
+.v360-tabs-dot.is-active {
+    background: var(--v360-primary);
+    transform: scale(1.3);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.15);
+}
+
+/* Pill tabs - inner: chi hien 10 item, width co dinh khong shrink theo content */
+.v360-tabs {
+    display: flex; gap: 8px;
+    flex-wrap: nowrap;
+    margin-bottom: 0;
+    padding: 6px;
+    background: var(--v360-surface);
+    border-radius: var(--v360-radius-pill);
+    box-shadow: var(--v360-shadow-sm);
+    flex: 1 1 0;        /* basis 0 -> luon grow fill remaining, khong phu thuoc tabs count */
+    min-width: 0;
+    overflow: hidden;
+}
+.v360-tab {
+    padding: clamp(6px, 0.85cqi, 13px) clamp(12px, 1.6cqi, 28px);
+    border-radius: var(--v360-radius-pill);
+    font-size: clamp(11px, 1.15cqi, 16px); font-weight: 600;
+    color: var(--v360-text-muted);
+    text-decoration: none;
+    border: none; background: transparent;
+    cursor: pointer;
+    transition: all var(--v360-trans);
+    white-space: nowrap;
+}
+.v360-tab:hover { color: var(--v360-primary); background: rgba(13,59,102,0.05); }
+.v360-tab.active {
+    background: linear-gradient(135deg, var(--v360-primary), var(--v360-primary-light));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(13,59,102,0.25);
+}
+/* ====================================================================
+   TOOLBAR - breadcrumb + sort + view toggle (above content grid/list)
+   ==================================================================== */
+.v360-list-wrap > .v360-toolbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: clamp(8px, 1cqh, 14px) var(--list-inset);
+    margin-bottom: clamp(8px, 1cqh, 14px);
+    border-bottom: 1px solid var(--v360-border, #e6ecf3);
+}
+.v360-toolbar__left { flex: 1; min-width: 0; }
+.v360-toolbar__right {
+    display: flex; align-items: center; gap: 14px;
+    flex-shrink: 0;
+}
+/* Breadcrumb folder path */
+.v360-crumb {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--v360-primary, #062952);
+    font-size: clamp(12px, 1.1cqi, 15px);
+    font-weight: 600;
+}
+.v360-crumb > i:first-child {
+    color: #ffb800;
+    font-size: 1.05em;
+}
+.v360-crumb a {
+    color: var(--v360-primary-light, #1976d2);
+    text-decoration: none;
+}
+.v360-crumb a:hover { text-decoration: underline; }
+.v360-crumb__sep {
+    color: var(--v360-text-muted, #5a6c83);
+    font-size: 0.75em;
+    margin: 0 2px;
+}
+.v360-crumb__current { color: var(--v360-text, #1a2a3f); font-weight: 700; }
+
+/* Sort dropdown */
+.v360-sort {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: clamp(11px, 1cqi, 13px);
+    color: var(--v360-text-muted, #5a6c83);
+}
+.v360-sort label { font-weight: 600; cursor: default; }
+.v360-sort__select {
+    padding: clamp(5px, 0.7cqi, 7px) clamp(10px, 1.2cqi, 14px);
+    border: 1px solid var(--v360-border, #e6ecf3);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--v360-text, #1a2a3f);
+    font-size: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+.v360-sort__select:hover { border-color: var(--v360-primary-light, #1976d2); }
+.v360-sort__select:focus {
+    outline: none;
+    border-color: var(--v360-primary, #062952);
+    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.12);
+}
+
+/* View toggle (grid/list) */
+.v360-viewtoggle {
+    display: inline-flex;
+    border: 1px solid var(--v360-border, #e6ecf3);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+.v360-viewtoggle__btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: clamp(30px, 3cqi, 38px);
+    height: clamp(28px, 2.8cqi, 34px);
+    color: var(--v360-text-muted, #5a6c83);
+    background: transparent;
+    text-decoration: none;
+    font-size: clamp(12px, 1.2cqi, 14px);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+.v360-viewtoggle__btn:hover {
+    background: rgba(0, 120, 212, 0.08);
+    color: var(--v360-primary, #062952);
+    text-decoration: none;
+}
+.v360-viewtoggle__btn.active {
+    background: var(--v360-primary, #062952);
+    color: #fff;
+}
+
+/* ====================================================================
+   FOLDER CARDS - variant cua .v360-card de folder + file cung dimensions.
+   Render trong CUNG .v360-grid voi project cards (explorer-style mixed view).
+   ==================================================================== */
+.v360-card--folder .v360-card__media {
+    background: linear-gradient(135deg, #dbeafe 0%, var(--v360-primary-light, #4a90e2) 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+.v360-card--folder .v360-card__media > .v360-card__folder-icon {
+    font-size: clamp(38px, 5cqi, 68px);
+    color: #ffffff;
+    line-height: 1;
+    filter: drop-shadow(0 6px 10px rgba(13, 59, 102, 0.35));
+    transition: transform 0.2s ease;
+}
+.v360-card--folder:hover .v360-card__folder-icon {
+    transform: scale(1.08);
+}
+.v360-card--folder .v360-card__badge {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--v360-primary, #0d3b66);
+}
+/* Legacy: cu giu lai cho cac trang khac neu can */
+.v360-folder-card {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+    padding: clamp(16px, 2cqi, 32px) clamp(12px, 1.6cqi, 24px);
+    background: #fff;
+    border: 1px solid var(--v360-border, #e6ecf3);
+    border-radius: clamp(10px, 1.2cqi, 14px);
+    text-decoration: none;
+    color: var(--v360-text, #1a2a3f);
+    box-shadow: 0 1px 3px rgba(10, 30, 70, 0.05);
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: clamp(160px, 18cqh, 230px);
+}
+.v360-folder-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0, 120, 212, 0.4);
+    box-shadow: 0 10px 24px rgba(10, 30, 70, 0.12);
+    text-decoration: none;
+    color: var(--v360-text, #1a2a3f);
+}
+.v360-folder-card__icon {
+    font-size: clamp(38px, 4.5cqi, 64px);
+    color: var(--v360-primary-light, #4a90e2);
+    line-height: 1;
+    filter: drop-shadow(0 4px 8px rgba(13, 59, 102, 0.25));
+    transition: transform 0.2s ease;
+}
+.v360-folder-card:hover .v360-folder-card__icon { transform: scale(1.08); color: var(--v360-primary, #0d3b66); }
+.v360-folder-card__name {
+    font-weight: 700; font-size: clamp(13px, 1.25cqi, 16px);
+    color: var(--v360-text, #1a2a3f); line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; word-break: break-word;
+}
+.v360-folder-card__meta {
+    color: var(--v360-text-muted, #5a6c83);
+    font-size: clamp(10px, 1cqi, 12px); margin-top: 4px;
+}
+
+/* ====================================================================
+   LIST VIEW - dang Windows folder details rows
+   ==================================================================== */
+.v360-list-wrap > .v360-listview {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    padding-left: var(--list-inset);
+    padding-right: var(--list-inset);
+    display: flex;
+    flex-direction: column;
+}
+.v360-listview__head {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) 140px;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 14px;
+    background: rgba(13, 59, 102, 0.04);
+    border: 1px solid var(--v360-border, #e6ecf3);
+    border-radius: 6px 6px 0 0;
+    font-size: clamp(10px, 0.95cqi, 12px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--v360-text-muted, #5a6c83);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+/* Folder view (3 cols): name | type | count */
+.v360-listview__head:has(.v360-listview__col--count) {
+    grid-template-columns: minmax(0, 3fr) 140px 120px;
+}
+.v360-listview__row {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) 140px;
+    align-items: center;
+    gap: 16px;
+    padding: clamp(8px, 1cqi, 12px) 14px;
+    background: #fff;
+    border-left: 1px solid var(--v360-border, #e6ecf3);
+    border-right: 1px solid var(--v360-border, #e6ecf3);
+    border-bottom: 1px solid var(--v360-border, #e6ecf3);
+    text-decoration: none;
+    color: var(--v360-text, #1a2a3f);
+    font-size: clamp(12px, 1.1cqi, 14px);
+    transition: background 0.12s ease;
+    cursor: pointer;
+}
+.v360-listview__row:hover {
+    background: rgba(0, 120, 212, 0.05);
+    text-decoration: none;
+    color: var(--v360-text, #1a2a3f);
+}
+.v360-listview__row:last-child {
+    border-radius: 0 0 6px 6px;
+}
+/* Folder mode row layout */
+.v360-listview:has(.v360-listview__col--count) .v360-listview__row {
+    grid-template-columns: minmax(0, 3fr) 140px 120px;
+}
+.v360-listview__col {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.v360-listview__col--name {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600;
+}
+.v360-listview__col--desc { color: var(--v360-text-muted, #5a6c83); }
+.v360-listview__col--date { color: var(--v360-text-muted, #5a6c83); font-variant-numeric: tabular-nums; }
+.v360-listview__col--type { color: var(--v360-text-muted, #5a6c83); font-style: italic; }
+.v360-listview__col--count {
+    text-align: right;
+    color: var(--v360-primary-light, #1976d2);
+    font-weight: 700;
+}
+.v360-listview__icon {
+    color: var(--v360-primary-light, #4a90e2);
+    font-size: 1.1em;
+    flex-shrink: 0;
+}
+.v360-listview__row:has(.fa-image) .v360-listview__icon { color: var(--v360-primary-light, #1976d2); }
+
+/* ====================================================================
+   FOLDER-STYLE primary tab cho group co children
+   Visual: icon folder + label + badge so children
+   ==================================================================== */
+.v360-tab.is-folder {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: clamp(12px, 1.4cqi, 22px);
+    padding-right: clamp(10px, 1.2cqi, 18px);
+}
+.v360-tab__icon {
+    font-size: 0.95em;
+    color: var(--v360-primary-light, #1976d2);
+    transition: color 0.15s ease, transform 0.2s ease;
+}
+.v360-tab.is-folder:hover .v360-tab__icon { color: var(--v360-primary, #062952); }
+.v360-tab.is-folder.active .v360-tab__icon {
+    color: #ffd84d;     /* yellow folder-open khi active - manila folder feel */
+    transform: scale(1.05);
+}
+.v360-tab__label { font-weight: inherit; }
+.v360-tab__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px; height: 18px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(13, 59, 102, 0.12);
+    color: var(--v360-primary, #062952);
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    margin-left: 4px;
+}
+.v360-tab.is-folder.active .v360-tab__badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+/* ====================================================================
+   FOLDER CONTENT (sub-tabs row) - "files" inside opened folder
+   Layout: breadcrumb (folder open + name) -> sub-tab buttons
+   ==================================================================== */
+.v360-list-wrap > .v360-subtabs {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(6px, 0.8cqi, 12px);
+    padding: clamp(8px, 1cqh, 14px) var(--list-inset) clamp(10px, 1.3cqh, 18px);
+    margin: 0;
+    background: rgba(13, 59, 102, 0.025);
+    border-bottom: 1px solid var(--v360-border, #e6ecf3);
+    animation: v360-subtabs-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes v360-subtabs-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* Breadcrumb folder header */
+.v360-subtabs__crumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(4px, 0.5cqi, 6px) clamp(8px, 1cqi, 14px) clamp(4px, 0.5cqi, 6px) 0;
+    color: var(--v360-primary, #062952);
+    font-size: clamp(11px, 1.05cqi, 14px);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.v360-subtabs__crumb > i:first-child {
+    color: #ffb800;  /* manila folder open */
+    font-size: 1.1em;
+}
+.v360-subtabs__sep {
+    font-size: 0.7em;
+    color: var(--v360-text-muted, #5a6c83);
+    margin-left: 4px;
+}
+
+/* Sub-tab (file inside folder) */
+.v360-subtab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: clamp(5px, 0.7cqi, 8px) clamp(12px, 1.4cqi, 20px);
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--v360-border, #e6ecf3);
+    color: var(--v360-text-muted, #5a6c83);
+    text-decoration: none;
+    font-size: clamp(11px, 1.05cqi, 14px);
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+.v360-subtab > i {
+    font-size: 0.9em;
+    opacity: 0.7;
+}
+.v360-subtab:hover {
+    background: rgba(0, 120, 212, 0.08);
+    border-color: rgba(0, 120, 212, 0.3);
+    color: var(--v360-primary, #062952);
+    text-decoration: none;
+}
+.v360-subtab:hover > i { opacity: 1; }
+.v360-subtab.active {
+    background: var(--v360-primary, #062952);
+    border-color: var(--v360-primary, #062952);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(13, 59, 102, 0.22);
+}
+.v360-subtab.active > i { opacity: 1; }
+
+/* ============================================================
+   VR STAGE - LIGHT theme cinematic map-select, MATCH Intro page
+   Cream gradient bg + navy text + blue accent. Backdrop subtle.
+   ============================================================ */
+.v360-list-wrap.v360-vr-stage {
+    position: relative;
+    /* White background - clean modern. (Intro de cream chi tam thoi cho doi anh
+       background that). Subtle gradient highlight o tren xuong neutral o duoi. */
+    background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+    color: #002B5C;
+    overflow: hidden;
+    --list-inset: clamp(12px, 3cqi, 56px);
+    --vr-navy: #002B5C;
+    --vr-navy-deep: #002048;
+    --vr-blue: #0078D4;
+    --vr-accent: #00AEEF;
+    --vr-sub: #425A75;
+}
+/* Backdrop: image cua active card BLURRED, light tint - subtle decoration */
+.v360-vr-stage__backdrop {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(60px) saturate(1.2) brightness(1.05);
+    transform: scale(1.2);
+    opacity: 0.18;
+    transition: background-image 0.8s ease, opacity 0.6s ease;
+    z-index: 0;
+    pointer-events: none;
+}
+.v360-vr-stage__veil {
+    position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse 70% 55% at 50% 35%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.1) 60%, transparent 100%),
+        linear-gradient(180deg, transparent 0%, rgba(244,247,251,0.7) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+.v360-vr-stage > *:not(.v360-vr-stage__backdrop):not(.v360-vr-stage__veil) {
+    position: relative;
+    z-index: 2;
+}
+
+/* Header overlayed on cream bg - navy text matching Intro */
+.v360-vr-stage__head .v360-list-title h1 {
+    color: var(--vr-navy) !important;
+    font-size: clamp(22px, 2.8cqi, 42px) !important;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    margin: 4px 0 2px !important;
+}
+.v360-vr-stage__head .v360-list-title p {
+    color: var(--vr-sub) !important;
+}
+.v360-vr-stage__eyebrow {
+    display: inline-block;
+    color: var(--vr-blue);
+    font-size: clamp(10px, 1.05cqi, 14px);
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    position: relative;
+}
+.v360-vr-stage__eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 24px; height: 2px;
+    background: linear-gradient(90deg, var(--vr-blue), var(--vr-accent));
+    vertical-align: middle;
+    margin-right: 10px;
+    border-radius: 2px;
+}
+
+/* Search box light theme */
+.v360-vr-stage .v360-search input {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(0, 90, 180, 0.16);
+    color: var(--vr-navy);
+    backdrop-filter: blur(8px);
+}
+.v360-vr-stage .v360-search input::placeholder { color: var(--vr-sub); }
+.v360-vr-stage .v360-search input:focus {
+    background: #fff;
+    border-color: var(--vr-blue);
+    box-shadow: 0 0 0 3px rgba(0,120,212,0.12);
+}
+.v360-vr-stage .v360-search button {
+    background: var(--vr-blue);
+}
+
+/* Filter chips light glass */
+.v360-vr-stage__filter.v360-tabs-wrap .v360-tabs {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(0, 90, 180, 0.14);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 18px rgba(0, 40, 90, 0.08);
+}
+.v360-vr-stage__filter .v360-tab {
+    color: var(--vr-sub);
+}
+.v360-vr-stage__filter .v360-tab:hover {
+    color: var(--vr-navy);
+    background: rgba(0, 120, 212, 0.08);
+}
+.v360-vr-stage__filter .v360-tab.active {
+    background: linear-gradient(135deg, var(--vr-blue), var(--vr-accent));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0, 120, 212, 0.35);
+}
+.v360-vr-stage__filter .v360-tabs-arrow {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 90, 180, 0.14);
+    color: var(--vr-navy);
+}
+.v360-vr-stage__filter .v360-tabs-arrow:hover {
+    background: var(--vr-blue);
+    color: #fff;
+    border-color: var(--vr-blue);
+}
+
+/* ============================================================
+   HERO SLIDER - game-style map selector for ListVirtual/Index
+   Big cinematic cards, arrows lon, dots indicator
+   ============================================================ */
+.v360-list-wrap > .v360-hero-slider {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1.2cqi, 18px);
+    padding: 0 var(--list-inset);
+}
+.v360-hero-slider__viewport {
+    flex: 1; min-width: 0;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.v360-hero-slider__viewport::-webkit-scrollbar { display: none; }
+.v360-hero-slider__track {
+    display: flex;
+    gap: clamp(16px, 2cqi, 28px);
+    height: 100%;
+    padding: clamp(12px, 1.5cqh, 28px) 0;
+    align-items: stretch;
+}
+/* Card: large hero block, fill viewport height. Light theme shadows */
+.v360-hero-card {
+    position: relative;
+    flex: 0 0 clamp(320px, 56cqi, 760px);
+    height: 100%;
+    border-radius: clamp(12px, 1.6cqi, 22px);
+    overflow: hidden;
+    background: #0a1929;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: 0 16px 40px rgba(0, 40, 90, 0.20);
+    scroll-snap-align: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s ease,
+                opacity 0.4s ease,
+                filter 0.4s ease;
+    transform: scale(0.88);
+    opacity: 0.55;
+    filter: saturate(0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.v360-hero-card.is-active {
+    transform: scale(1);
+    opacity: 1;
+    filter: saturate(1);
+    box-shadow: 0 24px 56px rgba(0, 40, 90, 0.30),
+                0 0 0 1px rgba(0, 120, 212, 0.35),
+                0 0 36px rgba(0, 174, 239, 0.18);
+    border-color: rgba(0, 174, 239, 0.55);
+}
+/* Single card: centered, larger, full intensity */
+.v360-hero-slider__track:has(.v360-hero-card:only-child) {
+    justify-content: center;
+}
+.v360-hero-card:only-child {
+    flex: 0 0 clamp(400px, 70cqi, 920px);
+    transform: scale(1);
+    opacity: 1;
+    filter: saturate(1);
+    box-shadow: 0 24px 56px rgba(0, 40, 90, 0.28),
+                0 0 0 1px rgba(0, 120, 212, 0.30),
+                0 0 50px rgba(0, 174, 239, 0.16);
+    border-color: rgba(0, 174, 239, 0.5);
+}
+.v360-hero-card:hover {
+    text-decoration: none;
+    color: #fff;
+    transform: scale(1.01);
+}
+.v360-hero-card.is-active:hover { transform: scale(1.015); }
+
+.v360-hero-card__bg {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.v360-hero-card:hover .v360-hero-card__bg { transform: scale(1.04); }
+
+.v360-hero-card__overlay {
+    position: absolute; inset: 0;
+    background:
+        linear-gradient(180deg, rgba(6, 41, 82, 0.1) 0%, rgba(6, 41, 82, 0.4) 55%, rgba(6, 41, 82, 0.92) 100%);
+    pointer-events: none;
+}
+
+.v360-hero-card__badge {
+    position: absolute;
+    top: clamp(12px, 1.8cqi, 22px);
+    left: clamp(12px, 1.8cqi, 22px);
+    display: inline-flex;
+    align-items: center; gap: 6px;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--v360-primary, #062952);
+    font-size: clamp(10px, 1.05cqi, 13px);
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    z-index: 2;
+}
+.v360-hero-card__badge i { font-size: clamp(11px, 1.1cqi, 14px); }
+
+.v360-hero-card__content {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: clamp(16px, 2.2cqi, 32px) clamp(20px, 3cqi, 44px) clamp(20px, 2.6cqi, 36px);
+    z-index: 2;
+}
+.v360-hero-card__eyebrow {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: clamp(10px, 1.05cqi, 13px);
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: clamp(6px, 0.8cqi, 12px);
+}
+.v360-hero-card__title {
+    color: #fff;
+    font-size: clamp(20px, 2.6cqi, 36px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 clamp(8px, 1cqi, 14px);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+.v360-hero-card__desc {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: clamp(11px, 1.2cqi, 15px);
+    line-height: 1.5;
+    margin: 0 0 clamp(10px, 1.2cqi, 16px);
+    max-width: 85%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.v360-hero-card__meta {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: clamp(10px, 1cqi, 12px);
+    margin: 0;
+    display: flex; gap: 14px;
+}
+.v360-hero-card__meta i { margin-right: 4px; color: var(--v360-accent, #2cc1e8); }
+.v360-hero-card__cta {
+    display: inline-flex;
+    align-items: center; gap: 10px;
+    padding: clamp(8px, 1cqi, 14px) clamp(16px, 2cqi, 28px);
+    background: linear-gradient(135deg, var(--v360-accent, #00bcd4), var(--v360-primary-light, #1976d2));
+    color: #fff;
+    border-radius: 999px;
+    font-size: clamp(11px, 1.15cqi, 14px);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    box-shadow: 0 8px 22px rgba(0, 188, 212, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.v360-hero-card__cta i { font-size: clamp(12px, 1.3cqi, 16px); }
+.v360-hero-card:hover .v360-hero-card__cta {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 188, 212, 0.5);
+}
+
+/* Arrows: white circle với navy chevron, lift on hover */
+.v360-hero-slider__arrow {
+    flex-shrink: 0;
+    width: clamp(44px, 4cqi, 60px);
+    height: clamp(44px, 4cqi, 60px);
+    border-radius: 50%;
+    border: 1px solid rgba(0, 90, 180, 0.14);
+    background: #fff;
+    color: #002B5C;
+    cursor: pointer;
+    font-size: clamp(14px, 1.5cqi, 18px);
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px rgba(0, 40, 90, 0.14);
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.v360-hero-slider__arrow:hover {
+    background: #0078D4;
+    color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 10px 26px rgba(0, 120, 212, 0.35);
+}
+.v360-hero-slider__arrow:active { transform: scale(0.96); }
+
+/* Footer: counter + dots row, centered */
+.v360-list-wrap > .v360-hero-slider__footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 2cqi, 32px);
+    padding: clamp(10px, 1.4cqh, 24px) 0 clamp(14px, 2cqh, 28px);
+}
+/* Counter "01 / 03" light theme */
+.v360-hero-slider__counter {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    color: #002B5C;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+}
+.v360-hero-slider__counter-cur {
+    color: #0078D4;
+    font-size: clamp(18px, 2.2cqi, 28px);
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+.v360-hero-slider__counter-sep {
+    color: rgba(0, 43, 92, 0.35);
+    font-size: clamp(14px, 1.6cqi, 20px);
+    margin: 0 2px;
+}
+.v360-hero-slider__counter-tot {
+    color: rgba(0, 43, 92, 0.55);
+    font-size: clamp(13px, 1.4cqi, 18px);
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+/* Dots light theme */
+.v360-hero-slider__dots {
+    display: flex;
+    gap: 8px;
+}
+.v360-hero-slider__dot {
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(0, 43, 92, 0.22);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+.v360-hero-slider__dot:hover {
+    background: rgba(0, 120, 212, 0.6);
+    transform: scale(1.2);
+}
+.v360-hero-slider__dot.is-active {
+    background: #0078D4;
+    width: 28px;
+    box-shadow: 0 2px 10px rgba(0, 120, 212, 0.4);
+}
+
+/* Card grid:
+   - Columns: auto-fill voi minmax(clamp), scale theo container width
+   - Rows: FIXED height qua grid-auto-rows. Min 230px = du fit media 45% +
+     body 55% (title 2 lines + desc 1 line + meta + padding). */
+.v360-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 15cqi, 250px), 1fr));
+    grid-auto-rows: clamp(230px, 26cqh, 310px);
+    gap: clamp(8px, 1.2cqi, 22px);
+}
+/* Card: CSS Grid 2 rows voi ratio 45% media / 55% body.
+   Body 55% du space cho title (2 lines) + desc (1 line) + meta (date row).
+   - Cards co kich thuoc dong nhat o moi grid cell (grid-auto-rows fixed)
+   - overflow: hidden clip noi dung that o boundary -> measure chinh xac. */
+.v360-card {
+    background: var(--v360-surface);
+    border-radius: var(--v360-radius);
+    overflow: hidden;
+    box-shadow: var(--v360-shadow-sm);
+    transition: all var(--v360-trans);
+    text-decoration: none;
+    color: inherit;
+    display: grid;
+    grid-template-rows: 45% 55%;
+    position: relative;
+}
+.v360-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--v360-shadow-lg);
+    text-decoration: none;
+    color: inherit;
+}
+/* Media: row 1 cua card grid (55% chieu cao). Khong dung padding-top trick
+   vi grid row da define height. img absolute-fill 100% media area. */
+.v360-card__media {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e3eaf2, #c5d3e2);
+    width: 100%; height: 100%;
+}
+.v360-card__media > img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    display: block;
+}
+.v360-card__media > .v360-card__overlay {
+    position: absolute; inset: 0;
+}
+.v360-card:hover .v360-card__media img { transform: scale(1.06); }
+.v360-card__badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: rgba(255,255,255,0.95);
+    color: var(--v360-primary);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    border-radius: var(--v360-radius-pill);
+    backdrop-filter: blur(6px);
+}
+.v360-card__overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(6,41,82,0.85) 100%);
+    display: flex; align-items: flex-end;
+    padding: 16px;
+    opacity: 0;
+    transition: opacity var(--v360-trans);
+}
+.v360-card:hover .v360-card__overlay { opacity: 1; }
+.v360-card__overlay-action {
+    color: #fff; font-size: 13px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+/* Body: row 2 cua card grid (45% chieu cao FIXED). Su dung grid 3-row layout
+   noi bo: title (auto), desc (auto), meta (auto with margin-top:auto khong dung
+   nua - meta o row cuoi explicit). overflow: hidden de clip neu content vuot. */
+.v360-card__body {
+    padding: clamp(10px, 1.4cqi, 18px) clamp(12px, 1.6cqi, 20px);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+.v360-card__title {
+    font-size: clamp(12px, 1.35cqi, 17px);
+    font-weight: 700; color: var(--v360-text);
+    margin: 0 0 clamp(3px, 0.5cqi, 8px);
+    line-height: 1.3;
+    max-height: 2.6em;            /* 2 lines × 1.3 line-height */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    flex-shrink: 0;
+}
+/* Desc: chi 1 dong de tiet kiem space trong body 55% (meta phai luon visible) */
+.v360-card__desc {
+    font-size: clamp(10px, 1.05cqi, 13px); color: var(--v360-text-muted);
+    line-height: 1.4; margin: 0;
+    max-height: 1.4em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    flex-shrink: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.v360-card__meta {
+    margin-top: auto;            /* pin xuong day body */
+    padding-top: clamp(5px, 0.8cqi, 10px);
+    display: flex;
+    gap: clamp(6px, 0.9cqi, 12px);
+    align-items: center;
+    font-size: clamp(9px, 0.95cqi, 12px);
+    color: var(--v360-text-muted);
+    border-top: 1px solid var(--v360-border);
+    flex-shrink: 0;              /* KHONG bao gio bi squeeze - date luon visible */
+}
+.v360-card__meta i { color: var(--v360-primary-light); }
+
+/* Empty state */
+.v360-empty {
+    text-align: center;
+    padding: 80px 20px;
+    background: var(--v360-surface);
+    border-radius: var(--v360-radius);
+    box-shadow: var(--v360-shadow-sm);
+}
+.v360-empty i { font-size: 56px; color: var(--v360-border); margin-bottom: 16px; }
+.v360-empty h3 { font-size: 18px; font-weight: 700; color: var(--v360-text); margin: 0 0 6px; }
+.v360-empty p { font-size: 14px; color: var(--v360-text-muted); margin: 0; }
+
+/* Pagination - override default PagedList.css to match design */
+.v360-pagination {
+    margin-top: 32px;
+    display: flex; justify-content: center;
+}
+.v360-pagination .pagination,
+.v360-pagination .pager,
+.v360-pagination ul {
+    display: flex !important; gap: 4px;
+    padding: 6px !important;
+    background: var(--v360-surface) !important;
+    border-radius: var(--v360-radius-pill) !important;
+    box-shadow: var(--v360-shadow-sm);
+    list-style: none; margin: 0;
+    border: none !important;
+}
+.v360-pagination li {
+    list-style: none !important;
+    display: inline-block;
+    margin: 0 !important; padding: 0 !important;
+    border: none !important; background: transparent !important;
+}
+.v360-pagination a,
+.v360-pagination span,
+.v360-pagination li > a,
+.v360-pagination li > span {
+    display: inline-grid !important;
+    place-items: center !important;
+    min-width: 38px; height: 38px;
+    padding: 0 14px !important;
+    border-radius: var(--v360-radius-pill) !important;
+    font-size: 14px; font-weight: 600;
+    color: var(--v360-text-muted) !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    border: none !important;
+    line-height: 1;
+}
+.v360-pagination a:hover,
+.v360-pagination li > a:hover {
+    background: rgba(13,59,102,0.08) !important;
+    color: var(--v360-primary) !important;
+}
+.v360-pagination .active > a,
+.v360-pagination .active > span,
+.v360-pagination li.active > a,
+.v360-pagination li.active > span {
+    background: linear-gradient(135deg, var(--v360-primary), var(--v360-primary-light)) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(13,59,102,0.25);
+}
+.v360-pagination .disabled > a,
+.v360-pagination .disabled > span {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* ===== Details viewer (iframe + minimap overlay) =========
+   Khoa toan bo body khi o trang viewer de chan scroll page-level.
+   Inner content quan ly scroll cuc bo (thumbs list). */
+html:has(.v360-viewer--custom),
+body:has(.v360-viewer--custom) { overflow: hidden !important; }
+
+/* Wrapper layout: ensure outer chain khong tao overflow ngoai vung viewer */
+.v360-app-outer { overflow: hidden; min-width: 0; }
+.v360-app-inner { overflow: hidden; min-width: 0; min-height: 0; display: flex; }
+.v360-area--viewer {
+    flex: 1 1 auto;
+    min-width: 0; min-height: 0;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+
+.v360-viewer {
+    background: #000;
+    padding: 0;
+    flex: 1 1 auto;
+    min-width: 0; min-height: 0;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.v360-viewer--custom { /* background da set o .v360-viewer */ }
+.v360-viewer__head {
+    display: flex; justify-content: space-between; gap: 12px;
+    align-items: center; flex-wrap: nowrap;
+    margin-bottom: 8px;
+    color: #fff;
+    flex-shrink: 0;
+    min-width: 0;
+}
+.v360-viewer__head-left {
+    display: flex; align-items: center; gap: 12px;
+    flex: 1 1 auto; min-width: 0;
+    overflow: hidden;
+}
+.v360-viewer__head-right {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+}
+/* Toolbar control buttons (audio / gyro / vr / fullscreen) */
+.v360-ctrl {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--v360-trans);
+    flex-shrink: 0;
+}
+.v360-ctrl:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: #fff;
+    transform: translateY(-1px);
+}
+.v360-ctrl.is-active {
+    background: linear-gradient(135deg, var(--v360-primary-light), var(--v360-accent));
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(44,193,232,0.4);
+}
+.v360-ctrl[disabled] { opacity: 0.35; cursor: not-allowed; }
+
+/* Live orientation readout (heading / pitch / zoom) */
+.v360-orient {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    letter-spacing: 0.3px;
+}
+.v360-orient i { color: var(--v360-accent); font-size: 13px; }
+.v360-orient b { color: #fff; font-weight: 700; min-width: 26px; display: inline-block; text-align: right; }
+.v360-orient__sep { opacity: 0.4; }
+@media (max-width: 720px) {
+    .v360-orient { display: none; }
+}
+
+/* Loading overlay (iframe chromeless co the trang trong khi tai) */
+/* ===== Modern loading screen - 360 brand identity =====
+   Tu spinner + text don gian sang multi-element layout:
+   - Dual orbit rings rotating opposite directions (representation 360)
+   - "360°" core text giua
+   - Title lon + sub muted
+   - Indeterminate progress bar duoi cung
+   - Dark gradient background voi subtle radial glow */
+.v360-loading {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 2.5vh, 32px);
+    background:
+        radial-gradient(ellipse at center, rgba(44,193,232,0.10) 0%, transparent 55%),
+        linear-gradient(135deg, #062952 0%, #041e3f 100%);
+    color: #fff;
+    z-index: 15;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    text-align: center;
+}
+.v360-loading.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Orbit element: 2 rings rotating opposite + center "360°" text */
+.v360-loading__orbit {
+    position: relative;
+    width: clamp(90px, 12vh, 130px);
+    height: clamp(90px, 12vh, 130px);
+}
+.v360-loading__orbit-ring {
+    position: absolute; inset: 0;
+    border: 2.5px solid transparent;
+    border-top-color: rgba(44, 193, 232, 0.95);
+    border-right-color: rgba(44, 193, 232, 0.45);
+    border-radius: 50%;
+    animation: v360-spin 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    box-shadow: 0 0 24px rgba(44, 193, 232, 0.25);
+}
+.v360-loading__orbit-ring--reverse {
+    inset: 12px;
+    border-top-color: transparent;
+    border-bottom-color: rgba(255, 255, 255, 0.7);
+    border-left-color: rgba(255, 255, 255, 0.3);
+    animation: v360-spin-reverse 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    box-shadow: none;
+}
+.v360-loading__orbit-core {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-weight: 800;
+    font-size: clamp(14px, 1.6vh, 20px);
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 0 12px rgba(44, 193, 232, 0.6);
+    animation: v360-pulse-text 2s ease-in-out infinite;
+}
+
+/* Text section */
+.v360-loading__text {
+    display: flex; flex-direction: column;
+    gap: clamp(6px, 0.8vh, 10px);
+    max-width: 80vw;
+}
+.v360-loading__title {
+    font-size: clamp(16px, 2vh, 22px);
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+.v360-loading__sub {
+    font-size: clamp(12px, 1.4vh, 15px);
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+}
+
+/* Indeterminate progress bar */
+.v360-loading__bar {
+    width: clamp(180px, 22vw, 280px);
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    position: relative;
+}
+.v360-loading__bar-fill {
+    position: absolute;
+    height: 100%;
+    width: 40%;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--v360-accent, #2cc1e8) 35%,
+        rgba(255, 255, 255, 0.95) 50%,
+        var(--v360-accent, #2cc1e8) 65%,
+        transparent 100%);
+    animation: v360-loading-bar 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    box-shadow: 0 0 12px rgba(44, 193, 232, 0.6);
+}
+.v360-loading__reload {
+    margin-top: 18px;
+    padding: 10px 22px;
+    background: var(--v360-accent, #2cc1e8);
+    color: #062952;
+    border: 0;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(44, 193, 232, .4);
+    transition: transform .15s, box-shadow .15s;
+}
+.v360-loading__reload:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(44, 193, 232, .55);
+}
+
+@keyframes v360-spin { to { transform: rotate(360deg); } }
+@keyframes v360-spin-reverse { to { transform: rotate(-360deg); } }
+@keyframes v360-pulse-text {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 0.85; }
+}
+@keyframes v360-loading-bar {
+    0% { left: -40%; }
+    100% { left: 100%; }
+}
+
+/* Thumb strip (compact, image-only, caption qua tooltip) */
+.v360-thumbs {
+    display: flex; align-items: stretch; gap: 0;
+    padding: 6px 0 0;
+    color: rgba(255,255,255,0.85);
+    flex-shrink: 0;
+    min-width: 0;
+}
+.v360-thumbs__list {
+    display: flex; gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 2px 2px 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.25) transparent;
+}
+.v360-thumbs__list::-webkit-scrollbar { height: 6px; }
+.v360-thumbs__list::-webkit-scrollbar-track { background: transparent; }
+.v360-thumbs__list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 3px; }
+.v360-thumbs__list::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+.v360-thumbs__hint {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+    align-self: center;
+    padding: 0 8px;
+}
+.v360-thumb {
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    width: 72px; height: 48px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    padding: 0;
+}
+.v360-thumb:hover {
+    border-color: var(--v360-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(44,193,232,0.35);
+    z-index: 2;
+}
+.v360-thumb.is-current {
+    border-color: var(--v360-accent);
+    box-shadow: 0 0 0 2px var(--v360-accent), 0 4px 10px rgba(44,193,232,0.45);
+    z-index: 2;
+}
+.v360-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+.v360-thumb i {
+    width: 100%; height: 100%;
+    display: grid; place-items: center;
+    font-size: 16px; color: rgba(255,255,255,0.35);
+}
+.v360-thumb span {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 2px 4px;
+    font-size: 9.5px; font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.75) 60%);
+    white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+    pointer-events: none;
+}
+.v360-thumb.is-current span {
+    background: linear-gradient(180deg, transparent, rgba(44,193,232,0.85) 60%);
+}
+.v360-viewer__title {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0;
+    font-size: 15px; font-weight: 700;
+    color: #fff;
+    min-width: 0;
+    overflow: hidden;
+}
+.v360-viewer__title #v360-scene-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+.v360-viewer__badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, var(--v360-primary-light), var(--v360-accent));
+    border-radius: var(--v360-radius-pill);
+    font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px;
+    color: #fff;
+    flex-shrink: 0;
+}
+.v360-viewer__back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: var(--v360-radius-pill);
+    font-size: 12px; font-weight: 600;
+    transition: all var(--v360-trans);
+    flex-shrink: 0;
+}
+.v360-viewer__back:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border-color: #fff;
+    text-decoration: none;
+}
+.v360-viewer__stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: 0;
+    overflow: hidden;
+    background: #000;
+}
+/* Stage o trang thai fullscreen: chiem full viewport, minimap van la child nen hien thi */
+.v360-viewer__stage:fullscreen { width: 100vw; height: 100vh; }
+.v360-viewer__stage:-webkit-full-screen { width: 100vw; height: 100vh; }
+
+/* Project Details back button: floating, khong chiem hang ngang */
+.v360-project-back {
+    position: absolute;
+    top: 12px; left: 12px;
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: rgba(6, 41, 82, 0.85);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    z-index: 25;
+    backdrop-filter: blur(8px);
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.v360-project-back:hover {
+    background: var(--v360-accent);
+    transform: scale(1.06);
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.v360-viewer__iframe {
+    width: 100%; height: 100%;
+    max-width: 100%;
+    border: 0;
+    display: block;
+}
+
+/* Minimap overlay - bottom-right, landscape rectangular, vien mong */
+.v360-minimap {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    width: 320px;
+    height: 460px;
+    background: rgba(6, 41, 82, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    z-index: 20;
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+    /* Smooth swap khi chatbot open/close. Khong apply cho fullscreen/minimized
+       (cac state do override position rieng, transition van fire ok). */
+    transition: top .35s cubic-bezier(.4, 0, .2, 1),
+                left .35s cubic-bezier(.4, 0, .2, 1),
+                right .35s cubic-bezier(.4, 0, .2, 1),
+                bottom .35s cubic-bezier(.4, 0, .2, 1),
+                width .35s cubic-bezier(.4, 0, .2, 1),
+                height .35s cubic-bezier(.4, 0, .2, 1);
+}
+/* Khi chatbot mo: chi DI CHUYEN minimap len top-left, GIU NGUYEN width/height
+   (320x460 mac dinh) - khong resize de tranh meo ti le minimap. */
+.v360-viewer__stage.cb-open .v360-minimap:not(.is-fullscreen):not(.is-minimized) {
+    top: 16px;
+    left: 16px;
+    bottom: auto;
+    right: auto;
+}
+/* Khi chatbot mo + minimap MINIMIZED (56x56 icon): dat o BEN TRAI panel chatbot
+   voi gap 16px. Panel: right:16 + width:380 = right edge 396 -> icon right:412
+   (right:412 + width 56 = left edge tai right:468 stage). */
+.v360-viewer__stage.cb-open .v360-minimap.is-minimized {
+    top: auto;
+    left: auto;
+    right: 412px;
+    bottom: 22px;
+}
+.v360-minimap__body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #111;
+}
+/* ===== Admin calibration panel (Calibrate page) ===== */
+.v360-admin {
+    position: absolute;
+    top: 16px; left: 16px;
+    width: 320px;
+    max-height: calc(100vh - 100px);
+    background: rgba(6, 41, 82, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    color: #fff;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.v360-admin__head {
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.v360-admin__head h3 {
+    margin: 0 0 4px;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.v360-admin__stats {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.7);
+}
+.v360-admin__stats b { color: var(--v360-accent); }
+.v360-admin__body {
+    padding: 12px 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+.v360-admin__row {
+    margin-bottom: 12px;
+}
+.v360-admin__row label {
+    display: block;
+    font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+.v360-admin__val {
+    font-size: 13px; font-weight: 600;
+    color: #fff;
+    word-break: break-word;
+}
+.v360-admin__uuid {
+    display: block;
+    font-family: 'Consolas', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.3);
+    padding: 4px 6px;
+    border-radius: 4px;
+    word-break: break-all;
+}
+.v360-admin__input-group {
+    display: flex; gap: 4px; align-items: stretch;
+}
+.v360-admin__input-group input {
+    flex: 1; min-width: 0;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 8px;
+    border-radius: 5px;
+    text-align: center;
+}
+.v360-admin__input-group input:focus {
+    outline: none;
+    border-color: var(--v360-accent);
+    box-shadow: 0 0 0 2px rgba(44,193,232,0.3);
+}
+.v360-admin__btn {
+    min-width: 38px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.15s ease;
+}
+.v360-admin__btn:hover { background: rgba(255,255,255,0.18); border-color: var(--v360-accent); }
+.v360-admin__btn:active { background: rgba(255,255,255,0.28); }
+.v360-admin__hint {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+}
+.v360-admin__hint span { color: var(--v360-accent); font-weight: 600; }
+.v360-admin__check {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #fff !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    cursor: pointer;
+}
+.v360-admin__check input { cursor: pointer; width: 16px; height: 16px; }
+.v360-admin__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+    width: 100%;
+}
+.v360-admin__primary, .v360-admin__secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    width: 100%;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+.v360-admin__primary i, .v360-admin__secondary i { font-size: 12px; }
+.v360-admin__primary {
+    background: linear-gradient(135deg, var(--v360-primary-light), var(--v360-accent));
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(44,193,232,0.4);
+}
+.v360-admin__primary:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(44,193,232,0.55); }
+.v360-admin__secondary {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+}
+.v360-admin__secondary:hover { background: rgba(255,255,255,0.18); }
+.v360-admin__danger {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 36px; width: 100%; padding: 0 10px;
+    border: none; border-radius: 6px;
+    font-size: 12.5px; font-weight: 700; line-height: 1;
+    cursor: pointer; box-sizing: border-box;
+    background: linear-gradient(135deg, #c62828, #ef5350);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(198,40,40,0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.v360-admin__danger:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(198,40,40,0.55); }
+
+/* ===== Featured admin panel (Details view co FeaturedAdminMode) ===== */
+.v360-admin--featured .v360-admin__card { padding: 12px 14px; }
+.v360-admin--featured .v360-admin__card-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+}
+.v360-admin--featured .v360-admin__card-head > span { flex: 1; font-weight: 700; font-size: 13px; }
+.v360-feat-preview-link {
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.v360-feat-preview-link:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* === Current scene card === */
+.v360-feat-current__hdr {
+    display: flex; justify-content: flex-end;
+    margin-bottom: 4px;
+}
+.v360-feat-current__pill {
+    font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.18);
+}
+.v360-feat-current__pill[data-state="added"] {
+    background: rgba(76,175,80,0.18);
+    color: #a5e9aa;
+    border-color: rgba(76,175,80,0.4);
+}
+.v360-feat-current__name {
+    font-size: 15px; font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+.v360-feat-current__uuid {
+    display: block;
+    font-size: 10.5px;
+    font-family: ui-monospace, Menlo, monospace;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+    word-break: break-all;
+}
+
+/* Image: full-width clickable label, ratio 16:10, overlay on hover */
+.v360-feat-img {
+    display: block; position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.35);
+    border: 1px dashed rgba(255,255,255,0.22);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.v360-feat-img:hover { border-color: var(--v360-accent); }
+.v360-feat-img.has-image { border-style: solid; border-color: rgba(255,255,255,0.18); }
+.v360-feat-img__photo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+.v360-feat-img__empty {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.5);
+    font-size: 11.5px;
+}
+.v360-feat-img__empty i { font-size: 28px; opacity: 0.6; }
+.v360-feat-img.has-image .v360-feat-img__empty { display: none; }
+.v360-feat-img__overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 12px; font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.v360-feat-img.has-image:hover .v360-feat-img__overlay { opacity: 1; }
+.v360-feat-img:not(.has-image) .v360-feat-img__overlay { display: none; }
+
+.v360-feat-toggle { margin-top: 6px; }
+
+/* === Featured list (right card) === */
+.v360-feat-list {
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 0;
+    margin-bottom: 10px;
+}
+.v360-feat-list__empty {
+    padding: 18px 10px;
+    color: rgba(255,255,255,0.5);
+    text-align: center; font-size: 11.5px;
+    line-height: 1.5;
+    background: rgba(0,0,0,0.18);
+    border-radius: 6px;
+    border: 1px dashed rgba(255,255,255,0.12);
+}
+.v360-feat-list__item {
+    display: grid;
+    grid-template-columns: 22px 44px 1fr auto;
+    gap: 8px; align-items: center;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    margin-bottom: 5px;
+    cursor: pointer;       /* click item body -> jump scene */
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+.v360-feat-list__item:hover { background: rgba(255,255,255,0.10); border-color: rgba(44,193,232,0.35); }
+/* Title + thumb + num la "click target" - khong de cursor pointer trong control buttons */
+.v360-feat-list__ctrl button { cursor: pointer; }
+.v360-feat-list__item.is-current {
+    border-color: var(--v360-accent);
+    background: rgba(44,193,232,0.14);
+    box-shadow: 0 0 0 1px rgba(44,193,232,0.25) inset;
+}
+.v360-feat-list__num {
+    font-weight: 800; font-size: 11px;
+    color: var(--v360-accent);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.v360-feat-list__thumb {
+    width: 44px; height: 32px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 11px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.v360-feat-list__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.v360-feat-list__title {
+    font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.94);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+.v360-feat-list__ctrl {
+    display: flex; gap: 2px;
+}
+.v360-feat-list__ctrl button {
+    width: 22px; height: 22px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.7);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.v360-feat-list__ctrl button:hover:not(:disabled) { background: rgba(255,255,255,0.18); color: #fff; }
+.v360-feat-list__ctrl button:disabled { opacity: 0.25; cursor: not-allowed; }
+.v360-feat-list__ctrl button[data-act=del]:hover:not(:disabled) { background: rgba(198,40,40,0.4); color: #ffd2d2; border-color: rgba(198,40,40,0.5); }
+.v360-admin__msg {
+    margin-top: 10px;
+    min-height: 18px;
+    font-size: 12px; font-weight: 600;
+    text-align: center;
+}
+/* Card UX phan biet per-scene vs tour-global */
+.v360-admin__card {
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+.v360-admin__card--scene {
+    border-left: 3px solid var(--v360-accent);
+    background: linear-gradient(180deg, rgba(44, 193, 232, 0.07) 0%, rgba(0,0,0,0.18) 100%);
+}
+.v360-admin__card--tour {
+    border-left: 3px solid #f5b400;
+    background: linear-gradient(180deg, rgba(245, 180, 0, 0.08) 0%, rgba(0,0,0,0.18) 100%);
+}
+.v360-admin__card-head {
+    display: flex; align-items: center; gap: 8px;
+    margin: 0 -2px 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 13px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+.v360-admin__card--scene .v360-admin__card-head { color: var(--v360-accent); }
+.v360-admin__card--scene .v360-admin__card-head i { color: var(--v360-accent); }
+.v360-admin__card--tour .v360-admin__card-head { color: #f5b400; }
+.v360-admin__card--tour .v360-admin__card-head i { color: #f5b400; }
+.v360-admin__row--colors {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.v360-admin__row--colors > div { min-width: 0; }
+.v360-admin__row .v360-admin__hint {
+    display: inline-block;
+    float: right;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    color: rgba(255,255,255,0.55);
+}
+.v360-admin__row input[type="text"] {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 13px;
+    padding: 6px 8px;
+    border-radius: 5px;
+}
+.v360-admin__row input[type="text"]:focus {
+    outline: none;
+    border-color: var(--v360-accent);
+}
+.v360-admin__row input[type="number"] {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 8px;
+    border-radius: 5px;
+    text-align: center;
+}
+.v360-admin__row input[type="color"] {
+    width: 100%;
+    height: 32px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 2px;
+}
+.v360-admin__row input[type="range"] {
+    width: 100%;
+    accent-color: var(--v360-accent);
+}
+
+/* Control buttons goc tren-phai (FS + minimize) */
+.v360-minimap__ctrls {
+    position: absolute;
+    top: 6px; right: 6px;
+    display: flex; gap: 4px;
+    z-index: 1002;
+}
+.v360-minimap__ctrl-btn {
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    background: rgba(6, 41, 82, 0.85);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 0;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.v360-minimap__ctrl-btn:hover {
+    background: var(--v360-accent);
+    color: #fff;
+}
+
+/* States */
+.v360-minimap.is-fullscreen {
+    /* Center + width/height tinh tu --v360-klh-aspect (set tu JS theo detailBounds).
+       Ca 2 chieu deu explicit qua min() -> khong collapse, khong can aspect-ratio property.
+       --v360-klh-aspect = width/height.
+       Padding 5vh tren+duoi (~50-60px tren FHD) + 32px ngang - khong bi tran sat mep. */
+    top: 50%; left: 50%;
+    right: auto; bottom: auto;
+    transform: translate(-50%, -50%);
+    width: min(calc(100vw - 64px), calc((100vh - 10vh) * var(--v360-klh-aspect, 1.6))) !important;
+    height: min(calc(100vh - 10vh), calc((100vw - 64px) / var(--v360-klh-aspect, 1.6))) !important;
+    z-index: 30;
+}
+.v360-minimap.is-fullscreen .v360-minimap__grip { display: none; }
+
+.v360-minimap.is-minimized {
+    width: 56px !important; height: 56px !important;
+    cursor: pointer;
+}
+.v360-minimap.is-minimized .v360-minimap__body { display: none; }
+.v360-minimap.is-minimized .v360-minimap__grip { display: none; }
+.v360-minimap.is-minimized .v360-minimap__ctrls {
+    top: 50%; right: 50%;
+    transform: translate(50%, -50%);
+    gap: 0;
+}
+.v360-minimap.is-minimized #v360-minimap-fs { display: none; }
+.v360-minimap.is-minimized #v360-minimap-min { width: 44px; height: 44px; font-size: 16px; border: none; background: transparent; }
+.v360-minimap.is-minimized #v360-minimap-min i::before { content: "\f279"; /* fa-map */ }
+
+/* Khi fullscreen, doi icon FS thanh compress */
+.v360-minimap.is-fullscreen #v360-minimap-fs i::before { content: "\f066"; /* fa-compress */ }
+
+/* Resize grip o goc trai-tren - keo ra (up-left) de gian to */
+.v360-minimap__grip {
+    position: absolute;
+    top: 0; left: 0;
+    width: 22px; height: 22px;
+    cursor: nwse-resize;
+    background: rgba(44, 193, 232, 0.55);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    z-index: 1001;
+    transition: background 0.15s ease;
+}
+.v360-minimap__grip:hover { background: var(--v360-accent); }
+.v360-minimap__grip:active { background: rgba(255, 255, 255, 0.9); }
+.v360-minimap__body img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0.85;
+}
+.v360-minimap__marker {
+    position: absolute;
+    width: 0; height: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+/* Cone: apex AT marker center (dot), body extending UP by default */
+.v360-minimap__cone {
+    position: absolute;
+    left: 0; top: 0;
+    width: 0; height: 0;
+    transform: rotate(0deg);
+    transform-origin: 0 0;
+    transition: transform 0.15s linear;
+    pointer-events: none;
+    z-index: 1;
+}
+.v360-minimap__cone::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 0; height: 0;
+    /* 0x0 element with border-top: apex AT element pos (= marker center),
+       base 32px ABOVE apex. Body extends UPWARD from apex. */
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 32px solid rgba(44, 193, 232, 0.7);
+    filter: drop-shadow(0 0 4px rgba(44,193,232,0.8));
+}
+.v360-minimap__dot {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 14px; height: 14px;
+    background: var(--v360-accent);
+    border: 3px solid #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 6px rgba(44,193,232,0.25), 0 2px 8px rgba(0,0,0,0.5);
+    z-index: 2;
+    animation: v360-pulse 2s ease-in-out infinite;
+}
+@keyframes v360-pulse {
+    0%, 100% { box-shadow: 0 0 0 6px rgba(44,193,232,0.25), 0 2px 8px rgba(0,0,0,0.5); }
+    50%      { box-shadow: 0 0 0 12px rgba(44,193,232,0), 0 2px 8px rgba(0,0,0,0.5); }
+}
+.v360-minimap__footer {
+    padding: 5px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.78);
+    background: rgba(0,0,0,0.32);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Leaflet integration (satellite minimap) ===== */
+.v360-minimap__body { padding: 0; overflow: hidden; }
+#v360-leaflet-map {
+    width: 100%; height: 100%;
+    background: #0a1929;
+    cursor: grab;
+}
+#v360-leaflet-map:active { cursor: grabbing; }
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
+}
+.leaflet-control-zoom a {
+    background: rgba(15, 76, 129, 0.92) !important;
+    color: #fff !important;
+    border: none !important;
+    width: 24px !important; height: 24px !important;
+    line-height: 24px !important;
+    font-size: 14px !important;
+}
+.leaflet-control-zoom a:hover { background: var(--v360-accent) !important; }
+
+/* KMZ drone imagery tiles - fade nhe khi LOD chuyen de tranh popping.
+   KHONG dung transform: scale() (anti-alias blur lam mau "bot") hay
+   image-rendering: crisp-edges (lam anh chup tu drone grainy). Browser default
+   scaling cho ket qua tot nhat tren photo content. */
+.v360-kmz-tile {
+    transition: opacity 140ms ease-out;
+    /* Anh drone bi noise + chay sang nhe - giam highlights, tang contrast vua phai,
+       giam saturation de mau dat/co/cong trinh deu nhau, them hue-rotate nhe cho cool tone.
+       Combine voi 'mix-blend-mode: multiply' tren dark base layer -> chong burn out best. */
+    filter: brightness(0.93) contrast(1.08) saturate(0.95);
+}
+/* Higher LOD (chi tiet hon) duoc xem o gan, can sharp - giam contrast it hon */
+.v360-kmz-tile--e,
+.v360-kmz-tile--f {
+    filter: brightness(0.95) contrast(1.05) saturate(0.95);
+}
+/* Lower LOD (overview) thay tu xa - day contrast manh hon cho dep */
+.v360-kmz-tile--a,
+.v360-kmz-tile--b,
+.v360-kmz-tile--c {
+    filter: brightness(0.90) contrast(1.10) saturate(0.92);
+}
+
+/* Scene pins - su dung CSS vars de admin tuy chinh runtime (TOUR_CONFIG) */
+.v360-leaf-pin {
+    background: var(--v360-pin-color, #f5b400);
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.55), 0 0 0 2px rgba(255,255,255,0.65);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.v360-leaf-pin:hover {
+    transform: scale(1.5);
+    z-index: 500 !important;
+    filter: brightness(1.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 0 3px #fff;
+}
+.v360-leaf-pin.is-current { opacity: 0; }  /* an pin tai scene hien tai - current marker xanh che */
+/* Admin mode: hidden pins van hien (dim + dashed) de admin tim lai bat ne */
+.v360-leaf-pin.is-hidden {
+    background: var(--v360-pin-color, #f5b400);
+    opacity: 0.45;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5),
+                0 0 0 4px rgba(0,0,0,0.55);
+    outline: 2px dashed #fff;
+    outline-offset: 2px;
+}
+.v360-leaf-pin.is-hidden:hover {
+    opacity: 0.9;
+    transform: scale(1.4);
+}
+
+/* Tooltip Leaflet hien thi ten tieng Viet khi hover */
+.leaflet-tooltip.v360-leaf-tooltip {
+    background: rgba(6, 41, 82, 0.96);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+    white-space: nowrap;
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.leaflet-tooltip-top.v360-leaf-tooltip::before { border-top-color: rgba(6, 41, 82, 0.96); }
+.leaflet-tooltip-bottom.v360-leaf-tooltip::before { border-bottom-color: rgba(6, 41, 82, 0.96); }
+.leaflet-tooltip-left.v360-leaf-tooltip::before { border-left-color: rgba(6, 41, 82, 0.96); }
+.leaflet-tooltip-right.v360-leaf-tooltip::before { border-right-color: rgba(6, 41, 82, 0.96); }
+
+/* Current marker: dot + cone xoay (apex AT marker, base extend theo huong nhin) */
+.v360-leaf-current {
+    background: transparent !important;
+    border: none !important;
+    pointer-events: none;
+    overflow: visible !important;
+}
+.v360-leaf-cone {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: var(--v360-cone-w, 44px);
+    height: var(--v360-cone-h, 40px);
+    margin-left: var(--v360-cone-half-w, -22px);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background: var(--v360-cone-gradient,
+        linear-gradient(to bottom, rgba(44,193,232,0.85) 0%, rgba(44,193,232,0.05) 100%));
+    transform-origin: 50% 0%;
+    transform: rotate(0deg);
+    transition: transform 0.15s linear;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px var(--v360-cone-shadow, rgba(44,193,232,0.55)));
+}
+.v360-leaf-dot {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: var(--v360-pin-size, 11px);
+    height: var(--v360-pin-size, 11px);
+    background: var(--v360-selected-color, var(--v360-accent));
+    border: 2px solid #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 2px rgba(44,193,232,0.5), 0 1px 4px rgba(0,0,0,0.6);
+    animation: v360-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* ===== Minimap pins (legacy, static image - keep for fallback) ===== */
+.v360-minimap__pins {
+    position: absolute; inset: 0;
+    pointer-events: none;
+}
+.v360-minimap__pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: rgba(25, 118, 210, 0.92);
+    color: #fff;
+    font-size: 11px; font-weight: 800;
+    display: grid; place-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 0 2px rgba(25,118,210,0.35);
+    pointer-events: auto;
+    transition: transform 0.15s ease, background 0.15s ease;
+    padding: 0;
+}
+.v360-minimap__pin:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+    background: var(--v360-accent);
+    z-index: 5;
+}
+.v360-minimap__pin.is-current {
+    background: var(--v360-accent);
+    box-shadow: 0 0 0 4px rgba(44,193,232,0.45), 0 2px 6px rgba(0,0,0,0.5);
+    animation: v360-pulse 2s ease-in-out infinite;
+}
+.v360-minimap__pin-label {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+.v360-minimap__pin:hover .v360-minimap__pin-label,
+.v360-minimap__pin.is-current .v360-minimap__pin-label {
+    opacity: 1;
+}
+@media (max-width: 600px) {
+    .v360-minimap { width: 220px; bottom: 12px; right: 12px; }
+    .v360-minimap__body { height: 160px; }
+    .v360-minimap__title { font-size: 10px; }
+}
+
+/* ===== Zones grid (6 khu vuc chinh - sibling, tren cung bg hero) ====== */
+.v360-zones {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    max-width: 1500px;
+    width: calc(100% - 8vw);
+    align-self: center;
+    margin: 0 0 10px;
+    padding: 0;
+}
+.v360-zones__head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+.v360-zones__head i {
+    color: var(--v360-accent);
+    font-size: 18px;
+}
+.v360-zones__title {
+    font-size: 14px; font-weight: 700;
+    color: #fff;                             /* white tren bg toi */
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+}
+.v360-zones__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+}
+.v360-zone {
+    position: relative;
+    /* No aspect-ratio - parent flex distributes height */
+    border-radius: var(--v360-radius);
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: var(--v360-shadow-md);
+    cursor: pointer;
+    transition: all var(--v360-trans);
+    background: #1a2940;
+    min-height: 0;
+}
+.v360-zone:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--v360-shadow-lg);
+    text-decoration: none;
+    color: #fff;
+}
+.v360-zone__bg {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+}
+.v360-zone:hover .v360-zone__bg { transform: scale(1.08); }
+.v360-zone__overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(6,41,82,0.85) 100%);
+}
+.v360-zone__num {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: rgba(13, 59, 102, 0.85);
+    color: #fff;
+    font-size: 14px; font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.15);
+    z-index: 2;
+}
+.v360-zone__title {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 14px 12px;
+    text-align: center;
+    font-size: 13px; font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, transparent, rgba(6,41,82,0.95));
+    z-index: 2;
+}
+@media (max-width: 1100px) {
+    .v360-zones__grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+    .v360-zones__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .v360-zone__title { font-size: 11px; padding: 10px 6px; }
+}
+
+/* ===== Footer band (sat day man hinh) ============ */
+.v360-footer-band {
+    flex-shrink: 0;
+    margin-top: auto;        /* day xuong day */
+    background: linear-gradient(90deg, var(--v360-primary) 0%, var(--v360-primary-light) 100%);
+    color: rgba(255,255,255,0.92);
+    padding: clamp(6px, 1vh, 14px) 4vw;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(12px, 1.4vw, 24px);
+    font-size: clamp(10px, min(0.78vw, 1.3vh), 13px);
+}
+.v360-footer-band > div {
+    display: flex; align-items: center; gap: 10px;
+    flex: 1; min-width: 220px;
+}
+.v360-footer-band i { font-size: clamp(13px, 1.6vh, 18px); color: rgba(255,255,255,0.9); }
+.v360-footer-band__cnpm {
+    text-align: right; font-weight: 700; letter-spacing: 1px;
+    justify-content: flex-end;
+}
+@media (max-width: 768px) {
+    .v360-footer-band { padding: 14px; font-size: 12px; gap: 16px; }
+    .v360-footer-band > div { min-width: auto; }
+    .v360-footer-band__cnpm { justify-content: flex-start; }
+}
+
+/* ============================================================
+   RESPONSIVE — Index pages (ListProject + ListVirtual)
+   Modern approach: container queries + fluid clamp(cqi).
+   Base rules da scale fluid theo container width - chi can 1 container query
+   cho direction change tai container hep (header switch ngang -> doc).
+   ============================================================ */
+
+/* Container hep (< 600px container width, ~mobile + tablet hep): */
+@container list (max-width: 600px) {
+    /* Header: title + search xep doc */
+    .v360-list-header { flex-direction: column; align-items: stretch; }
+    .v360-search { width: 100%; max-width: 100%; }
+    /* Card description an de title noi bat hon o card nho */
+    .v360-card__desc { display: none; }
+    /* Card aspect ti le 4:3 cho landscape phone OK hon */
+    .v360-card__media { padding-top: 75%; }
+}
+
+/* Container cuc hep (< 380px) - mobile portrait nho: */
+@container list (max-width: 380px) {
+    .v360-tabs-counter { display: none; }
+    .v360-card__media { padding-top: 62%; } /* ti le landscape ngan hon */
+}
+
+/* ============================================================
+   RESPONSIVE — Intro page (hero + zones + footer band)
+   ============================================================ */
+
+/* Laptop 13"-15" */
+@media (max-width: 1399px) {
+    .v360-hero { padding: 24px 3vw 0; }
+    .v360-zones__grid { grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .v360-zone__title { font-size: 12px; padding: 10px 8px; }
+    .v360-hero-content .v360-hero__title { font-size: clamp(24px, 3vw, 40px); }
+    .v360-usage { padding: 14px 20px 16px; }
+}
+
+/* Tablet landscape */
+@media (max-width: 1279px) {
+    .v360-area--fit { height: calc(100vh - 60px); }
+    .v360-hero { padding: 20px 2.5vw 0; }
+    .v360-zones__grid { grid-template-columns: repeat(4, 1fr); }
+    .v360-hero-content { padding: 18px 0 8px; }
+    .v360-hero-content .v360-hero__desc { font-size: 13px; }
+    .v360-usage__items { grid-template-columns: repeat(3, 1fr); }
+    .v360-usage__item { padding: 6px 10px; }
+    .v360-usage__item-icon { width: 40px; height: 40px; font-size: 16px; }
+    .v360-usage__item-title { font-size: 12px; }
+    .v360-usage__item-sub { font-size: 10.5px; }
+}
+
+/* Tablet portrait — let it scroll naturally, không fit viewport */
+@media (max-width: 991px) {
+    .v360-area--fit { height: auto; min-height: calc(100vh - 60px); overflow: visible; }
+    .v360-hero { padding: 18px 3vw 24px; }
+    .v360-zones { width: 100%; padding: 0 3vw; margin: 16px 0; }
+    .v360-zones__grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .v360-zone { aspect-ratio: 4 / 3; }
+    .v360-usage__items { grid-template-columns: 1fr 1fr; }
+    .v360-hero-content .v360-hero__title { font-size: clamp(22px, 4vw, 32px); }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .v360-hero { padding: 16px 4vw 20px; }
+    .v360-hero-content .v360-hero__brand img { height: 32px; }
+    .v360-hero-content .v360-hero__eyebrow { font-size: 10px; letter-spacing: 2px; }
+    .v360-hero-content .v360-hero__title { font-size: clamp(20px, 6vw, 28px); }
+    .v360-hero-content .v360-hero__cta { flex-direction: column; align-items: stretch; }
+    .v360-btn { width: 100%; justify-content: center; padding: 12px 20px; font-size: 13px; }
+    .v360-zones__grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .v360-zone__title { font-size: 10px; padding: 8px 4px; letter-spacing: 0.5px; }
+    .v360-usage { padding: 12px 14px 14px; }
+    .v360-usage__title { font-size: 13px; letter-spacing: 1.5px; }
+    .v360-footer-band { font-size: 11px; padding: 10px 4vw; }
+}

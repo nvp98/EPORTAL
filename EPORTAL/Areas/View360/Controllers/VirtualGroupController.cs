@@ -1,4 +1,4 @@
-﻿using EPORTAL.Models;
+using EPORTAL.Models;
 using EPORTAL.ModelsView360;
 using System;
 using System.Collections.Generic;
@@ -37,6 +37,7 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(ProjectsGroupValidation _DO)
         {
 
@@ -83,6 +84,7 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(ProjectsGroupValidation _DO)
         {
 
@@ -108,7 +110,7 @@ namespace EPORTAL.Areas.View360.Controllers
             }
             try
             {
-                db.ProjectsGroup_delete(id);
+                db.VirtualGroup_delete(id);
             }
             catch (Exception e)
             {

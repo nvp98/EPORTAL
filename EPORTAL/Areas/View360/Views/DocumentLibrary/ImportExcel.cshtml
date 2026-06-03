@@ -1,7 +1,8 @@
-﻿@model EPORTAL.Models.AuthorizationTVValidation
+@model EPORTAL.Models.AuthorizationTVValidation
 
 @using (Html.BeginForm("ImportExcel", "DocumentLibrary", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return myFunction()" }))
 {
+    @Html.AntiForgeryToken()
     <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
     <div class="modal-dialog">
         <div class="modal-content">

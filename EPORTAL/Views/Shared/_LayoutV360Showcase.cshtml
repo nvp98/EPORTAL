@@ -1,0 +1,183 @@
+@using EPORTAL.Models
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>@ViewBag.Title - Dự án 360°</title>
+    <link rel="icon" href="~/Content/assets/images/logo.png" type="image/png" />
+
+    @* Core libs *@
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome-free-6.0.0-web/css/all.min.css" rel="stylesheet" />
+
+    @* View360 styles *@
+    <link href="~/Content/view360-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+    <link href="~/Content/view360-showcase.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body class="v360-sc-body @ViewBag.BodyClass">
+
+    @* ========== HEADER FULL-WIDTH (navy gradient) ========== *@
+    <header class="v360-sc-header">
+        <div class="v360-sc-header__inner">
+
+            @* Context-aware back button - View set BackLabel + BackHref qua ViewBag
+               Default: "Portal" -> /Home/Index khi view khong override. *@
+            @{
+                var _backLabel = (string)ViewBag.BackLabel ?? "Portal";
+                var _backHref  = (string)ViewBag.BackHref  ?? Url.Action("Index", "Home", new { area = "" });
+            }
+            <a href="@_backHref" class="v360-sc-back" title="@_backLabel">
+                <i class="fa fa-arrow-left"></i>
+                <span>@_backLabel</span>
+            </a>
+
+            @* Brand: logo + portal title.
+               Mac dinh KHONG link (tranh redirect bat ngo).
+               View set ViewBag.LogoLink => wrap brand bang <a> de click ve trang chu cua module. *@
+            @{
+                var _logoLink = (string)ViewBag.LogoLink;
+            }
+            @if (!string.IsNullOrEmpty(_logoLink))
+            {
+                <a href="@_logoLink" class="v360-sc-brand v360-sc-brand--link" title="Trang chủ View360">
+                    <img src="~/Content/assets/images/logo.png" alt="HPDQ" class="v360-sc-brand__logo" />
+                    <span class="v360-sc-brand__title">CỔNG THÔNG TIN ĐIỆN TỬ HPDQ</span>
+                </a>
+            }
+            else
+            {
+                <div class="v360-sc-brand">
+                    <img src="~/Content/assets/images/logo.png" alt="HPDQ" class="v360-sc-brand__logo" />
+                    <span class="v360-sc-brand__title">CỔNG THÔNG TIN ĐIỆN TỬ HPDQ</span>
+                </div>
+            }
+
+            @* Search bar - hide khi page set ViewBag.HideSearch (vd: Intro, Details viewer) *@
+            @if (!(ViewBag.HideSearch == true))
+            {
+                <div class="v360-sc-search">
+                    <i class="fa fa-search v360-sc-search__icon"></i>
+                    <input type="text"
+                           id="v360-sc-search-input"
+                           class="v360-sc-search__input"
+                           placeholder="@(ViewBag.SearchPlaceholder ?? "Tìm kiếm...")"
+                           aria-label="@(ViewBag.SearchPlaceholder ?? "Tìm kiếm")"
+                           value="@(ViewBag.search ?? "")" />
+                    <button type="button" class="v360-sc-search__clear" id="v360-sc-search-clear" aria-label="Clear">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <div class="v360-sc-search-spacer"></div>
+            }
+            else
+            {
+                @* Spacer giu user dropdown ben phai *@
+                <div class="v360-sc-flex-spacer"></div>
+            }
+
+            @* User dropdown - khong co bell vi chua co notif feature *@
+            <div class="v360-sc-user">
+                <button type="button" class="v360-sc-user__btn" data-toggle="dropdown" aria-expanded="false">
+                    <span class="v360-sc-user__avatar">
+                        @{
+                            var initial = !string.IsNullOrEmpty(MyAuthentication.TenNV)
+                                ? MyAuthentication.TenNV.Trim().Substring(0, 1).ToUpper()
+                                : "U";
+                        }
+                        @initial
+                    </span>
+                    <span class="v360-sc-user__info">
+                        <span class="v360-sc-user__name">@MyAuthentication.TenNV</span>
+                        <span class="v360-sc-user__role">@MyAuthentication.Username</span>
+                    </span>
+                    <i class="fa fa-chevron-down v360-sc-user__caret"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right v360-sc-user__menu">
+                    @{
+                        int idnv = MyAuthentication.ID;
+                        if (idnv > 0)
+                        {
+                            <a class="dropdown-item" href="@Url.Action("Signature", "Login", new { area = "", id = idnv })">
+                                <i class="fa fa-user"></i> Hồ sơ / Chữ ký
+                            </a>
+                        }
+                    }
+                    <a class="dropdown-item" href="@Url.Action("ChangePassword", "Login", new { area = "" })">
+                        <i class="fa fa-key"></i> Đổi mật khẩu
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item v360-sc-user__logout" href="@Url.Action("Logout", "Login", new { area = "" })">
+                        <i class="fa fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    @* ========== MAIN CONTENT (page renders here) ========== *@
+    <main class="v360-sc-main">
+        @RenderBody()
+    </main>
+
+    @* ========== SCRIPTS ========== *@
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Content/view360-tabs-carousel.js?v=@(DateTime.UtcNow.Ticks)" defer></script>
+
+    <script>
+        (function () {
+            // Search: scope-first (submit voi ?search=...), Enter = trigger
+            var $input = document.getElementById('v360-sc-search-input');
+            var $clear = document.getElementById('v360-sc-search-clear');
+            if (!$input) return;
+
+            function submitSearch() {
+                var v = ($input.value || '').trim();
+                var url = new URL(window.location.href);
+                if (v) url.searchParams.set('search', v);
+                else url.searchParams.delete('search');
+                url.searchParams.delete('page');
+                window.location.href = url.toString();
+            }
+
+            $input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); submitSearch(); }
+            });
+            $clear.addEventListener('click', function () {
+                $input.value = '';
+                submitSearch();
+            });
+            // Toggle clear button visibility
+            function syncClear() { $clear.style.display = $input.value ? 'flex' : 'none'; }
+            $input.addEventListener('input', syncClear);
+            syncClear();
+
+            // Cmd+K / Ctrl+K -> focus search
+            document.addEventListener('keydown', function (e) {
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    $input.focus();
+                    $input.select();
+                }
+            });
+
+            // User dropdown toggle (bootstrap 4 manual fallback)
+            var $userBtn = document.querySelector('.v360-sc-user__btn');
+            var $userMenu = document.querySelector('.v360-sc-user__menu');
+            if ($userBtn && $userMenu) {
+                $userBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    $userMenu.classList.toggle('show');
+                });
+                document.addEventListener('click', function () { $userMenu.classList.remove('show'); });
+            }
+        })();
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

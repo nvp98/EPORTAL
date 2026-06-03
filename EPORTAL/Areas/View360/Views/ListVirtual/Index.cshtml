@@ -1,152 +1,149 @@
-﻿
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Virtual Tour 360°";
+    Layout = "~/Views/Shared/_LayoutV360Showcase.cshtml";
+    ViewBag.BodyClass = "v360-sc-fit";  // viewport-fit layout, pager fixed bottom
 }
 @using EPORTAL.ModelsView360
 @model PagedList.IPagedList<VirtualValidation>
 @using PagedList.Mvc
 @using EPORTAL.Models;
+@{
+    var tabs = (List<TabGroupViewModel>)ViewBag.TabGroups ?? new List<TabGroupViewModel>();
+    var search = (string)ViewBag.search ?? "";
+    ViewBag.SearchPlaceholder = "Tìm tour 360° theo tên...";
+    var fallbackImg = Url.Content("~/Content/assets/images/bg4.jpg");
+    var activeTab = tabs.FirstOrDefault(t => t.Active);
+    var newCutoff = DateTime.Now.Date.AddDays(-7);
 
-<style>
-    /* Style the buttons */
-    .btn_nav {
-        border: none;
-        outline: none;
-        padding: 10px 16px;
-        background-color: #f1f1f1;
-        cursor: pointer;
-        font-size: 18px;
+    // Icon map cho VR tour tabs - theo keyword name
+    Func<string, string> getTabIcon = name =>
+    {
+        var n = (name ?? "").ToLowerInvariant();
+        if (n.Contains("klh") || n.Contains("hpdq")) return "fa-industry";
+        if (n.Contains("kho"))                       return "fa-warehouse";
+        if (n.Contains("cảng") || n.Contains("cang") || n.Contains("cth")) return "fa-anchor";
+        if (n.Contains("camera"))                    return "fa-video";
+        return "fa-vr-cardboard";
+    };
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+
+<div class="v360-sc-fit__head">
+
+    @* Parent tabs - VirtualGroup hien tai flat, khong co sub-groups *@
+    @if (tabs.Count > 0)
+    {
+        <div class="v360-tabs-wrap" data-v360-tabs data-visible="9">
+            <button type="button" class="v360-tabs-arrow v360-tabs-arrow--prev" aria-label="Trước">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+            <nav class="v360-sc-tabs" aria-label="Nhóm tour 360">
+                @foreach (var tab in tabs)
+                {
+                    <a class="v360-sc-tab @(tab.Active ? "active" : "")"
+                       href="@Url.Action("Index", "ListVirtual", new { id = tab.IDGroup })"
+                       title="@tab.GroupName">
+                        <i class="fa @getTabIcon(tab.GroupName) v360-sc-tab__icon"></i>
+                        @tab.GroupName
+                    </a>
+                }
+            </nav>
+            <button type="button" class="v360-tabs-arrow v360-tabs-arrow--next" aria-label="Sau">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+        </div>
     }
 
-        /* Style the active class, and buttons on mouse-over */
-        .active, .btn_nav:hover {
-            background-color: #05428c;
-            color: white;
-        }
-</style>
-<link href="~/Content/PagedList.css" rel="stylesheet" />
-<div class="app-main__outer">
-    <div class="app-main__inner">
-
-        <div class="tab-content">
-            <div class="row">
-                <div class="card">
-
-                    <div class="card-header" style="padding:0px;">
-                        <div class="row" style="width:100%">
-                            <div class="col-md-8 col-lg-8" style="display:flex;padding:8px;" id="myDIV">
-                                @*<nav class="nav nav-pills flex-column flex-sm-row">
-
-                                    </nav>*@
-
-                                <div id="myDIV">
-                                    @{
-                                        EPORTALEntities db = new EPORTALEntities();
-                                        var List_Group = db.Get_IDGroupVirtual(MyAuthentication.ID).ToList();
-                                        foreach (var item in List_Group)
-                                        {
-                                            var Group = db.VirtualGroups.Where(x => x.IDGroup == item.IDGroup).FirstOrDefault();
-                                            <a href="@Url.Action("Index", "ListVirtual", new {@id = @item.IDGroup})"><button class="btn_nav" id="@Group.IDGroup">@Group.GroupName</button></a>
-                                        }
-                                    }
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-4">
-
-                                <div class="div_search">
-                                    <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-controls" value="@ViewBag.search" style="width:300px">
-                                    <button class="form-controls btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-
-
-                        <div class="row">
-                            @foreach (var item in Model)
-                            {
-                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" style="padding: 10px;">
-                                    <div style="background: #f1f1f1;">
-                                        <div class="box" style="border-radius: 0px; background: none; box-shadow: 2px 2px 10px gray;">
-                                            <a class="preview" style="border-radius: 0px; margin-top: 0px;" href="@Url.Action("Intro", "ListVirtual", new {@id = @item.ID})"><img style="border-radius: 0px; height:250px;" src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.Images))" /></a>
-                                        </div>
-                                        <div class="link" style="text-align: center; background: #f1f1f1; height: 100px; box-shadow: 2px 2px 10px gray; padding: 0 3% 0 3%;">
-                                            <h3 placeholder="Name"><a style="color: black;font-size: 15px;" href="@Url.Action("Intro", "ListVirtual", new {@id = @item.ID})">@item.Title</a> </h3>
-                                            <p placeholder="Description" class="desc">@item.Note</p>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-
-                            }
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <div class="pager">
-                            @Html.PagedListPager(Model, page => Url.Action("Index", "ListVirtual", new { area = "View360", page }))
-                            <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-
-    <div class="app-wrapper-footer">
-        <div class="app-footer">
-            <div class="app-footer__inner">
-                <div class="footer_content d-flex justify-content-between">
-                    <div class="footer_item">
-                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
-                    </div>
-                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
-                        <ul class="d-flex justify-content-center">
-
-                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
-                    <div class="footer_item_copy d-flex">
-                        <span class="copyright">Copyright</span>
-                        <ul class="copyright_ul">
-                            <li>Ban công nghệ thông tin</li>
-                            <li>Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    @* Filter bar *@
+    <div class="v360-sc-filterbar">
+        <div class="v360-sc-filterbar__left">
+            <span class="v360-sc-crumb__current">
+                @(!string.IsNullOrEmpty(search) ? "Kết quả tìm kiếm" : (activeTab != null ? activeTab.GroupName : "Tất cả tour 360°"))
+            </span>
+            <span class="v360-sc-crumb__meta">· @Model.TotalItemCount tour</span>
+            @if (!string.IsNullOrEmpty(search))
+            {
+                var clearSearchUrl = Url.Action("Index", "ListVirtual", new { id = activeTab != null ? (int?)activeTab.IDGroup : null });
+                <a href="@clearSearchUrl" class="v360-sc-searchchip" title="Bỏ từ khoá tìm kiếm này">
+                    <i class="fa fa-search v360-sc-searchchip__icon"></i>
+                    <span>Tìm: <b>@search</b></span>
+                    <span class="v360-sc-searchchip__close" aria-label="Xoá tìm kiếm">×</span>
+                </a>
+            }
         </div>
     </div>
-
 
 </div>
 
-<script type="text/javascript">
-     $("#btn-search").on('click', function () {
-        var search = $('#txtsearch').val();
-        window.location.href = '@Url.Action("Index", "ListVirtual")?search=' + search;
-     });
+<div class="v360-sc-fit__body">
 
-    var url = window.location.pathname;
-    var id = url.substring(url.lastIndexOf('/') + 1);
-
-    var header = document.getElementById("myDIV");
-    var btns = header.getElementsByClassName("btn_nav");
-    for (var i = 0; i < btns.length; i++) {
-        var myId = $(btns[i]).attr('id');
-        if (myId == id) {
-            btns[i].className += " active";
+@* ====================================================================
+   CONTENT: pure card grid - giong ListProject
+   ==================================================================== *@
+@if (Model.Count == 0)
+{
+    <div class="v360-sc-empty">
+        <i class="fa fa-vr-cardboard"></i>
+        <h3>Chưa có tour 360°</h3>
+        <p>
+            @if (!string.IsNullOrEmpty(search))
+            {
+                <text>Không tìm thấy kết quả cho "@search". Thử từ khóa khác hoặc đổi nhóm.</text>
+            }
+            else
+            {
+                <text>Nhóm này chưa có tour 360° nào. Chọn nhóm khác trên thanh tab phía trên.</text>
+            }
+        </p>
+    </div>
+}
+else
+{
+    <div class="v360-grid">
+        @foreach (var item in Model)
+        {
+            var imgUrl = string.IsNullOrEmpty(item.Images)
+                ? fallbackImg
+                : Url.Content("~/Images/" + System.IO.Path.GetFileName(item.Images));
+            var introUrl = Url.Action("Intro", "ListVirtual", new { id = item.ID });
+            <a class="v360-card" href="@introUrl">
+                <div class="v360-card__media">
+                    <img src="@imgUrl" alt="@item.Title"
+                         width="400" height="275"
+                         loading="lazy" decoding="async" />
+                    <span class="v360-card__badge"><i class="fa fa-vr-cardboard"></i>&nbsp;VR 360°</span>
+                    <div class="v360-card__overlay">
+                        <span class="v360-card__overlay-action">
+                            Khám phá <i class="fa fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="v360-card__body">
+                    <h3 class="v360-card__title">@item.Title</h3>
+                    @{
+                        var displayNote = (item.Note ?? "").Trim();
+                        if (displayNote.Length < 2) { displayNote = ""; }
+                    }
+                    @if (!string.IsNullOrEmpty(displayNote))
+                    {
+                        <p class="v360-card__desc">@displayNote</p>
+                    }
+                    <div class="v360-card__meta">
+                        <span><i class="fa fa-calendar"></i> @item.Date.ToString("dd/MM/yyyy")</span>
+                    </div>
+                </div>
+            </a>
         }
-    }
-</script>
+    </div>
+}
 
+</div>
 
-
+@if (Model.Count > 0 && Model.PageCount > 1)
+{
+    <div class="v360-sc-fit__pager v360-pagination">
+        @Html.PagedListPager(Model,
+            page => Url.Action("Index", "ListVirtual", new { area = "View360", page, id = ViewContext.RouteData.Values["id"], search }))
+    </div>
+}

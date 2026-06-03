@@ -1,0 +1,760 @@
+/* ============================================================
+   VIEW360 SHOWCASE LAYOUT
+   - Dark blue full-width header
+   - Pill tabs (parent + sub)
+   - Light bg content area
+   - Apply to: ListProject, ListVirtual
+   ============================================================ */
+
+:root {
+    --sc-header-h: 68px;
+    --sc-navy: #062952;
+    --sc-navy-2: #0d3b66;
+    --sc-blue: #2563eb;
+    --sc-blue-2: #1976d2;
+    --sc-bg: #f4f7fb;
+    --sc-surface: #ffffff;
+    --sc-border: #e2e8f0;
+    --sc-text: #0f172a;
+    --sc-text-muted: #64748b;
+    --sc-radius: 999px;
+    --sc-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --sc-shadow-md: 0 4px 14px rgba(15, 23, 42, 0.10);
+    --sc-shadow-active: 0 6px 18px rgba(37, 99, 235, 0.30);
+}
+
+/* ====== Body / Main ====== */
+.v360-sc-body {
+    background: var(--sc-bg);
+    color: var(--sc-text);
+    margin: 0;
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.v360-sc-main {
+    padding: 24px 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Full-width content mode (vd: ListVirtual/Intro) - bo padding + max-width de hero
+   tran ra edge-to-edge. Content tu quan ly inner spacing. */
+.v360-sc-body.v360-sc-fullwidth .v360-sc-main {
+    padding: 0;
+    max-width: none;
+}
+
+/* Spacer khi search bar an di - giu user dropdown ben phai */
+.v360-sc-flex-spacer { flex: 1; }
+
+/* Viewer mode (Details 360): khoa viewport, main fill remaining height duoi header.
+   Toan bo flex chain phai duoc thiet lap day du tu body -> iframe de viewer co height that.
+   - body: flex column 100vh
+   - header: flex-shrink 0 (~68px)
+   - main: flex 1, display flex column
+   - app-outer: flex 1, display flex column (modern.css chi set overflow, KHONG flex)
+   - app-inner: flex 1 (modern.css da set display:flex row, can them flex:1 + min-height:0)
+   - area--viewer: flex 1 (da co san trong modern.css)
+   - viewer: flex 1 (da co san) -> iframe full height
+*/
+.v360-sc-body.v360-sc-viewer {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.v360-sc-viewer .v360-sc-header { flex-shrink: 0; }
+.v360-sc-viewer .v360-sc-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+.v360-sc-viewer .v360-app-outer {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;  /* CRITICAL: lam flex container de app-inner co height */
+    width: 100%;
+}
+.v360-sc-viewer .v360-app-inner {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    /* display:flex (row) tu modern.css - children co flex:1 se fill */
+}
+
+/* Background trang khi iframe Kuula chua load xong */
+.v360-sc-viewer .v360-viewer,
+.v360-sc-viewer .v360-viewer__stage,
+.v360-sc-viewer .v360-area--viewer { background: #ffffff; }
+.v360-sc-viewer .v360-viewer__stage > iframe {
+    background: #ffffff;
+}
+
+/* Loading overlay - chuyen tu dark navy gradient sang white voi text mau primary */
+.v360-sc-viewer .v360-loading {
+    background:
+        radial-gradient(ellipse at center, rgba(37, 99, 235, 0.06) 0%, transparent 55%),
+        linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    color: var(--sc-text);
+}
+.v360-sc-viewer .v360-loading__orbit-ring {
+    border-top-color: rgba(37, 99, 235, 0.95);
+    border-right-color: rgba(37, 99, 235, 0.45);
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.18);
+}
+.v360-sc-viewer .v360-loading__orbit-ring--reverse {
+    border-top-color: transparent;
+    border-bottom-color: rgba(13, 59, 102, 0.65);
+    border-left-color: rgba(13, 59, 102, 0.30);
+}
+.v360-sc-viewer .v360-loading__orbit-core {
+    color: var(--sc-navy);
+    text-shadow: 0 0 12px rgba(37, 99, 235, 0.20);
+}
+.v360-sc-viewer .v360-loading__title { color: var(--sc-navy); }
+.v360-sc-viewer .v360-loading__sub   { color: var(--sc-text-muted); }
+.v360-sc-viewer .v360-loading__bar   { background: rgba(15, 23, 42, 0.06); }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.v360-sc-header {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(90deg, var(--sc-navy) 0%, var(--sc-navy-2) 100%);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+.v360-sc-header__inner {
+    display: flex; align-items: center; gap: 24px;
+    height: var(--sc-header-h);
+    padding: 0 24px;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+/* --- Back to portal button --- */
+.v360-sc-back {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: var(--sc-radius);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.v360-sc-back:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #fff;
+    text-decoration: none;
+}
+.v360-sc-back i { font-size: 11px; }
+@media (max-width: 768px) {
+    .v360-sc-back span { display: none; }
+    .v360-sc-back { padding: 8px 10px; }
+}
+
+/* --- Brand --- */
+.v360-sc-brand {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none;
+    color: #fff;
+    flex-shrink: 0;
+}
+.v360-sc-brand:hover { color: #fff; text-decoration: none; opacity: .9; }
+.v360-sc-brand__logo {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1); /* convert color logo to white */
+}
+.v360-sc-brand__title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    color: #fff;
+}
+
+/* --- Search --- */
+.v360-sc-search {
+    position: relative;
+    flex: 1;
+    max-width: 560px;
+    margin: 0 auto;
+}
+.v360-sc-search__icon {
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 14px;
+    pointer-events: none;
+}
+.v360-sc-search__input {
+    width: 100%;
+    height: 42px;
+    padding: 0 44px 0 44px;
+    border: none;
+    border-radius: var(--sc-radius);
+    background: #fff;
+    color: var(--sc-text);
+    font-size: 14px;
+    font-family: inherit;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    outline: none;
+    transition: box-shadow 0.18s, transform 0.18s;
+}
+.v360-sc-search__input:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.20), 0 2px 8px rgba(0, 0, 0, 0.10);
+}
+.v360-sc-search__input::placeholder { color: #94a3b8; }
+.v360-sc-search__clear {
+    position: absolute;
+    right: 8px; top: 50%;
+    transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border: none;
+    background: rgba(15, 23, 42, 0.06);
+    color: #64748b;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background 0.15s;
+}
+.v360-sc-search__clear:hover { background: rgba(15, 23, 42, 0.12); color: #0f172a; }
+
+/* --- User dropdown --- */
+.v360-sc-user { position: relative; flex-shrink: 0; }
+.v360-sc-user__btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 6px;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--sc-radius);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.v360-sc-user__btn:hover { background: rgba(255, 255, 255, 0.16); }
+.v360-sc-user__avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sc-blue), var(--sc-blue-2));
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.20);
+}
+.v360-sc-user__info {
+    display: flex; flex-direction: column;
+    text-align: left;
+    line-height: 1.2;
+    max-width: 200px;
+    overflow: hidden;
+}
+.v360-sc-user__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.v360-sc-user__role {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+}
+.v360-sc-user__caret {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.75);
+    transition: transform 0.2s;
+}
+.v360-sc-user__menu.show ~ .v360-sc-user__btn .v360-sc-user__caret { transform: rotate(180deg); }
+.v360-sc-user__menu {
+    position: absolute;
+    right: 0; top: calc(100% + 8px);
+    min-width: 220px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.20);
+    padding: 8px;
+    display: none;
+    z-index: 100;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.v360-sc-user__menu.show { display: block; animation: scFadeDown 0.16s ease-out; }
+@keyframes scFadeDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.v360-sc-user__menu .dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--sc-text);
+    text-decoration: none;
+    transition: background 0.12s;
+}
+.v360-sc-user__menu .dropdown-item:hover { background: #f1f5f9; color: var(--sc-blue); }
+.v360-sc-user__menu .dropdown-item i { width: 16px; text-align: center; color: var(--sc-text-muted); }
+.v360-sc-user__menu .dropdown-item:hover i { color: var(--sc-blue); }
+.v360-sc-user__menu .dropdown-divider {
+    height: 1px;
+    margin: 4px 6px;
+    background: var(--sc-border);
+    border: none;
+}
+.v360-sc-user__logout { color: #dc2626 !important; }
+.v360-sc-user__logout i { color: #dc2626 !important; }
+.v360-sc-user__logout:hover { background: #fef2f2 !important; }
+
+/* ============================================================
+   PAGE: TABS (parent + sub)
+   ============================================================ */
+.v360-sc-tabs {
+    display: flex; gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+}
+.v360-sc-tabs::-webkit-scrollbar { display: none; }
+
+/* Parent tabs */
+.v360-sc-tab {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 11px 22px;
+    border-radius: var(--sc-radius);
+    font-size: 14px; font-weight: 600;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.v360-sc-tab:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: var(--sc-text);
+    text-decoration: none;
+}
+.v360-sc-tab.active {
+    background: linear-gradient(135deg, var(--sc-blue-2), var(--sc-blue));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: var(--sc-shadow-active);
+}
+.v360-sc-tab__icon {
+    font-size: 14px;
+    opacity: 0.6;
+}
+.v360-sc-tab:hover .v360-sc-tab__icon { opacity: 0.85; }
+.v360-sc-tab.active .v360-sc-tab__icon { opacity: 1; color: #fff; }
+
+/* Sub-tabs row container - sit closer to parent tabs */
+.v360-tabs-wrap--sub { margin-top: 6px; }
+
+/* Arrow disabled state (at start/end of scroll) */
+.v360-tabs-arrow.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+    cursor: default;
+}
+/* Khi no overflow, JS them class de optionally collapse arrow space */
+.v360-tabs-wrap.is-no-overflow .v360-tabs-arrow { display: none; }
+
+/* Sub-tabs (children of active parent) */
+.v360-sc-subtabs {
+    display: flex; gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+}
+.v360-sc-subtabs::-webkit-scrollbar { display: none; }
+.v360-sc-subtab {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px 8px 14px;
+    border-radius: var(--sc-radius);
+    font-size: 13px; font-weight: 500;
+    background: transparent;
+    border: 1px solid var(--sc-border);
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.v360-sc-subtab:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: var(--sc-text);
+    text-decoration: none;
+}
+.v360-sc-subtab.active {
+    background: #fff;
+    border: 2px solid var(--sc-blue);
+    color: var(--sc-blue);
+    font-weight: 700;
+    padding: 7px 13px 7px 13px; /* compensate border 2px */
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    transform: translateY(-1px);
+}
+.v360-sc-subtab__icon {
+    font-size: 12px;
+    color: #94a3b8;
+}
+.v360-sc-subtab.active .v360-sc-subtab__icon { color: var(--sc-blue); }
+.v360-sc-subtab__count {
+    padding: 2px 8px;
+    border-radius: var(--sc-radius);
+    background: #e2e8f0;
+    color: var(--sc-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.v360-sc-subtab:hover .v360-sc-subtab__count { background: #cbd5e1; color: var(--sc-text); }
+.v360-sc-subtab.active .v360-sc-subtab__count {
+    background: var(--sc-blue);
+    color: #fff;
+}
+
+/* Special "Tất cả" first sub-tab */
+.v360-sc-subtab--all .v360-sc-subtab__icon { color: var(--sc-blue); }
+.v360-sc-subtab--all .v360-sc-subtab__count { background: #dbeafe; color: var(--sc-blue); }
+.v360-sc-subtab--all.active .v360-sc-subtab__count { background: var(--sc-blue); color: #fff; }
+
+/* ============================================================
+   FILTER BAR (sort + breadcrumb + view toggle)
+   ============================================================ */
+.v360-sc-filterbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    margin: 20px 0 16px;
+    padding: 0;
+    flex-wrap: wrap;
+}
+.v360-sc-crumb {
+    font-size: 13px;
+    color: var(--sc-text-muted);
+}
+.v360-sc-crumb__sep { color: #cbd5e1; margin: 0 8px; }
+.v360-sc-crumb__current { color: var(--sc-text); font-weight: 600; }
+.v360-sc-crumb__meta { color: #94a3b8; margin-left: 12px; }
+
+.v360-sc-filterbar__left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; min-width: 0; }
+
+/* Active search chip: amber pill with × clear button. */
+.v360-sc-searchchip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #78350f;
+    padding: 5px 6px 5px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(217,119,6,.15);
+    transition: all .15s ease;
+    max-width: 360px;
+}
+.v360-sc-searchchip:hover {
+    background: linear-gradient(135deg, #fde68a, #fcd34d);
+    color: #78350f;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(217,119,6,.25);
+}
+.v360-sc-searchchip__icon { font-size: 11px; opacity: .7; }
+.v360-sc-searchchip > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v360-sc-searchchip b { font-weight: 700; }
+.v360-sc-searchchip__close {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px;
+    background: rgba(120,53,15,.12);
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 1;
+    margin-left: 2px;
+    transition: background .12s ease;
+}
+.v360-sc-searchchip:hover .v360-sc-searchchip__close { background: rgba(120,53,15,.25); }
+
+.v360-sc-controls { display: flex; align-items: center; gap: 8px; }
+.v360-sc-sort {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-surface);
+    border-radius: 8px;
+    color: var(--sc-text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+.v360-sc-sort:hover { border-color: #94a3b8; }
+.v360-sc-sort:focus { outline: none; border-color: var(--sc-blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+.v360-sc-viewtoggle {
+    display: inline-flex;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-surface);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.v360-sc-viewtoggle a {
+    padding: 7px 12px;
+    color: var(--sc-text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    border-right: 1px solid var(--sc-border);
+    transition: background 0.15s, color 0.15s;
+}
+.v360-sc-viewtoggle a:last-child { border-right: none; }
+.v360-sc-viewtoggle a:hover { background: #f1f5f9; color: var(--sc-text); text-decoration: none; }
+.v360-sc-viewtoggle a.active {
+    background: linear-gradient(135deg, var(--sc-blue-2), var(--sc-blue));
+    color: #fff;
+}
+
+/* ============================================================
+   GRID / CARDS - override .v360-card cho light bg
+   ============================================================ */
+.v360-sc-main .v360-grid {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    grid-auto-rows: 320px;
+}
+.v360-sc-main .v360-card {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 14px;
+    box-shadow: var(--sc-shadow-sm);
+    transition: all 0.2s ease;
+}
+.v360-sc-main .v360-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+    border-color: rgba(37, 99, 235, 0.30);
+}
+.v360-sc-main .v360-card__title { color: var(--sc-text); }
+.v360-sc-main .v360-card__desc { color: var(--sc-text-muted); }
+.v360-sc-main .v360-card__meta { color: var(--sc-text-muted); }
+.v360-sc-main .v360-card__badge {
+    background: linear-gradient(135deg, var(--sc-blue-2), var(--sc-blue));
+    color: #fff;
+}
+/* "Mới cập nhật" badge - top right, green, static (khong pulse de tranh noisy) */
+.v360-sc-main .v360-card__badge--new {
+    position: absolute;
+    top: 12px; right: 12px; left: auto;
+    background: #10b981;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 4px 10px;
+    border-radius: var(--sc-radius);
+    box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+    z-index: 2;
+}
+
+/* Seen/Unseen eye icon - bottom-right meta row, cung hang voi ngay.
+   - is-seen   (mat mo): muted gray, "da xem roi"
+   - is-unseen (mat dong/slash): primary blue, "chua xem - call attention" */
+.v360-sc-main .v360-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.v360-sc-main .v360-card__seen {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.v360-sc-main .v360-card__seen.is-seen i   { color: #94a3b8; }              /* slate-400 */
+.v360-sc-main .v360-card__seen.is-unseen i { color: var(--sc-blue, #2563eb); } /* primary blue */
+
+/* List view rows trên light bg */
+.v360-sc-main .v360-listview { background: var(--sc-surface); border: 1px solid var(--sc-border); border-radius: 12px; }
+.v360-sc-main .v360-listview__head { background: #f8fafc; color: var(--sc-text-muted); border-bottom: 1px solid var(--sc-border); }
+.v360-sc-main .v360-listview__row { border-bottom: 1px solid #f1f5f9; }
+.v360-sc-main .v360-listview__row:hover { background: #f8fafc; }
+.v360-sc-main .v360-listview__col { color: var(--sc-text); }
+.v360-sc-main .v360-listview__col--desc, .v360-sc-main .v360-listview__col--date { color: var(--sc-text-muted); }
+
+/* Pager */
+.v360-sc-main .v360-pagination { text-align: center; margin: 24px 0; }
+.v360-sc-main .v360-pagination .pagination > li > a,
+.v360-sc-main .v360-pagination .pagination > li > span {
+    color: var(--sc-text);
+    border: 1px solid var(--sc-border);
+}
+.v360-sc-main .v360-pagination .pagination > .active > a,
+.v360-sc-main .v360-pagination .pagination > .active > span {
+    background: linear-gradient(135deg, var(--sc-blue-2), var(--sc-blue));
+    border-color: transparent;
+    color: #fff;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 992px) {
+    .v360-sc-header__inner { gap: 12px; padding: 0 16px; }
+    .v360-sc-brand__title { display: none; }
+    .v360-sc-search { max-width: none; }
+    .v360-sc-user__info { display: none; }
+    .v360-sc-main { padding: 16px; }
+}
+@media (max-width: 640px) {
+    .v360-sc-tab { padding: 9px 16px; font-size: 13px; }
+    .v360-sc-subtab { padding: 6px 10px; font-size: 12px; }
+    .v360-sc-main .v360-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+}
+
+/* ============================================================
+   HOME VIEW: Hero Banner + Section header
+   ============================================================ */
+.v360-sc-banner {
+    position: relative;
+    margin: 24px 0;
+    border-radius: 20px;
+    overflow: hidden;
+    min-height: 240px;
+    background: linear-gradient(135deg, #052147 0%, #0d3b66 45%, #1976d2 100%);
+    box-shadow: 0 8px 28px rgba(13, 59, 102, 0.20);
+    isolation: isolate;
+}
+.v360-sc-banner__bg {
+    position: absolute; inset: 0;
+    background-image: url('/eportal/Content/assets/images/v360-banner-home.jpg');
+    background-size: cover;
+    background-position: center center;
+    z-index: 0;
+}
+.v360-sc-banner__overlay {
+    position: absolute; inset: 0;
+    background: transparent;
+    z-index: 1;
+}
+.v360-sc-banner__content {
+    position: relative;
+    z-index: 2;
+    padding: 36px 40px;
+    max-width: 720px;
+}
+.v360-sc-banner__eyebrow {
+    color: #93c5fd;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.v360-sc-banner__title {
+    color: #fff;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 12px;
+    letter-spacing: -0.3px;
+}
+.v360-sc-banner__desc {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 20px;
+    max-width: 540px;
+}
+.v360-sc-banner__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.v360-sc-banner__chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--sc-radius);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.v360-sc-banner__chip i { color: #93c5fd; font-size: 13px; }
+
+/* Section header (Album mới cập nhật / Xem tất cả) */
+.v360-sc-section {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 28px 0 16px;
+    padding-bottom: 6px;
+}
+.v360-sc-section__title {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--sc-text);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+.v360-sc-section__title__icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: var(--sc-blue);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px;
+}
+.v360-sc-section__more {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--sc-blue);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+.v360-sc-section__more:hover {
+    background: #eef4ff;
+    color: var(--sc-blue-2);
+    text-decoration: none;
+}
+
+/* Empty state */
+.v360-sc-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--sc-text-muted);
+}
+.v360-sc-empty i { font-size: 56px; color: #cbd5e1; display: block; margin-bottom: 16px; }
+.v360-sc-empty h3 { font-size: 18px; color: var(--sc-text); margin: 0 0 6px; }
+.v360-sc-empty p { font-size: 14px; margin: 0; }
+
+/* ============================================================
+   PAGE WRAPPERS - semantic only, KHONG ep grid hay viewport-fit
+   ============================================================ */
+.v360-sc-fit__head,
+.v360-sc-fit__body { /* no-op wrappers, giu cau truc DOM cho future enhance */ }
+.v360-sc-fit__pager { /* pagination tu nhien o cuoi page */ }

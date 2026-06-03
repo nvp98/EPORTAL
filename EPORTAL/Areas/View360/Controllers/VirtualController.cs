@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
+using EPORTAL.Common;
 using EPORTAL.Models;
 using EPORTAL.ModelsView360;
 using ExcelDataReader;
@@ -78,8 +79,22 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(VirtualValidation _DO)
         {
+            var imageError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (imageError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + imageError + "');</script>";
+                return RedirectToAction("Index", "Virtual");
+            }
+            HttpPostedFileBase pdfFile = Request != null ? Request.Files["FileUpload"] : null;
+            var pdfError = FileUploadValidator.ValidatePdf(pdfFile);
+            if (pdfError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + pdfError + "');</script>";
+                return RedirectToAction("Index", "Virtual");
+            }
 
             try
             {
@@ -88,54 +103,26 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-                //Use Namespace called :  System.IO  
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
 
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
-
-
-                ////Add Current Date To Attached File Name  
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
                 //Upload file pdf
                 string filePath = string.Empty;
-                if (Request != null)
+                if (pdfFile != null && pdfFile.ContentLength > 0)
                 {
-                    HttpPostedFileBase file = Request.Files["FileUpload"];
-                    if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
+                    string pathPDF = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(pathPDF))
                     {
-                        string pathPDF = Server.MapPath("~/UploadedFiles/");
-                        if (!Directory.Exists(pathPDF))
-                        {
-                            Directory.CreateDirectory(pathPDF);
-                        }
-                        filePath = pathPDF + Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmm") + "-" + file.FileName);
-
-                        file.SaveAs(filePath);
-                        Stream stream = file.InputStream;
-                        if (file.FileName.EndsWith(".pdf"))
-                        {
-                            _DO.FilePDF = "~/UploadedFiles/" + filePath;
-                        }
-                        else
-                        {
-
-                        }
-
+                        Directory.CreateDirectory(pathPDF);
                     }
-                    else
-                    {
-                        //TempData["msgError"] = "<script>alert('Vui lòng nhập file Import');</script>";
-                    }
-                }
-                else
-                {
-                    //TempData["msgError"] = "<script>alert('Vui lòng nhập file Import');</script>";
+                    var safePdfName = FileUploadValidator.SafeFileName(pdfFile.FileName);
+                    filePath = Path.Combine(pathPDF, safePdfName);
+                    pdfFile.SaveAs(filePath);
+                    _DO.FilePDF = "~/UploadedFiles/" + filePath;
                 }
 
                 var a = db.Virtual_insert(_DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.FilePDF, _DO.IDGroup);
@@ -202,58 +189,55 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(VirtualValidation _DO)
         {
+            var imageError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (imageError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + imageError + "');</script>";
+                return RedirectToAction("Index", "Virtual");
+            }
+            HttpPostedFileBase pdfFile = Request != null ? Request.Files["FileUpload"] : null;
+            var pdfError = FileUploadValidator.ValidatePdf(pdfFile);
+            if (pdfError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + pdfError + "');</script>";
+                return RedirectToAction("Index", "Virtual");
+            }
 
             try
             {
                 string path = Server.MapPath("~/Images/");
-                //string path ="~/Images/";
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
-                //Use Namespace called :  System.IO  
-                //string FileName = _DO.ImageFile !=null?Path.GetFileNameWithoutExtension(_DO.ImageFile.FileName):"";
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
 
-
-                ////Add Current Date To Attached File Name  
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
 
                 //Upload file pdf
                 string filePath = string.Empty;
-                if (Request != null)
+                if (pdfFile != null && pdfFile.ContentLength > 0)
                 {
-                    HttpPostedFileBase file = Request.Files["FileUpload"];
-                    if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
+                    string pathPDF = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(pathPDF))
                     {
-                        string pathPDF = Server.MapPath("~/UploadedFiles/");
-                        if (!Directory.Exists(pathPDF))
-                        {
-                            Directory.CreateDirectory(pathPDF);
-                        }
-                        filePath = pathPDF + Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmm") + "-" + file.FileName);
-
-                        file.SaveAs(filePath);
-                        Stream stream = file.InputStream;
-                        if (file.FileName.EndsWith(".pdf"))
-                        {
-                            _DO.FilePDF = "~/UploadedFiles/" + filePath;
-                        }
-
+                        Directory.CreateDirectory(pathPDF);
                     }
-
-                    var a = db.Virtual_update(_DO.ID, _DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.FilePDF, _DO.IDGroup);
-                    TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
+                    var safePdfName = FileUploadValidator.SafeFileName(pdfFile.FileName);
+                    filePath = Path.Combine(pathPDF, safePdfName);
+                    pdfFile.SaveAs(filePath);
+                    _DO.FilePDF = "~/UploadedFiles/" + filePath;
                 }
+
+                var a = db.Virtual_update(_DO.ID, _DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.FilePDF, _DO.IDGroup);
+                TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
             }
             catch (Exception e)
             {
@@ -321,6 +305,7 @@ namespace EPORTAL.Areas.View360.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddPermission(AuthorizationVirtualValidation _DO)
         {
             AuthorizationVitual aus = new AuthorizationVitual();
@@ -381,8 +366,16 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ImportExcel(AuthorizationVirtualValidation _DO)
         {
+            HttpPostedFileBase excelFile = Request != null ? Request.Files["FileUpload"] : null;
+            var excelError = FileUploadValidator.ValidateExcel(excelFile);
+            if (excelError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + excelError + "');</script>";
+                return RedirectToAction("Index", "Virtual");
+            }
 
             string filePath = string.Empty;
             if (Request != null)
@@ -395,7 +388,8 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         Directory.CreateDirectory(path);
                     }
-                    filePath = path + Path.GetFileName(file.FileName);
+                    var safeName = FileUploadValidator.SafeFileName(file.FileName);
+                    filePath = Path.Combine(path, safeName);
 
                     file.SaveAs(filePath);
                     Stream stream = file.InputStream;

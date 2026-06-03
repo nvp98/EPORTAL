@@ -1,4 +1,4 @@
-﻿using EPORTAL.Models;
+using EPORTAL.Models;
 using EPORTAL.ModelsEquipment;
 using System;
 using System.Collections.Generic;
@@ -36,6 +36,7 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(L_NhomThuVienFileValidation _DO)
         {
 
@@ -82,6 +83,7 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(L_NhomThuVienFileValidation _DO)
         {
 

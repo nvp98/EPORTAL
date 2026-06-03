@@ -1,0 +1,1427 @@
+@{
+    ViewBag.Title = "Quản lý phân quyền";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool canGrant  = (bool)(ViewBag.CanGrant  ?? false);
+    bool canRevoke = (bool)(ViewBag.CanRevoke ?? false);
+}
+
+<style>
+:root {
+    --pm-blue: #2563eb; --pm-blue-d: #1d4ed8; --pm-blue-l: #eff6ff;
+    --pm-border: #e2e8f0; --pm-text: #0f172a; --pm-muted: #64748b; --pm-bg: #f8fafc;
+}
+.pm { padding: 18px; background: var(--pm-bg); min-height: calc(100vh - 60px); }
+
+/* Header */
+.pm-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+.pm-hd h2 { font-size: 19px; font-weight: 700; color: var(--pm-text); margin: 0; display: inline-flex; align-items: center; gap: 8px; }
+.pm-hd__sub { color: var(--pm-muted); font-size: 12px; margin-top: 2px; }
+.pm-hd__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Buttons */
+.pm-btn { padding: 8px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer;
+          border: 1px solid; transition: all .15s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.pm-btn--ghost { background: #fff; color: var(--pm-muted); border-color: var(--pm-border); }
+.pm-btn--ghost:hover { color: var(--pm-blue); border-color: var(--pm-blue); text-decoration: none; }
+.pm-btn--primary { background: var(--pm-blue); color: #fff; border-color: var(--pm-blue); }
+.pm-btn--primary:hover:not(:disabled) { background: var(--pm-blue-d); border-color: var(--pm-blue-d); text-decoration: none; color: #fff; }
+.pm-btn--danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+.pm-btn--danger:hover:not(:disabled) { background: #b91c1c; border-color: #b91c1c; }
+.pm-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Toolbar */
+.pm-toolbar { background: #fff; border: 1px solid var(--pm-border); border-radius: 10px; padding: 12px 16px;
+              display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.pm-toolbar__filter { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex: 1; min-width: 0; }
+.pm-toolbar__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.pm-input { padding: 8px 12px; border: 1px solid var(--pm-border); border-radius: 6px; font-size: 13px; min-width: 220px; }
+.pm-input:focus { outline: none; border-color: var(--pm-blue); box-shadow: 0 0 0 2px rgba(37,99,235,.1); }
+.pm-select { padding: 8px 10px; border: 1px solid var(--pm-border); border-radius: 6px; font-size: 13px; background: #fff; min-width: 140px; }
+.pm-select:focus { outline: none; border-color: var(--pm-blue); }
+
+/* Action bar (3 main workflows) */
+.pm-actions { background: linear-gradient(135deg, #eff6ff, #f8fafc); border: 1px solid #bfdbfe; border-radius: 10px;
+              padding: 14px 16px; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.pm-actions__label { font-size: 12px; color: var(--pm-muted); font-weight: 600; text-transform: uppercase;
+                      letter-spacing: .04em; margin-right: 6px; }
+.pm-action-btn { padding: 10px 16px; background: #fff; border: 1px solid var(--pm-blue); color: var(--pm-blue);
+                  border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+                  display: inline-flex; align-items: center; gap: 8px; transition: all .15s ease; }
+.pm-action-btn:hover { background: var(--pm-blue); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,.25); }
+.pm-action-btn__icon { font-size: 16px; }
+
+/* Table */
+.pm-tablewrap { background: #fff; border: 1px solid var(--pm-border); border-radius: 10px; overflow: hidden; }
+.pm-table-head { padding: 10px 16px; border-bottom: 1px solid var(--pm-border); display: flex;
+                  justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pm-table-info { font-size: 13px; color: var(--pm-text); }
+.pm-table-info b { color: var(--pm-blue); }
+.pm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pm-table th { text-align: left; padding: 11px 14px; background: #f8fafc; color: var(--pm-muted);
+                font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+                border-bottom: 1px solid var(--pm-border); }
+.pm-table td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: var(--pm-text); vertical-align: middle; }
+.pm-table tbody tr:hover td { background: #fafbfc; }
+.pm-table input[type=checkbox] { cursor: pointer; }
+.pm-table__noname { color: var(--pm-muted); font-style: italic; }
+.pm-table small { color: var(--pm-muted); }
+
+/* Hierarchy path styling */
+.pm-grouppath { color: var(--pm-muted); font-size: 12px; }
+.pm-grouppath__leaf { color: var(--pm-text); font-weight: 600; font-size: 13px; }
+.pm-grouppath__sep { color: #cbd5e1; margin: 0 4px; }
+
+.pm-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.pm-badge--p { background: #dbeafe; color: #1d4ed8; }
+.pm-badge--v { background: #ede9fe; color: #6d28d9; }
+.pm-badge--vd { background: #fee2e2; color: #b91c1c; }
+
+.pm-revoke-btn { padding: 5px 10px; background: #fff; border: 1px solid #fecaca; color: #dc2626;
+                  border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; }
+.pm-revoke-btn:hover { background: #fef2f2; border-color: #f87171; }
+
+.pm-pager { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--pm-border); gap: 10px; flex-wrap: wrap; }
+.pm-pager__info { font-size: 12px; color: var(--pm-muted); }
+.pm-pager__nav { display: flex; gap: 4px; align-items: center; font-size: 13px; }
+.pm-pager__nav button { padding: 5px 12px; border: 1px solid var(--pm-border); background: #fff;
+                         color: var(--pm-muted); border-radius: 6px; font-size: 12px; cursor: pointer; }
+.pm-pager__nav button:hover:not(:disabled) { color: var(--pm-blue); border-color: var(--pm-blue); }
+.pm-pager__nav button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Loading / empty */
+.pm-loading { padding: 50px; text-align: center; color: var(--pm-muted); font-size: 13px; }
+.pm-loading::before { content:''; display:inline-block; width:14px; height:14px;
+    border: 2px solid var(--pm-border); border-top-color: var(--pm-blue); border-radius: 50%;
+    animation: pm-spin .8s linear infinite; margin-right: 10px; vertical-align: middle; }
+@@keyframes pm-spin { to { transform: rotate(360deg); } }
+.pm-empty { padding: 60px 20px; text-align: center; color: #94a3b8; }
+.pm-empty__icon { font-size: 42px; opacity: .4; margin-bottom: 12px; }
+.pm-empty__title { font-weight: 600; color: var(--pm-muted); margin-bottom: 4px; }
+.pm-empty__hint { font-size: 12px; }
+
+/* Modal - z-index cao hon global header (thuong 999), padding-top de tranh header */
+.pm-modal-bg { position: fixed; inset: 0; background: rgba(15,23,42,.6); z-index: 99999;
+               display: none; align-items: flex-start; justify-content: center;
+               padding: 80px 20px 40px; overflow-y: auto; }
+.pm-modal-bg.show { display: flex; }
+.pm-modal { background: #fff; border-radius: 14px; max-width: 700px; width: 100%;
+            box-shadow: 0 20px 50px rgba(0,0,0,.3); margin-bottom: 40px; }
+.pm-modal__hd { padding: 16px 22px; border-bottom: 1px solid var(--pm-border);
+                display: flex; justify-content: space-between; align-items: center; }
+.pm-modal__title { font-size: 16px; font-weight: 700; color: var(--pm-text); margin: 0; }
+.pm-modal__close { background: transparent; border: 0; font-size: 22px; color: var(--pm-muted);
+                    cursor: pointer; padding: 0; width: 28px; height: 28px; border-radius: 50%; }
+.pm-modal__close:hover { background: #f1f5f9; color: var(--pm-text); }
+.pm-modal__body { padding: 18px 22px; max-height: calc(100vh - 220px); overflow-y: auto; }
+.pm-modal__ft { padding: 14px 22px; border-top: 1px solid var(--pm-border);
+                display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Form fields */
+.pm-fld { margin-bottom: 16px; }
+.pm-fld__lbl { display: block; font-size: 12px; font-weight: 600; color: var(--pm-text);
+               margin-bottom: 6px; }
+.pm-fld__lbl b { color: var(--pm-blue); }
+.pm-fld input[type=text], .pm-fld input[type=search], .pm-fld select, .pm-fld textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--pm-border); border-radius: 7px;
+    font-size: 13px; box-sizing: border-box; font-family: inherit;
+}
+.pm-fld input:focus, .pm-fld select:focus, .pm-fld textarea:focus {
+    outline: none; border-color: var(--pm-blue); box-shadow: 0 0 0 2px rgba(37,99,235,.12);
+}
+.pm-fld textarea { resize: vertical; min-height: 90px; font-family: monospace; font-size: 12px; }
+.pm-fld__hint { font-size: 11px; color: var(--pm-muted); margin-top: 4px; line-height: 1.4; }
+
+/* Step indicator inside modal */
+.pm-steps { display: flex; gap: 4px; margin-bottom: 16px; }
+.pm-step { flex: 1; padding: 8px 10px; border-radius: 6px; background: #f1f5f9; font-size: 12px;
+            color: var(--pm-muted); text-align: center; font-weight: 600; }
+.pm-step.active { background: var(--pm-blue); color: #fff; }
+.pm-step.done { background: #dcfce7; color: #166534; }
+
+/* User/content picker inside modals */
+.pm-pick { border: 1px solid var(--pm-border); border-radius: 8px; max-height: 220px; overflow-y: auto;
+            background: #fff; margin-bottom: 10px; }
+.pm-pick__item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer;
+                  font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+.pm-pick__item:last-child { border-bottom: 0; }
+.pm-pick__item:hover { background: var(--pm-blue-l); }
+.pm-pick__item input { flex-shrink: 0; cursor: pointer; }
+.pm-pick__item__main { flex: 1; min-width: 0; overflow: hidden; }
+.pm-pick__item__name { font-weight: 600; color: var(--pm-text); }
+.pm-pick__item__meta { font-size: 11px; color: var(--pm-muted); }
+
+.pm-pick-toolbar { padding: 6px 10px; background: #f8fafc; border-bottom: 1px solid var(--pm-border);
+                    font-size: 11px; color: var(--pm-muted); display: flex; justify-content: space-between; align-items: center; }
+.pm-pick-toolbar a { color: var(--pm-blue); cursor: pointer; }
+
+.pm-mode-radio { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.pm-mode-radio label { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+                       border: 1px solid var(--pm-border); border-radius: 8px; cursor: pointer;
+                       transition: all .12s ease; }
+.pm-mode-radio label:hover { background: #f8fafc; }
+.pm-mode-radio input { margin-top: 2px; }
+.pm-mode-radio input:checked + .pm-mode-radio__main { color: var(--pm-blue); }
+.pm-mode-radio label:has(input:checked) { background: var(--pm-blue-l); border-color: var(--pm-blue); }
+.pm-mode-radio__main b { font-size: 13px; color: var(--pm-text); }
+.pm-mode-radio__main small { display: block; color: var(--pm-muted); font-size: 11px; margin-top: 2px; }
+
+/* Preview result inside modal */
+.pm-preview { background: #f8fafc; border: 1px solid var(--pm-border); border-radius: 8px;
+              padding: 12px 14px; margin: 12px 0; }
+.pm-preview__title { font-size: 12px; color: var(--pm-muted); font-weight: 600;
+                      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+.pm-preview__nums { display: flex; gap: 18px; flex-wrap: wrap; }
+.pm-preview__num { text-align: center; }
+.pm-preview__num__n { font-size: 22px; font-weight: 700; }
+.pm-preview__num__lbl { font-size: 11px; color: var(--pm-muted); }
+.pm-preview__num--new .pm-preview__num__n { color: #16a34a; }
+.pm-preview__num--exist .pm-preview__num__n { color: #94a3b8; }
+.pm-preview__num--total .pm-preview__num__n { color: var(--pm-blue); }
+.pm-warn { background: #fef3c7; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px;
+            margin-top: 8px; font-size: 12px; color: #78350f; }
+
+.pm-result-msg { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 13px; }
+.pm-result-msg--ok { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.pm-result-msg--err { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* Resolve preview */
+.pm-resolve { margin-top: 10px; font-size: 12px; }
+.pm-resolve__sec { padding: 4px 8px; border-radius: 6px; margin-bottom: 6px; }
+.pm-resolve__ok { background: #dcfce7; color: #166534; }
+.pm-resolve__err { background: #fef2f2; color: #b91c1c; }
+</style>
+
+<div class="app-main__outer">
+<div class="app-main__inner">
+<div class="pm">
+
+    <div class="pm-hd">
+        <div>
+            <h2>🔐 Quản lý phân quyền View360</h2>
+            <div class="pm-hd__sub">Xem toàn bộ quyền đã cấp · Cấp mới qua 3 cách phổ biến · Audit anomalies.</div>
+        </div>
+        <div class="pm-hd__actions">
+            <a href="@Url.Action("Audit", "Permission")" class="pm-btn pm-btn--ghost">⚠ Audit</a>
+            <a href="@Url.Action("Index", "Projects")" class="pm-btn pm-btn--ghost">← Quản lý dự án</a>
+        </div>
+    </div>
+
+    @* ===== 3 ACTION BUTTONS ===== *@
+    <div class="pm-actions">
+        <span class="pm-actions__label">Cấp quyền mới:</span>
+        <button type="button" class="pm-action-btn" id="pm-act-user" @(canGrant ? "" : "disabled")>
+            <span class="pm-action-btn__icon">👤</span> Cho 1 user
+        </button>
+        <button type="button" class="pm-action-btn" id="pm-act-dept" @(canGrant ? "" : "disabled")>
+            <span class="pm-action-btn__icon">🏢</span> Cho cả phòng ban
+        </button>
+        <button type="button" class="pm-action-btn" id="pm-act-copy" @(canGrant ? "" : "disabled")>
+            <span class="pm-action-btn__icon">📋</span> Copy từ user khác
+        </button>
+        <button type="button" class="pm-action-btn" id="pm-act-paste" @(canGrant ? "" : "disabled")>
+            <span class="pm-action-btn__icon">📎</span> Paste MaNV (Excel)
+        </button>
+    </div>
+
+    @* ===== FILTER TOOLBAR ===== *@
+    <div class="pm-toolbar">
+        <div class="pm-toolbar__filter">
+            <input type="text" id="pm-q" class="pm-input" placeholder="🔎 Tìm tên NV / mã NV / tên nhóm..." />
+            <select id="pm-f-dept" class="pm-select">
+                <option value="">Tất cả phòng ban</option>
+            </select>
+            <select id="pm-f-type" class="pm-select">
+                <option value="">Tất cả loại</option>
+                <option value="1">Project</option>
+                <option value="2">Virtual</option>
+                <option value="3">Video</option>
+            </select>
+            <select id="pm-f-pgroup" class="pm-select" title="Lọc theo nhóm Project (gồm cây con)">
+                <option value="">Tất cả nhóm Project</option>
+            </select>
+            <button type="button" class="pm-btn pm-btn--ghost" id="pm-f-apply">Lọc</button>
+            <button type="button" class="pm-btn pm-btn--ghost" id="pm-f-reset">Đặt lại</button>
+        </div>
+    </div>
+
+    @* ===== TABLE ===== *@
+    <div class="pm-tablewrap">
+        <div class="pm-table-head">
+            <div class="pm-table-info">
+                Đang có <b id="pm-total">—</b> nhóm quyền (đã lọc) — mỗi dòng = 1 user × 1 nhóm.
+                <span id="pm-selected-info" style="display:none;color:#dc2626;margin-left:10px;">
+                    Đã chọn: <b id="pm-selected-count">0</b>
+                </span>
+            </div>
+            <div>
+                <button type="button" class="pm-btn pm-btn--danger" id="pm-bulk-revoke" disabled @(canRevoke ? "" : "style=display:none")>
+                    ✕ Gỡ <span id="pm-bulk-count">0</span> đã chọn
+                </button>
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="pm-table" id="pm-table">
+                <thead>
+                    <tr>
+                        <th style="width:36px;"><input type="checkbox" id="pm-check-all" /></th>
+                        <th style="width:90px;">Loại</th>
+                        <th>Người được cấp</th>
+                        <th>Phòng ban</th>
+                        <th>Nhóm nội dung</th>
+                        <th style="width:90px;text-align:right;">Số content</th>
+                        <th style="width:130px;">Cấp lúc (mới nhất)</th>
+                        <th style="width:80px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="pm-tbody">
+                    <tr><td colspan="8"><div class="pm-loading">Đang tải...</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pm-pager" id="pm-pager"></div>
+    </div>
+
+</div>
+</div>
+</div>
+
+@* ===== MODAL CONTAINER ===== *@
+<div class="pm-modal-bg" id="pm-mb">
+    <div class="pm-modal">
+        <div class="pm-modal__hd">
+            <h3 class="pm-modal__title" id="pm-m-title"></h3>
+            <button type="button" class="pm-modal__close" data-close>✕</button>
+        </div>
+        <div class="pm-modal__body" id="pm-m-body"></div>
+        <div class="pm-modal__ft" id="pm-m-ft">
+            <span id="pm-m-ft-left"></span>
+            <span>
+                <button type="button" class="pm-btn pm-btn--ghost" data-close>Hủy</button>
+                <button type="button" class="pm-btn pm-btn--primary" id="pm-m-confirm">Xác nhận</button>
+            </span>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+var base = '@Url.Content("~/")' + 'View360/Permission/';
+var canGrant = @(canGrant ? "true" : "false");
+var canRevoke = @(canRevoke ? "true" : "false");
+
+var state = {
+    page: 1, pageSize: 50,
+    filter: { search: '', phongBanId: '', type: '', rootGroupId: '' },
+    selected: new Set(),  // key = type-userId-groupId
+    cachedDepts: null
+};
+
+// ========== utils ==========
+function $(s, c) { return (c || document).querySelector(s); }
+function $$(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
+function escapeHtml(s) {
+    return (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function fmt(n) { return (n == null ? '0' : String(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+// Render hierarchy path "HPDQ 2 / Cán 4" with parent crumbs muted + leaf bold
+function renderGroupPath(fullPath, leafName) {
+    if (!fullPath) return '<span class="pm-grouppath__leaf">' + escapeHtml(leafName || '') + '</span>';
+    var parts = fullPath.split(' / ');
+    if (parts.length <= 1) {
+        return '<span class="pm-grouppath__leaf">' + escapeHtml(fullPath) + '</span>';
+    }
+    var crumbs = parts.slice(0, -1).map(function (p) { return escapeHtml(p); }).join('<span class="pm-grouppath__sep">/</span>');
+    return '<span class="pm-grouppath">' + crumbs + '</span>' +
+           '<span class="pm-grouppath__sep">/</span>' +
+           '<span class="pm-grouppath__leaf">' + escapeHtml(parts[parts.length - 1]) + '</span>';
+}
+function debounce(fn, ms) { var t; return function () { var a = arguments, s = this;
+    clearTimeout(t); t = setTimeout(function () { fn.apply(s, a); }, ms); }; }
+
+function api(path, opts) {
+    return fetch(base + path, opts || {}).then(function (r) {
+        return r.text().then(function (t) {
+            if (!t) return null;
+            try { var d = JSON.parse(t); if (d && d.error === true) throw new Error(d.message); return d; }
+            catch (e) { throw e instanceof Error ? e : new Error('Server lỗi'); }
+        });
+    });
+}
+function jsonPost(path, body) {
+    return api(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+}
+
+// ========== Modal ==========
+function openModal(title, bodyHtml, confirmLabel, onConfirm, leftFooter) {
+    $('#pm-m-title').textContent = title;
+    $('#pm-m-body').innerHTML = bodyHtml;
+    $('#pm-m-confirm').textContent = confirmLabel || 'Xác nhận';
+    $('#pm-m-ft-left').innerHTML = leftFooter || '';
+    $('#pm-m-confirm').onclick = function () { onConfirm($('#pm-m-body')); };
+    $('#pm-mb').classList.add('show');
+}
+function closeModal() {
+    $('#pm-mb').classList.remove('show');
+    $('#pm-m-confirm').disabled = false;
+    $('#pm-m-confirm').textContent = 'Xác nhận';
+}
+$$('#pm-mb [data-close]').forEach(function (b) { b.addEventListener('click', closeModal); });
+$('#pm-mb').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+function updateModalConfirm(label, disabled) {
+    $('#pm-m-confirm').textContent = label;
+    $('#pm-m-confirm').disabled = !!disabled;
+}
+
+// ========== Load PhongBans cache ==========
+function loadPhongBans() {
+    if (state.cachedDepts) return Promise.resolve(state.cachedDepts);
+    return api('PhongBans').then(function (rows) { state.cachedDepts = rows; return rows; });
+}
+
+// Populate dept dropdown in main filter
+loadPhongBans().then(function (rows) {
+    var $sel = $('#pm-f-dept');
+    rows.forEach(function (r) {
+        var o = document.createElement('option');
+        o.value = r.id; o.textContent = r.name;
+        $sel.appendChild(o);
+    });
+});
+
+// Populate Project group dropdown (with hierarchy indent)
+api('Groups?type=1').then(function (rows) {
+    var $sel = $('#pm-f-pgroup');
+    rows.forEach(function (g) {
+        var o = document.createElement('option');
+        o.value = g.id;
+        o.textContent = (g.depth > 0 ? '— '.repeat(g.depth) + ' ' : '') + g.name;
+        $sel.appendChild(o);
+    });
+});
+
+// ========== Main table ==========
+function loadTable() {
+    var f = state.filter;
+    var qs = 'page=' + state.page + '&pageSize=' + state.pageSize;
+    if (f.search) qs += '&search=' + encodeURIComponent(f.search);
+    if (f.phongBanId) qs += '&phongBanId=' + f.phongBanId;
+    if (f.type) qs += '&type=' + f.type;
+    if (f.rootGroupId) qs += '&rootGroupId=' + f.rootGroupId;
+    $('#pm-tbody').innerHTML = '<tr><td colspan="7"><div class="pm-loading">Đang tải...</div></td></tr>';
+    return api('ListGrants?' + qs).then(function (d) {
+        $('#pm-total').textContent = fmt(d.total);
+        renderRows(d.rows || []);
+        renderPager(d.page, d.totalPages, d.total);
+    }).catch(function (err) {
+        $('#pm-tbody').innerHTML = '<tr><td colspan="7"><div class="pm-empty">' +
+            '<div class="pm-empty__icon">⚠</div><div class="pm-empty__title">Lỗi tải dữ liệu</div>' +
+            '<div class="pm-empty__hint">' + escapeHtml(err.message) + '</div></div></td></tr>';
+    });
+}
+
+function renderRows(rows) {
+    if (rows.length === 0) {
+        $('#pm-tbody').innerHTML = '<tr><td colspan="8"><div class="pm-empty">' +
+            '<div class="pm-empty__icon">📭</div>' +
+            '<div class="pm-empty__title">Không có quyền nào khớp filter</div>' +
+            '<div class="pm-empty__hint">Đổi filter hoặc bấm "Đặt lại" để xem hết.</div>' +
+            '</div></td></tr>';
+        return;
+    }
+    // Cache row data for bulk revoke
+    state.rowData = {};
+    $('#pm-tbody').innerHTML = rows.map(function (r) {
+        // Key = type-userId-groupId-grantType (group-grant vs file-grants có thể trùng group → 2 rows)
+        var key = r.type + '-' + r.nhanVienId + '-' + r.groupId + '-' + (r.grantType || 0);
+        state.rowData[key] = r;
+        var typeCls = r.type === 1 ? 'p' : (r.type === 2 ? 'v' : 'vd');
+        var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : 'video');
+
+        // Grant type badge: 📂 Group-grant (auto-inherit) vs 📄 File-grants legacy
+        var grantBadge;
+        if (r.grantType === 1) {
+            grantBadge = '<span title="Cấp ở mức NHÓM — tự inherit content mới khi admin thêm vào nhóm" ' +
+                'style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-left:4px;">' +
+                '📂 Nhóm' + (r.isRecursive ? ' (recursive)' : '') + '</span>';
+        } else {
+            grantBadge = '<span title="Quyền lẻ từng content (legacy) — KHÔNG inherit content mới" ' +
+                'style="background:#fef3c7;color:#78350f;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-left:4px;">' +
+                '📄 Lẻ</span>';
+        }
+
+        return '<tr data-key="' + key + '">' +
+            '<td><input type="checkbox" class="pm-row-check"' +
+                (state.selected.has(key) ? ' checked' : '') + ' /></td>' +
+            '<td><span class="pm-badge pm-badge--' + typeCls + '">' + r.typeName + '</span>' + grantBadge + '</td>' +
+            '<td><b>' + escapeHtml(r.hoTen) + '</b> <small>· ' + escapeHtml(r.maNV || '') + '</small></td>' +
+            '<td>' + escapeHtml(r.phongBan || '—') + '</td>' +
+            '<td>' + renderGroupPath(r.groupName, r.groupNameLeaf) + '</td>' +
+            '<td style="text-align:right"><span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' +
+                fmt(r.contentCount) + ' ' + unit + '</span></td>' +
+            '<td><small>' + escapeHtml(r.lastCreatedate) + '</small></td>' +
+            '<td>' + (canRevoke ? '<button class="pm-revoke-btn" data-revoke-key="' + key + '">✕ Gỡ</button>' : '') + '</td>' +
+            '</tr>';
+    }).join('');
+
+    // Wire checkboxes
+    $$('.pm-row-check').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            var key = cb.closest('tr').dataset.key;
+            if (cb.checked) state.selected.add(key);
+            else state.selected.delete(key);
+            updateSelectedUI();
+        });
+    });
+    // Wire single revoke
+    $$('[data-revoke-key]').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var key = b.dataset.revokeKey;
+            var r = state.rowData[key];
+            if (!r) return;
+            var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : 'video');
+            var msg = r.grantType === 1
+                ? 'Gỡ quyền NHÓM "' + r.groupName + '" của user ' + r.hoTen +
+                  '? (user sẽ không còn auto-inherit ' + unit + ' mới)'
+                : 'Gỡ ' + r.contentCount + ' ' + unit + ' lẻ trong nhóm "' + r.groupName + '" của user ' + r.hoTen + '?';
+            if (!confirm(msg)) return;
+            b.disabled = true; b.textContent = '...';
+
+            var payload;
+            if (r.grantType === 1) {
+                // Revoke group-grant
+                payload = { Groups: [{ UserId: r.nhanVienId, Type: r.type, GroupId: r.groupId, Recursive: false }] };
+            } else {
+                // Revoke ALL file-grants for this user in this group
+                // Backend: dùng Items + expand server-side... thực tế client cần list content IDs.
+                // Đơn giản: gửi Groups với cờ "ScopeFileOnly" — nhưng schema chưa hỗ trợ.
+                // Workaround: client query content IDs trong group rồi pass Items.
+                // Tạm: dùng Groups - server sẽ expand file-grants matching group.
+                payload = { Groups: [{ UserId: r.nhanVienId, Type: r.type, GroupId: r.groupId, Recursive: false, ScopeFileOnly: true }] };
+            }
+
+            jsonPost('Revoke', payload).then(function (d) {
+                alert('Đã gỡ ' + d.deleted + ' bản ghi quyền.');
+                state.selected.delete(key);
+                loadTable();
+            }).catch(function (err) {
+                alert('Lỗi: ' + err.message);
+                b.disabled = false; b.textContent = '✕ Gỡ';
+            });
+        });
+    });
+}
+
+function renderPager(page, totalPages, total) {
+    var $p = $('#pm-pager');
+    if (!total) { $p.innerHTML = ''; return; }
+    var info = 'Trang ' + page + '/' + Math.max(1, totalPages) + ' · ' + fmt(total) + ' quyền';
+    var nav = '';
+    if (totalPages > 1) {
+        nav =
+            '<button type="button" data-page="1"' + (page <= 1 ? ' disabled' : '') + '>«</button>' +
+            '<button type="button" data-page="' + (page - 1) + '"' + (page <= 1 ? ' disabled' : '') + '>‹ Trước</button>' +
+            '<button type="button" data-page="' + (page + 1) + '"' + (page >= totalPages ? ' disabled' : '') + '>Sau ›</button>' +
+            '<button type="button" data-page="' + totalPages + '"' + (page >= totalPages ? ' disabled' : '') + '>»</button>';
+    }
+    $p.innerHTML = '<div class="pm-pager__info">' + info + '</div><div class="pm-pager__nav">' + nav + '</div>';
+    $p.querySelectorAll('[data-page]').forEach(function (b) {
+        b.onclick = function () {
+            var p = parseInt(b.dataset.page, 10);
+            if (p >= 1 && p <= totalPages) { state.page = p; loadTable(); }
+        };
+    });
+}
+
+function updateSelectedUI() {
+    var n = state.selected.size;
+    $('#pm-bulk-count').textContent = n;
+    $('#pm-bulk-revoke').disabled = n === 0;
+    $('#pm-selected-info').style.display = n > 0 ? '' : 'none';
+    $('#pm-selected-count').textContent = n;
+    // Sync check-all
+    var visible = $$('.pm-row-check');
+    var allChecked = visible.length > 0 && visible.every(function (cb) { return cb.checked; });
+    $('#pm-check-all').checked = allChecked;
+}
+
+// Check-all
+$('#pm-check-all').addEventListener('change', function () {
+    var on = this.checked;
+    $$('.pm-row-check').forEach(function (cb) {
+        cb.checked = on;
+        var key = cb.closest('tr').dataset.key;
+        if (on) state.selected.add(key);
+        else state.selected.delete(key);
+    });
+    updateSelectedUI();
+});
+
+// Bulk revoke (group-level)
+$('#pm-bulk-revoke').addEventListener('click', function () {
+    if (state.selected.size === 0) return;
+    if (!confirm('Gỡ ' + state.selected.size + ' nhóm quyền đã chọn?')) return;
+    var groups = Array.from(state.selected).map(function (k) {
+        var r = state.rowData[k];
+        if (!r) {
+            var p = k.split('-');
+            return { UserId: parseInt(p[1], 10), Type: parseInt(p[0], 10), GroupId: parseInt(p[2], 10), Recursive: false };
+        }
+        return { UserId: r.nhanVienId, Type: r.type, GroupId: r.groupId, Recursive: false };
+    });
+    this.disabled = true; this.textContent = 'Đang xử lý...';
+    var btn = this;
+    jsonPost('Revoke', { Groups: groups }).then(function (d) {
+        alert('Đã gỡ ' + d.deleted + ' quyền (từ ' + groups.length + ' nhóm).');
+        state.selected.clear();
+        loadTable();
+    }).catch(function (err) {
+        alert('Lỗi: ' + err.message);
+    }).then(function () {
+        btn.textContent = '✕ Gỡ 0 đã chọn';
+        btn.disabled = true;
+    });
+});
+
+// Filter handlers
+function applyFilter() {
+    state.filter.search = $('#pm-q').value.trim();
+    state.filter.phongBanId = $('#pm-f-dept').value;
+    state.filter.type = $('#pm-f-type').value;
+    state.filter.rootGroupId = $('#pm-f-pgroup').value;
+    state.page = 1;
+    state.selected.clear();
+    updateSelectedUI();
+    loadTable();
+}
+$('#pm-f-apply').addEventListener('click', applyFilter);
+$('#pm-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') applyFilter(); });
+$('#pm-f-dept').addEventListener('change', applyFilter);
+$('#pm-f-type').addEventListener('change', applyFilter);
+$('#pm-f-pgroup').addEventListener('change', applyFilter);
+$('#pm-f-reset').addEventListener('click', function () {
+    $('#pm-q').value = ''; $('#pm-f-dept').value = ''; $('#pm-f-type').value = '';
+    $('#pm-f-pgroup').value = '';
+    applyFilter();
+});
+
+// ========== Group picker (shared inside modals) ==========
+// Cap quyen o muc NHOM (group/album), KHONG xuong tung content le.
+// Server tu expand groupId -> list contentId khi grant.
+// State: Map<"type-groupId", {type, groupId, recursive, name}>
+function buildGroupPickerHtml() {
+    return '<div class="pm-fld">' +
+        '<label class="pm-fld__lbl">Loại nội dung</label>' +
+        '<div style="display:flex;gap:4px;background:#f1f5f9;border-radius:7px;padding:3px;">' +
+            '<button type="button" class="gp-type-btn active" data-type="1">📁 Project (theo nhóm)</button>' +
+            '<button type="button" class="gp-type-btn" data-type="2">🌐 Virtual (theo nhóm)</button>' +
+            '<button type="button" class="gp-type-btn" data-type="3">🎬 Video (theo album)</button>' +
+        '</div></div>' +
+        '<div class="pm-fld">' +
+            '<input type="text" id="gp-q" placeholder="🔎 Tìm tên nhóm..." />' +
+        '</div>' +
+        '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b;margin-bottom:10px;cursor:pointer;" id="gp-rec-wrap">' +
+            '<input type="checkbox" id="gp-rec" checked /> <b>Project</b>: gồm cả nhóm con (recursive)' +
+        '</label>' +
+        '<div class="pm-pick" id="gp-list"><div class="pm-loading">Đang tải nhóm...</div></div>' +
+        '<div id="gp-summary" style="margin-top:10px;padding:10px 12px;background:#f8fafc;border-radius:6px;font-size:12px;color:#0f172a;">' +
+            'Chưa chọn nhóm nào.' +
+        '</div>';
+}
+
+// Inject style cho file/folder explorer
+(function injectGpStyle() {
+    if (document.getElementById('gp-style')) return;
+    var s = document.createElement('style');
+    s.id = 'gp-style';
+    s.textContent =
+        '.gp-type-btn{flex:1;padding:7px 10px;background:transparent;border:0;font-size:12px;font-weight:600;color:#64748b;border-radius:5px;cursor:pointer;}' +
+        '.gp-type-btn.active{background:#fff;color:#2563eb;box-shadow:0 1px 3px rgba(0,0,0,.08);}' +
+
+        /* Folder row */
+        '.gp-folder{display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:13px;border-bottom:1px solid #f1f5f9;}' +
+        '.gp-folder:hover{background:#eff6ff;}' +
+        '.gp-folder input[type=checkbox]{flex-shrink:0;cursor:pointer;margin:0;}' +
+        '.gp-folder__name{flex:1;color:#0f172a;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
+        '.gp-folder--selected{background:#dcfce7;}' +
+        '.gp-folder--selected .gp-folder__name{color:#166534;font-weight:700;}' +
+        '.gp-expand{width:18px;height:18px;background:transparent;border:0;cursor:pointer;color:#94a3b8;font-size:9px;padding:0;border-radius:4px;flex-shrink:0;}' +
+        '.gp-expand:hover{background:rgba(0,0,0,.06);color:#2563eb;}' +
+        '.gp-row__icon{flex-shrink:0;}' +
+        '.gp-row__count{font-size:11px;color:#94a3b8;background:#f1f5f9;padding:1px 7px;border-radius:999px;flex-shrink:0;}' +
+
+        /* Recursive toggle inline */
+        '.gp-rec{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;font-size:10px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:4px;cursor:pointer;flex-shrink:0;}' +
+        '.gp-rec input{margin:0;width:11px;height:11px;}' +
+        '.gp-rec:has(input:checked){color:#16a34a;border-color:#86efac;background:#f0fdf4;}' +
+
+        /* File rows under folder */
+        '.gp-files{background:#fafbfc;border-bottom:1px solid #f1f5f9;}' +
+        '.gp-file{display:flex;align-items:center;gap:8px;padding:5px 10px;font-size:12px;border-top:1px dotted #e2e8f0;}' +
+        '.gp-file:hover{background:#eff6ff;}' +
+        '.gp-file input[type=checkbox]{flex-shrink:0;cursor:pointer;margin:0;}' +
+        '.gp-file input[type=checkbox]:disabled{cursor:not-allowed;}' +
+        '.gp-file__name{flex:1;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
+        '.gp-file--covered .gp-file__name{color:#94a3b8;font-style:italic;}' +
+        '.gp-file--selected .gp-file__name{color:#0f172a;font-weight:600;}' +
+        '.gp-files-loading{padding:10px 18px;color:#94a3b8;font-size:11px;font-style:italic;}' +
+        '.gp-row__hint{padding:6px 18px;color:#94a3b8;font-size:11px;font-style:italic;}';
+    document.head.appendChild(s);
+})();
+
+function wireGroupPicker(getSelected) {
+    var currentType = 1;
+    var $q = $('#gp-q'), $list = $('#gp-list'), $sum = $('#gp-summary');
+
+    // Hide global "Recursive" checkbox - giờ per-folder
+    if ($('#gp-rec-wrap')) $('#gp-rec-wrap').style.display = 'none';
+
+    // ===== State =====
+    // _folders: Map<"type-groupId", {type, groupId, recursive, name, contentCount}>
+    // _files:   Map<"f-type-fileId", {type, id, title}>
+    if (!getSelected._folders) getSelected._folders = new Map();
+    if (!getSelected._files)   getSelected._files   = new Map();
+    var expandedFolders = new Set();   // key="type-gid"
+    var folderFilesCache = {};         // "type-gid" -> [files]
+    var folderCountCache = {};         // "type-gid-rec" -> count
+    var allGroupsByType = {};          // type -> rows
+
+    function key(type, gid) { return type + '-' + gid; }
+    function keyf(type, fid) { return 'f-' + type + '-' + fid; }
+
+    function refreshSummary() {
+        var fSize = getSelected._folders.size, sSize = getSelected._files.size;
+        if (fSize === 0 && sSize === 0) {
+            $sum.textContent = 'Chưa chọn gì.';
+            return;
+        }
+        // Folders breakdown by type
+        var folderByType = { 1: 0, 2: 0, 3: 0 };
+        var contentByType = { 1: 0, 2: 0, 3: 0 };
+        getSelected._folders.forEach(function (f) {
+            folderByType[f.type]++;
+            contentByType[f.type] += (f.contentCount || 0);
+        });
+        var fileByType = { 1: 0, 2: 0, 3: 0 };
+        getSelected._files.forEach(function (f) { fileByType[f.type]++; });
+
+        var html = '';
+        if (fSize > 0) {
+            var parts = [];
+            if (folderByType[1] > 0) parts.push('📁 ' + folderByType[1] + ' nhóm Project (' + contentByType[1] + ' DA)');
+            if (folderByType[2] > 0) parts.push('🌐 ' + folderByType[2] + ' nhóm Virtual (' + contentByType[2] + ' tour)');
+            if (folderByType[3] > 0) parts.push('🎬 ' + folderByType[3] + ' album Video (' + contentByType[3] + ' video)');
+            html += '<div style="margin-bottom:4px;"><b style="color:#16a34a;">📂 Cấp NHÓM</b> (auto-inherit):<br>' +
+                '<span style="color:#475569;">' + parts.join(' · ') + '</span></div>';
+        }
+        if (sSize > 0) {
+            var fparts = [];
+            if (fileByType[1] > 0) fparts.push('📄 ' + fileByType[1] + ' Project');
+            if (fileByType[2] > 0) fparts.push('📄 ' + fileByType[2] + ' Virtual');
+            if (fileByType[3] > 0) fparts.push('📄 ' + fileByType[3] + ' Video');
+            html += '<div><b style="color:#78350f;">📄 Cấp LẺ</b> (file-grant, không inherit):<br>' +
+                '<span style="color:#475569;">' + fparts.join(' · ') + '</span></div>';
+        }
+        $sum.innerHTML = html;
+    }
+
+    function fetchFolderCount(type, gid, recursive) {
+        var k = key(type, gid) + '-' + (recursive ? '1' : '0');
+        if (folderCountCache[k] != null) return Promise.resolve(folderCountCache[k]);
+        var qs = 'type=' + type + '&groupId=' + gid + '&limit=10000';
+        if (type === 1 && recursive) qs += '&recursive=true';
+        return api('Contents?' + qs).then(function (rows) {
+            var n = (rows || []).length;
+            folderCountCache[k] = n;
+            return n;
+        });
+    }
+
+    function loadFilesInFolder(type, gid) {
+        var k = key(type, gid);
+        if (folderFilesCache[k]) return Promise.resolve(folderFilesCache[k]);
+        // Direct content only (không recursive, file picker chỉ show direct)
+        var qs = 'type=' + type + '&groupId=' + gid + '&limit=2000';
+        return api('Contents?' + qs).then(function (rows) {
+            folderFilesCache[k] = rows || [];
+            return folderFilesCache[k];
+        });
+    }
+
+    function loadGroupsForType(type) {
+        if (allGroupsByType[type]) return Promise.resolve(allGroupsByType[type]);
+        return api('Groups?type=' + type).then(function (rows) {
+            allGroupsByType[type] = rows || [];
+            return allGroupsByType[type];
+        });
+    }
+
+    function renderTree() {
+        var rows = (allGroupsByType[currentType] || []).slice();
+        var q = ($q.value || '').toLowerCase().trim();
+        if (q) rows = rows.filter(function (g) { return (g.name || '').toLowerCase().indexOf(q) >= 0; });
+
+        if (rows.length === 0) {
+            $list.innerHTML = '<div class="pm-empty"><div class="pm-empty__hint">Không có nhóm nào.</div></div>';
+            return;
+        }
+
+        $list.innerHTML = rows.map(renderFolderRow).join('');
+        wireRowHandlers();
+
+        // Pre-fetch counts for visible groups
+        rows.forEach(function (g) {
+            var k = key(currentType, g.id);
+            var folder = getSelected._folders.get(k);
+            var rec = folder ? !!folder.recursive : false;
+            fetchFolderCount(currentType, g.id, rec).then(function (cnt) {
+                var $c = $list.querySelector('[data-cnt="' + k + '"]');
+                if ($c) {
+                    var unit = currentType === 1 ? 'DA' : (currentType === 2 ? 'tour' : 'video');
+                    $c.textContent = cnt + ' ' + unit;
+                }
+                // Update folder.contentCount nếu selected
+                if (folder) {
+                    folder.contentCount = cnt;
+                    refreshSummary();
+                }
+            });
+        });
+    }
+
+    function renderFolderRow(group) {
+        var k = key(currentType, group.id);
+        var expanded = expandedFolders.has(k);
+        var folder = getSelected._folders.get(k);
+        var selected = !!folder;
+        var recursive = folder ? folder.recursive : false;
+        var depth = group.depth || 0;
+        var indent = '';
+        for (var i = 0; i < depth; i++) indent += '<span style="display:inline-block;width:14px;color:#cbd5e1;font-family:monospace;">│ </span>';
+        if (depth > 0) indent = indent.substring(0, indent.length - '<span style="display:inline-block;width:14px;color:#cbd5e1;font-family:monospace;">│ </span>'.length) +
+            '<span style="display:inline-block;width:14px;color:#cbd5e1;font-family:monospace;">└─</span>';
+
+        var html = '<div class="gp-folder' + (selected ? ' gp-folder--selected' : '') + '" data-fkey="' + k + '">' +
+            indent +
+            '<button type="button" class="gp-expand" data-toggle="' + k + '">' + (expanded ? '▼' : '▶') + '</button>' +
+            '<input type="checkbox" class="gp-folder-cb"' + (selected ? ' checked' : '') + ' />' +
+            '<span class="gp-row__icon">' + (depth === 0 ? '📂' : '📁') + '</span>' +
+            '<span class="gp-folder__name" title="' + escapeHtml(group.name) + '">' + escapeHtml(group.name) + '</span>' +
+            '<span class="gp-row__count" data-cnt="' + k + '">…</span>' +
+            (currentType === 1
+                ? '<label class="gp-rec" title="Auto-inherit cả descendants (cây con)">' +
+                  '<input type="checkbox" class="gp-rec-cb"' + (recursive ? ' checked' : '') + ' /> R</label>'
+                : '') +
+            '</div>';
+
+        // Files inside (when expanded)
+        if (expanded) {
+            var files = folderFilesCache[k];
+            if (!files) {
+                html += '<div class="gp-files-loading">⏳ Đang tải files...</div>';
+            } else if (files.length === 0) {
+                html += '<div class="gp-files"><div class="gp-row__hint">(Nhóm trống — không có content trực tiếp)</div></div>';
+            } else {
+                html += '<div class="gp-files">';
+                html += files.map(function (f) {
+                    var fk = keyf(currentType, f.id);
+                    var fchecked = getSelected._files.has(fk);
+                    var coveredByFolder = selected;
+                    var rowClass = 'gp-file' + (coveredByFolder ? ' gp-file--covered' : '') + (fchecked ? ' gp-file--selected' : '');
+                    return '<div class="' + rowClass + '" data-filekey="' + fk + '">' +
+                        '<input type="checkbox" class="gp-file-cb"' +
+                            (fchecked ? ' checked' : '') +
+                            (coveredByFolder ? ' disabled' : '') +
+                            ' data-fid="' + f.id + '" data-title="' + escapeHtml(f.title || '') + '" />' +
+                        '<span class="gp-row__icon">📄</span>' +
+                        '<span class="gp-file__name" title="' + escapeHtml(f.title || '') + '">' +
+                            escapeHtml(f.title || '(không tiêu đề)') + '</span>' +
+                        (coveredByFolder ? '<small style="color:#16a34a;flex-shrink:0;">✓ qua folder</small>' : '') +
+                        '</div>';
+                }).join('');
+                html += '</div>';
+            }
+        }
+        return html;
+    }
+
+    function wireRowHandlers() {
+        // Expand toggle
+        $list.querySelectorAll('.gp-expand').forEach(function (b) {
+            b.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var k = b.dataset.toggle;
+                if (expandedFolders.has(k)) {
+                    expandedFolders.delete(k);
+                    renderTree();
+                } else {
+                    expandedFolders.add(k);
+                    var parts = k.split('-');
+                    var type = parseInt(parts[0], 10);
+                    var gid = parseInt(parts[1], 10);
+                    if (folderFilesCache[k]) {
+                        renderTree();
+                    } else {
+                        renderTree();  // show loading state
+                        loadFilesInFolder(type, gid).then(function () { renderTree(); });
+                    }
+                }
+            });
+        });
+
+        // Folder checkbox
+        $list.querySelectorAll('.gp-folder-cb').forEach(function (cb) {
+            cb.addEventListener('change', function () {
+                var k = cb.closest('.gp-folder').dataset.fkey;
+                var parts = k.split('-');
+                var type = parseInt(parts[0], 10);
+                var gid = parseInt(parts[1], 10);
+                if (cb.checked) {
+                    var groupInfo = (allGroupsByType[type] || []).find(function (g) { return g.id === gid; });
+                    var name = groupInfo ? groupInfo.name : '';
+                    fetchFolderCount(type, gid, false).then(function (cnt) {
+                        getSelected._folders.set(k, {
+                            type: type, groupId: gid, recursive: false,
+                            name: name, contentCount: cnt
+                        });
+                        refreshSummary();
+                        renderTree();
+                        if (typeof getSelected.onChange === 'function') getSelected.onChange();
+                    });
+                } else {
+                    getSelected._folders.delete(k);
+                    refreshSummary();
+                    renderTree();
+                    if (typeof getSelected.onChange === 'function') getSelected.onChange();
+                }
+            });
+        });
+
+        // Recursive checkbox (per folder)
+        $list.querySelectorAll('.gp-rec-cb').forEach(function (cb) {
+            cb.addEventListener('change', function (e) {
+                e.stopPropagation();
+                var k = cb.closest('.gp-folder').dataset.fkey;
+                var parts = k.split('-');
+                var type = parseInt(parts[0], 10);
+                var gid = parseInt(parts[1], 10);
+                var folder = getSelected._folders.get(k);
+                if (!folder) {
+                    // Auto-select folder when recursive ticked
+                    if (cb.checked) {
+                        var groupInfo = (allGroupsByType[type] || []).find(function (g) { return g.id === gid; });
+                        var name = groupInfo ? groupInfo.name : '';
+                        fetchFolderCount(type, gid, true).then(function (cnt) {
+                            getSelected._folders.set(k, {
+                                type: type, groupId: gid, recursive: true,
+                                name: name, contentCount: cnt
+                            });
+                            refreshSummary();
+                            renderTree();
+                            if (typeof getSelected.onChange === 'function') getSelected.onChange();
+                        });
+                    }
+                } else {
+                    folder.recursive = cb.checked;
+                    // Re-fetch count for new recursive state
+                    fetchFolderCount(type, gid, folder.recursive).then(function (cnt) {
+                        folder.contentCount = cnt;
+                        refreshSummary();
+                        renderTree();
+                        if (typeof getSelected.onChange === 'function') getSelected.onChange();
+                    });
+                }
+            });
+        });
+
+        // File checkbox
+        $list.querySelectorAll('.gp-file-cb').forEach(function (cb) {
+            cb.addEventListener('change', function () {
+                if (cb.disabled) return;
+                var $row = cb.closest('.gp-file');
+                var fk = $row.dataset.filekey;
+                var parts = fk.split('-');  // ['f', type, fid]
+                var type = parseInt(parts[1], 10);
+                var fid = parseInt(cb.dataset.fid, 10);
+                if (cb.checked) {
+                    getSelected._files.set(fk, {
+                        type: type, id: fid, title: cb.dataset.title
+                    });
+                    $row.classList.add('gp-file--selected');
+                } else {
+                    getSelected._files.delete(fk);
+                    $row.classList.remove('gp-file--selected');
+                }
+                refreshSummary();
+                if (typeof getSelected.onChange === 'function') getSelected.onChange();
+            });
+        });
+    }
+
+    // Type tabs
+    $$('.gp-type-btn').forEach(function (b) {
+        b.addEventListener('click', function () {
+            $$('.gp-type-btn').forEach(function (x) { x.classList.toggle('active', x === b); });
+            currentType = parseInt(b.dataset.type, 10);
+            expandedFolders = new Set();  // reset expansion when switch type
+            $list.innerHTML = '<div class="pm-loading">Đang tải nhóm...</div>';
+            loadGroupsForType(currentType).then(function () { renderTree(); });
+        });
+    });
+
+    // Search filter
+    $q.addEventListener('input', debounce(renderTree, 200));
+
+    // Init
+    refreshSummary();
+    $list.innerHTML = '<div class="pm-loading">Đang tải nhóm...</div>';
+    loadGroupsForType(currentType).then(function () { renderTree(); });
+}
+
+// Helper: build payload from selectedHelper for Grant/PreviewGrant
+function buildGrantContent(selectedHelper) {
+    var groups = Array.from(selectedHelper._folders.values()).map(function (f) {
+        return { Type: f.type, GroupId: f.groupId, Recursive: !!f.recursive };
+    });
+    var items = Array.from(selectedHelper._files.values()).map(function (f) {
+        return { Type: f.type, Id: f.id };
+    });
+    return { Groups: groups, Items: items };
+}
+
+// Backward-compat helper - old code expected groupsPayload
+function groupsPayload(selectedMap) {
+    // selectedMap may be _folders Map directly OR old _selected Map
+    if (!selectedMap) return [];
+    return Array.from(selectedMap.values()).map(function (g) {
+        return { Type: g.type, GroupId: g.groupId, Recursive: !!g.recursive };
+    });
+}
+
+// ========== Preview (shared) ==========
+// payload = { UserIds, Items?, Groups? }
+function runPreview(payload, onResult) {
+    if (!payload.UserIds || payload.UserIds.length === 0) { onResult(null); return; }
+    var hasContent = (payload.Items && payload.Items.length > 0) || (payload.Groups && payload.Groups.length > 0);
+    if (!hasContent) { onResult(null); return; }
+    jsonPost('PreviewGrant', payload)
+        .then(onResult)
+        .catch(function (err) { onResult({ error: err.message }); });
+}
+
+function renderPreview(p) {
+    if (!p) return '<div class="pm-fld__hint">Chưa đủ thông tin để preview.</div>';
+    if (p.error) return '<div class="pm-warn">⚠ ' + escapeHtml(p.error) + '</div>';
+
+    // Breakdown content type nếu có nhiều loại
+    var typeBreak = [];
+    if (p.projectCount > 0) typeBreak.push(fmt(p.projectCount) + ' Project');
+    if (p.virtualCount > 0) typeBreak.push(fmt(p.virtualCount) + ' Virtual');
+    if (p.videoCount > 0) typeBreak.push(fmt(p.videoCount) + ' Video');
+    var contentDesc = typeBreak.length > 0 ? ' (' + typeBreak.join(' + ') + ')' : '';
+
+    var html = '<div class="pm-preview">' +
+        '<div class="pm-preview__title">Preview — kết quả sẽ xảy ra khi bấm "Cấp"</div>' +
+
+        // Phép tính rõ ràng: U user × C content = T quyền
+        '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:#0f172a;">' +
+            '<b>' + fmt(p.userCount) + '</b> user × <b>' + fmt(p.contentCount) + '</b> content' + escapeHtml(contentDesc) +
+            ' = <b style="color:#2563eb;">' + fmt(p.total) + ' quyền</b> sẽ được kiểm tra' +
+        '</div>' +
+
+        // Breakdown: đã có / sẽ cấp mới
+        '<div class="pm-preview__nums">' +
+            '<div class="pm-preview__num pm-preview__num--exist" title="Cặp (user, content) đã có trong DB - sẽ giữ nguyên, không cấp lại">' +
+                '<div class="pm-preview__num__n">' + fmt(p.existing) + '</div>' +
+                '<div class="pm-preview__num__lbl">⊘ Đã có (giữ nguyên)</div>' +
+            '</div>' +
+            '<div class="pm-preview__num pm-preview__num--new" title="Cặp (user, content) chưa có - sẽ tạo mới trong AuthorizationUSER/Vitual/Video">' +
+                '<div class="pm-preview__num__n">' + fmt(p.notExisting) + '</div>' +
+                '<div class="pm-preview__num__lbl">+ Cần cấp mới</div>' +
+            '</div>' +
+        '</div>' +
+
+        // Note: existing == total → tất cả đã có
+        (p.existing === p.total && p.total > 0
+            ? '<div style="margin-top:10px;padding:8px 12px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;font-size:12px;color:#166534;">' +
+              '✓ Tất cả ' + fmt(p.total) + ' quyền này đã được cấp từ trước. Không cần thao tác thêm.' +
+              '</div>'
+            : '') +
+        // Note: existing = 0
+        (p.existing === 0 && p.total > 0
+            ? '<div style="margin-top:10px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:12px;color:#1d4ed8;">' +
+              'ℹ Toàn bộ ' + fmt(p.total) + ' quyền sẽ được cấp mới (chưa user nào trong danh sách có quyền với content này).' +
+              '</div>'
+            : '');
+
+    if (p.warnings && p.warnings.length > 0) {
+        html += p.warnings.map(function (w) { return '<div class="pm-warn" style="margin-top:8px;">⚠ ' + escapeHtml(w.message) + '</div>'; }).join('');
+    }
+    html += '</div>';
+    return html;
+}
+
+// ========== Modal: Cấp 1 user ==========
+$('#pm-act-user').addEventListener('click', function () {
+    var pickedUser = null;
+    var groupSel = {};
+    groupSel._selected = new Map();
+
+    var body =
+        '<div class="pm-fld">' +
+            '<label class="pm-fld__lbl">① Tìm user</label>' +
+            '<input type="text" id="u1-q" placeholder="Gõ tên hoặc mã NV..." />' +
+            '<div class="pm-pick" id="u1-list" style="display:none;"></div>' +
+            '<div id="u1-picked" style="margin-top:8px;"></div>' +
+        '</div>' +
+        '<div id="u1-step2" style="display:none;">' +
+            '<label class="pm-fld__lbl">② Chọn nhóm nội dung (cấp ở mức NHÓM, server tự expand thành content trong nhóm)</label>' +
+            buildGroupPickerHtml() +
+        '</div>' +
+        '<div id="u1-preview"></div>';
+
+    openModal('👤 Cấp quyền cho 1 user', body, 'Cấp 0 quyền mới', function () {
+        var c = buildGrantContent(groupSel);
+        execGrant({ UserIds: [pickedUser.id], Groups: c.Groups, Items: c.Items });
+    });
+
+    groupSel.onChange = updatePreview;
+    function updatePreview() {
+        if (!pickedUser) return;
+        var c = buildGrantContent(groupSel);
+        runPreview({ UserIds: [pickedUser.id], Groups: c.Groups, Items: c.Items }, function (p) {
+            $('#u1-preview').innerHTML = renderPreview(p);
+            if (p && !p.error) updateModalConfirm('+ Cấp ' + fmt(p.notExisting) + ' quyền mới', !canGrant || p.notExisting === 0);
+        });
+    }
+    updateModalConfirm('Cấp 0 quyền mới', true);
+
+    var $q = $('#u1-q'), $list = $('#u1-list'), $picked = $('#u1-picked');
+    $q.addEventListener('input', debounce(function () {
+        if (!$q.value.trim()) { $list.style.display = 'none'; return; }
+        api('Users?limit=20&search=' + encodeURIComponent($q.value.trim())).then(function (rows) {
+            $list.style.display = 'block';
+            if (!rows || rows.length === 0) {
+                $list.innerHTML = '<div class="pm-empty"><div class="pm-empty__hint">Không tìm thấy</div></div>';
+                return;
+            }
+            $list.innerHTML = rows.map(function (r) {
+                return '<div class="pm-pick__item" data-uid="' + r.id +
+                    '" data-name="' + escapeHtml(r.hoTen) +
+                    '" data-manv="' + escapeHtml(r.maNV || '') +
+                    '" data-pb="' + escapeHtml(r.phongBan || '') + '">' +
+                    '<span class="pm-pick__item__main">' +
+                        '<div class="pm-pick__item__name">' + escapeHtml(r.hoTen) + '</div>' +
+                        '<div class="pm-pick__item__meta">' + escapeHtml(r.maNV || '') + ' · ' + escapeHtml(r.phongBan || '—') + '</div>' +
+                    '</span></div>';
+            }).join('');
+            $list.querySelectorAll('[data-uid]').forEach(function (el) {
+                el.onclick = function () {
+                    pickedUser = {
+                        id: parseInt(el.dataset.uid, 10),
+                        hoTen: el.dataset.name, maNV: el.dataset.manv, phongBan: el.dataset.pb
+                    };
+                    $picked.innerHTML = '<div style="background:#dcfce7;padding:8px 12px;border-radius:6px;font-size:13px;">✓ <b>' +
+                        escapeHtml(pickedUser.hoTen) + '</b> · ' + escapeHtml(pickedUser.maNV) + ' · ' + escapeHtml(pickedUser.phongBan) + '</div>';
+                    $list.style.display = 'none';
+                    $q.value = '';
+                    $('#u1-step2').style.display = 'block';
+                    wireGroupPicker(groupSel);
+                    updatePreview();
+                };
+            });
+        });
+    }, 250));
+});
+
+// ========== Modal: Cấp cả phòng ==========
+$('#pm-act-dept').addEventListener('click', function () {
+    var pickedDept = null, deptUsers = [];
+    var groupSel = {};
+    groupSel._selected = new Map();
+
+    var body =
+        '<div class="pm-fld">' +
+            '<label class="pm-fld__lbl">① Chọn phòng ban</label>' +
+            '<select id="d1-sel" class="pm-select" style="width:100%;"><option value="">— Chọn phòng ban —</option></select>' +
+            '<div id="d1-info" style="margin-top:8px;"></div>' +
+        '</div>' +
+        '<div id="d1-step2" style="display:none;">' +
+            '<label class="pm-fld__lbl">② Chọn nhóm nội dung</label>' +
+            buildGroupPickerHtml() +
+        '</div>' +
+        '<div id="d1-preview"></div>';
+
+    openModal('🏢 Cấp quyền cho cả phòng ban', body, 'Cấp 0 quyền mới', function () {
+        var c = buildGrantContent(groupSel);
+        execGrant({
+            UserIds: deptUsers.map(function (u) { return u.id; }),
+            Groups: c.Groups, Items: c.Items
+        });
+    });
+    updateModalConfirm('Cấp 0 quyền mới', true);
+
+    groupSel.onChange = updatePreview;
+    function updatePreview() {
+        if (deptUsers.length === 0) return;
+        var c = buildGrantContent(groupSel);
+        runPreview({
+            UserIds: deptUsers.map(function (u) { return u.id; }),
+            Groups: c.Groups, Items: c.Items
+        }, function (p) {
+            $('#d1-preview').innerHTML = renderPreview(p);
+            if (p && !p.error) updateModalConfirm('+ Cấp ' + fmt(p.notExisting) + ' quyền mới', !canGrant || p.notExisting === 0);
+        });
+    }
+
+    // Populate dept
+    loadPhongBans().then(function (rows) {
+        var $sel = $('#d1-sel');
+        rows.forEach(function (r) {
+            var o = document.createElement('option');
+            o.value = r.id; o.textContent = r.name;
+            $sel.appendChild(o);
+        });
+    });
+
+    $('#d1-sel').addEventListener('change', function () {
+        var v = this.value;
+        if (!v) { $('#d1-info').innerHTML = ''; $('#d1-step2').style.display = 'none'; return; }
+        var name = this.options[this.selectedIndex].text;
+        $('#d1-info').innerHTML = '<div class="pm-loading">Đang đếm NV...</div>';
+        api('Users?limit=2000&phongBanId=' + v).then(function (rows) {
+            deptUsers = rows || [];
+            if (deptUsers.length === 0) {
+                $('#d1-info').innerHTML = '<div class="pm-warn">⚠ Phòng <b>' + escapeHtml(name) + '</b> không có NV active. Chọn phòng khác.</div>';
+                $('#d1-step2').style.display = 'none';
+                return;
+            }
+            pickedDept = { id: v, name: name };
+            $('#d1-info').innerHTML = '<div style="background:#dcfce7;padding:8px 12px;border-radius:6px;font-size:13px;">' +
+                '✓ <b>' + escapeHtml(name) + '</b> — ' + deptUsers.length + ' NV đang hoạt động sẽ được cấp.</div>';
+            $('#d1-step2').style.display = 'block';
+            wireGroupPicker(groupSel);
+            updatePreview();
+        });
+    });
+});
+
+// ========== Modal: Copy từ user ==========
+$('#pm-act-copy').addEventListener('click', function () {
+    var sourceUser = null, copyItems = [];
+    var targetUsers = new Map(); // id -> user
+
+    var body =
+        '<div class="pm-fld">' +
+            '<label class="pm-fld__lbl">① User <b>nguồn</b> (sẽ copy quyền của user này)</label>' +
+            '<input type="text" id="c1-src" placeholder="Tên hoặc mã NV..." />' +
+            '<div class="pm-pick" id="c1-src-list" style="display:none;"></div>' +
+            '<div id="c1-src-info" style="margin-top:8px;"></div>' +
+        '</div>' +
+        '<div id="c1-step2" style="display:none;">' +
+            '<label class="pm-fld__lbl">② User <b>đích</b> (1 hoặc nhiều, sẽ nhận cùng quyền)</label>' +
+            '<input type="text" id="c1-tgt" placeholder="Gõ tên / MaNV để thêm..." />' +
+            '<div class="pm-pick" id="c1-tgt-list" style="display:none;"></div>' +
+            '<div id="c1-tgt-chips" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>' +
+        '</div>' +
+        '<div id="c1-preview"></div>';
+
+    openModal('📋 Copy quyền từ user khác', body, 'Cấp 0 quyền mới', function () {
+        execGrant({
+            UserIds: Array.from(targetUsers.keys()),
+            Items: copyItems.map(function (it) { return { Type: it.type, Id: it.id }; })
+        });
+    });
+    updateModalConfirm('Cấp 0 quyền mới', true);
+
+    function updatePreview() {
+        var ids = Array.from(targetUsers.keys());
+        if (ids.length === 0 || copyItems.length === 0) {
+            $('#c1-preview').innerHTML = '';
+            updateModalConfirm('Cấp 0 quyền mới', true);
+            return;
+        }
+        runPreview({
+            UserIds: ids,
+            Items: copyItems.map(function (it) { return { Type: it.type, Id: it.id }; })
+        }, function (p) {
+            $('#c1-preview').innerHTML = renderPreview(p);
+            if (p && !p.error) updateModalConfirm('+ Cấp ' + fmt(p.notExisting) + ' quyền mới', !canGrant || p.notExisting === 0);
+        });
+    }
+
+    function searchAndShowList(input, listEl, onPick) {
+        input.addEventListener('input', debounce(function () {
+            if (!input.value.trim()) { listEl.style.display = 'none'; return; }
+            api('Users?limit=20&search=' + encodeURIComponent(input.value.trim())).then(function (rows) {
+                listEl.style.display = 'block';
+                if (!rows || rows.length === 0) {
+                    listEl.innerHTML = '<div class="pm-empty"><div class="pm-empty__hint">Không tìm thấy</div></div>';
+                    return;
+                }
+                listEl.innerHTML = rows.map(function (r) {
+                    return '<div class="pm-pick__item" data-uid="' + r.id +
+                        '" data-name="' + escapeHtml(r.hoTen) +
+                        '" data-manv="' + escapeHtml(r.maNV || '') +
+                        '" data-pb="' + escapeHtml(r.phongBan || '') + '">' +
+                        '<span class="pm-pick__item__main">' +
+                            '<div class="pm-pick__item__name">' + escapeHtml(r.hoTen) + '</div>' +
+                            '<div class="pm-pick__item__meta">' + escapeHtml(r.maNV || '') + ' · ' + escapeHtml(r.phongBan || '—') + '</div>' +
+                        '</span></div>';
+                }).join('');
+                listEl.querySelectorAll('[data-uid]').forEach(function (el) {
+                    el.onclick = function () {
+                        onPick({
+                            id: parseInt(el.dataset.uid, 10),
+                            hoTen: el.dataset.name, maNV: el.dataset.manv, phongBan: el.dataset.pb
+                        });
+                    };
+                });
+            });
+        }, 250));
+    }
+
+    // Source picker
+    searchAndShowList($('#c1-src'), $('#c1-src-list'), function (u) {
+        sourceUser = u;
+        $('#c1-src').value = '';
+        $('#c1-src-list').style.display = 'none';
+        $('#c1-src-info').innerHTML = '<div class="pm-loading">Đang lấy quyền user nguồn...</div>';
+        api('CopyFromUser?userId=' + u.id).then(function (d) {
+            if (!d.items || d.items.length === 0) {
+                $('#c1-src-info').innerHTML = '<div class="pm-warn">⚠ User <b>' + escapeHtml(u.hoTen) +
+                    '</b> chưa có quyền nội dung nào. Chọn user khác.</div>';
+                return;
+            }
+            copyItems = d.items;
+            $('#c1-src-info').innerHTML = '<div style="background:#dcfce7;padding:8px 12px;border-radius:6px;font-size:13px;">' +
+                '✓ <b>' + escapeHtml(u.hoTen) + '</b> có <b>' + d.items.length + '</b> quyền (Project/Virtual/Video). ' +
+                'Sẽ copy y hệt cho user(s) đích bên dưới.</div>';
+            $('#c1-step2').style.display = 'block';
+            updatePreview();
+        });
+    });
+
+    // Target picker
+    function refreshTargetChips() {
+        $('#c1-tgt-chips').innerHTML = Array.from(targetUsers.values()).map(function (u) {
+            return '<span style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:5px;">' +
+                escapeHtml(u.hoTen) + ' <small style="color:#94a3b8;">· ' + escapeHtml(u.maNV) + '</small> ' +
+                '<button type="button" data-rm="' + u.id + '" style="background:none;border:0;color:#dc2626;font-size:14px;cursor:pointer;padding:0;">✕</button></span>';
+        }).join('');
+        $('#c1-tgt-chips').querySelectorAll('[data-rm]').forEach(function (b) {
+            b.onclick = function () { targetUsers.delete(parseInt(b.dataset.rm, 10)); refreshTargetChips(); updatePreview(); };
+        });
+    }
+    searchAndShowList($('#c1-tgt'), $('#c1-tgt-list'), function (u) {
+        if (sourceUser && u.id === sourceUser.id) { alert('Không copy cho chính user nguồn'); return; }
+        targetUsers.set(u.id, u);
+        $('#c1-tgt').value = '';
+        $('#c1-tgt-list').style.display = 'none';
+        refreshTargetChips();
+        updatePreview();
+    });
+});
+
+// ========== Modal: Paste MaNV ==========
+$('#pm-act-paste').addEventListener('click', function () {
+    var matchedUsers = [];
+    var groupSel = {};
+    groupSel._selected = new Map();
+
+    var body =
+        '<div class="pm-fld">' +
+            '<label class="pm-fld__lbl">① Paste danh sách MaNV</label>' +
+            '<textarea id="p1-input" placeholder="HPDQ001\nHPDQ002\n..."></textarea>' +
+            '<div class="pm-fld__hint">Copy cột MaNV từ Excel paste vào đây. Mã không tìm thấy sẽ được liệt kê.</div>' +
+            '<button type="button" class="pm-btn pm-btn--ghost" id="p1-resolve" style="margin-top:8px;">🔍 Kiểm tra MaNV</button>' +
+            '<div id="p1-result"></div>' +
+        '</div>' +
+        '<div id="p1-step2" style="display:none;">' +
+            '<label class="pm-fld__lbl">② Chọn nhóm nội dung</label>' +
+            buildGroupPickerHtml() +
+        '</div>' +
+        '<div id="p1-preview"></div>';
+
+    openModal('📎 Paste MaNV (Excel-style)', body, 'Cấp 0 quyền mới', function () {
+        var c = buildGrantContent(groupSel);
+        execGrant({
+            UserIds: matchedUsers.map(function (u) { return u.id; }),
+            Groups: c.Groups, Items: c.Items
+        });
+    });
+    updateModalConfirm('Cấp 0 quyền mới', true);
+
+    groupSel.onChange = updatePreview;
+    function updatePreview() {
+        if (matchedUsers.length === 0) return;
+        var c = buildGrantContent(groupSel);
+        runPreview({
+            UserIds: matchedUsers.map(function (u) { return u.id; }),
+            Groups: c.Groups, Items: c.Items
+        }, function (p) {
+            $('#p1-preview').innerHTML = renderPreview(p);
+            if (p && !p.error) updateModalConfirm('+ Cấp ' + fmt(p.notExisting) + ' quyền mới', !canGrant || p.notExisting === 0);
+        });
+    }
+
+    $('#p1-resolve').addEventListener('click', function () {
+        var raw = $('#p1-input').value;
+        var manvs = raw.split(/[\s,;\r\n]+/).filter(function (s) { return s.trim(); });
+        if (manvs.length === 0) { alert('Chưa paste mã nào'); return; }
+        $('#p1-result').innerHTML = '<div class="pm-loading">Đang resolve...</div>';
+        jsonPost('ResolveMaNV', { MaNVs: manvs }).then(function (d) {
+            matchedUsers = d.matched || [];
+            var html = '';
+            if (matchedUsers.length > 0) {
+                html += '<div class="pm-resolve__sec pm-resolve__ok">' +
+                    '✓ Tìm thấy <b>' + matchedUsers.length + '</b>: ' +
+                    matchedUsers.slice(0, 30).map(function (m) {
+                        return escapeHtml(m.maNV) + ' (' + escapeHtml(m.hoTen) + ')';
+                    }).join(', ') +
+                    (matchedUsers.length > 30 ? ', +' + (matchedUsers.length - 30) + ' khác' : '') +
+                    '</div>';
+            }
+            if (d.unmatched && d.unmatched.length > 0) {
+                html += '<div class="pm-resolve__sec pm-resolve__err">' +
+                    '⚠ Không tìm thấy <b>' + d.unmatched.length + '</b>: ' + d.unmatched.join(', ') +
+                    '</div>';
+            }
+            $('#p1-result').innerHTML = '<div class="pm-resolve">' + html + '</div>';
+            if (matchedUsers.length > 0) {
+                $('#p1-step2').style.display = 'block';
+                wireGroupPicker(groupSel);
+                updatePreview();
+            }
+        });
+    });
+});
+
+// ========== Execute grant (shared) ==========
+// payload = { UserIds, Items?, Groups? }
+function execGrant(payload) {
+    if (!payload.UserIds || payload.UserIds.length === 0) return;
+    var $btn = $('#pm-m-confirm');
+    $btn.disabled = true; $btn.textContent = 'Đang xử lý...';
+    jsonPost('Grant', payload).then(function (d) {
+        alert('✓ Đã cấp ' + d.created + ' quyền mới' +
+            (d.skipped > 0 ? '. Skip ' + d.skipped + ' đã tồn tại.' : '.'));
+        closeModal();
+        loadTable();
+    }).catch(function (err) {
+        alert('Lỗi: ' + err.message);
+        $btn.disabled = false; $btn.textContent = 'Thử lại';
+    });
+}
+
+// ========== Init ==========
+loadTable();
+
+})();
+</script>

@@ -58,6 +58,11 @@ namespace EPORTAL.Controllers
         [HttpPost]
         public ActionResult LoginUser(LoginValidation u, string returnUrl)
         {
+            if (u == null || string.IsNullOrWhiteSpace(u.MaNV) || string.IsNullOrWhiteSpace(u.MatKhau))
+            {
+                TempData["msgError"] = "<script>alert('Vui lòng nhập đầy đủ mã nhân viên và mật khẩu');</script>";
+                return RedirectToAction("Index", "Login");
+            }
 
             NhanVien user1 = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.CCCD.Substring(x.CCCD.Length - 5,5) == u.MatKhau).FirstOrDefault();
 

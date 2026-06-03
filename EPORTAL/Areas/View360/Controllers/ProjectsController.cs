@@ -1,4 +1,5 @@
-﻿using EPORTAL.Models;
+using EPORTAL.Common;
+using EPORTAL.Models;
 using EPORTAL.ModelsView360;
 using PagedList;
 using System;
@@ -21,7 +22,12 @@ namespace EPORTAL.Areas.View360.Controllers
         PhanQuyenHTEntities dbP = new PhanQuyenHTEntities();
         int IDQuyenHT = EPORTAL.Models.MyAuthentication.IDQuyenHT;
         String controll = "Projects";
-        public ActionResult Index(int? page, string search, string IDGroup)
+        // Folder-file explorer view:
+        // gid    = group ID dang xem (null = root - hien tat ca top-level folders)
+        // search = tu khoa (search recursive trong gid + descendants)
+        // sort   = "date-desc" (default) | "date-asc" | "name-asc" | "name-desc"
+        // view   = "grid" (default) | "list"
+        public ActionResult Index(int? page, string search, string IDGroup, int? gid, string sort, string view)
         {
             var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.VIEW_ALL).First();
             if (check == 0)
@@ -30,38 +36,136 @@ namespace EPORTAL.Areas.View360.Controllers
                 return RedirectToAction("Logout", "Login", new { area = "" });
             }
             if (search == null) search = "";
-            if (IDGroup == null) IDGroup = "";
-            ViewBag.search = search;
-
-            var res = from a in db.Project_select(search)
-                      select new ProjectValidation
-                      {
-                          ID = a.ID,
-                          Title = a.Title,
-                          Images = a.Images,
-                          URL = a.URL,
-                          Date = (DateTime)a.Date,
-                          Note = a.Note,
-                          FilePDF = a.FilePDF,
-                          IDPhongBan = (int)a.IDPhongBan,
-                          TenPhongBan = a.TenPhongBan,
-                          IDGroup = a.IDGroup ?? default
-                      };
-            List<ProjectsGroup> pg = db.ProjectsGroups.ToList();
-            if (IDGroup != "")
+            // Backward-compat: legacy IDGroup query param map sang gid
+            if (!gid.HasValue && !string.IsNullOrEmpty(IDGroup))
             {
-                res = res.Where(x=>x.IDGroup== Convert.ToInt32(IDGroup));
-                ViewBag.PGList = new SelectList(pg, "IDGroup", "GroupName", Convert.ToInt32(IDGroup));
-            }else { ViewBag.PGList = new SelectList(pg, "IDGroup", "GroupName"); }
-            
-            
+                int legacyGid;
+                if (int.TryParse(IDGroup, out legacyGid)) gid = legacyGid;
+            }
+            ViewBag.search = search;
+            var sortKey = string.IsNullOrEmpty(sort) ? "date-desc" : sort.ToLowerInvariant();
+            var viewMode = string.IsNullOrEmpty(view) ? "grid" : view.ToLowerInvariant();
+            if (viewMode != "list") viewMode = "grid";
+            ViewBag.Sort = sortKey;
+            ViewBag.View = viewMode;
+            ViewBag.CurrentGid = gid;
+
+            // Full project list (filtered by search keyword neu co)
+            var all = (from a in db.Project_select(search)
+                       select new ProjectValidation
+                       {
+                           ID = a.ID,
+                           Title = a.Title,
+                           Images = a.Images,
+                           URL = a.URL,
+                           Date = (DateTime)a.Date,
+                           Note = a.Note,
+                           FilePDF = a.FilePDF,
+                           IDPhongBan = (int)a.IDPhongBan,
+                           TenPhongBan = a.TenPhongBan,
+                           IDGroup = a.IDGroup ?? default
+                       }).ToList();
+
+            List<ProjectsGroup> pg = db.ProjectsGroups.ToList();
+            ViewBag.PGList = ProjectsGroupHierarchy.BuildSelectList(gid);
             ViewBag.listPG = pg;
-            if (page == null) page = 1;
-            int pageSize = 50;
-            int pageNumber = (page ?? 1);
-            return View(res.OrderByDescending(x=>x.Date).ToList().ToPagedList(pageNumber, pageSize));
+
+            // Hierarchy tree day du - dung cho sidebar va breadcrumb
+            var tree = ProjectsGroupHierarchy.GetAllTree();
+            var flat = ProjectsGroupHierarchy.FlattenPreOrder(tree);
+            var byId = flat.ToDictionary(n => n.IDGroup);
+
+            // CONSISTENCY: override ProjectCount tu cung nguon voi content (`all` tu Project_select SP)
+            // thay vi raw SQL trong LoadAllInternal. Tranh truong hop sidebar 172 vs content 170 (SP loc them).
+            // ProjectCount = DIRECT count (projects co IDGroup == node.IDGroup).
+            var directCountByGroup = all
+                .Where(p => p.IDGroup > 0)
+                .GroupBy(p => p.IDGroup)
+                .ToDictionary(g => g.Key, g => g.Count());
+            foreach (var n in flat)
+            {
+                n.ProjectCount = directCountByGroup.ContainsKey(n.IDGroup) ? directCountByGroup[n.IDGroup] : 0;
+            }
+
+            // SUBTREE count: tinh tong project trong node + tat ca descendants (recursive).
+            // Hien song song voi direct count -> user thay duoc "quy mo ca cay con".
+            var subtreeCount = new Dictionary<int, int>();
+            Func<ProjectGroupNode, int> computeSubtree = null;
+            computeSubtree = node => {
+                if (subtreeCount.ContainsKey(node.IDGroup)) return subtreeCount[node.IDGroup];
+                int total = node.ProjectCount;
+                foreach (var c in node.Children) total += computeSubtree(c);
+                subtreeCount[node.IDGroup] = total;
+                return total;
+            };
+            foreach (var n in tree) computeSubtree(n);
+            ViewBag.SubtreeCount = subtreeCount;
+
+            ViewBag.HierarchyTree = tree;
+            ViewBag.HierarchyFlat = flat;
+
+            // Build breadcrumb: tu root den current folder
+            var crumbs = new List<ProjectGroupNode>();
+            if (gid.HasValue && byId.ContainsKey(gid.Value))
+            {
+                var cur = byId[gid.Value];
+                while (cur != null)
+                {
+                    crumbs.Insert(0, cur);
+                    cur = cur.ParentIDGroup.HasValue && byId.ContainsKey(cur.ParentIDGroup.Value)
+                          ? byId[cur.ParentIDGroup.Value] : null;
+                }
+            }
+            ViewBag.Breadcrumb = crumbs;
+            ViewBag.CurrentFolder = gid.HasValue && byId.ContainsKey(gid.Value) ? byId[gid.Value] : null;
+
+            // Subfolders va Projects trong current folder
+            List<ProjectGroupNode> subfolders;
+            List<ProjectValidation> projects;
+            bool isSearching = !string.IsNullOrEmpty(search);
+
+            if (isSearching)
+            {
+                // Khi search: hien tat ca projects match (khong giu rang buoc folder)
+                // Va hien tat ca folders match name
+                subfolders = flat
+                    .Where(n => (n.GroupName ?? "").IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderBy(n => n.GroupName)
+                    .ToList();
+                projects = all;
+            }
+            else if (gid.HasValue)
+            {
+                subfolders = byId.ContainsKey(gid.Value) ? byId[gid.Value].Children.ToList() : new List<ProjectGroupNode>();
+                projects = all.Where(p => p.IDGroup == gid.Value).ToList();
+            }
+            else
+            {
+                // Root: top-level folders + projects khong thuoc group nao
+                subfolders = tree;
+                projects = all.Where(p => p.IDGroup == 0 || !byId.ContainsKey(p.IDGroup)).ToList();
+            }
+
+            // ProjectCount cua subfolder da duoc fill boi LoadAllInternal (toan bo, khong search-filter).
+            // Khi search, giu count tong de user thay quy mo folder.
+            ViewBag.Subfolders = subfolders;
+
+            // Apply sort
+            switch (sortKey)
+            {
+                case "date-asc": projects = projects.OrderBy(x => x.Date).ToList(); break;
+                case "name-asc": projects = projects.OrderBy(x => x.Title ?? "").ToList(); break;
+                case "name-desc": projects = projects.OrderByDescending(x => x.Title ?? "").ToList(); break;
+                case "date-desc":
+                default: projects = projects.OrderByDescending(x => x.Date).ToList(); break;
+            }
+
+            // Grid view: 24 cards/page. List view: tat ca trong 1 trang (UI lazy-load via CSS content-visibility).
+            int pageSize = viewMode == "list" ? Math.Max(projects.Count, 1) : 24;
+            int pageNumber = viewMode == "list" ? 1 : (page ?? 1);
+            return View(projects.ToPagedList(pageNumber, pageSize));
         }
-        public ActionResult Create()
+        public ActionResult Create(int? gid)
         {
             var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.ADD).First();
             if (check == 0)
@@ -72,14 +176,28 @@ namespace EPORTAL.Areas.View360.Controllers
             List<PhongBan> pb = db.PhongBans.ToList();
             ViewBag.PBList = new SelectList(pb, "IDPhongBan", "TenPhongBan");
 
-            List<ProjectsGroup> pg = db.ProjectsGroups.ToList();
-            ViewBag.PGList = new SelectList(pg, "IDGroup", "GroupName");
-
+            // Pre-select group tu folder dang xem (gid query param) - SelectList da
+            // co selectedValue, DropDownListFor se pick up cho user.
+            ViewBag.PGList = ProjectsGroupHierarchy.BuildSelectList(gid);
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(ProjectValidation _DO)
         {
+            var imageError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (imageError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + imageError + "');</script>";
+                return RedirectToAction("Index", "Projects");
+            }
+            HttpPostedFileBase pdfFile = Request != null ? Request.Files["FileUpload"] : null;
+            var pdfError = FileUploadValidator.ValidatePdf(pdfFile);
+            if (pdfError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + pdfError + "');</script>";
+                return RedirectToAction("Index", "Projects");
+            }
 
             try
             {
@@ -88,57 +206,34 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-                //Use Namespace called :  System.IO  
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
 
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
-
-
-                ////Add Current Date To Attached File Name  
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
                 //Upload file pdf
                 string filePath = string.Empty;
-                if (Request != null)
+                if (pdfFile != null && pdfFile.ContentLength > 0)
                 {
-                    HttpPostedFileBase file = Request.Files["FileUpload"];
-                    if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
+                    string pathPDF = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(pathPDF))
                     {
-                        string pathPDF = Server.MapPath("~/UploadedFiles/");
-                        if (!Directory.Exists(pathPDF))
-                        {
-                            Directory.CreateDirectory(pathPDF);
-                        }
-                        filePath = pathPDF + Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmm") + "-" + file.FileName);
-
-                        file.SaveAs(filePath);
-                        Stream stream = file.InputStream;
-                        if (file.FileName.EndsWith(".pdf"))
-                        {
-                            _DO.FilePDF = "~/UploadedFiles/" + filePath;
-                        }
-                        else
-                        {
-
-                        }
-
+                        Directory.CreateDirectory(pathPDF);
                     }
-                    else
-                    {
-                        //TempData["msgError"] = "<script>alert('Vui lòng nhập file Import');</script>";
-                    }
-                }
-                else
-                {
-                    //TempData["msgError"] = "<script>alert('Vui lòng nhập file Import');</script>";
+                    var safePdfName = FileUploadValidator.SafeFileName(pdfFile.FileName);
+                    filePath = Path.Combine(pathPDF, safePdfName);
+                    pdfFile.SaveAs(filePath);
+                    _DO.FilePDF = "~/UploadedFiles/" + filePath;
                 }
 
                 var a = db.Projects_insert(_DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.FilePDF,_DO.IDGroup);
+
+                // (Auto-sync legacy đã được xoá: hybrid permission qua AuthorizationUSER_Group
+                //  + SP Project_select_USER mới tự xử lý group-grant inheritance. Project mới
+                //  trong group được cấp group-grant tự động hiển thị cho user khi list.)
+
                 TempData["msgSuccess"] = "<script>alert('Thêm mới thành công');</script>";
             }
             catch (Exception e)
@@ -190,8 +285,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 List<PhongBan> pb = db.PhongBans.ToList();
                 ViewBag.IDPhongBan = new SelectList(pb, "IDPhongBan", "TenPhongBan", DO.IDPhongBan);
                 ViewBag.Date = DO.Date.ToString("yyyy-MM-dd");
-                List<ProjectsGroup> pg = db.ProjectsGroups.ToList();
-                ViewBag.PGList = new SelectList(pg, "IDGroup", "GroupName",DO.IDGroup);
+                ViewBag.PGList = ProjectsGroupHierarchy.BuildSelectList(DO.IDGroup);
 
             }
             else
@@ -202,58 +296,55 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(ProjectValidation _DO)
         {
+            var imageError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (imageError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + imageError + "');</script>";
+                return RedirectToAction("Index", "Projects");
+            }
+            HttpPostedFileBase pdfFile = Request != null ? Request.Files["FileUpload"] : null;
+            var pdfError = FileUploadValidator.ValidatePdf(pdfFile);
+            if (pdfError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + pdfError + "');</script>";
+                return RedirectToAction("Index", "Projects");
+            }
 
             try
             {
                 string path = Server.MapPath("~/Images/");
-                //string path ="~/Images/";
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
-                //Use Namespace called :  System.IO  
-                //string FileName = _DO.ImageFile !=null?Path.GetFileNameWithoutExtension(_DO.ImageFile.FileName):"";
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
 
-
-                ////Add Current Date To Attached File Name  
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
 
                 //Upload file pdf
                 string filePath = string.Empty;
-                if (Request != null)
+                if (pdfFile != null && pdfFile.ContentLength > 0)
                 {
-                    HttpPostedFileBase file = Request.Files["FileUpload"];
-                    if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
+                    string pathPDF = Server.MapPath("~/UploadedFiles/");
+                    if (!Directory.Exists(pathPDF))
                     {
-                        string pathPDF = Server.MapPath("~/UploadedFiles/");
-                        if (!Directory.Exists(pathPDF))
-                        {
-                            Directory.CreateDirectory(pathPDF);
-                        }
-                        filePath = pathPDF + Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmm") + "-" + file.FileName);
-
-                        file.SaveAs(filePath);
-                        Stream stream = file.InputStream;
-                        if (file.FileName.EndsWith(".pdf"))
-                        {
-                            _DO.FilePDF = "~/UploadedFiles/" + filePath;
-                        }
-
+                        Directory.CreateDirectory(pathPDF);
                     }
-                    
-                    var a = db.Projects_update(_DO.ID, _DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.FilePDF,_DO.IDGroup);
-                    TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
+                    var safePdfName = FileUploadValidator.SafeFileName(pdfFile.FileName);
+                    filePath = Path.Combine(pathPDF, safePdfName);
+                    pdfFile.SaveAs(filePath);
+                    _DO.FilePDF = "~/UploadedFiles/" + filePath;
                 }
+
+                var a = db.Projects_update(_DO.ID, _DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.FilePDF,_DO.IDGroup);
+                TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
             }
             catch (Exception e)
             {
@@ -279,6 +370,47 @@ namespace EPORTAL.Areas.View360.Controllers
                 TempData["msgSuccess"] = "<script>alert('Xóa dữ liệu thất bại: " + e.Message + "');</script>";
             }
             return RedirectToAction("Index", "Projects");
+        }
+
+        /// <summary>
+        /// Di chuyen project sang group khac. targetId rong = chuyen ra ngoai (IDGroup=0 hoac NULL).
+        /// Dung raw SQL de chi update IDGroup, khong dung lai SP Projects_update (can full payload).
+        /// </summary>
+        [HttpPost]
+        public ActionResult Move(int id, string targetId)
+        {
+            var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.EDIT).First();
+            if (check == 0) return new HttpStatusCodeResult(403, "Không có quyền");
+            try
+            {
+                int? newGroup = null;
+                int parsed;
+                if (!string.IsNullOrEmpty(targetId) && int.TryParse(targetId, out parsed)) newGroup = parsed;
+
+                var entry = System.Configuration.ConfigurationManager.ConnectionStrings["EPORTALEntities"];
+                if (entry == null) return new HttpStatusCodeResult(500, "Connection config missing");
+                var raw = entry.ConnectionString;
+                if (raw.IndexOf("metadata=", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    raw = new System.Data.Entity.Core.EntityClient.EntityConnectionStringBuilder(raw).ProviderConnectionString;
+                }
+                using (var conn = new System.Data.SqlClient.SqlConnection(raw))
+                {
+                    conn.Open();
+                    using (var cmd = new System.Data.SqlClient.SqlCommand(
+                        "UPDATE dbo.Projects SET IDGroup = @gid WHERE ID = @id", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+                        cmd.Parameters.AddWithValue("@gid", (object)newGroup ?? DBNull.Value);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return new HttpStatusCodeResult(200);
+            }
+            catch (Exception e)
+            {
+                return new HttpStatusCodeResult(400, e.Message);
+            }
         }
         public ActionResult Authorization(int? page, int? id)
         {
@@ -321,6 +453,7 @@ namespace EPORTAL.Areas.View360.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddPermission(AuthorizationUSERValidation _DO)
         {
             AuthorizationUSER aus = new AuthorizationUSER();
@@ -381,9 +514,17 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ImportExcel(AuthorizationUSERValidation _DO)
         {
-            
+            HttpPostedFileBase excelFile = Request != null ? Request.Files["FileUpload"] : null;
+            var excelError = FileUploadValidator.ValidateExcel(excelFile);
+            if (excelError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + excelError + "');</script>";
+                return RedirectToAction("Index", "Projects");
+            }
+
             string filePath = string.Empty;
             if (Request != null)
             {
@@ -395,7 +536,8 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         Directory.CreateDirectory(path);
                     }
-                    filePath = path + Path.GetFileName(file.FileName);
+                    var safeName = FileUploadValidator.SafeFileName(file.FileName);
+                    filePath = Path.Combine(path, safeName);
 
                     file.SaveAs(filePath);
                     Stream stream = file.InputStream;
@@ -548,8 +690,12 @@ namespace EPORTAL.Areas.View360.Controllers
                 
                 if (IDGroup != "")
                 {
-                    list_Projects = list_Projects.Where(x => x.IDGroup == Convert.ToInt32(IDGroup)).ToList();
-                    ViewBag.PGList = new SelectList(listpg, "IDGroup", "GroupName", Convert.ToInt32(IDGroup));
+                    var rootGid = Convert.ToInt32(IDGroup);
+                    // Recursive: include direct + all descendant groups de export "ca cay con".
+                    // Tan dung hierarchy moi (ParentIDGroup). Neu group khong co children, set = {rootGid}.
+                    var allowed = ExpandGroupDescendants(rootGid);
+                    list_Projects = list_Projects.Where(x => allowed.Contains(x.IDGroup)).ToList();
+                    ViewBag.PGList = new SelectList(listpg, "IDGroup", "GroupName", rootGid);
                 }
                 else { ViewBag.PGList = new SelectList(listpg, "IDGroup", "GroupName"); }
                 if (list_Projects.Count > 0)
@@ -681,7 +827,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         Worksheet.Cell("C" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("C" + row).Style.Alignment.WrapText = true;
 
-                        Worksheet.Cell("D" + row).Value = db.NhanViens.Where(x => x.ID == item.NhanVienID).Select(x => x.PhongBan.TenPhongBan);
+                        Worksheet.Cell("D" + row).Value = db.NhanViens.Where(x => x.ID == item.NhanVienID).Select(x => x.PhongBan.TenPhongBan).FirstOrDefault();
                         Worksheet.Cell("D" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
                         Worksheet.Cell("D" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("D" + row).Style.Alignment.WrapText = true;
@@ -718,6 +864,33 @@ namespace EPORTAL.Areas.View360.Controllers
                 return RedirectToAction("Index", "Projects");
             }
 
+        }
+
+        /// <summary>
+        /// Tu root group ID, tra ve set gom chinh no + tat ca descendant IDGroup.
+        /// Dung cho export/filter recursive theo cay hierarchy ProjectsGroup.
+        /// </summary>
+        private static HashSet<int> ExpandGroupDescendants(int rootGid)
+        {
+            var allowed = new HashSet<int> { rootGid };
+            var tree = ProjectsGroupHierarchy.GetAllTree();
+            ProjectGroupNode rootNode = null;
+            Action<ProjectGroupNode> findRoot = null;
+            findRoot = n => {
+                if (rootNode != null) return;
+                if (n.IDGroup == rootGid) { rootNode = n; return; }
+                foreach (var c in n.Children) findRoot(c);
+            };
+            foreach (var n in tree) findRoot(n);
+            if (rootNode == null) return allowed;
+
+            Action<ProjectGroupNode> walk = null;
+            walk = node => {
+                foreach (var c in node.Children)
+                    if (allowed.Add(c.IDGroup)) walk(c);
+            };
+            walk(rootNode);
+            return allowed;
         }
     }
 }

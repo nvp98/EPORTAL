@@ -1,4 +1,5 @@
-﻿using EPORTAL.Models;
+using EPORTAL.Common;
+using EPORTAL.Models;
 using EPORTAL.ModelsView360;
 using ExcelDataReader;
 using PagedList;
@@ -25,34 +26,47 @@ namespace EPORTAL.Areas.View360.Controllers
         {
            listQuyen = db.A_CheckListQuyen(IDQuyenHT, controll).ToList();
         }
-        // GET: View360/MyDocument
+        // KHONG cache HTML output - dua vao Session cache SP `L_ThuVienFile_selectbyUser` (per-user inherent).
         public ActionResult Index(int? page, string search)
         {
-            //listQuyen = db.A_CheckListQuyen(IDQuyenHT, controll).ToList();
-            //if (listQuyen.Contains(A_Constants.VIEW_ALL) == false)
-            //{
-            //    TempData["msgError"] = "<script>alert('Bạn không có quyền thực hiện chức năng này');</script>";
-            //    return RedirectToAction("Logout", "Login", new { area = "" });
-            //}
             if (search == null) search = "";
             ViewBag.search = search;
-            var res = from a in db.L_ThuVienFile_selectbyUser(search, MyAuthentication.ID)
-                      select new L_ThuVienFileValidation
-                      {
-                          ID = a.ID,
-                          TenTaiLieu = a.TenTaiLieu,
-                          FileName = a.FileName,
-                          GhiChu = a.GhiChu,
-                          Createdate = a.Createdate,
-                          TenNhomTV = a.TenNhomTV,
-                          IDNhom = a.IDNhom ?? default,
-                      };
-            var listNhom = db.L_NhomThuVienFile.ToList();
+
+            // Cache SP `L_ThuVienFile_selectbyUser` + L_NhomThuVienFile per user trong Session 120s
+            var sessKey = "v360_doc_list_" + MyAuthentication.ID + "_" + (search ?? "");
+            var sess = System.Web.HttpContext.Current?.Session;
+            var cached = sess != null ? sess[sessKey] as Tuple<DateTime, List<L_ThuVienFileValidation>, List<L_NhomThuVienFile>> : null;
+            List<L_ThuVienFileValidation> docList;
+            List<L_NhomThuVienFile> listNhom;
+            if (cached != null && (DateTime.UtcNow - cached.Item1).TotalSeconds < 120)
+            {
+                docList = cached.Item2;
+                listNhom = cached.Item3;
+            }
+            else
+            {
+                docList = db.L_ThuVienFile_selectbyUser(search, MyAuthentication.ID)
+                    .Select(a => new L_ThuVienFileValidation
+                    {
+                        ID = a.ID,
+                        TenTaiLieu = a.TenTaiLieu,
+                        FileName = a.FileName,
+                        GhiChu = a.GhiChu,
+                        Createdate = a.Createdate,
+                        TenNhomTV = a.TenNhomTV,
+                        IDNhom = a.IDNhom ?? default,
+                    })
+                    .OrderByDescending(x => x.ID)
+                    .ToList();
+                listNhom = db.L_NhomThuVienFile.ToList();
+                if (sess != null) sess[sessKey] = Tuple.Create(DateTime.UtcNow, docList, listNhom);
+            }
             ViewBag.listNhom = listNhom;
+
             if (page == null) page = 1;
             int pageSize = 30;
             int pageNumber = (page ?? 1);
-            return View(res.OrderByDescending(x => x.ID).ToList().ToPagedList(pageNumber, pageSize));
+            return View(docList.ToPagedList(pageNumber, pageSize));
         }
         public ActionResult ImportExcel()
         {
@@ -70,8 +84,16 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ImportExcel(AuthorizationUSERValidation _DO)
         {
+            HttpPostedFileBase excelFile = Request != null ? Request.Files["FileUpload"] : null;
+            var excelError = FileUploadValidator.ValidateExcel(excelFile);
+            if (excelError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + excelError + "');</script>";
+                return RedirectToAction("Index", "MyDocument");
+            }
 
             string filePath = string.Empty;
             if (Request != null)
@@ -84,7 +106,8 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         Directory.CreateDirectory(path);
                     }
-                    filePath = path + Path.GetFileName(file.FileName);
+                    var safeName = FileUploadValidator.SafeFileName(file.FileName);
+                    filePath = Path.Combine(path, safeName);
 
                     file.SaveAs(filePath);
                     Stream stream = file.InputStream;

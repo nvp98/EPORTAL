@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
+using EPORTAL.Common;
 using EPORTAL.Models;
 using EPORTAL.ModelsView360;
 using ExcelDataReader;
@@ -76,8 +77,15 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(VideoValidation _DO)
         {
+            var imageError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (imageError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + imageError + "');</script>";
+                return RedirectToAction("Index", "Video");
+            }
 
             try
             {
@@ -86,19 +94,12 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-                //Use Namespace called :  System.IO  
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
 
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
-
-
-                ////Add Current Date To Attached File Name  
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
                 var a = db.Video_insert(_DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan,_DO.AlbumID);
                 TempData["msgSuccess"] = "<script>alert('Thêm mới thành công');</script>";
@@ -183,26 +184,29 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(VideoValidation _DO)
         {
+            var imageError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (imageError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + imageError + "');</script>";
+                return RedirectToAction("Index", "Video");
+            }
 
             try
             {
                 string path = Server.MapPath("~/Images/");
-                //string path ="~/Images/";
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
 
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
 
                 var a = db.Video_update(_DO.IDVideo, _DO.Title, _DO.URL, _DO.Images, _DO.Date, _DO.Note, _DO.IDPhongBan, _DO.AlbumID);
@@ -256,6 +260,7 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddPermission(AuthorizationVideoValidation _DO)
         {
             AuthorizationVideo aus = new AuthorizationVideo();
@@ -312,8 +317,17 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ImportExcel(AuthorizationVideoValidation _DO)
         {
+            HttpPostedFileBase excelFile = Request != null ? Request.Files["FileUpload"] : null;
+            var excelError = FileUploadValidator.ValidateExcel(excelFile);
+            if (excelError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + excelError + "');</script>";
+                return RedirectToAction("Index", "Video");
+            }
+
             string filePath = string.Empty;
             if (Request != null)
             {
@@ -325,7 +339,8 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         Directory.CreateDirectory(path);
                     }
-                    filePath = path + Path.GetFileName(file.FileName);
+                    var safeName = FileUploadValidator.SafeFileName(file.FileName);
+                    filePath = Path.Combine(path, safeName);
 
                     file.SaveAs(filePath);
                     Stream stream = file.InputStream;

@@ -252,6 +252,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -453,7 +454,6 @@
     <Compile Include="Areas\TagSign\Controllers\InOutAndResultController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ListCardRegisInforController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ListHandleController.cs" />
-    <Compile Include="Areas\TagSign\Controllers\ReportController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ResultController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\ListExtendcardNTController.cs" />
@@ -461,6 +461,8 @@
     <Compile Include="Areas\TagSign\Controllers\ViewNT\PortToController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\PositionController.cs" />
     <Compile Include="Areas\TagSign\Controllers\ViewNT\WorkPlaceController.cs" />
+    <Compile Include="Areas\View360\Controllers\DashboardController.cs" />
+    <Compile Include="Areas\View360\Controllers\PermissionController.cs" />
     <Compile Include="Areas\View360\Controllers\DocumentGroupController.cs" />
     <Compile Include="Areas\View360\Controllers\DocumentLibraryController.cs" />
     <Compile Include="Areas\View360\Controllers\ListVirtualController.cs" />
@@ -1023,6 +1025,21 @@
     <Compile Include="Areas\View360\Controllers\VideoController.cs" />
     <Compile Include="Areas\View360\View360AreaRegistration.cs" />
     <Compile Include="Common\Encryptor.cs" />
+    <Compile Include="Common\FileUploadValidator.cs" />
+    <Compile Include="Common\JsonForHtml.cs" />
+    <Compile Include="Common\SameOriginOnlyAttribute.cs" />
+    <Compile Include="Common\KuulaCollectionFetcher.cs" />
+    <Compile Include="Common\KuulaSceneStore.cs" />
+    <Compile Include="Common\LayoutBadgeCache.cs" />
+    <Compile Include="Common\SqlConnectionHelper.cs" />
+    <Compile Include="Common\ProjectsGroupHierarchy.cs" />
+    <Compile Include="Common\View360AccessTracker.cs" />
+    <Compile Include="Common\SceneCalibrationStore.cs" />
+    <Compile Include="Common\SceneHeadingCalibrator.cs" />
+    <Compile Include="Common\ChatbotContentStore.cs" />
+    <Compile Include="Common\ChatbotAIClient.cs" />
+    <Compile Include="Areas\View360\Controllers\ChatbotController.cs" />
+    <Compile Include="ModelsView360\TabGroupViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DeclarationInfoController.cs" />
     <Compile Include="Controllers\EmployeeAPIController.cs" />
@@ -3874,7 +3891,6 @@
     <Content Include="Areas\TagSign\Views\Calendar\Edit.cshtml" />
     <Content Include="Areas\TagSign\Views\Calendar\ImportExcel.cshtml" />
     <Content Include="Areas\TagSign\Views\Calendar\Index.cshtml" />
-    <Content Include="Areas\TagSign\Views\Report\Index.cshtml" />
     <Content Include="App_Data\BM_KHB.xlsx" />
     <Content Include="App_Data\BM_KHB_Temp.xlsx" />
     <Content Include="Areas\Partner\Views\ContractorStaff\ViewNVNT.cshtml" />
@@ -3919,6 +3935,9 @@
     <Content Include="Areas\View360\Views\DocumentLibrary\Edit.cshtml" />
     <Content Include="Areas\View360\Views\DocumentLibrary\Index.cshtml" />
     <Content Include="Areas\View360\Views\MyDocument\Index.cshtml" />
+    <Content Include="Areas\View360\Views\Dashboard\Index.cshtml" />
+    <Content Include="Areas\View360\Views\Permission\Index.cshtml" />
+    <Content Include="Areas\View360\Views\Permission\Audit.cshtml" />
     <Content Include="Areas\View360\Views\ProjectsGroup\Create.cshtml" />
     <Content Include="Areas\View360\Views\ProjectsGroup\Edit.cshtml" />
     <Content Include="Areas\View360\Views\ProjectsGroup\Index.cshtml" />
@@ -4114,6 +4133,22 @@
     <Content Include="Areas\View360\Views\Virtual\ImportExcel.cshtml" />
     <Content Include="Areas\View360\Views\ListVirtual\Index.cshtml" />
     <Content Include="Areas\View360\Views\ListVirtual\Details.cshtml" />
+    <Content Include="Areas\View360\Views\Chatbot\Index.cshtml" />
+    <Content Include="Content\view360-chatbot.css" />
+    <Content Include="Content\view360-chatbot.js" />
+    <Content Include="Content\view360-chatbot-admin.css" />
+    <Content Include="Content\view360-modern.css" />
+    <Content Include="Content\view360-showcase.css" />
+    <Content Include="Content\view360-tabs-carousel.js" />
+    <Content Include="Views\Shared\_LayoutV360Showcase.cshtml" />
+    <Content Include="Areas\View360\Views\ListVirtual\Featured.cshtml" />
+    <Content Include="Areas\View360\Views\ListVirtual\FeaturedIndex.cshtml" />
+    <Content Include="Areas\View360\Views\ListVirtual\CalibrateIndex.cshtml" />
+    <Content Include="Content\view360-featured\7Hknl\691a99a546db5188_639154422810427947.png" />
+    <Content Include="Content\view360-featured\7Hknl\695cd0e8c5388141_639154437868708133.png" />
+    <Content Include="Content\view360-featured\7Hknl\695cd5fa8969b490_639154430917970144.png" />
+    <Content Include="Content\view360-featured\7Hknl\695cd5fa8969b490_639154724803204291.png" />
+    <Content Include="Content\view360-featured\7Hknl\69e73378b921d795_639154421940237998.png" />
     <Content Include="Areas\View360\Views\VirtualGroup\Index.cshtml" />
     <Content Include="Areas\View360\Views\VirtualGroup\Create.cshtml" />
     <Content Include="Areas\View360\Views\VirtualGroup\Edit.cshtml" />

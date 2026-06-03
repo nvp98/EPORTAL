@@ -1,0 +1,290 @@
+@{
+    ViewBag.Title = "Audit phân quyền";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool canRevoke = (bool)(ViewBag.CanRevoke ?? false);
+}
+
+<style>
+.pma { padding: 18px; background: #f8fafc; min-height: calc(100vh - 60px); }
+.pma-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+.pma-hd h2 { font-size: 19px; font-weight: 700; color: #0f172a; margin: 0; }
+.pma-hd__sub { color: #64748b; font-size: 12px; margin-top: 2px; }
+.pma-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@@media (max-width: 900px) { .pma-grid { grid-template-columns: 1fr; } }
+.pma-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+.pma-card__hd { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9; }
+.pma-card__icon { font-size: 24px; }
+.pma-card__title { font-weight: 700; color: #0f172a; font-size: 15px; }
+.pma-card__sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+.pma-card__count { margin-left: auto; font-size: 22px; font-weight: 700; color: #dc2626; }
+.pma-card__count.zero { color: #16a34a; }
+.pma-card__body { max-height: 360px; overflow-y: auto; }
+.pma-empty { padding: 30px 20px; text-align: center; color: #94a3b8; font-size: 13px; }
+.pma-empty__big { font-size: 36px; opacity: .4; margin-bottom: 10px; }
+.pma-empty__ok { color: #16a34a; }
+
+.pma-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+.pma-row:last-child { border-bottom: 0; }
+.pma-row__main { flex: 1; min-width: 0; }
+.pma-row__name { font-weight: 600; color: #0f172a; }
+.pma-row__meta { font-size: 11px; color: #64748b; margin-top: 2px; }
+.pma-row__action { margin-left: 10px; flex-shrink: 0; }
+.pma-row__num { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+
+.pma-act-btn { padding: 6px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;
+                font-size: 12px; font-weight: 600; cursor: pointer; color: #475569; text-decoration: none; }
+.pma-act-btn:hover { border-color: #2563eb; color: #2563eb; text-decoration: none; }
+.pma-act-btn--danger { color: #dc2626; border-color: #fecaca; }
+.pma-act-btn--danger:hover { background: #fef2f2; border-color: #f87171; }
+
+.pma-loading { padding: 30px; text-align: center; color: #94a3b8; font-size: 13px; }
+.pma-not-ready { background: #fef3c7; color: #78350f; padding: 14px; border-radius: 8px; font-size: 12px; }
+
+.pma-badge { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 5px; }
+.pma-badge--p { background: #dbeafe; color: #1d4ed8; }
+.pma-badge--v { background: #ede9fe; color: #6d28d9; }
+.pma-badge--vd { background: #fee2e2; color: #b91c1c; }
+</style>
+
+<div class="app-main__outer">
+<div class="app-main__inner">
+<div class="pma">
+
+    <div class="pma-hd">
+        <div>
+            <h2>⚠ Audit phân quyền View360</h2>
+            <div class="pma-hd__sub">Surface những vấn đề cần admin xử lý — phòng ban 0% coverage, NV nghỉ còn quyền, content orphan, quyền chưa dùng.</div>
+        </div>
+        <div>
+            <a href="@Url.Action("Index", "Permission")" class="pma-act-btn">← Về trang phân quyền</a>
+        </div>
+    </div>
+
+    <div id="pma-loading" class="pma-loading">Đang tải dữ liệu audit...</div>
+
+    <div class="pma-grid" id="pma-grid" style="display:none;">
+
+        @* === Dept 0% coverage === *@
+        <div class="pma-card">
+            <div class="pma-card__hd">
+                <span class="pma-card__icon">🏢</span>
+                <div>
+                    <div class="pma-card__title">Phòng ban 0% coverage</div>
+                    <div class="pma-card__sub">Phòng có NV active nhưng chưa ai có quyền truy cập</div>
+                </div>
+                <span class="pma-card__count" id="pma-dept-count">—</span>
+            </div>
+            <div class="pma-card__body" id="pma-dept-body"></div>
+        </div>
+
+        @* === Inactive users with grants === *@
+        <div class="pma-card">
+            <div class="pma-card__hd">
+                <span class="pma-card__icon">🚪</span>
+                <div>
+                    <div class="pma-card__title">NV đã nghỉ còn quyền</div>
+                    <div class="pma-card__sub">NhanVien.IDTinhTrangLV ≠ 1 nhưng vẫn còn row trong Authorization*</div>
+                </div>
+                <span class="pma-card__count" id="pma-inactive-count">—</span>
+            </div>
+            <div class="pma-card__body" id="pma-inactive-body"></div>
+        </div>
+
+        @* === Orphan content === *@
+        <div class="pma-card">
+            <div class="pma-card__hd">
+                <span class="pma-card__icon">📂</span>
+                <div>
+                    <div class="pma-card__title">Content chưa cấp ai</div>
+                    <div class="pma-card__sub">Project / Virtual publish > 30 ngày, không có row Authorization nào</div>
+                </div>
+                <span class="pma-card__count" id="pma-orphan-count">—</span>
+            </div>
+            <div class="pma-card__body" id="pma-orphan-body"></div>
+        </div>
+
+        @* === Unused grants === *@
+        <div class="pma-card">
+            <div class="pma-card__hd">
+                <span class="pma-card__icon">📊</span>
+                <div>
+                    <div class="pma-card__title">NV có quyền chưa từng mở</div>
+                    <div class="pma-card__sub">NV active có grant nhưng 0 row trong View360_AccessLog</div>
+                </div>
+                <span class="pma-card__count" id="pma-unused-count">—</span>
+            </div>
+            <div class="pma-card__body" id="pma-unused-body"></div>
+        </div>
+
+    </div>
+
+</div>
+</div>
+</div>
+
+<script>
+(function () {
+    var base = '@Url.Content("~/")' + 'View360/Permission/';
+    var canRevoke = @(canRevoke ? "true" : "false");
+
+    function escapeHtml(s) {
+        return (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function fmt(n) { return (n == null ? '0' : String(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function setCount(elId, n, hideIfZero) {
+        var $e = document.getElementById(elId);
+        $e.textContent = fmt(n);
+        $e.classList.toggle('zero', n === 0);
+    }
+
+    function emptyOk(msg) {
+        return '<div class="pma-empty pma-empty__ok">' +
+            '<div class="pma-empty__big">✓</div>' +
+            '<div>' + escapeHtml(msg) + '</div></div>';
+    }
+    function notReady(msg) {
+        return '<div class="pma-not-ready">⚠ ' + escapeHtml(msg) + '</div>';
+    }
+
+    fetch(base + 'Anomalies').then(function (r) { return r.json(); }).then(function (d) {
+        document.getElementById('pma-loading').style.display = 'none';
+        document.getElementById('pma-grid').style.display = '';
+
+        // === Dept 0% ===
+        var depts = d.deptZeroCoverage || [];
+        setCount('pma-dept-count', depts.length);
+        var $db = document.getElementById('pma-dept-body');
+        if (depts.length === 0) {
+            $db.innerHTML = emptyOk('Mọi phòng ban đều có ít nhất 1 user được cấp quyền.');
+        } else {
+            $db.innerHTML = depts.map(function (dp) {
+                var url = base + 'Index?deptId=' + dp.id; // future: pre-fill chip
+                return '<div class="pma-row">' +
+                    '<div class="pma-row__main">' +
+                        '<div class="pma-row__name">' + escapeHtml(dp.name) + '</div>' +
+                        '<div class="pma-row__meta">' + fmt(dp.activeUsers) + ' NV đang hoạt động · 0 user có quyền</div>' +
+                    '</div>' +
+                    '<a class="pma-act-btn" href="' + escapeHtml(url) + '">+ Cấp ngay</a>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // === Inactive ===
+        var inactives = d.inactiveUsersWithGrant || [];
+        setCount('pma-inactive-count', inactives.length);
+        var $ib = document.getElementById('pma-inactive-body');
+        if (inactives.length === 0) {
+            $ib.innerHTML = emptyOk('Tất cả NV active có grant. Không có NV nghỉ còn quyền dư.');
+        } else {
+            $ib.innerHTML = inactives.map(function (u) {
+                return '<div class="pma-row" data-user-id="' + u.id + '">' +
+                    '<div class="pma-row__main">' +
+                        '<div class="pma-row__name">' + escapeHtml(u.hoTen) +
+                            ' <small style="color:#94a3b8">· ' + escapeHtml(u.maNV || '') + '</small></div>' +
+                        '<div class="pma-row__meta">' + escapeHtml(u.phongBan || '—') +
+                            ' · <span class="pma-row__num">' + fmt(u.grantCount) + ' quyền</span></div>' +
+                    '</div>' +
+                    (canRevoke
+                        ? '<button class="pma-act-btn pma-act-btn--danger" data-revoke-user="' + u.id +
+                            '" data-name="' + escapeHtml(u.hoTen) +
+                            '" data-count="' + u.grantCount + '">✕ Thu hồi hết</button>'
+                        : '') +
+                    '</div>';
+            }).join('');
+            // Wire revoke buttons
+            $ib.querySelectorAll('[data-revoke-user]').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var uid = parseInt(b.dataset.revokeUser, 10);
+                    var name = b.dataset.name;
+                    var cnt = b.dataset.count;
+                    if (!confirm('Thu hồi tất cả ' + cnt + ' quyền của "' + name + '"?')) return;
+                    bulkRevokeUser(uid, b);
+                });
+            });
+        }
+
+        // === Orphan content ===
+        var orphans = d.orphanContent || [];
+        setCount('pma-orphan-count', orphans.length);
+        var $ob = document.getElementById('pma-orphan-body');
+        if (orphans.length === 0) {
+            $ob.innerHTML = emptyOk('Mọi content > 30 ngày đều đã được cấp quyền cho ít nhất 1 user.');
+        } else {
+            $ob.innerHTML = orphans.map(function (c) {
+                var typeCls = c.type === 1 ? 'p' : (c.type === 2 ? 'v' : 'vd');
+                return '<div class="pma-row">' +
+                    '<div class="pma-row__main">' +
+                        '<div class="pma-row__name">' +
+                            '<span class="pma-badge pma-badge--' + typeCls + '">' + c.typeName + '</span>' +
+                            escapeHtml(c.title || '(không tiêu đề)') + '</div>' +
+                        '<div class="pma-row__meta">Publish: ' + escapeHtml(c.date) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // === Unused grants ===
+        var unused = d.unusedGrants || [];
+        var $ub = document.getElementById('pma-unused-body');
+        if (d.unusedGrantsReady === false) {
+            document.getElementById('pma-unused-count').textContent = '—';
+            $ub.innerHTML = notReady(d.unusedGrantsMessage || 'Tracking chưa sẵn sàng.');
+        } else {
+            setCount('pma-unused-count', unused.length);
+            if (unused.length === 0) {
+                $ub.innerHTML = emptyOk('Mọi NV active có grant đều đã mở ít nhất 1 lần.');
+            } else {
+                $ub.innerHTML = unused.map(function (u) {
+                    return '<div class="pma-row">' +
+                        '<div class="pma-row__main">' +
+                            '<div class="pma-row__name">' + escapeHtml(u.hoTen) +
+                                ' <small style="color:#94a3b8">· ' + escapeHtml(u.maNV || '') + '</small></div>' +
+                            '<div class="pma-row__meta">' + escapeHtml(u.phongBan || '—') +
+                                ' · ' + fmt(u.grantCount) + ' quyền · 0 lượt truy cập</div>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+    }).catch(function (err) {
+        document.getElementById('pma-loading').innerHTML =
+            '<div style="color:#dc2626;">⚠ Lỗi tải audit: ' + escapeHtml(err.message || String(err)) + '</div>';
+    });
+
+    function bulkRevokeUser(userId, btnEl) {
+        // Lấy hết grant của user qua UserGrants, rồi POST Revoke từng cái
+        btnEl.disabled = true; btnEl.textContent = 'Đang xử lý...';
+        fetch(base + 'UserGrants?userId=' + userId).then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d.grants || d.grants.length === 0) {
+                    alert('User này không có grant nào (data đã thay đổi?)');
+                    btnEl.disabled = false; btnEl.textContent = '✕ Thu hồi hết';
+                    return;
+                }
+                var items = d.grants.map(function (g) {
+                    return { UserId: userId, Type: g.type, ContentId: g.contentId };
+                });
+                return fetch(base + 'Revoke', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Items: items })
+                }).then(function (r) { return r.json(); }).then(function (res) {
+                    if (res.error) throw new Error(res.message);
+                    alert('Đã thu hồi ' + res.deleted + ' quyền của user.');
+                    // Remove row
+                    var row = btnEl.closest('.pma-row');
+                    if (row) row.remove();
+                    // Update count
+                    var cnt = parseInt(document.getElementById('pma-inactive-count').textContent.replace(/,/g, ''), 10);
+                    setCount('pma-inactive-count', Math.max(0, cnt - 1));
+                });
+            })
+            .catch(function (err) {
+                alert('Lỗi: ' + (err.message || err));
+                btnEl.disabled = false; btnEl.textContent = '✕ Thu hồi hết';
+            });
+    }
+})();
+</script>
