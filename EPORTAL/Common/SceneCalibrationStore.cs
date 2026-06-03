@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Web;
@@ -31,7 +32,19 @@ namespace EPORTAL.Common
         public string SceneUuid    { get; set; }
         public int    DisplayOrder { get; set; }
         public string CustomTitle  { get; set; }
-        public string ImagePath    { get; set; } // relative path under ~/Content/view360-featured/
+        public string ImagePath    { get; set; } // legacy fallback under ~/Content/view360-featured/
+        public bool   HasImage     { get; set; }
+        public string ImageUrl     { get; set; }
+        public long   ImageVersion { get; set; }
+    }
+
+    public class FeaturedSceneImage
+    {
+        public byte[]   Data            { get; set; }
+        public string   ContentType     { get; set; }
+        public string   FileName        { get; set; }
+        public string   LegacyImagePath { get; set; }
+        public DateTime UpdatedAt       { get; set; }
     }
 
     public class TourConfig
@@ -315,7 +328,10 @@ WHEN NOT MATCHED THEN
             {
                 using (var conn = OpenConnection())
                 using (var cmd = new SqlCommand(
-                    @"SELECT SceneUuid, DisplayOrder, CustomTitle, ImagePath
+                    @"SELECT SceneUuid, DisplayOrder, CustomTitle, ImagePath,
+                             CASE WHEN DATALENGTH(ImageData) > 0 OR NULLIF(ImagePath, N'') IS NOT NULL
+                                  THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS HasImage,
+                             UpdatedAt
                       FROM dbo.V360_FeaturedScene
                       WHERE CollectionId=@cid
                       ORDER BY DisplayOrder ASC, Id ASC", conn))
@@ -330,7 +346,9 @@ WHEN NOT MATCHED THEN
                                 SceneUuid    = rd.GetString(0),
                                 DisplayOrder = rd.GetInt32(1),
                                 CustomTitle  = rd.IsDBNull(2) ? null : rd.GetString(2),
-                                ImagePath    = rd.IsDBNull(3) ? null : rd.GetString(3)
+                                ImagePath    = rd.IsDBNull(3) ? null : rd.GetString(3),
+                                HasImage     = !rd.IsDBNull(4) && rd.GetBoolean(4),
+                                ImageVersion = rd.IsDBNull(5) ? 0L : rd.GetDateTime(5).Ticks
                             });
                         }
                     }
@@ -344,46 +362,76 @@ WHEN NOT MATCHED THEN
         }
 
         /// <summary>
-        /// Replace toan bo featured list cho tour - delete het row cu roi insert moi.
-        /// Don gian hon MERGE va dam bao DisplayOrder dung khi admin reorder/remove.
+        /// Upsert featured list cho tour, giu nguyen image bytes khi admin reorder/rename,
+        /// va xoa cac row khong con nam trong danh sach.
         /// </summary>
         public static bool SaveFeatured(string collectionId, List<FeaturedScene> items)
         {
-            if (string.IsNullOrEmpty(collectionId)) return false;
+            if (string.IsNullOrEmpty(collectionId) || collectionId.Length > 50) return false;
             EnsureLegacyImported();
             try
             {
+                var normalized = new List<FeaturedScene>();
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                if (items != null)
+                {
+                    foreach (var item in items)
+                    {
+                        if (item == null || string.IsNullOrWhiteSpace(item.SceneUuid)) continue;
+                        var uuid = item.SceneUuid.Trim();
+                        if (uuid.Length > 100 || !seen.Add(uuid)) continue;
+                        if (!string.IsNullOrEmpty(item.CustomTitle) && item.CustomTitle.Length > 500) return false;
+                        normalized.Add(new FeaturedScene
+                        {
+                            SceneUuid = uuid,
+                            CustomTitle = string.IsNullOrWhiteSpace(item.CustomTitle) ? null : item.CustomTitle.Trim()
+                        });
+                    }
+                }
+
                 using (var conn = OpenConnection())
                 using (var tx = conn.BeginTransaction())
                 {
-                    using (var del = new SqlCommand(
-                        "DELETE FROM dbo.V360_FeaturedScene WHERE CollectionId=@cid", conn, tx))
+                    using (var createKeep = new SqlCommand(
+                        "CREATE TABLE #FeaturedKeep (SceneUuid NVARCHAR(100) NOT NULL PRIMARY KEY);", conn, tx))
                     {
-                        del.Parameters.AddWithValue("@cid", collectionId);
-                        del.ExecuteNonQuery();
+                        createKeep.ExecuteNonQuery();
                     }
-                    if (items != null && items.Count > 0)
+
+                    int ord = 0;
+                    foreach (var f in normalized)
                     {
-                        int ord = 0;
-                        foreach (var f in items)
+                        using (var upsert = new SqlCommand(@"
+INSERT INTO #FeaturedKeep (SceneUuid) VALUES (@u);
+
+MERGE dbo.V360_FeaturedScene AS T
+USING (SELECT @cid AS CollectionId, @u AS SceneUuid) AS S
+  ON T.CollectionId = S.CollectionId AND T.SceneUuid = S.SceneUuid
+WHEN MATCHED THEN
+    UPDATE SET DisplayOrder=@ord, CustomTitle=@ct, UpdatedAt=GETDATE()
+WHEN NOT MATCHED THEN
+    INSERT (CollectionId, SceneUuid, DisplayOrder, CustomTitle, UpdatedAt)
+    VALUES (@cid, @u, @ord, @ct, GETDATE());", conn, tx))
                         {
-                            if (string.IsNullOrEmpty(f.SceneUuid)) continue;
-                            using (var ins = new SqlCommand(@"
-INSERT INTO dbo.V360_FeaturedScene
-    (CollectionId, SceneUuid, DisplayOrder, CustomTitle, ImagePath, UpdatedAt)
-VALUES (@cid, @u, @ord, @ct, @ip, GETDATE());", conn, tx))
-                            {
-                                ins.Parameters.AddWithValue("@cid", collectionId);
-                                ins.Parameters.AddWithValue("@u", f.SceneUuid);
-                                ins.Parameters.AddWithValue("@ord", ord++);
-                                ins.Parameters.AddWithValue("@ct",
-                                    string.IsNullOrEmpty(f.CustomTitle) ? (object)DBNull.Value : f.CustomTitle);
-                                ins.Parameters.AddWithValue("@ip",
-                                    string.IsNullOrEmpty(f.ImagePath) ? (object)DBNull.Value : f.ImagePath);
-                                ins.ExecuteNonQuery();
-                            }
+                            upsert.Parameters.Add("@cid", SqlDbType.NVarChar, 50).Value = collectionId;
+                            upsert.Parameters.Add("@u", SqlDbType.NVarChar, 100).Value = f.SceneUuid;
+                            upsert.Parameters.Add("@ord", SqlDbType.Int).Value = ord++;
+                            upsert.Parameters.Add("@ct", SqlDbType.NVarChar, 500).Value =
+                                string.IsNullOrEmpty(f.CustomTitle) ? (object)DBNull.Value : f.CustomTitle;
+                            upsert.ExecuteNonQuery();
                         }
                     }
+
+                    using (var deleteRemoved = new SqlCommand(@"
+DELETE F
+FROM dbo.V360_FeaturedScene AS F
+WHERE F.CollectionId=@cid
+  AND NOT EXISTS (SELECT 1 FROM #FeaturedKeep AS K WHERE K.SceneUuid=F.SceneUuid);", conn, tx))
+                    {
+                        deleteRemoved.Parameters.Add("@cid", SqlDbType.NVarChar, 50).Value = collectionId;
+                        deleteRemoved.ExecuteNonQuery();
+                    }
+
                     tx.Commit();
                 }
                 return true;
@@ -391,6 +439,85 @@ VALUES (@cid, @u, @ord, @ct, @ip, GETDATE());", conn, tx))
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.SaveFeatured] " + ex.Message);
+                return false;
+            }
+        }
+
+        public static FeaturedSceneImage GetFeaturedImage(string collectionId, string sceneUuid)
+        {
+            if (string.IsNullOrEmpty(collectionId) || string.IsNullOrEmpty(sceneUuid)) return null;
+            EnsureLegacyImported();
+            try
+            {
+                using (var conn = OpenConnection())
+                using (var cmd = new SqlCommand(@"
+SELECT ImageData, ImageContentType, ImageFileName, ImagePath, UpdatedAt
+FROM dbo.V360_FeaturedScene
+WHERE CollectionId=@cid AND SceneUuid=@u;", conn))
+                {
+                    cmd.Parameters.Add("@cid", SqlDbType.NVarChar, 50).Value = collectionId;
+                    cmd.Parameters.Add("@u", SqlDbType.NVarChar, 100).Value = sceneUuid;
+                    using (var rd = cmd.ExecuteReader())
+                    {
+                        if (!rd.Read()) return null;
+                        return new FeaturedSceneImage
+                        {
+                            Data            = rd.IsDBNull(0) ? null : (byte[])rd.GetValue(0),
+                            ContentType     = rd.IsDBNull(1) ? null : rd.GetString(1),
+                            FileName        = rd.IsDBNull(2) ? null : rd.GetString(2),
+                            LegacyImagePath = rd.IsDBNull(3) ? null : rd.GetString(3),
+                            UpdatedAt       = rd.GetDateTime(4)
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.GetFeaturedImage] " + ex.Message);
+                return null;
+            }
+        }
+
+        public static bool SaveFeaturedImage(string collectionId, string sceneUuid, byte[] data,
+            string contentType, string fileName)
+        {
+            if (string.IsNullOrEmpty(collectionId) || collectionId.Length > 50
+                || string.IsNullOrEmpty(sceneUuid) || sceneUuid.Length > 100
+                || data == null || data.Length == 0
+                || string.IsNullOrEmpty(contentType) || contentType.Length > 100)
+                return false;
+
+            EnsureLegacyImported();
+            try
+            {
+                using (var conn = OpenConnection())
+                using (var cmd = new SqlCommand(@"
+DECLARE @ord INT =
+    ISNULL((SELECT MAX(DisplayOrder) + 1 FROM dbo.V360_FeaturedScene WHERE CollectionId=@cid), 0);
+
+MERGE dbo.V360_FeaturedScene AS T
+USING (SELECT @cid AS CollectionId, @u AS SceneUuid) AS S
+  ON T.CollectionId = S.CollectionId AND T.SceneUuid = S.SceneUuid
+WHEN MATCHED THEN
+    UPDATE SET ImageData=@data, ImageContentType=@contentType, ImageFileName=@fileName,
+               ImagePath=NULL, UpdatedAt=GETDATE()
+WHEN NOT MATCHED THEN
+    INSERT (CollectionId, SceneUuid, DisplayOrder, ImageData, ImageContentType, ImageFileName, UpdatedAt)
+    VALUES (@cid, @u, @ord, @data, @contentType, @fileName, GETDATE());", conn))
+                {
+                    cmd.Parameters.Add("@cid", SqlDbType.NVarChar, 50).Value = collectionId;
+                    cmd.Parameters.Add("@u", SqlDbType.NVarChar, 100).Value = sceneUuid;
+                    cmd.Parameters.Add("@data", SqlDbType.VarBinary, -1).Value = data;
+                    cmd.Parameters.Add("@contentType", SqlDbType.NVarChar, 100).Value = contentType;
+                    cmd.Parameters.Add("@fileName", SqlDbType.NVarChar, 255).Value =
+                        string.IsNullOrEmpty(fileName) ? (object)DBNull.Value : fileName;
+                    cmd.ExecuteNonQuery();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.SaveFeaturedImage] " + ex.Message);
                 return false;
             }
         }

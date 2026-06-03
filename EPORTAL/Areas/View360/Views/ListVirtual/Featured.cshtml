@@ -97,7 +97,6 @@
     var SAVED         = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(saved));
     var SAVE_URL      = '@Url.Action("SaveFeatured", "ListVirtual", new { area = "View360" })';
     var UPLOAD_URL    = '@Url.Action("UploadFeaturedImage", "ListVirtual", new { area = "View360" })';
-    var APP_ROOT      = '@Url.Content("~/")';
     var POOL_TITLES   = {}; // uuid -> kuula scene title (fallback khi admin chua override)
     document.querySelectorAll('.v360-feat-pool__item').forEach(function (el) {
         POOL_TITLES[el.dataset.uuid] = el.dataset.title;
@@ -109,7 +108,8 @@
         return {
             SceneUuid:   s.SceneUuid,
             CustomTitle: s.CustomTitle || '',
-            ImagePath:   s.ImagePath   || ''
+            HasImage:    !!s.HasImage,
+            ImageUrl:    s.ImageUrl || ''
         };
     });
 
@@ -118,18 +118,12 @@
     var counter  = document.getElementById('feat-count');
     var pool     = document.getElementById('feat-pool');
 
-    function resolveImg(path) {
-        if (!path) return '';
-        // path luu DB la '~/Content/...' - resolve qua APP_ROOT (avoid double slash)
-        return path.replace(/^~\//, APP_ROOT);
-    }
-
     function render() {
         selected.innerHTML = '';
         state.forEach(function (item, idx) {
             var titleFallback = POOL_TITLES[item.SceneUuid] || '(không tên)';
             var displayTitle  = item.CustomTitle || titleFallback;
-            var imgUrl        = resolveImg(item.ImagePath);
+            var imgUrl        = item.ImageUrl || '';
 
             var card = document.createElement('div');
             card.className = 'v360-feat-item';
@@ -178,7 +172,7 @@
         var item = btn.closest('.v360-feat-pool__item');
         var uuid = item.dataset.uuid;
         if (state.some(function (s) { return s.SceneUuid === uuid; })) return;
-        state.push({ SceneUuid: uuid, CustomTitle: '', ImagePath: '' });
+        state.push({ SceneUuid: uuid, CustomTitle: '', HasImage: false, ImageUrl: '' });
         render();
     });
 
@@ -219,8 +213,9 @@
             var idx = parseInt(card.dataset.idx, 10);
             var file = e.target.files && e.target.files[0];
             if (!file) return;
-            uploadImage(state[idx].SceneUuid, file, function (path) {
-                state[idx].ImagePath = path;
+            uploadImage(state[idx].SceneUuid, file, function (url) {
+                state[idx].HasImage = true;
+                state[idx].ImageUrl = url;
                 render();
             });
         }
@@ -235,7 +230,7 @@
         fetch(UPLOAD_URL, { method: 'POST', body: fd, credentials: 'same-origin' })
             .then(function (r) { return r.json(); })
             .then(function (j) {
-                if (j.ok) done(j.path);
+                if (j.ok) done(j.url);
                 else alert('Upload thất bại: ' + (j.error || 'unknown'));
             })
             .catch(function (err) { alert('Lỗi upload: ' + err.message); });
@@ -247,7 +242,9 @@
         btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang lưu...';
         var fd = new FormData();
         fd.append('collectionId', COLLECTION_ID);
-        fd.append('itemsJson', JSON.stringify(state));
+        fd.append('itemsJson', JSON.stringify(state.map(function (item) {
+            return { SceneUuid: item.SceneUuid, CustomTitle: item.CustomTitle || '' };
+        })));
         fd.append('__RequestVerificationToken', token);
         fetch(SAVE_URL, { method: 'POST', body: fd, credentials: 'same-origin' })
             .then(function (r) { return r.json(); })

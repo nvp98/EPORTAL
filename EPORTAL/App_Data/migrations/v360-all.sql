@@ -92,7 +92,10 @@ BEGIN
         SceneUuid     NVARCHAR(100)     NOT NULL,
         DisplayOrder  INT               NOT NULL CONSTRAINT DF_V360FS_Ord DEFAULT (0),
         CustomTitle   NVARCHAR(500)     NULL,
-        ImagePath     NVARCHAR(500)     NULL,
+        ImagePath     NVARCHAR(500)     NULL, -- legacy fallback; new uploads use ImageData
+        ImageData     VARBINARY(MAX)    NULL,
+        ImageContentType NVARCHAR(100)  NULL,
+        ImageFileName NVARCHAR(255)     NULL,
         UpdatedAt     DATETIME          NOT NULL CONSTRAINT DF_V360FS_UpdAt DEFAULT (GETDATE()),
         UpdatedBy     INT               NULL,
         CONSTRAINT UQ_V360FS_CidUuid UNIQUE (CollectionId, SceneUuid)
@@ -103,6 +106,28 @@ END
 ELSE
 BEGIN
     PRINT '[1] V360_FeaturedScene already exists - skipped';
+END
+GO
+
+-- Existing deployments: add DB-backed featured image columns without dropping legacy ImagePath.
+IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageData') IS NULL
+BEGIN
+    ALTER TABLE dbo.V360_FeaturedScene ADD ImageData VARBINARY(MAX) NULL;
+    PRINT '[1] Added V360_FeaturedScene.ImageData';
+END
+GO
+
+IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageContentType') IS NULL
+BEGIN
+    ALTER TABLE dbo.V360_FeaturedScene ADD ImageContentType NVARCHAR(100) NULL;
+    PRINT '[1] Added V360_FeaturedScene.ImageContentType';
+END
+GO
+
+IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageFileName') IS NULL
+BEGIN
+    ALTER TABLE dbo.V360_FeaturedScene ADD ImageFileName NVARCHAR(255) NULL;
+    PRINT '[1] Added V360_FeaturedScene.ImageFileName';
 END
 GO
 

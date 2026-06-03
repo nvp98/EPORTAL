@@ -32,6 +32,116 @@ namespace EPORTAL.Areas.View360.Controllers
         private const int PAGE_SIZE_DEFAULT = 10;
         private const int FEATURED_UPLOAD_MAX_BYTES = 8 * 1024 * 1024;  // 8MB
 
+        private static string FeaturedImageContentType(string extension)
+        {
+            switch ((extension ?? "").ToLowerInvariant())
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+                case ".png":
+                    return "image/png";
+                case ".webp":
+                    return "image/webp";
+                default:
+                    return null;
+            }
+        }
+
+        private static bool IsValidFeaturedImage(byte[] data, string extension)
+        {
+            if (data == null || data.Length == 0) return false;
+            var ext = (extension ?? "").ToLowerInvariant();
+            if (ext == ".webp")
+            {
+                return data.Length >= 12
+                    && data[0] == (byte)'R' && data[1] == (byte)'I'
+                    && data[2] == (byte)'F' && data[3] == (byte)'F'
+                    && data[8] == (byte)'W' && data[9] == (byte)'E'
+                    && data[10] == (byte)'B' && data[11] == (byte)'P';
+            }
+
+            try
+            {
+                using (var stream = new System.IO.MemoryStream(data))
+                using (var image = System.Drawing.Image.FromStream(
+                    stream, validateImageData: true, useEmbeddedColorManagement: false))
+                {
+                    var format = image.RawFormat;
+                    return ((ext == ".jpg" || ext == ".jpeg")
+                            && format.Equals(System.Drawing.Imaging.ImageFormat.Jpeg))
+                           || (ext == ".png"
+                               && format.Equals(System.Drawing.Imaging.ImageFormat.Png));
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void PopulateFeaturedImageUrls(Controller ctrl, string collectionId,
+            IEnumerable<FeaturedScene> items)
+        {
+            if (ctrl == null || string.IsNullOrEmpty(collectionId) || items == null) return;
+            foreach (var item in items)
+            {
+                if (item == null || !item.HasImage || string.IsNullOrEmpty(item.SceneUuid)) continue;
+                item.ImageUrl = ctrl.Url.Action("FeaturedImage", "ListVirtual", new
+                {
+                    area = "View360",
+                    collectionId = collectionId,
+                    sceneUuid = item.SceneUuid,
+                    v = item.ImageVersion
+                });
+            }
+        }
+
+        private bool TryReadLegacyFeaturedImage(string imagePath, out byte[] data,
+            out string contentType, out string fileName)
+        {
+            data = null;
+            contentType = null;
+            fileName = null;
+            if (string.IsNullOrEmpty(imagePath)
+                || !imagePath.StartsWith("~/Content/view360-featured/", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            try
+            {
+                var root = System.IO.Path.GetFullPath(Server.MapPath("~/Content/view360-featured/"));
+                var fullPath = System.IO.Path.GetFullPath(Server.MapPath(imagePath));
+                var rootPrefix = root.TrimEnd(
+                    System.IO.Path.DirectorySeparatorChar,
+                    System.IO.Path.AltDirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
+                if (!fullPath.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                var info = new System.IO.FileInfo(fullPath);
+                if (!info.Exists || info.Length <= 0 || info.Length > FEATURED_UPLOAD_MAX_BYTES)
+                    return false;
+
+                var extension = info.Extension.ToLowerInvariant();
+                contentType = FeaturedImageContentType(extension);
+                if (string.IsNullOrEmpty(contentType)) return false;
+
+                data = System.IO.File.ReadAllBytes(fullPath);
+                if (!IsValidFeaturedImage(data, extension))
+                {
+                    data = null;
+                    contentType = null;
+                    return false;
+                }
+                fileName = info.Name;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[FeaturedImage] Legacy image read err: " + ex.Message);
+                return false;
+            }
+        }
+
         // KHONG cache HTML output (phan quyen phuc tap, risk bleed neu VaryByCustom soti).
         // Speedup chu yeu dua vao Session cache SP `Virtual_select_USER` (per-user inherent).
         public ActionResult Index(int? page, string search, int? id, int? ps)
@@ -383,6 +493,7 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!string.IsNullOrEmpty(collectionId))
             {
                 var saved = SceneCalibrationStore.GetFeatured(collectionId);
+                PopulateFeaturedImageUrls(this, collectionId, saved);
                 if (saved.Count > 0)
                 {
                     var scenes = KuulaCollectionFetcher.GetScenes(collectionId);
@@ -411,7 +522,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         {
                             SceneUuid = f.SceneUuid,
                             Title     = title,
-                            ImagePath = f.ImagePath,
+                            ImageUrl  = f.ImageUrl,
                             SceneHash = f.SceneUuid
                         });
                     }
@@ -458,9 +569,11 @@ namespace EPORTAL.Areas.View360.Controllers
             if (tour != null)
             {
                 var cid = KuulaCollectionFetcher.ExtractCollectionId(tour.URL);
-                ViewBag.FeaturedListJson = JsonForHtml.Serialize(
-                    string.IsNullOrEmpty(cid) ? new List<FeaturedScene>()
-                                              : SceneCalibrationStore.GetFeatured(cid));
+                var featured = string.IsNullOrEmpty(cid)
+                    ? new List<FeaturedScene>()
+                    : SceneCalibrationStore.GetFeatured(cid);
+                PopulateFeaturedImageUrls(this, cid, featured);
+                ViewBag.FeaturedListJson = JsonForHtml.Serialize(featured);
             }
             else
             {
@@ -498,6 +611,8 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!HasAdminPerm(A_Constants.EDIT)) return new HttpUnauthorizedResult();
             if (string.IsNullOrEmpty(collectionId) || string.IsNullOrEmpty(sceneUuid))
                 return Json(new { ok = false, error = "missing collectionId/sceneUuid" });
+            if (collectionId.Length > 50 || sceneUuid.Length > 100)
+                return Json(new { ok = false, error = "collectionId/sceneUuid too long" });
             var file = Request.Files != null && Request.Files.Count > 0 ? Request.Files[0] : null;
             if (file == null || file.ContentLength <= 0)
                 return Json(new { ok = false, error = "no file" });
@@ -508,46 +623,82 @@ namespace EPORTAL.Areas.View360.Controllers
             if (Array.IndexOf(allowed, ext) < 0)
                 return Json(new { ok = false, error = "unsupported ext" });
 
-            // MIME validation: decode anh thuc su (tranh upload file evil.jpg chua HTML/PHP).
-            // System.Drawing.Image.FromStream throw neu khong phai image hop le.
+            byte[] imageData;
             try
             {
-                using (var probe = file.InputStream)
+                using (var buffer = new System.IO.MemoryStream())
                 {
-                    var pos = probe.Position;
-                    using (var img = System.Drawing.Image.FromStream(probe, validateImageData: false, useEmbeddedColorManagement: false))
-                    {
-                        // Match ext voi format thuc su (vd: jpg ext nhung PNG content -> reject)
-                        var fmt = img.RawFormat;
-                        bool match =
-                            (ext == ".jpg" || ext == ".jpeg") && fmt.Equals(System.Drawing.Imaging.ImageFormat.Jpeg)
-                            || (ext == ".png") && fmt.Equals(System.Drawing.Imaging.ImageFormat.Png)
-                            || (ext == ".webp"); // System.Drawing khong nhan diện duoc webp -> skip check, du dua tren ext
-                        if (!match && ext != ".webp")
-                            return Json(new { ok = false, error = "file content khong khop extension" });
-                    }
-                    probe.Position = pos;  // rewind cho SaveAs sau day
+                    file.InputStream.CopyTo(buffer);
+                    imageData = buffer.ToArray();
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("[UploadFeaturedImage] MIME check err: " + ex.Message);
-                return Json(new { ok = false, error = "file khong phai anh hop le" });
+                System.Diagnostics.Debug.WriteLine("[UploadFeaturedImage] Read err: " + ex.Message);
+                return Json(new { ok = false, error = "cannot read file" });
             }
 
-            // Sanitize uuid - chi cho a-z0-9 (tranh path traversal)
-            var safeUuid = System.Text.RegularExpressions.Regex.Replace(sceneUuid, "[^A-Za-z0-9]", "");
-            var safeCid  = System.Text.RegularExpressions.Regex.Replace(collectionId, "[^A-Za-z0-9]", "");
-            if (string.IsNullOrEmpty(safeUuid) || string.IsNullOrEmpty(safeCid))
-                return Json(new { ok = false, error = "invalid id chars" });
+            if (imageData.Length == 0 || imageData.Length > FEATURED_UPLOAD_MAX_BYTES)
+                return Json(new { ok = false, error = "invalid file size" });
+            if (!IsValidFeaturedImage(imageData, ext))
+                return Json(new { ok = false, error = "file khong phai anh hop le hoac khong khop extension" });
 
-            var dir = Server.MapPath("~/Content/view360-featured/" + safeCid);
-            if (!System.IO.Directory.Exists(dir)) System.IO.Directory.CreateDirectory(dir);
-            var fileName = safeUuid + "_" + DateTime.UtcNow.Ticks + ext;
-            var fullPath = System.IO.Path.Combine(dir, fileName);
-            file.SaveAs(fullPath);
-            var rel = "~/Content/view360-featured/" + safeCid + "/" + fileName;
-            return Json(new { ok = true, path = rel, url = Url.Content(rel) });
+            var contentType = FeaturedImageContentType(ext);
+            var fileName = System.IO.Path.GetFileName(file.FileName);
+            if (string.IsNullOrEmpty(fileName)) fileName = "featured" + ext;
+            if (fileName.Length > 255) fileName = fileName.Substring(fileName.Length - 255);
+
+            if (!SceneCalibrationStore.SaveFeaturedImage(
+                collectionId, sceneUuid, imageData, contentType, fileName))
+                return Json(new { ok = false, error = "DB save failed" });
+
+            var imageUrl = Url.Action("FeaturedImage", "ListVirtual", new
+            {
+                area = "View360",
+                collectionId = collectionId,
+                sceneUuid = sceneUuid,
+                v = DateTime.UtcNow.Ticks
+            });
+            return Json(new { ok = true, url = imageUrl, hasImage = true });
+        }
+
+        [HttpGet]
+        public ActionResult FeaturedImage(string collectionId, string sceneUuid)
+        {
+            if (string.IsNullOrEmpty(collectionId) || collectionId.Length > 50
+                || string.IsNullOrEmpty(sceneUuid) || sceneUuid.Length > 100)
+                return HttpNotFound();
+
+            var image = SceneCalibrationStore.GetFeaturedImage(collectionId, sceneUuid);
+            if (image == null) return HttpNotFound();
+
+            if (image.Data == null || image.Data.Length == 0)
+            {
+                byte[] legacyData;
+                string legacyContentType;
+                string legacyFileName;
+                if (!TryReadLegacyFeaturedImage(
+                    image.LegacyImagePath, out legacyData, out legacyContentType, out legacyFileName))
+                    return HttpNotFound();
+
+                image.Data = legacyData;
+                image.ContentType = legacyContentType;
+                image.FileName = legacyFileName;
+
+                // Lazy one-time migration: after this succeeds the row no longer depends on server files.
+                SceneCalibrationStore.SaveFeaturedImage(
+                    collectionId, sceneUuid, legacyData, legacyContentType, legacyFileName);
+            }
+
+            var contentType = image.ContentType;
+            if (contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/webp")
+                contentType = FeaturedImageContentType(System.IO.Path.GetExtension(image.FileName));
+            if (string.IsNullOrEmpty(contentType)) contentType = "application/octet-stream";
+
+            Response.Cache.SetCacheability(HttpCacheability.Public);
+            Response.Cache.SetMaxAge(TimeSpan.FromDays(1));
+            Response.Cache.SetSlidingExpiration(false);
+            return File(image.Data, contentType);
         }
 
     }
@@ -556,7 +707,7 @@ namespace EPORTAL.Areas.View360.Controllers
     {
         public string SceneUuid { get; set; }
         public string Title     { get; set; }
-        public string ImagePath { get; set; }
+        public string ImageUrl  { get; set; }
         public string SceneHash { get; set; }
     }
 

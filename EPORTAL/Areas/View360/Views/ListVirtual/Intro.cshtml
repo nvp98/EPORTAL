@@ -131,9 +131,9 @@
                                 {
                                     idx++;
                                     var cardUrl = Url.Action("Details", "ListVirtual", new { id = Model.ID, scene = c.SceneHash });
-                                    var cardImg = string.IsNullOrEmpty(c.ImagePath)
+                                    var cardImg = string.IsNullOrEmpty(c.ImageUrl)
                                         ? heroBg
-                                        : Url.Content(c.ImagePath);
+                                        : c.ImageUrl;
                                     <a class="v360-feat-strip__card" href="@cardUrl">
                                         <div class="v360-feat-strip__img" style="background-image:url('@cardImg');"></div>
                                         <div class="v360-feat-strip__num">@idx.ToString("D2")</div>

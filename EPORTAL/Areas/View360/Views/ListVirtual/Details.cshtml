@@ -442,7 +442,6 @@
     var SCENE_CUSTOM_TITLE = @Html.Raw(ViewBag.SceneCustomTitleJson ?? "{}");
     var TOUR_CONFIG     = @Html.Raw(ViewBag.TourConfigJson ?? "{}");
     var FEATURED_LIST   = @Html.Raw(ViewBag.FeaturedListJson ?? "[]");
-    var APP_ROOT        = '@Url.Content("~/")';
     // Pending scene uuid de jump sau khi iframe ban 'frameloaded' (tu ?scene=<uuid> trong URL,
     // thuong la Intro card click). One-shot - clear sau khi dispatch.
     // PENDING_GO_SCENE giu nguyen tu URL. JS deep-link code se check "alreadyThere":
@@ -750,14 +749,11 @@
         var featState = (FEATURED_LIST || []).map(function (f) {
             return {
                 SceneUuid: f.SceneUuid,
-                ImagePath: f.ImagePath || ''
+                HasImage: !!f.HasImage,
+                ImageUrl: f.ImageUrl || ''
             };
         });
 
-        function resolveImg(p) {
-            if (!p) return '';
-            return p.replace(/^~\//, APP_ROOT);
-        }
         function setMsg(text, color) {
             fMsg.textContent = text || '';
             fMsg.style.color = color || '';
@@ -789,7 +785,7 @@
             var html = '';
             featState.forEach(function (it, idx) {
                 var title = getSceneTitle(it.SceneUuid) || '(chưa có tên)';
-                var img = resolveImg(it.ImagePath);
+                var img = it.ImageUrl || '';
                 var isCurrent = (currentPostKey === it.SceneUuid);
                 html +=
                     '<div class="v360-feat-list__item' + (isCurrent ? ' is-current' : '') + '" data-idx="' + idx + '" title="' + escHtml(it.SceneUuid) + '">' +
@@ -856,9 +852,9 @@
                 fToggle.querySelector('i').className = 'fa fa-times';
                 fToggle.classList.remove('v360-admin__primary');
                 fToggle.classList.add('v360-admin__danger');
-                var img = resolveImg(featState[idx].ImagePath);
+                var img = featState[idx].ImageUrl || '';
                 setImgPreview(img);
-                fImgStat.textContent = featState[idx].ImagePath ? 'Đã có ảnh — bấm để đổi' : 'Bấm vào khung trên để chọn ảnh';
+                fImgStat.textContent = featState[idx].HasImage ? 'Đã có ảnh — bấm để đổi' : 'Bấm vào khung trên để chọn ảnh';
                 fImgPrev.style.pointerEvents = '';
                 fImgPrev.style.opacity = '';
             } else {
@@ -882,7 +878,7 @@
             if (!currentPostKey) return;
             var idx = findIdx(currentPostKey);
             if (idx >= 0) { featState.splice(idx, 1); }
-            else          { featState.push({ SceneUuid: currentPostKey, ImagePath: '' }); }
+            else          { featState.push({ SceneUuid: currentPostKey, HasImage: false, ImageUrl: '' }); }
             refreshCurrentScenePanel();
         });
 
@@ -941,7 +937,8 @@
                 .then(function (r) { return r.json(); })
                 .then(function (j) {
                     if (j.ok) {
-                        featState[idx].ImagePath = j.path;
+                        featState[idx].HasImage = true;
+                        featState[idx].ImageUrl = j.url;
                         setImgPreview(j.url);
                         fImgStat.textContent = 'Đã upload — nhớ bấm "Lưu thay đổi" bên dưới';
                         renderList();
@@ -992,7 +989,7 @@
             fBtnSave.disabled = true;
             fBtnSave.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang lưu...';
             var payload = featState.map(function (f) {
-                return { SceneUuid: f.SceneUuid, ImagePath: f.ImagePath || '', CustomTitle: '' };
+                return { SceneUuid: f.SceneUuid, CustomTitle: '' };
             });
             var fd = new FormData();
             fd.append('collectionId', COLLECTION_ID);
