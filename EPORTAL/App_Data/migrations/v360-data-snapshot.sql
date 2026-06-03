@@ -1,6 +1,6 @@
 ﻿-- ============================================================
 -- V360 admin-config DATA SNAPSHOT (idempotent MERGE/UPDATE)
--- Generated: 2026-06-03 08:57:09 tu localhost,1433/EPORTAL
+-- Generated: 2026-06-03 15:59:11 tu localhost,1433/EPORTAL
 -- Re-apply: chay file nay sau khi DB schema da deploy (v360-all.sql).
 -- ============================================================
 
@@ -183,268 +183,151 @@ GO
 -- ============================================================
 -- 6 : dbo.ProjectsGroup (SortOrder + ParentIDGroup, key=GroupName)
 -- ============================================================
--- 3D-VR 360
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'3D-VR 360')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'3D-VR 360'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'3D-VR 360', NULL, 0);
-
--- Cá»•ng-Camera
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Cá»•ng-Camera')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Cá»•ng-Camera'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Cá»•ng-Camera', NULL, 0);
-
--- DA. ThÃ©pRay
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'DA. ThÃ©pRay')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'DA. ThÃ©pRay'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'DA. ThÃ©pRay', NULL, 0);
-
--- DA. ThépRay
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'DA. ThépRay')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'DA. ThépRay'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'DA. ThépRay', NULL, 0);
-
--- HPDQ1
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ1')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'HPDQ1'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'HPDQ1', NULL, 0);
-
--- HPDQ2
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ2')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'HPDQ2'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'HPDQ2', NULL, 0);
-
--- PhÃº YÃªn
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'PhÃº YÃªn')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = NULL, SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'PhÃº YÃªn'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'PhÃº YÃªn', NULL, 0);
-
 -- HPDQ 2
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 1
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'HPDQ 2'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'HPDQ 2', NULL, 1);
 
 -- HPDQ 1
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 1')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 1')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 2
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'HPDQ 1'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 1')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'HPDQ 1', NULL, 2);
 
 -- Phú Yên
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Phú Yên')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Phú Yên')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 3
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Phú Yên'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Phú Yên')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'Phú Yên', NULL, 3);
 
 -- Cổng-Camera
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Cổng-Camera')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Cổng-Camera')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 4
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Cổng-Camera'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Cổng-Camera')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'Cổng-Camera', NULL, 4);
 
 -- 3D-VR360
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'3D-VR360')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'3D-VR360')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 5
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'3D-VR360'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'3D-VR360')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'3D-VR360', NULL, 5);
 
 -- DA.ThepRay
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'DA.ThepRay')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'DA.ThepRay')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 6
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'DA.ThepRay'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'DA.ThepRay')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'DA.ThepRay', NULL, 6);
 
 -- CTH
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'CTH')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'CTH')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 7
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'CTH'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'CTH')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'CTH', NULL, 7);
 
 -- KHO
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'KHO')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'KHO')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 8
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'KHO'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'KHO')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'KHO', NULL, 8);
 
 -- KSMB
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'KSMB')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'KSMB')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
        SET ParentIDGroup = NULL, SortOrder = 9
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'KSMB'));
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'KSMB')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
     VALUES (N'KSMB', NULL, 9);
 
--- Cáº£ng 11 KÃ©o dÃ i
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Cáº£ng 11 KÃ©o dÃ i')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 1')) AND ParentIDGroup IS NULL), SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Cáº£ng 11 KÃ©o dÃ i'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Cáº£ng 11 KÃ©o dÃ i', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 1')) AND ParentIDGroup IS NULL), 0);
-
--- Dá»± Ã¡n ÄÃºc 4
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dá»± Ã¡n ÄÃºc 4')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dá»± Ã¡n ÄÃºc 4'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dá»± Ã¡n ÄÃºc 4', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 0);
-
--- Dá»± Ã¡n CÃ¡n 4
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dá»± Ã¡n CÃ¡n 4')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dá»± Ã¡n CÃ¡n 4'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dá»± Ã¡n CÃ¡n 4', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 0);
-
--- Dá»± Ã¡n Kho than kÃ©o dÃ i
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dá»± Ã¡n Kho than kÃ©o dÃ i')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dá»± Ã¡n Kho than kÃ©o dÃ i'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dá»± Ã¡n Kho than kÃ©o dÃ i', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 0);
-
--- Dá»± Ã¡n LÃ² Quay ÄÃ¡y
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dá»± Ã¡n LÃ² Quay ÄÃ¡y')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dá»± Ã¡n LÃ² Quay ÄÃ¡y'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dá»± Ã¡n LÃ² Quay ÄÃ¡y', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 0);
-
--- NM.LG2
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'NM.LG2')))
-    UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 0
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'NM.LG2'));
-ELSE
-    INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'NM.LG2', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 0);
-
 -- 2D
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'2D ')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'2D ')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 1
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'2D '));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 1
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'2D ')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'2D ', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 1);
+    VALUES (N'2D ', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 1);
 
 -- Cảng 11 Kéo dài
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Cảng 11 Kéo dài')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Cảng 11 Kéo dài')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 1')) AND ParentIDGroup IS NULL), SortOrder = 1
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Cảng 11 Kéo dài'));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 1')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 1
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Cảng 11 Kéo dài')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Cảng 11 Kéo dài', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 1')) AND ParentIDGroup IS NULL), 1);
+    VALUES (N'Cảng 11 Kéo dài', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 1')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 1);
 
 -- Dự án Lò Quay Đáy
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dự án Lò Quay Đáy')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Lò Quay Đáy')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 2
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dự án Lò Quay Đáy'));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 2
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Lò Quay Đáy')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dự án Lò Quay Đáy', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 2);
+    VALUES (N'Dự án Lò Quay Đáy', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 2);
 
 -- Dự án Cán 4
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dự án Cán 4')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Cán 4')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 3
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dự án Cán 4'));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 3
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Cán 4')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dự án Cán 4', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 3);
+    VALUES (N'Dự án Cán 4', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 3);
 
 -- Dự án Đúc 4
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dự án Đúc 4')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Đúc 4')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 4
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dự án Đúc 4'));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 4
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Đúc 4')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dự án Đúc 4', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 4);
+    VALUES (N'Dự án Đúc 4', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 4);
 
 -- Dự án Kho than kéo dài
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'Dự án Kho than kéo dài')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Kho than kéo dài')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 5
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'Dự án Kho than kéo dài'));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 5
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'Dự án Kho than kéo dài')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'Dự án Kho than kéo dài', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 5);
+    VALUES (N'Dự án Kho than kéo dài', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 5);
 
 -- NM.LG 2
-IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'NM.LG 2')))
+IF EXISTS (SELECT 1 FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'NM.LG 2')),' ','') COLLATE Latin1_General_CI_AI)
     UPDATE dbo.ProjectsGroup
-       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), SortOrder = 6
-     WHERE LTRIM(RTRIM(GroupName)) = LTRIM(RTRIM(N'NM.LG 2'));
+       SET ParentIDGroup = (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), SortOrder = 6
+     WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'NM.LG 2')),' ','') COLLATE Latin1_General_CI_AI;
 ELSE
     INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup, SortOrder)
-    VALUES (N'NM.LG 2', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE LTRIM(RTRIM(GroupName))=LTRIM(RTRIM(N'HPDQ 2')) AND ParentIDGroup IS NULL), 6);
+    VALUES (N'NM.LG 2', (SELECT TOP 1 IDGroup FROM dbo.ProjectsGroup WHERE REPLACE(LTRIM(RTRIM(GroupName)),' ','') COLLATE Latin1_General_CI_AI = REPLACE(LTRIM(RTRIM(N'HPDQ 2')),' ','') COLLATE Latin1_General_CI_AI AND ParentIDGroup IS NULL), 6);
 
-PRINT '[6] dbo.ProjectsGroup : 29 rows merged (key=GroupName)';
+PRINT '[6] dbo.ProjectsGroup : 16 rows merged (key=GroupName)';
 GO
 
 PRINT '';

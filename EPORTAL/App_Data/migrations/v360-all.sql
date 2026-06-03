@@ -261,8 +261,12 @@ INSERT INTO @parentGroups (Name) VALUES
 INSERT INTO dbo.ProjectsGroup (GroupName, ParentIDGroup)
 SELECT pg.Name, NULL FROM @parentGroups pg
 WHERE NOT EXISTS (
+    -- Space + accent + case insensitive: tranh tao bien the trung khi DB da co
+    -- ten khac kieu (vd "HPDQ 1" vs "HPDQ1", "3D-VR360" vs "3D-VR 360",
+    -- "DA.ThepRay" vs "DA. ThépRay"). Chi insert khi that su chua co group nao tuong duong.
     SELECT 1 FROM dbo.ProjectsGroup g
-    WHERE LTRIM(RTRIM(g.GroupName)) = LTRIM(RTRIM(pg.Name))
+    WHERE REPLACE(LTRIM(RTRIM(g.GroupName)), ' ', '') COLLATE Latin1_General_CI_AI
+        = REPLACE(LTRIM(RTRIM(pg.Name)), ' ', '') COLLATE Latin1_General_CI_AI
 );
 PRINT '[3] Inserted ' + CAST(@@ROWCOUNT AS NVARCHAR) + ' parent groups';
 GO
@@ -281,7 +285,8 @@ BEGIN
     SELECT s.Name, @hpdq1ID FROM @hpdq1Subs s
     WHERE NOT EXISTS (
         SELECT 1 FROM dbo.ProjectsGroup g
-        WHERE LTRIM(RTRIM(g.GroupName)) = LTRIM(RTRIM(s.Name))
+        WHERE REPLACE(LTRIM(RTRIM(g.GroupName)), ' ', '') COLLATE Latin1_General_CI_AI
+            = REPLACE(LTRIM(RTRIM(s.Name)), ' ', '') COLLATE Latin1_General_CI_AI
     );
     PRINT '[3] Inserted ' + CAST(@@ROWCOUNT AS NVARCHAR) + ' sub-groups cho HPDQ1';
 END;
@@ -303,7 +308,8 @@ BEGIN
     SELECT s.Name, @hpdq2ID FROM @hpdq2Subs s
     WHERE NOT EXISTS (
         SELECT 1 FROM dbo.ProjectsGroup g
-        WHERE LTRIM(RTRIM(g.GroupName)) = LTRIM(RTRIM(s.Name))
+        WHERE REPLACE(LTRIM(RTRIM(g.GroupName)), ' ', '') COLLATE Latin1_General_CI_AI
+            = REPLACE(LTRIM(RTRIM(s.Name)), ' ', '') COLLATE Latin1_General_CI_AI
     );
     PRINT '[3] Inserted ' + CAST(@@ROWCOUNT AS NVARCHAR) + ' sub-groups cho HPDQ2';
 END;
