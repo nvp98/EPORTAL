@@ -15,6 +15,24 @@ namespace EPORTAL.Areas.View360.Controllers
         // GET: View360/ListProject
         EPORTALEntities db = new EPORTALEntities();
 
+        // Session-timeout guard. Trang showcase user-facing khong dung [Authorize] global
+        // (xem FilterConfig: chi co HandleErrorAttribute). Khi Forms ticket het han
+        // (timeout 180' sliding) -> User.Identity het auth -> MyAuthentication.ID = 0 ->
+        // SP tra 0 row -> truoc day hien trang RONG ("0 du an") thay vi ve Login.
+        // Cac controller cu (ProjectsController...) tu redirect qua A_CheckQuyen; o day
+        // chi can check "da dang nhap chua" roi redirect Logout/Login (auto dang xuat).
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            var user = filterContext.HttpContext.User;
+            if (user == null || user.Identity == null || !user.Identity.IsAuthenticated
+                || MyAuthentication.ID == 0)
+            {
+                filterContext.Result = RedirectToAction("Logout", "Login", new { area = "" });
+                return;
+            }
+            base.OnActionExecuting(filterContext);
+        }
+
         // Cache 60s/user/page/id - SP-result ton tien, cache dodge it.
         // VaryByCustom="User" -> moi user co cache key rieng (xem Global.asax.cs).
         // KHONG cache HTML output - dua vao Session cache SP `Project_select_USER` (per-user inherent).

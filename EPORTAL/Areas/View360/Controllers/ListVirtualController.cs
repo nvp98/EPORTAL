@@ -18,6 +18,23 @@ namespace EPORTAL.Areas.View360.Controllers
         int IDQuyenHT = MyAuthentication.IDQuyenHT;
         const string AdminPermKey = "Projects";  // re-use admin permission key
 
+        // Session-timeout guard. Showcase user-facing khong dung [Authorize] global
+        // (FilterConfig chi co HandleErrorAttribute). Khi Forms ticket het han (timeout
+        // 180' sliding) -> User.Identity het auth -> MyAuthentication.ID = 0 -> truoc day
+        // hien trang RONG ("0 tour") thay vi ve Login. Check "da dang nhap chua" -> redirect
+        // Logout/Login (auto dang xuat). Admin actions van check HasAdminPerm rieng.
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            var user = filterContext.HttpContext.User;
+            if (user == null || user.Identity == null || !user.Identity.IsAuthenticated
+                || MyAuthentication.ID == 0)
+            {
+                filterContext.Result = RedirectToAction("Logout", "Login", new { area = "" });
+                return;
+            }
+            base.OnActionExecuting(filterContext);
+        }
+
         // Gate admin actions (Calibrate/Featured/SaveCalibration/...) - mat dam bao
         // chi user co quyen "Projects" moi mutate config cua tour.
         private bool HasAdminPerm(string action)
