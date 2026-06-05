@@ -1036,6 +1036,7 @@
     <Compile Include="Common\View360AccessTracker.cs" />
     <Compile Include="Common\SceneCalibrationStore.cs" />
     <Compile Include="Common\SceneHeadingCalibrator.cs" />
+    <Compile Include="Common\ChatbotConfig.cs" />
     <Compile Include="Common\ChatbotContentStore.cs" />
     <Compile Include="Common\ChatbotAIClient.cs" />
     <Compile Include="Areas\View360\Controllers\ChatbotController.cs" />
@@ -4137,6 +4138,13 @@
     <Content Include="Content\view360-chatbot.css" />
     <Content Include="Content\view360-chatbot.js" />
     <Content Include="Content\view360-chatbot-admin.css" />
+    <Content Include="Content\leaflet\leaflet.js" />
+    <Content Include="Content\leaflet\leaflet.css" />
+    <Content Include="Content\leaflet\images\marker-icon.png" />
+    <Content Include="Content\leaflet\images\marker-icon-2x.png" />
+    <Content Include="Content\leaflet\images\marker-shadow.png" />
+    <Content Include="Content\leaflet\images\layers.png" />
+    <Content Include="Content\leaflet\images\layers-2x.png" />
     <Content Include="Content\view360-modern.css" />
     <Content Include="Content\view360-showcase.css" />
     <Content Include="Content\view360-tabs-carousel.js" />

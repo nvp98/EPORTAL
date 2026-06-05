@@ -205,7 +205,10 @@ namespace EPORTAL.Areas.View360.Controllers
             foreach (var t in tabGroups) t.Active = (id ?? 0) == t.IDGroup;
             ViewBag.TabGroups = tabGroups;
 
-            var res = id.HasValue ? all.Where(x => x.IDGroup == id.Value).ToList() : all;
+            // id = 0 la sentinel "Tat ca tour" (link /Index/0). HasValue=true nhung KHONG phai
+            // mot VirtualGroup that (IDGroup bat dau tu 1) -> phai hieu la "khong filter", neu khong
+            // se loc IDGroup==0 va loai sach moi tour (bug "0 tour" du da co quyen).
+            var res = (id.HasValue && id.Value != 0) ? all.Where(x => x.IDGroup == id.Value).ToList() : all;
 
             int pageNumber = page ?? 1;
             return View(res.ToPagedList(pageNumber, pageSize));

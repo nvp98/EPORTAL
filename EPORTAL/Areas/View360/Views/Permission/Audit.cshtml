@@ -1,5 +1,5 @@
 @{
-    ViewBag.Title = "Audit phân quyền";
+    ViewBag.Title = "Rà soát phân quyền";
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool canRevoke = (bool)(ViewBag.CanRevoke ?? false);
 }
@@ -52,15 +52,15 @@
 
     <div class="pma-hd">
         <div>
-            <h2>⚠ Audit phân quyền View360</h2>
-            <div class="pma-hd__sub">Surface những vấn đề cần admin xử lý — phòng ban 0% coverage, NV nghỉ còn quyền, content orphan, quyền chưa dùng.</div>
+            <h2>⚠ Rà soát phân quyền View360</h2>
+            <div class="pma-hd__sub">Rà soát những vấn đề cần admin xử lý — phòng ban chưa ai có quyền, NV nghỉ còn quyền, nội dung chưa cấp ai, quyền chưa dùng.</div>
         </div>
         <div>
             <a href="@Url.Action("Index", "Permission")" class="pma-act-btn">← Về trang phân quyền</a>
         </div>
     </div>
 
-    <div id="pma-loading" class="pma-loading">Đang tải dữ liệu audit...</div>
+    <div id="pma-loading" class="pma-loading">Đang tải dữ liệu rà soát...</div>
 
     <div class="pma-grid" id="pma-grid" style="display:none;">
 
@@ -69,8 +69,8 @@
             <div class="pma-card__hd">
                 <span class="pma-card__icon">🏢</span>
                 <div>
-                    <div class="pma-card__title">Phòng ban 0% coverage</div>
-                    <div class="pma-card__sub">Phòng có NV active nhưng chưa ai có quyền truy cập</div>
+                    <div class="pma-card__title">Phòng ban chưa ai có quyền</div>
+                    <div class="pma-card__sub">Phòng có NV đang làm việc nhưng chưa ai có quyền truy cập</div>
                 </div>
                 <span class="pma-card__count" id="pma-dept-count">—</span>
             </div>
@@ -83,7 +83,7 @@
                 <span class="pma-card__icon">🚪</span>
                 <div>
                     <div class="pma-card__title">NV đã nghỉ còn quyền</div>
-                    <div class="pma-card__sub">NhanVien.IDTinhTrangLV ≠ 1 nhưng vẫn còn row trong Authorization*</div>
+                    <div class="pma-card__sub">Nhân viên đã nghỉ việc nhưng vẫn còn quyền truy cập</div>
                 </div>
                 <span class="pma-card__count" id="pma-inactive-count">—</span>
             </div>
@@ -95,8 +95,8 @@
             <div class="pma-card__hd">
                 <span class="pma-card__icon">📂</span>
                 <div>
-                    <div class="pma-card__title">Content chưa cấp ai</div>
-                    <div class="pma-card__sub">Project / Virtual publish > 30 ngày, không có row Authorization nào</div>
+                    <div class="pma-card__title">Nội dung chưa cấp ai</div>
+                    <div class="pma-card__sub">Project / Virtual đăng > 30 ngày nhưng chưa cấp quyền cho ai</div>
                 </div>
                 <span class="pma-card__count" id="pma-orphan-count">—</span>
             </div>
@@ -109,7 +109,7 @@
                 <span class="pma-card__icon">📊</span>
                 <div>
                     <div class="pma-card__title">NV có quyền chưa từng mở</div>
-                    <div class="pma-card__sub">NV active có grant nhưng 0 row trong View360_AccessLog</div>
+                    <div class="pma-card__sub">NV đang làm việc có quyền nhưng chưa từng truy cập lần nào</div>
                 </div>
                 <span class="pma-card__count" id="pma-unused-count">—</span>
             </div>
@@ -157,14 +157,14 @@
         setCount('pma-dept-count', depts.length);
         var $db = document.getElementById('pma-dept-body');
         if (depts.length === 0) {
-            $db.innerHTML = emptyOk('Mọi phòng ban đều có ít nhất 1 user được cấp quyền.');
+            $db.innerHTML = emptyOk('Mọi phòng ban đều có ít nhất 1 người được cấp quyền.');
         } else {
             $db.innerHTML = depts.map(function (dp) {
                 var url = base + 'Index?deptId=' + dp.id; // future: pre-fill chip
                 return '<div class="pma-row">' +
                     '<div class="pma-row__main">' +
                         '<div class="pma-row__name">' + escapeHtml(dp.name) + '</div>' +
-                        '<div class="pma-row__meta">' + fmt(dp.activeUsers) + ' NV đang hoạt động · 0 user có quyền</div>' +
+                        '<div class="pma-row__meta">' + fmt(dp.activeUsers) + ' NV đang hoạt động · 0 người có quyền</div>' +
                     '</div>' +
                     '<a class="pma-act-btn" href="' + escapeHtml(url) + '">+ Cấp ngay</a>' +
                     '</div>';
@@ -176,7 +176,7 @@
         setCount('pma-inactive-count', inactives.length);
         var $ib = document.getElementById('pma-inactive-body');
         if (inactives.length === 0) {
-            $ib.innerHTML = emptyOk('Tất cả NV active có grant. Không có NV nghỉ còn quyền dư.');
+            $ib.innerHTML = emptyOk('Mọi quyền đều thuộc về NV đang làm việc. Không có NV đã nghỉ nào còn quyền dư.');
         } else {
             $ib.innerHTML = inactives.map(function (u) {
                 return '<div class="pma-row" data-user-id="' + u.id + '">' +
@@ -210,7 +210,7 @@
         setCount('pma-orphan-count', orphans.length);
         var $ob = document.getElementById('pma-orphan-body');
         if (orphans.length === 0) {
-            $ob.innerHTML = emptyOk('Mọi content > 30 ngày đều đã được cấp quyền cho ít nhất 1 user.');
+            $ob.innerHTML = emptyOk('Mọi nội dung > 30 ngày đều đã được cấp quyền cho ít nhất 1 người.');
         } else {
             $ob.innerHTML = orphans.map(function (c) {
                 var typeCls = c.type === 1 ? 'p' : (c.type === 2 ? 'v' : 'vd');
@@ -219,7 +219,7 @@
                         '<div class="pma-row__name">' +
                             '<span class="pma-badge pma-badge--' + typeCls + '">' + c.typeName + '</span>' +
                             escapeHtml(c.title || '(không tiêu đề)') + '</div>' +
-                        '<div class="pma-row__meta">Publish: ' + escapeHtml(c.date) + '</div>' +
+                        '<div class="pma-row__meta">Đăng: ' + escapeHtml(c.date) + '</div>' +
                     '</div>' +
                     '</div>';
             }).join('');
@@ -230,11 +230,11 @@
         var $ub = document.getElementById('pma-unused-body');
         if (d.unusedGrantsReady === false) {
             document.getElementById('pma-unused-count').textContent = '—';
-            $ub.innerHTML = notReady(d.unusedGrantsMessage || 'Tracking chưa sẵn sàng.');
+            $ub.innerHTML = notReady(d.unusedGrantsMessage || 'Theo dõi chưa sẵn sàng.');
         } else {
             setCount('pma-unused-count', unused.length);
             if (unused.length === 0) {
-                $ub.innerHTML = emptyOk('Mọi NV active có grant đều đã mở ít nhất 1 lần.');
+                $ub.innerHTML = emptyOk('Mọi NV đang làm việc có quyền đều đã mở ít nhất 1 lần.');
             } else {
                 $ub.innerHTML = unused.map(function (u) {
                     return '<div class="pma-row">' +
@@ -250,7 +250,7 @@
         }
     }).catch(function (err) {
         document.getElementById('pma-loading').innerHTML =
-            '<div style="color:#dc2626;">⚠ Lỗi tải audit: ' + escapeHtml(err.message || String(err)) + '</div>';
+            '<div style="color:#dc2626;">⚠ Lỗi tải dữ liệu rà soát: ' + escapeHtml(err.message || String(err)) + '</div>';
     });
 
     function bulkRevokeUser(userId, btnEl) {
@@ -259,7 +259,7 @@
         fetch(base + 'UserGrants?userId=' + userId).then(function (r) { return r.json(); })
             .then(function (d) {
                 if (!d.grants || d.grants.length === 0) {
-                    alert('User này không có grant nào (data đã thay đổi?)');
+                    alert('Người này không có quyền nào (dữ liệu đã thay đổi?)');
                     btnEl.disabled = false; btnEl.textContent = '✕ Thu hồi hết';
                     return;
                 }
@@ -272,7 +272,7 @@
                     body: JSON.stringify({ Items: items })
                 }).then(function (r) { return r.json(); }).then(function (res) {
                     if (res.error) throw new Error(res.message);
-                    alert('Đã thu hồi ' + res.deleted + ' quyền của user.');
+                    alert('Đã thu hồi ' + res.deleted + ' quyền của người dùng.');
                     // Remove row
                     var row = btnEl.closest('.pma-row');
                     if (row) row.remove();

@@ -262,5 +262,85 @@ VALUES
             }
             return 0;
         }
+
+        /// <summary>
+        /// Tong token (TokensIn + TokensOut) da dung trong NGAY hom nay (theo gio server, reset luc 0h).
+        /// nhanVienId = null -> tong TOAN HE THONG. Dung cho tran token/ngay (chong dot quota).
+        /// Lay tu bang log nen song sot qua IIS recycle (khac MemoryCache).
+        /// </summary>
+        public static long SumTokensToday(int? nhanVienId)
+        {
+            try
+            {
+                using (var conn = OpenConnection())
+                using (var cmd = new SqlCommand(
+                    @"SELECT ISNULL(SUM(ISNULL(TokensIn,0) + ISNULL(TokensOut,0)), 0)
+                      FROM dbo.V360_ChatbotMessage
+                      WHERE CreatedAt >= CAST(GETDATE() AS DATE)
+                        AND (@nv IS NULL OR NhanVienID = @nv)", conn))
+                {
+                    cmd.Parameters.AddWithValue("@nv", nhanVienId.HasValue ? (object)nhanVienId.Value : DBNull.Value);
+                    var v = cmd.ExecuteScalar();
+                    return (v == null || v == DBNull.Value) ? 0L : Convert.ToInt64(v);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[ChatbotContentStore.SumTokensToday] " + ex.Message);
+            }
+            return 0L;
+        }
+
+        // ===== VBee usage (TTS/STT) - tran NGAY (V360_ChatbotUsageDaily) =====
+        /// <summary>So lan goi VBee (Kind='tts'|'stt') cua user trong NGAY hom nay (gio server).</summary>
+        public static int GetDailyUsageCalls(int nhanVienId, string kind)
+        {
+            if (nhanVienId <= 0 || string.IsNullOrEmpty(kind)) return 0;
+            try
+            {
+                using (var conn = OpenConnection())
+                using (var cmd = new SqlCommand(
+                    @"SELECT ISNULL(Calls,0) FROM dbo.V360_ChatbotUsageDaily
+                      WHERE NhanVienID=@nv AND UsageDate=CAST(GETDATE() AS DATE) AND Kind=@k", conn))
+                {
+                    cmd.Parameters.AddWithValue("@nv", nhanVienId);
+                    cmd.Parameters.AddWithValue("@k", kind);
+                    var v = cmd.ExecuteScalar();
+                    return (v == null || v == DBNull.Value) ? 0 : Convert.ToInt32(v);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[ChatbotContentStore.GetDailyUsageCalls] " + ex.Message);
+            }
+            return 0;
+        }
+
+        /// <summary>Tang counter usage VBee cho user/ngay/kind (+1 call, +units chars-hoac-giay). Fire-and-forget.</summary>
+        public static void IncrementDailyUsage(int nhanVienId, string kind, long units)
+        {
+            if (nhanVienId <= 0 || string.IsNullOrEmpty(kind)) return;
+            try
+            {
+                using (var conn = OpenConnection())
+                using (var cmd = new SqlCommand(
+                    @"MERGE dbo.V360_ChatbotUsageDaily AS t
+                      USING (SELECT @nv AS NhanVienID, CAST(GETDATE() AS DATE) AS UsageDate, @k AS Kind) AS s
+                      ON (t.NhanVienID = s.NhanVienID AND t.UsageDate = s.UsageDate AND t.Kind = s.Kind)
+                      WHEN MATCHED THEN UPDATE SET Calls = t.Calls + 1, Units = t.Units + @u
+                      WHEN NOT MATCHED THEN INSERT (NhanVienID, UsageDate, Kind, Calls, Units)
+                           VALUES (s.NhanVienID, s.UsageDate, s.Kind, 1, @u);", conn))
+                {
+                    cmd.Parameters.AddWithValue("@nv", nhanVienId);
+                    cmd.Parameters.AddWithValue("@k", kind);
+                    cmd.Parameters.AddWithValue("@u", units < 0 ? 0L : units);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[ChatbotContentStore.IncrementDailyUsage] " + ex.Message);
+            }
+        }
     }
 }

@@ -227,6 +227,34 @@ BEGIN
 END
 GO
 
+-- Index ho tro dem theo user/ngay (CountRecentUserMessages + SumTokensToday cho tran token/ngay OpenAI).
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_V360CM_NV' AND object_id = OBJECT_ID('dbo.V360_ChatbotMessage'))
+BEGIN
+    CREATE INDEX IX_V360CM_NV ON dbo.V360_ChatbotMessage(NhanVienID, CreatedAt) INCLUDE (Role, TokensIn, TokensOut);
+    PRINT '[1] Created index IX_V360CM_NV';
+END
+GO
+
+-- V360_ChatbotUsageDaily: dem usage VBee (TTS/STT) theo user/ngay -> tran NGAY song sot qua IIS recycle
+-- (khac IsRateLimited theo gio luu o MemoryCache, mat khi app pool recycle).
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'V360_ChatbotUsageDaily' AND schema_id = SCHEMA_ID('dbo'))
+BEGIN
+    CREATE TABLE dbo.V360_ChatbotUsageDaily (
+        NhanVienID  INT          NOT NULL,
+        UsageDate   DATE         NOT NULL,
+        Kind        VARCHAR(16)  NOT NULL,   -- 'tts' | 'stt'
+        Calls       INT          NOT NULL CONSTRAINT DF_V360UD_Calls DEFAULT (0),
+        Units       BIGINT       NOT NULL CONSTRAINT DF_V360UD_Units DEFAULT (0),  -- chars (tts) / giay (stt)
+        CONSTRAINT PK_V360_ChatbotUsageDaily PRIMARY KEY (NhanVienID, UsageDate, Kind)
+    );
+    PRINT '[1] Created table V360_ChatbotUsageDaily';
+END
+ELSE
+BEGIN
+    PRINT '[1] V360_ChatbotUsageDaily already exists - skipped';
+END
+GO
+
 
 -- ================================================================
 -- SECTION 2: ProjectsGroup.ParentIDGroup column (hierarchy 2-cap)
@@ -733,19 +761,29 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Resolve TẤT CẢ NhanVienID cùng MaNV (xử lý data trùng MaNV - xem chú thích ở Virtual_select_USER).
+    DECLARE @Ids TABLE (ID INT PRIMARY KEY);
+    INSERT INTO @Ids (ID)
+    SELECT n2.ID
+    FROM dbo.NhanVien n1
+    JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+    WHERE n1.ID = @NhanVienID
+      AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> '';
+    IF NOT EXISTS (SELECT 1 FROM @Ids) INSERT INTO @Ids (ID) VALUES (@NhanVienID);
+
     DECLARE @AccessibleGroups TABLE (IDGroup INT PRIMARY KEY);
 
     -- (a) Group-grant direct (Recursive=0)
     INSERT INTO @AccessibleGroups (IDGroup)
     SELECT DISTINCT IDGroup
     FROM dbo.AuthorizationUSER_Group
-    WHERE NhanVienID = @NhanVienID AND ContentType = 1 AND [Recursive] = 0;
+    WHERE NhanVienID IN (SELECT ID FROM @Ids) AND ContentType = 1 AND [Recursive] = 0;
 
     -- (b) Group-grant recursive: expand sang tat ca con chau
     ;WITH RecursiveRoots AS (
         SELECT IDGroup
         FROM dbo.AuthorizationUSER_Group
-        WHERE NhanVienID = @NhanVienID AND ContentType = 1 AND [Recursive] = 1
+        WHERE NhanVienID IN (SELECT ID FROM @Ids) AND ContentType = 1 AND [Recursive] = 1
     ),
     Descendants AS (
         SELECT IDGroup, IDGroup AS RootId FROM RecursiveRoots
@@ -769,7 +807,7 @@ BEGIN
     (
         EXISTS (
             SELECT 1 FROM dbo.AuthorizationUSER au
-            WHERE au.NhanVienID = @NhanVienID AND au.ProjectID = p.ID
+            WHERE au.NhanVienID IN (SELECT ID FROM @Ids) AND au.ProjectID = p.ID
         )
         OR p.IDGroup IN (SELECT IDGroup FROM @AccessibleGroups)
     )
@@ -785,6 +823,20 @@ CREATE OR ALTER PROCEDURE dbo.Virtual_select_USER
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    -- Data có MaNV TRÙNG (nhiều dòng NhanVien cùng MaNV, khác ID). Định danh thật là MaNV:
+    -- admin cấp quyền vào 1 ID (nhỏ nhất) nhưng user có thể đăng nhập bằng ID trùng khác ->
+    -- quyền "không thấy". Resolve sang TẤT CẢ NhanVienID cùng MaNV để mọi bản trùng dùng chung quyền.
+    DECLARE @Ids TABLE (ID INT PRIMARY KEY);
+    INSERT INTO @Ids (ID)
+    SELECT n2.ID
+    FROM dbo.NhanVien n1
+    JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+    WHERE n1.ID = @NhanVienID
+      AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> '';
+    -- Fallback: MaNV rỗng/null hoặc ID không tồn tại -> chỉ chính nó (tránh gộp nhầm mọi MaNV null)
+    IF NOT EXISTS (SELECT 1 FROM @Ids) INSERT INTO @Ids (ID) VALUES (@NhanVienID);
+
     SELECT
         v.ID, v.Title, v.Images, v.Note, v.FilePDF, v.URL, v.Date,
         v.IDPhongBan, pb.TenPhongBan, v.IDGroup
@@ -794,11 +846,11 @@ BEGIN
     (
         EXISTS (
             SELECT 1 FROM dbo.AuthorizationVitual av
-            WHERE av.NhanVienID = @NhanVienID AND av.VirtualID = v.ID
+            WHERE av.NhanVienID IN (SELECT ID FROM @Ids) AND av.VirtualID = v.ID
         )
         OR EXISTS (
             SELECT 1 FROM dbo.AuthorizationUSER_Group g
-            WHERE g.NhanVienID = @NhanVienID AND g.ContentType = 2 AND g.IDGroup = v.IDGroup
+            WHERE g.NhanVienID IN (SELECT ID FROM @Ids) AND g.ContentType = 2 AND g.IDGroup = v.IDGroup
         )
     )
     AND (@search IS NULL OR @search = '' OR v.Title LIKE '%' + @search + '%');
@@ -813,6 +865,17 @@ CREATE OR ALTER PROCEDURE dbo.Video_select
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    -- Resolve TẤT CẢ NhanVienID cùng MaNV (xử lý data trùng MaNV - xem chú thích ở Virtual_select_USER).
+    DECLARE @Ids TABLE (ID INT PRIMARY KEY);
+    INSERT INTO @Ids (ID)
+    SELECT n2.ID
+    FROM dbo.NhanVien n1
+    JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+    WHERE n1.ID = @NhanVienID
+      AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> '';
+    IF NOT EXISTS (SELECT 1 FROM @Ids) INSERT INTO @Ids (ID) VALUES (@NhanVienID);
+
     SELECT
         vd.IDVideo, vd.Title, vd.Images, vd.Note, vd.URL, vd.Date,
         vd.IDPhongBan, pb.TenPhongBan, vd.AlbumID
@@ -822,17 +885,107 @@ BEGIN
     (
         EXISTS (
             SELECT 1 FROM dbo.AuthorizationVideo avi
-            WHERE avi.NhanVienID = @NhanVienID AND avi.VideoID = vd.IDVideo
+            WHERE avi.NhanVienID IN (SELECT ID FROM @Ids) AND avi.VideoID = vd.IDVideo
         )
         OR EXISTS (
             SELECT 1 FROM dbo.AuthorizationUSER_Group g
-            WHERE g.NhanVienID = @NhanVienID AND g.ContentType = 3 AND g.IDGroup = vd.AlbumID
+            WHERE g.NhanVienID IN (SELECT ID FROM @Ids) AND g.ContentType = 3 AND g.IDGroup = vd.AlbumID
         )
     )
     AND (@search IS NULL OR @search = '' OR vd.Title LIKE '%' + @search + '%');
 END;
 GO
 PRINT '[9.4c] (Re)created dbo.Video_select';
+GO
+
+-- 9.4d Get_IDGroup (nav nhóm Project) - dùng build thanh tab nhóm ở ListProject.
+-- BẢN CŨ chỉ đọc AuthorizationUSER (file-grant) -> user chỉ có GROUP-grant sẽ KHÔNG có nav.
+-- Sửa: đọc cả AuthorizationUSER_Group (direct + recursive con cháu) + resolve theo MaNV (data trùng).
+-- Giữ nguyên 2 cột kết quả (IDGroup, NhanVienID) để khớp EF complex type.
+CREATE OR ALTER PROCEDURE [dbo].[Get_IDGroup]
+    @NhanVienID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Ids TABLE (ID INT PRIMARY KEY);
+    INSERT INTO @Ids (ID)
+    SELECT n2.ID FROM dbo.NhanVien n1
+    JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+    WHERE n1.ID = @NhanVienID AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> '';
+    IF NOT EXISTS (SELECT 1 FROM @Ids) INSERT INTO @Ids (ID) VALUES (@NhanVienID);
+
+    DECLARE @Groups TABLE (IDGroup INT PRIMARY KEY);
+
+    -- (a) File-grant: nhóm chứa project user có quyền lẻ
+    INSERT INTO @Groups (IDGroup)
+    SELECT DISTINCT pr.IDGroup
+    FROM dbo.AuthorizationUSER au
+    JOIN dbo.Projects pr ON au.ProjectID = pr.ID
+    WHERE au.NhanVienID IN (SELECT ID FROM @Ids) AND pr.IDGroup IS NOT NULL;
+
+    -- (b) Group-grant direct (Recursive=0)
+    INSERT INTO @Groups (IDGroup)
+    SELECT DISTINCT g.IDGroup
+    FROM dbo.AuthorizationUSER_Group g
+    WHERE g.NhanVienID IN (SELECT ID FROM @Ids) AND g.ContentType = 1 AND g.[Recursive] = 0
+      AND g.IDGroup NOT IN (SELECT IDGroup FROM @Groups);
+
+    -- (c) Group-grant recursive: expand sang tất cả con cháu
+    ;WITH RecursiveRoots AS (
+        SELECT IDGroup FROM dbo.AuthorizationUSER_Group
+        WHERE NhanVienID IN (SELECT ID FROM @Ids) AND ContentType = 1 AND [Recursive] = 1
+    ),
+    Descendants AS (
+        SELECT IDGroup FROM RecursiveRoots
+        UNION ALL
+        SELECT pg.IDGroup FROM dbo.ProjectsGroup pg
+        JOIN Descendants d ON pg.ParentIDGroup = d.IDGroup
+    )
+    INSERT INTO @Groups (IDGroup)
+    SELECT DISTINCT d.IDGroup FROM Descendants d
+    WHERE d.IDGroup NOT IN (SELECT IDGroup FROM @Groups);
+
+    SELECT g.IDGroup, @NhanVienID AS NhanVienID FROM @Groups g;
+END;
+GO
+PRINT '[9.4d] (Re)created dbo.Get_IDGroup';
+GO
+
+-- 9.4e Get_IDGroupVirtual (tab nhóm Virtual). Tương tự nhưng VirtualGroup phẳng (không recursive).
+CREATE OR ALTER PROCEDURE [dbo].[Get_IDGroupVirtual]
+    @NhanVienID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Ids TABLE (ID INT PRIMARY KEY);
+    INSERT INTO @Ids (ID)
+    SELECT n2.ID FROM dbo.NhanVien n1
+    JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+    WHERE n1.ID = @NhanVienID AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> '';
+    IF NOT EXISTS (SELECT 1 FROM @Ids) INSERT INTO @Ids (ID) VALUES (@NhanVienID);
+
+    DECLARE @Groups TABLE (IDGroup INT PRIMARY KEY);
+
+    -- (a) File-grant: nhóm chứa tour user có quyền lẻ
+    INSERT INTO @Groups (IDGroup)
+    SELECT DISTINCT pr.IDGroup
+    FROM dbo.AuthorizationVitual au
+    JOIN dbo.Virtual pr ON au.VirtualID = pr.ID
+    WHERE au.NhanVienID IN (SELECT ID FROM @Ids) AND pr.IDGroup IS NOT NULL;
+
+    -- (b) Group-grant (ContentType=2)
+    INSERT INTO @Groups (IDGroup)
+    SELECT DISTINCT g.IDGroup
+    FROM dbo.AuthorizationUSER_Group g
+    WHERE g.NhanVienID IN (SELECT ID FROM @Ids) AND g.ContentType = 2
+      AND g.IDGroup NOT IN (SELECT IDGroup FROM @Groups);
+
+    SELECT g.IDGroup, @NhanVienID AS NhanVienID FROM @Groups g;
+END;
+GO
+PRINT '[9.4e] (Re)created dbo.Get_IDGroupVirtual';
 GO
 
 -- Re-enable execution (NOEXEC ON co the da bat trong version-check tren).

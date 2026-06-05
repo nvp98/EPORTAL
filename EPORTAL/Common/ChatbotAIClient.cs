@@ -21,6 +21,9 @@ namespace EPORTAL.Common
         public string         SystemPrompt { get; set; }
         public List<ChatTurn> History      { get; set; }
         public string         UserMessage  { get; set; }
+        // Danh sach TEN diem da cau hinh -> dung lam enum cho tool navigate_to_scene.
+        // Model chi duoc chon dung 1 ten trong day (khong tu bia keyword). Null/rong -> tool kieu cu (query).
+        public List<string>   NavLabels    { get; set; }
     }
 
     public class ChatbotReply
@@ -60,27 +63,56 @@ namespace EPORTAL.Common
 
         // Tool spec dung chung cho SendAsync + StreamAsync (Chat Completions API format).
         // RealtimeSession (Realtime API) co schema khac - khong dung helper nay.
-        private static JArray BuildTools()
+        //
+        // Khi co navLabels (danh sach ten diem da cau hinh): tham so `scene` la ENUM cac ten do
+        // -> model BUOC phai chon dung 1 ten co san (khong bia keyword, het lop bug fuzzy-match).
+        // Khong co navLabels: fallback tool kieu cu nhan `query` (tu khoa tu do) -> server tu match.
+        private static JArray BuildTools(List<string> navLabels)
         {
+            JObject targetParam;
+            JArray required;
+            if (navLabels != null && navLabels.Count > 0)
+            {
+                var en = new JArray();
+                foreach (var l in navLabels) en.Add(l);
+                targetParam = new JObject {
+                    ["scene"] = new JObject {
+                        ["type"] = "string",
+                        ["description"] = "TÊN CHÍNH XÁC của điểm đích — phải chọn đúng MỘT tên trong danh sách điểm của tour (không tự bịa, không dịch).",
+                        ["enum"] = en
+                    },
+                    ["reason"] = new JObject {
+                        ["type"] = "string",
+                        ["description"] = "Câu xác nhận ngắn 1 dòng tiếng Việt, vd 'Đang đưa bạn tới Cảng tổng hợp.'"
+                    }
+                };
+                required = new JArray { "scene", "reason" };
+            }
+            else
+            {
+                targetParam = new JObject {
+                    ["query"] = new JObject {
+                        ["type"] = "string",
+                        ["description"] = "Từ khoá tiếng Việt user dùng để chỉ điểm đích (vd 'cảng', 'khu sản xuất'). KHÔNG dịch sang tiếng Anh."
+                    },
+                    ["reason"] = new JObject {
+                        ["type"] = "string",
+                        ["description"] = "Câu xác nhận ngắn 1 dòng tiếng Việt, vd 'Đang đưa bạn tới khu vực cảng.'"
+                    }
+                };
+                required = new JArray { "query", "reason" };
+            }
+
             return new JArray {
                 new JObject {
                     ["type"] = "function",
                     ["function"] = new JObject {
                         ["name"] = "navigate_to_scene",
-                        ["description"] = "GỌI FUNCTION NÀY khi user thể hiện ý định di chuyển tới điểm/khu vực khác trong tour 360°. Trigger tiếng Việt: 'chuyển tới X', 'đi tới X', 'tới X', 'đến X', 'qua X', 'đưa tôi tới X', 'dẫn tôi tới X', 'cho tôi xem X', 'mở X', 'tôi muốn xem X'. KHÔNG cần copy uuid — chỉ truyền `query` là TỪ KHOÁ tiếng Việt mà user dùng (vd: 'cảng', 'khu A', 'phòng họp'). Server sẽ tự match keyword/tên/nội dung scene.",
+                        ["description"] = "GỌI FUNCTION NÀY khi user thể hiện ý định DI CHUYỂN tới điểm/khu vực khác trong tour 360° ('đi tới X', 'qua X', 'đưa tôi tới X', 'cho tôi xem X', 'mở X'...). KHÔNG gọi khi user chỉ HỎI THÔNG TIN về một điểm.",
                         ["parameters"] = new JObject {
                             ["type"] = "object",
-                            ["properties"] = new JObject {
-                                ["query"] = new JObject {
-                                    ["type"] = "string",
-                                    ["description"] = "Từ khoá tiếng Việt user dùng để chỉ điểm đích (vd 'cảng', 'khu sản xuất', 'phòng họp'). KHÔNG dịch sang tiếng Anh."
-                                },
-                                ["reason"] = new JObject {
-                                    ["type"] = "string",
-                                    ["description"] = "Câu xác nhận ngắn 1 dòng tiếng Việt, vd 'Đang đưa bạn tới khu vực cảng.'"
-                                }
-                            },
-                            ["required"] = new JArray { "query", "reason" }
+                            ["properties"] = targetParam,
+                            ["required"] = required
                         }
                     }
                 }
@@ -98,9 +130,8 @@ namespace EPORTAL.Common
                     reply.Error = "OPENAI_API_KEY khong duoc set (kiem tra .env hoac IIS env var)";
                     return reply;
                 }
-                var model     = ConfigurationManager.AppSettings["Chatbot.Model"] ?? "gpt-4o-mini";
-                var maxTokStr = ConfigurationManager.AppSettings["Chatbot.MaxTokens"] ?? "800";
-                int maxTok    = int.TryParse(maxTokStr, out var n) ? n : 800;
+                var model  = ChatbotConfig.Get("CHATBOT_MODEL", "Chatbot.Model", "gpt-4o-mini");
+                int maxTok = ChatbotConfig.GetInt("CHATBOT_MAX_TOKENS", "Chatbot.MaxTokens", 800);
 
                 var messages = new JArray();
                 if (!string.IsNullOrEmpty(req.SystemPrompt))
@@ -118,7 +149,7 @@ namespace EPORTAL.Common
                 }
                 messages.Add(new JObject { ["role"] = "user", ["content"] = req.UserMessage ?? "" });
 
-                var tools = BuildTools();
+                var tools = BuildTools(req.NavLabels);
 
                 var payload = new JObject {
                     ["model"]       = model,
@@ -161,12 +192,13 @@ namespace EPORTAL.Common
                                     try
                                     {
                                         var args = JObject.Parse(argsRaw ?? "{}");
-                                        var query = (string)args["query"];
+                                        // Tool moi dung `scene` (ten chinh xac tu enum); fallback `query` (tool cu).
+                                        var query = (string)args["scene"] ?? (string)args["query"];
                                         var reason = (string)args["reason"];
                                         if (!string.IsNullOrEmpty(query))
                                         {
                                             reply.ActionType   = "navigate";
-                                            // ActionTarget tam thoi luu QUERY - controller resolve thanh uuid qua FindSceneByQuery
+                                            // ActionTarget luu TEN/keyword - controller resolve thanh uuid (exact map > FindSceneByQuery)
                                             reply.ActionTarget = query;
                                             reply.Text = !string.IsNullOrEmpty(reason)
                                                 ? reason
@@ -235,9 +267,8 @@ namespace EPORTAL.Common
                     onComplete?.Invoke(0, 0, error);
                     return;
                 }
-                var model     = ConfigurationManager.AppSettings["Chatbot.Model"] ?? "gpt-4.1-mini";
-                var maxTokStr = ConfigurationManager.AppSettings["Chatbot.MaxTokens"] ?? "800";
-                int maxTok    = int.TryParse(maxTokStr, out var n) ? n : 800;
+                var model  = ChatbotConfig.Get("CHATBOT_MODEL", "Chatbot.Model", "gpt-4.1-mini");
+                int maxTok = ChatbotConfig.GetInt("CHATBOT_MAX_TOKENS", "Chatbot.MaxTokens", 800);
 
                 var messages = new JArray();
                 if (!string.IsNullOrEmpty(req.SystemPrompt))
@@ -255,7 +286,7 @@ namespace EPORTAL.Common
                 }
                 messages.Add(new JObject { ["role"] = "user", ["content"] = req.UserMessage ?? "" });
 
-                var tools = BuildTools();
+                var tools = BuildTools(req.NavLabels);
 
                 var payload = new JObject {
                     ["model"]       = model,

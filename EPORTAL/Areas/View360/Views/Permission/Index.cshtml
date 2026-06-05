@@ -199,10 +199,10 @@
     <div class="pm-hd">
         <div>
             <h2>🔐 Quản lý phân quyền View360</h2>
-            <div class="pm-hd__sub">Xem toàn bộ quyền đã cấp · Cấp mới qua 3 cách phổ biến · Audit anomalies.</div>
+            <div class="pm-hd__sub">Xem toàn bộ quyền đã cấp · Cấp mới qua 3 cách phổ biến · Rà soát bất thường.</div>
         </div>
         <div class="pm-hd__actions">
-            <a href="@Url.Action("Audit", "Permission")" class="pm-btn pm-btn--ghost">⚠ Audit</a>
+            <a href="@Url.Action("Audit", "Permission")" class="pm-btn pm-btn--ghost">⚠ Rà soát</a>
             <a href="@Url.Action("Index", "Projects")" class="pm-btn pm-btn--ghost">← Quản lý dự án</a>
         </div>
     </div>
@@ -211,16 +211,16 @@
     <div class="pm-actions">
         <span class="pm-actions__label">Cấp quyền mới:</span>
         <button type="button" class="pm-action-btn" id="pm-act-user" @(canGrant ? "" : "disabled")>
-            <span class="pm-action-btn__icon">👤</span> Cho 1 user
+            <span class="pm-action-btn__icon">👤</span> Cho 1 người dùng
         </button>
         <button type="button" class="pm-action-btn" id="pm-act-dept" @(canGrant ? "" : "disabled")>
             <span class="pm-action-btn__icon">🏢</span> Cho cả phòng ban
         </button>
         <button type="button" class="pm-action-btn" id="pm-act-copy" @(canGrant ? "" : "disabled")>
-            <span class="pm-action-btn__icon">📋</span> Copy từ user khác
+            <span class="pm-action-btn__icon">📋</span> Sao chép từ người dùng khác
         </button>
         <button type="button" class="pm-action-btn" id="pm-act-paste" @(canGrant ? "" : "disabled")>
-            <span class="pm-action-btn__icon">📎</span> Paste MaNV (Excel)
+            <span class="pm-action-btn__icon">📎</span> Dán mã NV (Excel)
         </button>
     </div>
 
@@ -237,7 +237,7 @@
                 <option value="2">Virtual</option>
                 <option value="3">Video</option>
             </select>
-            <select id="pm-f-pgroup" class="pm-select" title="Lọc theo nhóm Project (gồm cây con)">
+            <select id="pm-f-pgroup" class="pm-select" title="Lọc theo nhóm Project (gồm nhóm con)">
                 <option value="">Tất cả nhóm Project</option>
             </select>
             <button type="button" class="pm-btn pm-btn--ghost" id="pm-f-apply">Lọc</button>
@@ -249,7 +249,7 @@
     <div class="pm-tablewrap">
         <div class="pm-table-head">
             <div class="pm-table-info">
-                Đang có <b id="pm-total">—</b> nhóm quyền (đã lọc) — mỗi dòng = 1 user × 1 nhóm.
+                Đang có <b id="pm-total">—</b> nhóm quyền (đã lọc) — mỗi dòng = 1 người dùng × 1 nhóm.
                 <span id="pm-selected-info" style="display:none;color:#dc2626;margin-left:10px;">
                     Đã chọn: <b id="pm-selected-count">0</b>
                 </span>
@@ -269,7 +269,7 @@
                         <th>Người được cấp</th>
                         <th>Phòng ban</th>
                         <th>Nhóm nội dung</th>
-                        <th style="width:90px;text-align:right;">Số content</th>
+                        <th style="width:90px;text-align:right;">Số nội dung</th>
                         <th style="width:130px;">Cấp lúc (mới nhất)</th>
                         <th style="width:80px;"></th>
                     </tr>
@@ -348,7 +348,7 @@ function api(path, opts) {
         return r.text().then(function (t) {
             if (!t) return null;
             try { var d = JSON.parse(t); if (d && d.error === true) throw new Error(d.message); return d; }
-            catch (e) { throw e instanceof Error ? e : new Error('Server lỗi'); }
+            catch (e) { throw e instanceof Error ? e : new Error('Lỗi máy chủ'); }
         });
     });
 }
@@ -414,13 +414,18 @@ function loadTable() {
     if (f.phongBanId) qs += '&phongBanId=' + f.phongBanId;
     if (f.type) qs += '&type=' + f.type;
     if (f.rootGroupId) qs += '&rootGroupId=' + f.rootGroupId;
-    $('#pm-tbody').innerHTML = '<tr><td colspan="7"><div class="pm-loading">Đang tải...</div></td></tr>';
+    // Selection theo PHẠM VI TRANG hiện tại: rowData được dựng lại mỗi lần render nên key
+    // ở trang/bộ lọc khác sẽ thành "mồ côi" -> đếm sai (vd 16 chọn / 15 dòng) và bulk revoke
+    // rơi vào nhánh fallback. Clear khi tải lại bảng để selection luôn khớp dòng đang thấy.
+    state.selected.clear();
+    $('#pm-tbody').innerHTML = '<tr><td colspan="8"><div class="pm-loading">Đang tải...</div></td></tr>';
     return api('ListGrants?' + qs).then(function (d) {
         $('#pm-total').textContent = fmt(d.total);
         renderRows(d.rows || []);
         renderPager(d.page, d.totalPages, d.total);
+        updateSelectedUI();
     }).catch(function (err) {
-        $('#pm-tbody').innerHTML = '<tr><td colspan="7"><div class="pm-empty">' +
+        $('#pm-tbody').innerHTML = '<tr><td colspan="8"><div class="pm-empty">' +
             '<div class="pm-empty__icon">⚠</div><div class="pm-empty__title">Lỗi tải dữ liệu</div>' +
             '<div class="pm-empty__hint">' + escapeHtml(err.message) + '</div></div></td></tr>';
     });
@@ -430,8 +435,8 @@ function renderRows(rows) {
     if (rows.length === 0) {
         $('#pm-tbody').innerHTML = '<tr><td colspan="8"><div class="pm-empty">' +
             '<div class="pm-empty__icon">📭</div>' +
-            '<div class="pm-empty__title">Không có quyền nào khớp filter</div>' +
-            '<div class="pm-empty__hint">Đổi filter hoặc bấm "Đặt lại" để xem hết.</div>' +
+            '<div class="pm-empty__title">Không có quyền nào khớp bộ lọc</div>' +
+            '<div class="pm-empty__hint">Đổi bộ lọc hoặc bấm "Đặt lại" để xem hết.</div>' +
             '</div></td></tr>';
         return;
     }
@@ -447,11 +452,11 @@ function renderRows(rows) {
         // Grant type badge: 📂 Group-grant (auto-inherit) vs 📄 File-grants legacy
         var grantBadge;
         if (r.grantType === 1) {
-            grantBadge = '<span title="Cấp ở mức NHÓM — tự inherit content mới khi admin thêm vào nhóm" ' +
+            grantBadge = '<span title="Cấp ở mức NHÓM — tự kế thừa nội dung mới khi admin thêm vào nhóm" ' +
                 'style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-left:4px;">' +
-                '📂 Nhóm' + (r.isRecursive ? ' (recursive)' : '') + '</span>';
+                '📂 Nhóm' + (r.isRecursive ? ' (gồm nhóm con)' : '') + '</span>';
         } else {
-            grantBadge = '<span title="Quyền lẻ từng content (legacy) — KHÔNG inherit content mới" ' +
+            grantBadge = '<span title="Quyền lẻ từng nội dung (cũ) — KHÔNG kế thừa nội dung mới" ' +
                 'style="background:#fef3c7;color:#78350f;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-left:4px;">' +
                 '📄 Lẻ</span>';
         }
@@ -487,9 +492,9 @@ function renderRows(rows) {
             if (!r) return;
             var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : 'video');
             var msg = r.grantType === 1
-                ? 'Gỡ quyền NHÓM "' + r.groupName + '" của user ' + r.hoTen +
-                  '? (user sẽ không còn auto-inherit ' + unit + ' mới)'
-                : 'Gỡ ' + r.contentCount + ' ' + unit + ' lẻ trong nhóm "' + r.groupName + '" của user ' + r.hoTen + '?';
+                ? 'Gỡ quyền NHÓM "' + r.groupName + '" của người dùng ' + r.hoTen +
+                  '? (người dùng sẽ không còn tự kế thừa ' + unit + ' mới)'
+                : 'Gỡ ' + r.contentCount + ' ' + unit + ' lẻ trong nhóm "' + r.groupName + '" của người dùng ' + r.hoTen + '?';
             if (!confirm(msg)) return;
             b.disabled = true; b.textContent = '...';
 
@@ -541,7 +546,8 @@ function renderPager(page, totalPages, total) {
 
 function updateSelectedUI() {
     var n = state.selected.size;
-    $('#pm-bulk-count').textContent = n;
+    var $cnt = $('#pm-bulk-count');
+    if ($cnt) $cnt.textContent = n;   // span có thể tạm mất khi nút đang "Đang xử lý..."
     $('#pm-bulk-revoke').disabled = n === 0;
     $('#pm-selected-info').style.display = n > 0 ? '' : 'none';
     $('#pm-selected-count').textContent = n;
@@ -563,29 +569,37 @@ $('#pm-check-all').addEventListener('change', function () {
     updateSelectedUI();
 });
 
-// Bulk revoke (group-level)
+// Bulk revoke
 $('#pm-bulk-revoke').addEventListener('click', function () {
     if (state.selected.size === 0) return;
     if (!confirm('Gỡ ' + state.selected.size + ' nhóm quyền đã chọn?')) return;
+    // Key = "type-userId-groupId-grantType". Phải phân biệt grantType giống nút Gỡ từng dòng:
+    //   grantType 1 = group-grant -> xoá row trong AuthorizationUSER_Group
+    //   grantType 0 = file-grant lẻ -> ScopeFileOnly=true để xoá file-grants trong nhóm
+    // (Bug cũ: luôn gửi group-revoke -> với quyền Lẻ backend xoá 0 bản ghi.)
     var groups = Array.from(state.selected).map(function (k) {
         var r = state.rowData[k];
-        if (!r) {
-            var p = k.split('-');
-            return { UserId: parseInt(p[1], 10), Type: parseInt(p[0], 10), GroupId: parseInt(p[2], 10), Recursive: false };
+        if (r) {
+            return { UserId: r.nhanVienId, Type: r.type, GroupId: r.groupId,
+                     Recursive: false, ScopeFileOnly: r.grantType !== 1 };
         }
-        return { UserId: r.nhanVienId, Type: r.type, GroupId: r.groupId, Recursive: false };
+        var p = k.split('-');
+        return { UserId: parseInt(p[1], 10), Type: parseInt(p[0], 10), GroupId: parseInt(p[2], 10),
+                 Recursive: false, ScopeFileOnly: parseInt(p[3], 10) !== 1 };
     });
-    this.disabled = true; this.textContent = 'Đang xử lý...';
     var btn = this;
+    btn.disabled = true; btn.textContent = 'Đang xử lý...';
     jsonPost('Revoke', { Groups: groups }).then(function (d) {
-        alert('Đã gỡ ' + d.deleted + ' quyền (từ ' + groups.length + ' nhóm).');
+        alert('Đã gỡ ' + d.deleted + ' quyền (từ ' + groups.length + ' nhóm đã chọn).');
         state.selected.clear();
         loadTable();
     }).catch(function (err) {
         alert('Lỗi: ' + err.message);
     }).then(function () {
-        btn.textContent = '✕ Gỡ 0 đã chọn';
-        btn.disabled = true;
+        // Khôi phục lại cấu trúc nút (tạo lại <span id="pm-bulk-count">) rồi đồng bộ trạng thái.
+        // Bug cũ: gán textContent làm mất span -> số đếm trên nút kẹt ở 0, lệch với "Đã chọn".
+        btn.innerHTML = '✕ Gỡ <span id="pm-bulk-count">0</span> đã chọn';
+        updateSelectedUI();
     });
 });
 
@@ -627,7 +641,7 @@ function buildGroupPickerHtml() {
             '<input type="text" id="gp-q" placeholder="🔎 Tìm tên nhóm..." />' +
         '</div>' +
         '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b;margin-bottom:10px;cursor:pointer;" id="gp-rec-wrap">' +
-            '<input type="checkbox" id="gp-rec" checked /> <b>Project</b>: gồm cả nhóm con (recursive)' +
+            '<input type="checkbox" id="gp-rec" checked /> <b>Project</b>: gồm cả nhóm con' +
         '</label>' +
         '<div class="pm-pick" id="gp-list"><div class="pm-loading">Đang tải nhóm...</div></div>' +
         '<div id="gp-summary" style="margin-top:10px;padding:10px 12px;background:#f8fafc;border-radius:6px;font-size:12px;color:#0f172a;">' +
@@ -717,7 +731,7 @@ function wireGroupPicker(getSelected) {
             if (folderByType[1] > 0) parts.push('📁 ' + folderByType[1] + ' nhóm Project (' + contentByType[1] + ' DA)');
             if (folderByType[2] > 0) parts.push('🌐 ' + folderByType[2] + ' nhóm Virtual (' + contentByType[2] + ' tour)');
             if (folderByType[3] > 0) parts.push('🎬 ' + folderByType[3] + ' album Video (' + contentByType[3] + ' video)');
-            html += '<div style="margin-bottom:4px;"><b style="color:#16a34a;">📂 Cấp NHÓM</b> (auto-inherit):<br>' +
+            html += '<div style="margin-bottom:4px;"><b style="color:#16a34a;">📂 Cấp NHÓM</b> (tự kế thừa):<br>' +
                 '<span style="color:#475569;">' + parts.join(' · ') + '</span></div>';
         }
         if (sSize > 0) {
@@ -725,7 +739,7 @@ function wireGroupPicker(getSelected) {
             if (fileByType[1] > 0) fparts.push('📄 ' + fileByType[1] + ' Project');
             if (fileByType[2] > 0) fparts.push('📄 ' + fileByType[2] + ' Virtual');
             if (fileByType[3] > 0) fparts.push('📄 ' + fileByType[3] + ' Video');
-            html += '<div><b style="color:#78350f;">📄 Cấp LẺ</b> (file-grant, không inherit):<br>' +
+            html += '<div><b style="color:#78350f;">📄 Cấp LẺ</b> (quyền lẻ, không kế thừa):<br>' +
                 '<span style="color:#475569;">' + fparts.join(' · ') + '</span></div>';
         }
         $sum.innerHTML = html;
@@ -815,7 +829,7 @@ function wireGroupPicker(getSelected) {
             '<span class="gp-folder__name" title="' + escapeHtml(group.name) + '">' + escapeHtml(group.name) + '</span>' +
             '<span class="gp-row__count" data-cnt="' + k + '">…</span>' +
             (currentType === 1
-                ? '<label class="gp-rec" title="Auto-inherit cả descendants (cây con)">' +
+                ? '<label class="gp-rec" title="Tự kế thừa cả nhóm con (cấp dưới)">' +
                   '<input type="checkbox" class="gp-rec-cb"' + (recursive ? ' checked' : '') + ' /> R</label>'
                 : '') +
             '</div>';
@@ -824,9 +838,9 @@ function wireGroupPicker(getSelected) {
         if (expanded) {
             var files = folderFilesCache[k];
             if (!files) {
-                html += '<div class="gp-files-loading">⏳ Đang tải files...</div>';
+                html += '<div class="gp-files-loading">⏳ Đang tải nội dung...</div>';
             } else if (files.length === 0) {
-                html += '<div class="gp-files"><div class="gp-row__hint">(Nhóm trống — không có content trực tiếp)</div></div>';
+                html += '<div class="gp-files"><div class="gp-row__hint">(Nhóm trống — không có nội dung trực tiếp)</div></div>';
             } else {
                 html += '<div class="gp-files">';
                 html += files.map(function (f) {
@@ -842,7 +856,7 @@ function wireGroupPicker(getSelected) {
                         '<span class="gp-row__icon">📄</span>' +
                         '<span class="gp-file__name" title="' + escapeHtml(f.title || '') + '">' +
                             escapeHtml(f.title || '(không tiêu đề)') + '</span>' +
-                        (coveredByFolder ? '<small style="color:#16a34a;flex-shrink:0;">✓ qua folder</small>' : '') +
+                        (coveredByFolder ? '<small style="color:#16a34a;flex-shrink:0;">✓ qua nhóm</small>' : '') +
                         '</div>';
                 }).join('');
                 html += '</div>';
@@ -1016,32 +1030,49 @@ function runPreview(payload, onResult) {
 }
 
 function renderPreview(p) {
-    if (!p) return '<div class="pm-fld__hint">Chưa đủ thông tin để preview.</div>';
+    if (!p) return '<div class="pm-fld__hint">Chưa đủ thông tin để xem trước.</div>';
     if (p.error) return '<div class="pm-warn">⚠ ' + escapeHtml(p.error) + '</div>';
 
-    // Breakdown content type nếu có nhiều loại
-    var typeBreak = [];
-    if (p.projectCount > 0) typeBreak.push(fmt(p.projectCount) + ' Project');
-    if (p.virtualCount > 0) typeBreak.push(fmt(p.virtualCount) + ' Virtual');
-    if (p.videoCount > 0) typeBreak.push(fmt(p.videoCount) + ' Video');
-    var contentDesc = typeBreak.length > 0 ? ' (' + typeBreak.join(' + ') + ')' : '';
+    // Đơn vị cấp = NHÓM (group-grant auto-inherit) + LẺ (file-grant per-content).
+    // Phải đếm cùng đơn vị với action Grant, nếu không số ở Preview sẽ lệch số ở thông báo.
+    var unitParts = [];
+    if (p.groupCount > 0) {
+        var gByType = [];
+        if (p.groupProjectCount > 0) gByType.push(p.groupProjectCount + ' Project');
+        if (p.groupVirtualCount > 0) gByType.push(p.groupVirtualCount + ' Virtual');
+        if (p.groupVideoCount > 0) gByType.push(p.groupVideoCount + ' Video');
+        unitParts.push(fmt(p.groupCount) + ' nhóm' + (gByType.length ? ' (' + gByType.join(' + ') + ')' : ''));
+    }
+    if (p.itemCount > 0) {
+        var iByType = [];
+        if (p.fileProjectCount > 0) iByType.push(p.fileProjectCount + ' Project');
+        if (p.fileVirtualCount > 0) iByType.push(p.fileVirtualCount + ' Virtual');
+        if (p.fileVideoCount > 0) iByType.push(p.fileVideoCount + ' Video');
+        unitParts.push(fmt(p.itemCount) + ' nội dung lẻ' + (iByType.length ? ' (' + iByType.join(' + ') + ')' : ''));
+    }
+    var unitDesc = unitParts.join(' + ');
 
     var html = '<div class="pm-preview">' +
-        '<div class="pm-preview__title">Preview — kết quả sẽ xảy ra khi bấm "Cấp"</div>' +
+        '<div class="pm-preview__title">Xem trước — kết quả sẽ xảy ra khi bấm "Cấp"</div>' +
 
-        // Phép tính rõ ràng: U user × C content = T quyền
+        // Phép tính rõ ràng: U user × (nhóm + lẻ) = T quyền sẽ được kiểm tra
         '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:#0f172a;">' +
-            '<b>' + fmt(p.userCount) + '</b> user × <b>' + fmt(p.contentCount) + '</b> content' + escapeHtml(contentDesc) +
+            '<b>' + fmt(p.userCount) + '</b> người dùng × <b>' + fmt(p.unitCount) + '</b> mục' +
+            (unitDesc ? ' [' + escapeHtml(unitDesc) + ']' : '') +
             ' = <b style="color:#2563eb;">' + fmt(p.total) + ' quyền</b> sẽ được kiểm tra' +
+            (p.groupContentCount > 0
+                ? '<div style="margin-top:6px;font-size:12px;color:#16a34a;">📂 ' + fmt(p.groupCount) +
+                  ' nhóm sẽ tự động phủ ~<b>' + fmt(p.groupContentCount) + '</b> nội dung (tự kế thừa).</div>'
+                : '') +
         '</div>' +
 
-        // Breakdown: đã có / sẽ cấp mới
+        // Breakdown: đã có / sẽ cấp mới (đơn vị nhóm/lẻ, khớp với thông báo sau khi cấp)
         '<div class="pm-preview__nums">' +
-            '<div class="pm-preview__num pm-preview__num--exist" title="Cặp (user, content) đã có trong DB - sẽ giữ nguyên, không cấp lại">' +
+            '<div class="pm-preview__num pm-preview__num--exist" title="Mục (người dùng × nhóm/nội dung) đã có sẵn - sẽ giữ nguyên, không cấp lại">' +
                 '<div class="pm-preview__num__n">' + fmt(p.existing) + '</div>' +
                 '<div class="pm-preview__num__lbl">⊘ Đã có (giữ nguyên)</div>' +
             '</div>' +
-            '<div class="pm-preview__num pm-preview__num--new" title="Cặp (user, content) chưa có - sẽ tạo mới trong AuthorizationUSER/Vitual/Video">' +
+            '<div class="pm-preview__num pm-preview__num--new" title="Mục (người dùng × nhóm/nội dung) chưa có - sẽ tạo mới">' +
                 '<div class="pm-preview__num__n">' + fmt(p.notExisting) + '</div>' +
                 '<div class="pm-preview__num__lbl">+ Cần cấp mới</div>' +
             '</div>' +
@@ -1056,7 +1087,7 @@ function renderPreview(p) {
         // Note: existing = 0
         (p.existing === 0 && p.total > 0
             ? '<div style="margin-top:10px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:12px;color:#1d4ed8;">' +
-              'ℹ Toàn bộ ' + fmt(p.total) + ' quyền sẽ được cấp mới (chưa user nào trong danh sách có quyền với content này).' +
+              'ℹ Toàn bộ ' + fmt(p.total) + ' quyền sẽ được cấp mới (chưa người dùng nào trong danh sách có quyền với nội dung này).' +
               '</div>'
             : '');
 
@@ -1075,18 +1106,18 @@ $('#pm-act-user').addEventListener('click', function () {
 
     var body =
         '<div class="pm-fld">' +
-            '<label class="pm-fld__lbl">① Tìm user</label>' +
+            '<label class="pm-fld__lbl">① Tìm người dùng</label>' +
             '<input type="text" id="u1-q" placeholder="Gõ tên hoặc mã NV..." />' +
             '<div class="pm-pick" id="u1-list" style="display:none;"></div>' +
             '<div id="u1-picked" style="margin-top:8px;"></div>' +
         '</div>' +
         '<div id="u1-step2" style="display:none;">' +
-            '<label class="pm-fld__lbl">② Chọn nhóm nội dung (cấp ở mức NHÓM, server tự expand thành content trong nhóm)</label>' +
+            '<label class="pm-fld__lbl">② Chọn nhóm nội dung (cấp ở mức NHÓM, hệ thống tự mở rộng thành nội dung trong nhóm)</label>' +
             buildGroupPickerHtml() +
         '</div>' +
         '<div id="u1-preview"></div>';
 
-    openModal('👤 Cấp quyền cho 1 user', body, 'Cấp 0 quyền mới', function () {
+    openModal('👤 Cấp quyền cho 1 người dùng', body, 'Cấp 0 quyền mới', function () {
         var c = buildGrantContent(groupSel);
         execGrant({ UserIds: [pickedUser.id], Groups: c.Groups, Items: c.Items });
     });
@@ -1198,7 +1229,7 @@ $('#pm-act-dept').addEventListener('click', function () {
         api('Users?limit=2000&phongBanId=' + v).then(function (rows) {
             deptUsers = rows || [];
             if (deptUsers.length === 0) {
-                $('#d1-info').innerHTML = '<div class="pm-warn">⚠ Phòng <b>' + escapeHtml(name) + '</b> không có NV active. Chọn phòng khác.</div>';
+                $('#d1-info').innerHTML = '<div class="pm-warn">⚠ Phòng <b>' + escapeHtml(name) + '</b> không có NV đang làm việc. Chọn phòng khác.</div>';
                 $('#d1-step2').style.display = 'none';
                 return;
             }
@@ -1219,20 +1250,20 @@ $('#pm-act-copy').addEventListener('click', function () {
 
     var body =
         '<div class="pm-fld">' +
-            '<label class="pm-fld__lbl">① User <b>nguồn</b> (sẽ copy quyền của user này)</label>' +
+            '<label class="pm-fld__lbl">① Người dùng <b>nguồn</b> (sẽ sao chép quyền của người dùng này)</label>' +
             '<input type="text" id="c1-src" placeholder="Tên hoặc mã NV..." />' +
             '<div class="pm-pick" id="c1-src-list" style="display:none;"></div>' +
             '<div id="c1-src-info" style="margin-top:8px;"></div>' +
         '</div>' +
         '<div id="c1-step2" style="display:none;">' +
-            '<label class="pm-fld__lbl">② User <b>đích</b> (1 hoặc nhiều, sẽ nhận cùng quyền)</label>' +
-            '<input type="text" id="c1-tgt" placeholder="Gõ tên / MaNV để thêm..." />' +
+            '<label class="pm-fld__lbl">② Người dùng <b>đích</b> (1 hoặc nhiều, sẽ nhận cùng quyền)</label>' +
+            '<input type="text" id="c1-tgt" placeholder="Gõ tên / mã NV để thêm..." />' +
             '<div class="pm-pick" id="c1-tgt-list" style="display:none;"></div>' +
             '<div id="c1-tgt-chips" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>' +
         '</div>' +
         '<div id="c1-preview"></div>';
 
-    openModal('📋 Copy quyền từ user khác', body, 'Cấp 0 quyền mới', function () {
+    openModal('📋 Sao chép quyền từ người dùng khác', body, 'Cấp 0 quyền mới', function () {
         execGrant({
             UserIds: Array.from(targetUsers.keys()),
             Items: copyItems.map(function (it) { return { Type: it.type, Id: it.id }; })
@@ -1292,17 +1323,17 @@ $('#pm-act-copy').addEventListener('click', function () {
         sourceUser = u;
         $('#c1-src').value = '';
         $('#c1-src-list').style.display = 'none';
-        $('#c1-src-info').innerHTML = '<div class="pm-loading">Đang lấy quyền user nguồn...</div>';
+        $('#c1-src-info').innerHTML = '<div class="pm-loading">Đang lấy quyền người dùng nguồn...</div>';
         api('CopyFromUser?userId=' + u.id).then(function (d) {
             if (!d.items || d.items.length === 0) {
-                $('#c1-src-info').innerHTML = '<div class="pm-warn">⚠ User <b>' + escapeHtml(u.hoTen) +
-                    '</b> chưa có quyền nội dung nào. Chọn user khác.</div>';
+                $('#c1-src-info').innerHTML = '<div class="pm-warn">⚠ Người dùng <b>' + escapeHtml(u.hoTen) +
+                    '</b> chưa có quyền nội dung nào. Chọn người dùng khác.</div>';
                 return;
             }
             copyItems = d.items;
             $('#c1-src-info').innerHTML = '<div style="background:#dcfce7;padding:8px 12px;border-radius:6px;font-size:13px;">' +
                 '✓ <b>' + escapeHtml(u.hoTen) + '</b> có <b>' + d.items.length + '</b> quyền (Project/Virtual/Video). ' +
-                'Sẽ copy y hệt cho user(s) đích bên dưới.</div>';
+                'Sẽ sao chép y hệt cho (các) người dùng đích bên dưới.</div>';
             $('#c1-step2').style.display = 'block';
             updatePreview();
         });
@@ -1320,7 +1351,7 @@ $('#pm-act-copy').addEventListener('click', function () {
         });
     }
     searchAndShowList($('#c1-tgt'), $('#c1-tgt-list'), function (u) {
-        if (sourceUser && u.id === sourceUser.id) { alert('Không copy cho chính user nguồn'); return; }
+        if (sourceUser && u.id === sourceUser.id) { alert('Không sao chép cho chính người dùng nguồn'); return; }
         targetUsers.set(u.id, u);
         $('#c1-tgt').value = '';
         $('#c1-tgt-list').style.display = 'none';
@@ -1337,10 +1368,10 @@ $('#pm-act-paste').addEventListener('click', function () {
 
     var body =
         '<div class="pm-fld">' +
-            '<label class="pm-fld__lbl">① Paste danh sách MaNV</label>' +
+            '<label class="pm-fld__lbl">① Dán danh sách mã NV</label>' +
             '<textarea id="p1-input" placeholder="HPDQ001\nHPDQ002\n..."></textarea>' +
-            '<div class="pm-fld__hint">Copy cột MaNV từ Excel paste vào đây. Mã không tìm thấy sẽ được liệt kê.</div>' +
-            '<button type="button" class="pm-btn pm-btn--ghost" id="p1-resolve" style="margin-top:8px;">🔍 Kiểm tra MaNV</button>' +
+            '<div class="pm-fld__hint">Sao chép cột mã NV từ Excel dán vào đây. Mã không tìm thấy sẽ được liệt kê.</div>' +
+            '<button type="button" class="pm-btn pm-btn--ghost" id="p1-resolve" style="margin-top:8px;">🔍 Kiểm tra mã NV</button>' +
             '<div id="p1-result"></div>' +
         '</div>' +
         '<div id="p1-step2" style="display:none;">' +
@@ -1349,7 +1380,7 @@ $('#pm-act-paste').addEventListener('click', function () {
         '</div>' +
         '<div id="p1-preview"></div>';
 
-    openModal('📎 Paste MaNV (Excel-style)', body, 'Cấp 0 quyền mới', function () {
+    openModal('📎 Dán mã NV (kiểu Excel)', body, 'Cấp 0 quyền mới', function () {
         var c = buildGrantContent(groupSel);
         execGrant({
             UserIds: matchedUsers.map(function (u) { return u.id; }),
@@ -1374,8 +1405,8 @@ $('#pm-act-paste').addEventListener('click', function () {
     $('#p1-resolve').addEventListener('click', function () {
         var raw = $('#p1-input').value;
         var manvs = raw.split(/[\s,;\r\n]+/).filter(function (s) { return s.trim(); });
-        if (manvs.length === 0) { alert('Chưa paste mã nào'); return; }
-        $('#p1-result').innerHTML = '<div class="pm-loading">Đang resolve...</div>';
+        if (manvs.length === 0) { alert('Chưa dán mã nào'); return; }
+        $('#p1-result').innerHTML = '<div class="pm-loading">Đang kiểm tra...</div>';
         jsonPost('ResolveMaNV', { MaNVs: manvs }).then(function (d) {
             matchedUsers = d.matched || [];
             var html = '';
@@ -1411,7 +1442,7 @@ function execGrant(payload) {
     $btn.disabled = true; $btn.textContent = 'Đang xử lý...';
     jsonPost('Grant', payload).then(function (d) {
         alert('✓ Đã cấp ' + d.created + ' quyền mới' +
-            (d.skipped > 0 ? '. Skip ' + d.skipped + ' đã tồn tại.' : '.'));
+            (d.skipped > 0 ? '. Bỏ qua ' + d.skipped + ' đã tồn tại.' : '.'));
         closeModal();
         loadTable();
     }).catch(function (err) {

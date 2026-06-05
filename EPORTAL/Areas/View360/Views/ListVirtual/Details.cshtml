@@ -85,11 +85,10 @@
 {
     <link href="~/Content/view360-chatbot-admin.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
 }
-@* Leaflet for real-GPS minimap with satellite tiles *@
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+@* Leaflet for real-GPS minimap with satellite tiles. Self-host (~/Content/leaflet) thay vi unpkg CDN
+   de prod khong phu thuoc internet ben ngoai (corporate firewall co the chan unpkg). *@
+<link rel="stylesheet" href="~/Content/leaflet/leaflet.css" />
+<script src="~/Content/leaflet/leaflet.js"></script>
 
 <div class="app-main__outer v360-app-outer">
     <div class="app-main__inner v360-app-inner" style="padding:0;">

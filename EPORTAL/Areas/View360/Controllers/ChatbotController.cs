@@ -62,6 +62,24 @@ namespace EPORTAL.Areas.View360.Controllers
             return false;
         }
 
+        // Tran TOKEN/NGAY (reset 0h gio server) - chong dot quota OpenAI khi treo/loi/abuse.
+        // Tong token lay tu bang log (song sot qua IIS recycle, khac MemoryCache theo gio).
+        //   Chatbot.DailyTokensPerUser  : tran moi user/ngay (mac dinh 1.000.000; <=0 = tat).
+        //   Chatbot.DailyTokensGlobal   : tran toan he thong/ngay (mac dinh 0 = tat).
+        // Tra ve thong bao loi neu vuot, null neu con han muc. Soft-cap: cau lam vuot nguong van chay xong.
+        private static string CheckDailyTokenCap(int userId)
+        {
+            long perUser = ChatbotConfig.GetLong("CHATBOT_DAILY_TOKENS_PER_USER", "Chatbot.DailyTokensPerUser", 1000000L);
+            if (perUser > 0 && userId > 0 && ChatbotContentStore.SumTokensToday(userId) >= perUser)
+                return "Bạn đã dùng hết hạn mức trò chuyện AI trong ngày. Vui lòng thử lại vào ngày mai.";
+
+            long global = ChatbotConfig.GetLong("CHATBOT_DAILY_TOKENS_GLOBAL", "Chatbot.DailyTokensGlobal", 0L);
+            if (global > 0 && ChatbotContentStore.SumTokensToday(null) >= global)
+                return "Hệ thống đã đạt giới hạn sử dụng AI trong ngày. Vui lòng thử lại sau.";
+
+            return null;
+        }
+
         // ===== Cache layer for tour info / scene info (5 min) =====
         // Giam DB load khi co nhieu user hoi cung 1 tour.
         private static T GetCached<T>(string key, Func<T> loader) where T : class
@@ -207,8 +225,7 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!Request.IsAuthenticated) return new HttpUnauthorizedResult();
 
             // Rate limit: voice session dat ~$0.06/phut, mac dinh cap 10/h/user.
-            var rtLimit = int.TryParse(ConfigurationManager.AppSettings["Chatbot.RealtimeSessionsPerHour"] ?? "10",
-                                       out var rl) ? rl : 10;
+            var rtLimit = ChatbotConfig.GetInt("CHATBOT_REALTIME_SESSIONS_PER_HOUR", "Chatbot.RealtimeSessionsPerHour", 10);
             if (IsRateLimited("realtime", MyAuthentication.ID, rtLimit))
                 return Json(new { ok = false, error = "Đã đạt giới hạn " + rtLimit + " phiên thoại/giờ. Vui lòng thử lại sau." });
 
@@ -243,9 +260,9 @@ namespace EPORTAL.Areas.View360.Controllers
             if (string.IsNullOrEmpty(apiKey))
                 return Json(new { ok = false, error = "OPENAI_API_KEY chua duoc cau hinh" });
 
-            var model = ConfigurationManager.AppSettings["Chatbot.RealtimeModel"] ?? "gpt-realtime-2";
-            var voice = ConfigurationManager.AppSettings["Chatbot.RealtimeVoice"] ?? "nova";
-            var vadType = ConfigurationManager.AppSettings["Chatbot.RealtimeVAD"] ?? "semantic_vad";
+            var model = ChatbotConfig.Get("CHATBOT_REALTIME_MODEL", "Chatbot.RealtimeModel", "gpt-realtime-2");
+            var voice = ChatbotConfig.Get("CHATBOT_REALTIME_VOICE", "Chatbot.RealtimeVoice", "nova");
+            var vadType = ChatbotConfig.Get("CHATBOT_REALTIME_VAD", "Chatbot.RealtimeVAD", "semantic_vad");
 
             // Endpoint MOI cho gpt-realtime-2: /v1/realtime/client_secrets voi nested session payload.
             // Endpoint cu /v1/realtime/sessions chi work voi gpt-4o-realtime-preview.
@@ -363,11 +380,17 @@ namespace EPORTAL.Areas.View360.Controllers
         {
             if (!Request.IsAuthenticated) return new HttpUnauthorizedResult();
 
-            // Rate limit: VBee TTS bill per-char, mac dinh cap 60 TTS calls/h/user.
-            var ttsLimit = int.TryParse(ConfigurationManager.AppSettings["Chatbot.TtsCallsPerHour"] ?? "60",
-                                        out var tl) ? tl : 60;
+            // Rate limit: VBee TTS bill per-CHAR (khong phai per-call), nen pipeline tach cau
+            // (nhieu call/cau tra loi, tong ky tu khong doi) khong tang chi phi. Cap theo SO CALL
+            // de chong abuse -> default cao (600/h) vi moi cau tra loi = nhieu call ngan.
+            var ttsLimit = ChatbotConfig.GetInt("CHATBOT_TTS_CALLS_PER_HOUR", "Chatbot.TtsCallsPerHour", 600);
             if (IsRateLimited("tts", MyAuthentication.ID, ttsLimit))
                 return new HttpStatusCodeResult(429, "Đã đạt giới hạn " + ttsLimit + " TTS/giờ");
+
+            // Tran NGAY (DB counter -> song sot qua IIS recycle). <=0 = tat.
+            var ttsDaily = ChatbotConfig.GetInt("CHATBOT_DAILY_TTS_CALLS_PER_USER", "Chatbot.DailyTtsCallsPerUser", 3000);
+            if (ttsDaily > 0 && ChatbotContentStore.GetDailyUsageCalls(MyAuthentication.ID, "tts") >= ttsDaily)
+                return new HttpStatusCodeResult(429, "Đã đạt giới hạn đọc (TTS) trong ngày");
 
             string raw;
             using (var reader = new System.IO.StreamReader(Request.InputStream))
@@ -387,9 +410,9 @@ namespace EPORTAL.Areas.View360.Controllers
                 return new HttpStatusCodeResult(500);
             }
 
-            var voiceCode = ConfigurationManager.AppSettings["Chatbot.VbeeVoice"]
+            var voiceCode = GetChatbotCfg("CHATBOT_VBEE_VOICE", "Chatbot.VbeeVoice")
                          ?? "hn_female_ngochuyen_full_48k-fhg";   // Ngoc Huyen - flagship nu Bac
-            var speedStr  = ConfigurationManager.AppSettings["Chatbot.VbeeSpeed"] ?? "1.0";
+            var speedStr  = GetChatbotCfg("CHATBOT_VBEE_SPEED", "Chatbot.VbeeSpeed") ?? "1.0";
             double speed  = double.TryParse(speedStr, System.Globalization.NumberStyles.Float,
                                             System.Globalization.CultureInfo.InvariantCulture, out var sp) ? sp : 1.0;
 
@@ -399,6 +422,9 @@ namespace EPORTAL.Areas.View360.Controllers
                 System.Diagnostics.Debug.WriteLine("[Speak/VBee] truncate textLen=" + text.Length + " max=" + maxChars + " voice=" + voiceCode);
                 text = text.Substring(0, maxChars);
             }
+
+            // Dem usage TTS theo ngay (call +1, units = so ky tu thuc gui VBee).
+            ChatbotContentStore.IncrementDailyUsage(MyAuthentication.ID, "tts", text.Length);
 
             var payload = new JObject {
                 ["text"]         = text,
@@ -475,12 +501,18 @@ namespace EPORTAL.Areas.View360.Controllers
                 && voiceCode.EndsWith("-phg", StringComparison.OrdinalIgnoreCase);
         }
 
+        // Doc config chatbot theo thu tu uu tien: .env (Environment) -> Web.config AppSettings -> null.
+        // Cho phep gom config VBee (giong/toc do/gioi han ky tu) vao .env cung VBEE_API_TOKEN.
+        private static string GetChatbotCfg(string envKey, string appSettingsKey)
+            => ChatbotConfig.Get(envKey, appSettingsKey, null);
+
         private static int GetVbeeTtsMaxChars(string voiceCode)
         {
             var isAsyncVoice = ShouldUseAsyncTtsFirst(voiceCode);
-            var key = isAsyncVoice ? "Chatbot.VbeeAsyncMaxChars" : "Chatbot.VbeeSyncMaxChars";
+            var envKey = isAsyncVoice ? "CHATBOT_VBEE_ASYNC_MAX_CHARS" : "CHATBOT_VBEE_SYNC_MAX_CHARS";
+            var appKey = isAsyncVoice ? "Chatbot.VbeeAsyncMaxChars" : "Chatbot.VbeeSyncMaxChars";
             var fallback = isAsyncVoice ? 4000 : 300;
-            var maxStr = ConfigurationManager.AppSettings[key];
+            var maxStr = GetChatbotCfg(envKey, appKey);
             int maxChars;
             if (!int.TryParse(maxStr, out maxChars)) maxChars = fallback;
 
@@ -528,9 +560,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     + JsonConvert.SerializeObject(respBody) + "}", "application/json");
             }
 
-            var maxPollSecondsStr = ConfigurationManager.AppSettings["Chatbot.VbeeAsyncPollSeconds"] ?? "60";
-            int maxPollSeconds;
-            if (!int.TryParse(maxPollSecondsStr, out maxPollSeconds)) maxPollSeconds = 60;
+            int maxPollSeconds = ChatbotConfig.GetInt("CHATBOT_VBEE_ASYNC_POLL_SECONDS", "Chatbot.VbeeAsyncPollSeconds", 60);
             maxPollSeconds = Math.Max(15, Math.Min(120, maxPollSeconds));
 
             var deadline = DateTime.UtcNow.AddSeconds(maxPollSeconds);
@@ -625,16 +655,26 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!Request.IsAuthenticated) return new HttpUnauthorizedResult();
 
             // Rate limit: VBee STT bill per-second, mac dinh cap 60 STT calls/h/user.
-            var sttLimit = int.TryParse(ConfigurationManager.AppSettings["Chatbot.SttCallsPerHour"] ?? "60",
-                                        out var sl) ? sl : 60;
+            var sttLimit = ChatbotConfig.GetInt("CHATBOT_STT_CALLS_PER_HOUR", "Chatbot.SttCallsPerHour", 60);
             if (IsRateLimited("stt", MyAuthentication.ID, sttLimit))
-                return Json(new { ok = false, error = "Đã đạt giới hạn " + sttLimit + " STT/giờ" });
+                return Json(new { ok = false, limited = true, error = "Đã đạt giới hạn " + sttLimit + " lượt nói/giờ. Vui lòng thử lại sau." });
+
+            // Tran NGAY (DB counter -> song sot qua IIS recycle). <=0 = tat.
+            var sttDaily = ChatbotConfig.GetInt("CHATBOT_DAILY_STT_CALLS_PER_USER", "Chatbot.DailySttCallsPerUser", 300);
+            if (sttDaily > 0 && ChatbotContentStore.GetDailyUsageCalls(MyAuthentication.ID, "stt") >= sttDaily)
+                return Json(new { ok = false, limited = true, error = "Đã đạt giới hạn nhận giọng nói trong ngày. Vui lòng thử lại vào ngày mai." });
 
             var file = Request.Files["audio"];
             if (file == null || file.ContentLength == 0)
                 return Json(new { ok = false, error = "Khong co audio" });
             if (file.ContentLength > MAX_AUDIO_BYTES)
                 return Json(new { ok = false, error = "File qua lon (>10MB)" });
+
+            // Dem usage STT theo ngay (call +1, units = giay audio neu client gui).
+            double sttDur;
+            double.TryParse(Request.Form["clientDurationSeconds"], System.Globalization.NumberStyles.Float,
+                            System.Globalization.CultureInfo.InvariantCulture, out sttDur);
+            ChatbotContentStore.IncrementDailyUsage(MyAuthentication.ID, "stt", (long)Math.Ceiling(sttDur));
 
             var vbeeToken = Environment.GetEnvironmentVariable("VBEE_API_TOKEN");
             var vbeeAppId = Environment.GetEnvironmentVariable("VBEE_ID_APP");
@@ -800,7 +840,7 @@ namespace EPORTAL.Areas.View360.Controllers
 
         private bool IsSttDebugSaveEnabled()
         {
-            var setting = ConfigurationManager.AppSettings["Chatbot.SttDebugSaveAudio"];
+            var setting = ChatbotConfig.Get("CHATBOT_STT_DEBUG_SAVE_AUDIO", "Chatbot.SttDebugSaveAudio", null);
             return string.Equals(setting, "true", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(Request.Form["saveSttDebug"], "1", StringComparison.OrdinalIgnoreCase);
         }
@@ -862,9 +902,7 @@ namespace EPORTAL.Areas.View360.Controllers
 
         private static void CleanupSttDebugAudio(string dir)
         {
-            var hoursStr = ConfigurationManager.AppSettings["Chatbot.SttDebugMaxAgeHours"];
-            int hours;
-            if (!int.TryParse(hoursStr, out hours)) hours = 48;
+            int hours = ChatbotConfig.GetInt("CHATBOT_STT_DEBUG_MAX_AGE_HOURS", "Chatbot.SttDebugMaxAgeHours", 48);
             if (hours <= 0) return;
 
             var cutoff = DateTime.UtcNow.AddHours(-hours);
@@ -910,6 +948,8 @@ namespace EPORTAL.Areas.View360.Controllers
             sb.AppendLine("Khi user nói muốn đi tới điểm khác (vd 'đưa tôi tới cảng', 'chuyển sang khu A', 'qua phòng họp'):");
             sb.AppendLine("- GỌI function `navigate_to_scene` với `query` = từ khoá user dùng (vd 'cảng', 'khu A').");
             sb.AppendLine("- Đồng thời nói 1 câu ngắn xác nhận như 'Đang đưa bạn tới cảng'.");
+            sb.AppendLine("KHÔNG navigate khi user chỉ HỎI THÔNG TIN (vd 'cảng có đặc điểm gì', 'giới thiệu về cảng', 'cảng có gì'):");
+            sb.AppendLine("- Đây là câu hỏi thông tin → TRẢ LỜI bằng lời, KHÔNG gọi navigate_to_scene. Nhắc tên điểm KHÔNG phải ý định di chuyển.");
             sb.AppendLine();
             if (!string.IsNullOrEmpty(tourInfo?.Overview))
             {
@@ -1003,11 +1043,15 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!Guid.TryParse(sessionGuidStr, out sessionGuid)) sessionGuid = Guid.NewGuid();
 
             // Rate limit
-            var rateLimitStr = ConfigurationManager.AppSettings["Chatbot.RateLimitPerHour"] ?? "60";
-            int rateLimit = int.TryParse(rateLimitStr, out var rl) ? rl : 60;
+            int rateLimit = ChatbotConfig.GetInt("CHATBOT_RATE_LIMIT_PER_HOUR", "Chatbot.RateLimitPerHour", 60);
             int recent = ChatbotContentStore.CountRecentUserMessages(MyAuthentication.ID, 60);
             if (recent >= rateLimit)
             { writeEvent("error", new { error = "Đã đạt giới hạn " + rateLimit + " câu/giờ. Vui lòng thử lại sau." }); resp.End(); return; }
+
+            // Tran token/ngay (chong dot quota OpenAI khi treo/loi/abuse)
+            var dailyCapMsg = CheckDailyTokenCap(MyAuthentication.ID);
+            if (dailyCapMsg != null)
+            { writeEvent("error", new { error = dailyCapMsg }); resp.End(); return; }
 
             // Load tour info
             var tourInfo = GetCached("chatbot_tour_" + collectionId,
@@ -1024,7 +1068,11 @@ namespace EPORTAL.Areas.View360.Controllers
                 .Where(kv => !string.IsNullOrEmpty(kv.Value.CustomTitle))
                 .ToDictionary(kv => kv.Key, kv => kv.Value.CustomTitle);
 
-            var sysPrompt = BuildSystemPrompt(tourInfo, sceneInfo, allScenes, customTitles, sceneUuid);
+            // Danh sach diem da cau hinh -> enum cho tool + render trong prompt + map ten->uuid.
+            var navList = BuildNavList(allScenes, sceneInfo, customTitles, sceneUuid);
+            var navMap  = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var nv in navList) navMap[nv.Label] = nv.Uuid;
+            var sysPrompt = BuildSystemPrompt(tourInfo, sceneInfo, allScenes, customTitles, sceneUuid, navList);
 
             var history = new List<ChatTurn>();
             if (historyArr != null)
@@ -1057,7 +1105,8 @@ namespace EPORTAL.Areas.View360.Controllers
             await client.StreamAsync(new ChatbotRequest {
                 SystemPrompt = sysPrompt,
                 History      = history,
-                UserMessage  = message
+                UserMessage  = message,
+                NavLabels    = navList.Select(x => x.Label).ToList()
             },
             onTextDelta: delta => {
                 fullText.Append(delta);
@@ -1094,16 +1143,28 @@ namespace EPORTAL.Areas.View360.Controllers
                 try
                 {
                     var args = JObject.Parse(argsJson ?? "{}");
-                    var query = (string)args["query"];
+                    // Tool moi: `scene` = ten chinh xac tu enum. Fallback `query` (tool cu).
+                    var scene = (string)args["scene"] ?? (string)args["query"];
                     var reason = (string)args["reason"];
-                    if (string.IsNullOrEmpty(query)) return;
+                    if (string.IsNullOrEmpty(scene)) return;
 
-                    var match = FindSceneByQuery(query, allScenes, sceneInfo, customTitles, sceneUuid);
-                    if (match.uuid != null)
+                    // Uu tien lookup ten chinh xac -> uuid; neu lech thi FindSceneByQuery (fuzzy) lam luoi do.
+                    string mUuid, mName;
+                    if (navMap.TryGetValue(scene.Trim(), out var exactUuid))
+                    {
+                        mUuid = exactUuid; mName = scene.Trim();
+                    }
+                    else
+                    {
+                        var match = FindSceneByQuery(scene, allScenes, sceneInfo, customTitles, sceneUuid);
+                        mUuid = match.uuid; mName = match.name;
+                    }
+
+                    if (mUuid != null)
                     {
                         actionType   = "navigate";
-                        actionTarget = match.uuid;
-                        System.Diagnostics.Debug.WriteLine("[AskStream] match query '" + query + "' -> " + match.uuid + " (" + match.name + ")");
+                        actionTarget = mUuid;
+                        System.Diagnostics.Debug.WriteLine("[AskStream] navigate '" + scene + "' -> " + mUuid + " (" + mName + ")");
 
                         // Bubble text: dung reason; them ten thuc te neu khac
                         var bubbleText = reason ?? "Đang đưa bạn tới điểm đó.";
@@ -1116,7 +1177,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     else
                     {
                         // Khong tim thay scene - tra text fallback
-                        var notFound = "Tôi không tìm thấy điểm \"" + query + "\" trong tour. Bạn có thể thử tên khác hoặc chọn từ minimap.";
+                        var notFound = "Tôi không tìm thấy điểm \"" + scene + "\" trong tour. Bạn có thể thử tên khác hoặc chọn từ minimap.";
                         if (fullText.Length == 0)
                         {
                             fullText.Append(notFound);
@@ -1237,11 +1298,15 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!Guid.TryParse(sessionGuidStr, out sessionGuid)) sessionGuid = Guid.NewGuid();
 
             // Rate limit per user
-            var rateLimitStr = ConfigurationManager.AppSettings["Chatbot.RateLimitPerHour"] ?? "60";
-            int rateLimit = int.TryParse(rateLimitStr, out var rl) ? rl : 60;
+            int rateLimit = ChatbotConfig.GetInt("CHATBOT_RATE_LIMIT_PER_HOUR", "Chatbot.RateLimitPerHour", 60);
             int recent = ChatbotContentStore.CountRecentUserMessages(MyAuthentication.ID, 60);
             if (recent >= rateLimit)
                 return Json(new { ok = false, error = "Đã đạt giới hạn " + rateLimit + " câu/giờ. Vui lòng thử lại sau." });
+
+            // Tran token/ngay (chong dot quota OpenAI)
+            var dailyCapMsg = CheckDailyTokenCap(MyAuthentication.ID);
+            if (dailyCapMsg != null)
+                return Json(new { ok = false, error = dailyCapMsg });
 
             // Load tour info + scene info (cached 5min)
             var tourInfo = GetCached("chatbot_tour_" + collectionId,
@@ -1260,8 +1325,13 @@ namespace EPORTAL.Areas.View360.Controllers
                 .Where(kv => !string.IsNullOrEmpty(kv.Value.CustomTitle))
                 .ToDictionary(kv => kv.Key, kv => kv.Value.CustomTitle);
 
+            // Danh sach diem da cau hinh -> enum tool + render prompt + map ten->uuid.
+            var navList = BuildNavList(allScenes, sceneInfo, customTitles, sceneUuid);
+            var navMap  = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var nv in navList) navMap[nv.Label] = nv.Uuid;
+
             // Build system prompt
-            var sysPrompt = BuildSystemPrompt(tourInfo, sceneInfo, allScenes, customTitles, sceneUuid);
+            var sysPrompt = BuildSystemPrompt(tourInfo, sceneInfo, allScenes, customTitles, sceneUuid, navList);
 
             // Build history
             var history = new List<ChatTurn>();
@@ -1283,7 +1353,8 @@ namespace EPORTAL.Areas.View360.Controllers
             var reply = await client.SendAsync(new ChatbotRequest {
                 SystemPrompt = sysPrompt,
                 History      = history,
-                UserMessage  = message
+                UserMessage  = message,
+                NavLabels    = navList.Select(x => x.Label).ToList()
             });
             sw.Stop();
 
@@ -1315,13 +1386,21 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!reply.Ok)
                 return Json(new { ok = false, error = reply.Error ?? "AI provider error" });
 
-            // Resolve query -> uuid + name (FindSceneByQuery: fuzzy match server-side).
+            // Resolve ten -> uuid: uu tien lookup ten chinh xac (tu enum), fallback FindSceneByQuery.
             string actionTarget = null, actionName = null;
             if (reply.ActionType == "navigate" && !string.IsNullOrEmpty(reply.ActionTarget))
             {
-                var matched = FindSceneByQuery(reply.ActionTarget, allScenes, sceneInfo, customTitles, sceneUuid);
-                actionTarget = matched.uuid;
-                actionName = matched.name;
+                if (navMap.TryGetValue(reply.ActionTarget.Trim(), out var exactUuid))
+                {
+                    actionTarget = exactUuid;
+                    actionName = reply.ActionTarget.Trim();
+                }
+                else
+                {
+                    var matched = FindSceneByQuery(reply.ActionTarget, allScenes, sceneInfo, customTitles, sceneUuid);
+                    actionTarget = matched.uuid;
+                    actionName = matched.name;
+                }
                 if (actionTarget == null)
                 {
                     // Khong tim thay -> reply text fallback, khong navigate
@@ -1357,9 +1436,33 @@ namespace EPORTAL.Areas.View360.Controllers
                 var uc = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch);
                 if (uc != System.Globalization.UnicodeCategory.NonSpacingMark) sb.Append(ch);
             }
-            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC)
+            var result = sb.ToString().Normalize(System.Text.NormalizationForm.FormC)
                      .ToLowerInvariant()
                      .Replace('đ', 'd');
+            // Gop khoang trang thua (space doi, tab, newline, nbsp) -> 1 space + trim.
+            // Tranh truong hop title "Cang  tong hop" khong khop query "cang tong hop".
+            return System.Text.RegularExpressions.Regex.Replace(result, @"\s+", " ").Trim();
+        }
+
+        /// <summary>True neu MOI tu trong tokens deu khop NGUYEN MOT TU trong text
+        /// (text da normalize, cac tu cach nhau bang 1 space). Cho phep match cum nhieu tu
+        /// khong can lien nhau / dung thu tu (vd "cang tong hop" khop "cang ... tong hop"),
+        /// nhung KHONG match chuoi con giua tu (tranh "ho" lot vao "hop", "ca" lot vao "cang").
+        /// Chi ap dung khi query co >= 2 tu.</summary>
+        private static bool AllTokensContained(string[] tokens, string text)
+        {
+            if (tokens == null || tokens.Length < 2 || string.IsNullOrEmpty(text)) return false;
+            var words = text.Split(' ');
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                bool found = false;
+                for (int w = 0; w < words.Length; w++)
+                {
+                    if (words[w] == tokens[i]) { found = true; break; }
+                }
+                if (!found) return false;
+            }
+            return true;
         }
 
         /// <summary>Lay ten hien thi cho scene: CustomTitle (uu tien) > Kuula title.</summary>
@@ -1392,6 +1495,9 @@ namespace EPORTAL.Areas.View360.Controllers
             if (string.IsNullOrEmpty(query) || allScenes == null) return (null, null);
             var q = NormalizeForSearch(query.Trim());
             if (q.Length < 2) return (null, null);
+            // Tach tu de match "du tu khoa" khi cum lien khong khop (xem AllTokensContained).
+            var qTokens = q.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                           .Where(t => t.Length >= 2).ToArray();
 
             string bestUuid = null;
             string bestName = null;
@@ -1409,6 +1515,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     if (ctN == q) score = Math.Max(score, 200);                  // exact
                     else if (ctN.StartsWith(q)) score = Math.Max(score, 150);    // prefix
                     else if (ctN.Contains(q)) score = Math.Max(score, 120);      // substring
+                    else if (AllTokensContained(qTokens, ctN)) score = Math.Max(score, 110); // du tu khoa
                 }
                 // 2. ShortIntro
                 if (sceneInfo != null && sceneInfo.TryGetValue(s.Uuid, out var info) && info != null)
@@ -1417,6 +1524,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         var n = NormalizeForSearch(info.ShortIntro);
                         if (n.Contains(q)) score = Math.Max(score, 80);
+                        // KHONG token-match tren ShortIntro: la van xuoi dai -> de match bua.
                     }
                 }
                 // 3. Kuula title - thap nhat (thuong la filename xau)
@@ -1424,6 +1532,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     var tN = NormalizeForSearch(s.Title);
                     if (tN.Contains(q)) score = Math.Max(score, 30);
+                    else if (AllTokensContained(qTokens, tN)) score = Math.Max(score, 25);
                 }
 
                 if (score > bestScore)
@@ -1463,12 +1572,76 @@ namespace EPORTAL.Areas.View360.Controllers
             };
         }
 
+        /// <summary>1 diem dieu huong: ten hien thi (duy nhat) + uuid + noi dung.</summary>
+        private sealed class NavItem
+        {
+            public string Uuid { get; set; }
+            public string Label { get; set; }
+            public string ShortIntro { get; set; }
+            public string Detail { get; set; }
+        }
+
+        /// <summary>
+        /// Danh sach diem DA CAU HINH (co CustomTitle hoac co ShortIntro/DetailContent) de:
+        ///   - render "DANH SACH CAC DIEM" trong system prompt
+        ///   - lam enum `scene` cho tool navigate_to_scene (LLM chon dung 1 ten, khong bia)
+        ///   - map Label -> uuid khi resolve tool call (lookup thang, khong fuzzy)
+        /// Label duy nhat (trung thi them " (2)"), loai tru scene hien tai, uu tien co CustomTitle, cap 60.
+        /// </summary>
+        private static List<NavItem> BuildNavList(
+            List<KuulaCollectionFetcher.SceneInfo> allScenes,
+            Dictionary<string, ChatbotSceneInfo> sceneInfo,
+            Dictionary<string, string> customTitles,
+            string currentSceneUuid)
+        {
+            var list = new List<NavItem>();
+            if (allScenes == null) return list;
+            var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            Func<string, bool> hasName = uuid =>
+                customTitles != null && customTitles.TryGetValue(uuid, out var ct) && !string.IsNullOrEmpty(ct);
+            Func<string, ChatbotSceneInfo> infoOf = uuid =>
+                (sceneInfo != null && sceneInfo.TryGetValue(uuid, out var ci)) ? ci : null;
+            Func<string, bool> hasInfo = uuid =>
+            {
+                var ci = infoOf(uuid);
+                return ci != null && (!string.IsNullOrEmpty(ci.ShortIntro) || !string.IsNullOrEmpty(ci.DetailContent));
+            };
+
+            var ordered = allScenes
+                .Where(s => !string.IsNullOrEmpty(s.Uuid) && s.Uuid != currentSceneUuid)
+                .Where(s => hasName(s.Uuid) || hasInfo(s.Uuid))      // CHI diem da cau hinh
+                .OrderByDescending(s => hasName(s.Uuid) ? 1 : 0);
+
+            foreach (var s in ordered)
+            {
+                var baseLabel = (hasName(s.Uuid) ? customTitles[s.Uuid] : s.Title) ?? "Điểm";
+                baseLabel = baseLabel.Trim();
+                if (baseLabel.Length == 0) baseLabel = "Điểm";
+                var label = baseLabel;
+                int dup = 2;
+                while (used.Contains(label)) { label = baseLabel + " (" + dup + ")"; dup++; }
+                used.Add(label);
+
+                var info = infoOf(s.Uuid);
+                list.Add(new NavItem {
+                    Uuid = s.Uuid,
+                    Label = label,
+                    ShortIntro = info?.ShortIntro,
+                    Detail = info?.DetailContent
+                });
+                if (list.Count >= 60) break;
+            }
+            return list;
+        }
+
         private static string BuildSystemPrompt(
             ChatbotTourInfo tourInfo,
             Dictionary<string, ChatbotSceneInfo> sceneInfo,
             List<KuulaCollectionFetcher.SceneInfo> allScenes,
             Dictionary<string, string> customTitles,
-            string currentSceneUuid)
+            string currentSceneUuid,
+            List<NavItem> navList)
         {
             var sb = new System.Text.StringBuilder();
 
@@ -1478,20 +1651,28 @@ namespace EPORTAL.Areas.View360.Controllers
             // ==== NAVIGATION RULES - DAT LEN DAU + EMPHATIC ====
             sb.AppendLine("=== QUY TẮC #1 — NAVIGATION (QUAN TRỌNG NHẤT) ===");
             sb.AppendLine("Khi câu hỏi của user có Ý ĐỊNH DI CHUYỂN tới điểm/khu vực khác → BẮT BUỘC gọi function `navigate_to_scene` với:");
-            sb.AppendLine("  - `query`: TỪ KHOÁ TIẾNG VIỆT user dùng (vd 'cảng', 'khu A', 'phòng họp'). KHÔNG copy uuid. KHÔNG dịch sang tiếng Anh.");
-            sb.AppendLine("  - `reason`: câu xác nhận ngắn (vd 'Đang đưa bạn tới khu vực cảng.').");
-            sb.AppendLine("Server sẽ tự dùng query để match scene chính xác — bạn KHÔNG cần lo về uuid.");
+            sb.AppendLine("  - `scene`: TÊN CHÍNH XÁC của điểm đích — CHỌN ĐÚNG MỘT tên trong '=== DANH SÁCH CÁC ĐIỂM TRONG TOUR ===' bên dưới (chép NGUYÊN VĂN, KHÔNG tự chế tên mới, KHÔNG dịch).");
+            sb.AppendLine("  - `reason`: câu xác nhận ngắn (vd 'Đang đưa bạn tới Cảng tổng hợp.').");
+            sb.AppendLine("Nếu nơi user muốn tới KHÔNG có trong danh sách → ĐỪNG gọi navigate; hãy trả lời rằng tour chưa có điểm đó.");
             sb.AppendLine();
             sb.AppendLine("Trigger phrases chỉ ý định di chuyển:");
             sb.AppendLine("  - 'chuyển tới X', 'đi tới X', 'qua X', 'đến X', 'tới X', 'sang X'");
             sb.AppendLine("  - 'đưa tôi tới X', 'dẫn tôi tới X', 'cho tôi xem X', 'mở X', 'hiện X'");
             sb.AppendLine("  - 'tôi muốn xem X', 'tôi muốn đến X'");
             sb.AppendLine();
+            sb.AppendLine("KHÔNG NAVIGATE khi user chỉ HỎI THÔNG TIN về một điểm (dù câu hỏi có nhắc tên điểm đó):");
+            sb.AppendLine("  - 'X có đặc điểm gì?', 'X có gì?', 'giới thiệu về X', 'thông tin về X', 'mô tả X', 'X là gì?', 'X rộng/lớn bao nhiêu?', 'kể về X', 'X hoạt động thế nào?'");
+            sb.AppendLine("  → Đây là câu hỏi THÔNG TIN: phải TRẢ LỜI bằng text theo QUY TẮC #2. TUYỆT ĐỐI KHÔNG gọi navigate_to_scene.");
+            sb.AppendLine("LƯU Ý: user NHẮC TÊN một điểm KHÔNG phải là ý định di chuyển. Chỉ navigate khi user rõ ràng muốn ĐI/CHUYỂN/XEM TẬN NƠI (đúng các trigger phía trên).");
+            sb.AppendLine();
             sb.AppendLine("=== QUY TẮC #2 — TRẢ LỜI CÂU HỎI ===");
             sb.AppendLine("- LUÔN trả lời bằng tiếng Việt, ngắn gọn (2-4 câu), thân thiện.");
             sb.AppendLine("- CHỈ dựa trên thông tin được cung cấp. KHÔNG bịa số liệu, không suy đoán.");
             sb.AppendLine("- Nếu không có thông tin để trả lời câu hỏi: 'Tôi chưa được cung cấp thông tin về điều này. Bạn có thể hỏi quản trị viên.'");
             sb.AppendLine("- KHÔNG trả lời ngoài chủ đề Khu Liên Hợp Hòa Phát Dung Quất và tour này.");
+            sb.AppendLine("- 'ở đây / tại đây / chỗ này / khu này / nơi này / điểm này' LUÔN chỉ ĐIỂM NGƯỜI DÙNG ĐANG XEM (mục '=== ĐIỂM NGƯỜI DÙNG ĐANG XEM ==='), KHÔNG phải điểm vừa nhắc ở câu hỏi trước.");
+            sb.AppendLine("- User có thể hỏi về BẤT KỲ điểm nào trong '=== DANH SÁCH CÁC ĐIỂM TRONG TOUR ===' (không riêng điểm đang xem). Hãy dùng phần 'Chi tiết' của ĐÚNG điểm user hỏi để trả lời — KHÔNG nói 'chưa có thông tin' nếu điểm đó có mô tả trong danh sách.");
+            sb.AppendLine("- ĐẾM / LIỆT KÊ các điểm dựa trên DANH SÁCH CÁC ĐIỂM bên dưới KHÔNG phải là bịa số liệu: khi user hỏi 'tour có bao nhiêu khu/điểm', 'có những khu nào' → hãy đếm và trả lời theo danh sách đó.");
             sb.AppendLine();
             sb.AppendLine("=== QUY TẮC #2.5 — KHÔNG VIẾT TẮT (câu trả lời có thể được TTS đọc to) ===");
             sb.AppendLine("- KHÔNG dùng từ viết tắt. Luôn viết đầy đủ tiếng Việt:");
@@ -1551,34 +1732,32 @@ namespace EPORTAL.Areas.View360.Controllers
                 sb.AppendLine();
             }
 
-            // ==== Other scenes (for context khi tra loi - khong can biet uuid) ====
-            // Uu tien list scene CO TEN (CustomTitle) hoac CO NOI DUNG truoc, scene khong cau hinh sau.
+            // ==== Danh sach diem da cau hinh (navList) — vua la ngu canh tra loi, vua la
+            //      tap hop ten hop le cho `scene` cua navigate_to_scene (LLM phai chon dung 1 ten). ====
             sb.AppendLine("=== DANH SÁCH CÁC ĐIỂM TRONG TOUR ===");
-            sb.AppendLine("(Đây là ngữ cảnh để bạn biết tour có gì. Khi navigate, chỉ cần truyền từ khoá user dùng — server tự match.)");
-            var sortedScenes = allScenes
-                .Where(s => !string.IsNullOrEmpty(s.Uuid) && s.Uuid != currentSceneUuid)
-                .Select(s => new {
-                    Scene = s,
-                    HasName = customTitles.ContainsKey(s.Uuid),
-                    HasInfo = sceneInfo.ContainsKey(s.Uuid)
-                                && !string.IsNullOrEmpty(sceneInfo[s.Uuid].ShortIntro)
-                })
-                .OrderByDescending(x => x.HasName ? 2 : 0) // CustomTitle uu tien
-                .ThenByDescending(x => x.HasInfo ? 1 : 0);
-            int n = 0;
-            foreach (var item in sortedScenes)
+            sb.AppendLine("(Đây là TẤT CẢ điểm có thể tới. Khi navigate, `scene` PHẢI là một trong các tên dưới đây — chép đúng nguyên văn.)");
+            if (navList == null || navList.Count == 0)
             {
-                var s = item.Scene;
-                if (++n > 60) { sb.AppendLine("...(còn nữa, đã giới hạn 60 điểm)"); break; }
-                var name = customTitles.ContainsKey(s.Uuid) ? customTitles[s.Uuid] : s.Title;
-                sb.Append("- ").Append(name ?? "(chưa đặt tên)");
-                if (sceneInfo.ContainsKey(s.Uuid))
+                sb.AppendLine("(Chưa có điểm nào được cấu hình để điều hướng.)");
+            }
+            else
+            {
+                foreach (var item in navList)
                 {
-                    var ci = sceneInfo[s.Uuid];
-                    if (!string.IsNullOrEmpty(ci.ShortIntro))
-                        sb.Append(" — ").Append(ci.ShortIntro);
+                    sb.Append("- ").Append(item.Label);
+                    if (!string.IsNullOrEmpty(item.ShortIntro))
+                        sb.Append(" — ").Append(item.ShortIntro);
+                    // Kèm "Chi tiết" (cắt 600 ký tự) để bot trả lời được câu hỏi về điểm KHÔNG phải
+                    // điểm đang xem (vd đang ở Cảng nhưng hỏi "Tòa nhà hành chính có gì").
+                    if (!string.IsNullOrEmpty(item.Detail))
+                    {
+                        var detail = item.Detail.Trim();
+                        if (detail.Length > 600) detail = detail.Substring(0, 600) + "…";
+                        sb.AppendLine();
+                        sb.Append("    Chi tiết: ").Append(detail);
+                    }
+                    sb.AppendLine();
                 }
-                sb.AppendLine();
             }
 
             // ==== Optional admin-defined override ====

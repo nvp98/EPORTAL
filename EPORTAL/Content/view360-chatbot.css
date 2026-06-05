@@ -460,6 +460,36 @@
 }
 .v360cb__nav i { color: #ffd66e; }
 
+/* Da toi noi (arrival xac nhan) - doi tu vang sang xanh la */
+.v360cb__nav--done {
+    background: linear-gradient(135deg, rgba(45, 200, 120, .25), rgba(45, 200, 120, .12));
+    border-color: rgba(80, 220, 150, .5);
+    color: #bff5d8;
+    box-shadow: 0 0 10px rgba(45, 200, 120, .25);
+}
+.v360cb__nav--done i { color: #6ee7a8; }
+
+/* Song am thanh khi dang nghe (Voice mode VAD) - bar nhap nhay theo cuong do mic */
+.v360cb__wave {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 30px;
+}
+.v360cb__wave-bar {
+    width: 3px;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #7af0ff, #2aa6ff);
+    box-shadow: 0 0 6px rgba(95, 220, 255, .7);
+    transition: height .08s ease-out;
+}
+.v360cb__wave-label {
+    margin-left: 9px;
+    font-size: 12px;
+    opacity: .85;
+}
+
 /* Streaming bubble: text + cursor blink */
 .v360cb__msg--streaming { padding-right: 18px; }
 .v360cb__cursor {

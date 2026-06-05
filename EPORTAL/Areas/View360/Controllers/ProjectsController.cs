@@ -495,7 +495,10 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public FileResult DownloadExcel()
         {
-            string path = "/App_Data/Template_Permission.xlsx";
+            // Phai dung Server.MapPath de ra duong dan vat ly duoi web-app root.
+            // Truoc day "/App_Data/..." bi TransmitFile resolve theo working dir -> tro ra
+            // D:\Dev\EPORTAL\App_Data (thieu thu muc app "EPORTAL") -> DirectoryNotFound.
+            string path = Server.MapPath("~/App_Data/Template_Permission.xlsx");
             return File(path, "application/vnd.ms-excel", "Template_Permission.xlsx");
         }
         public ActionResult ImportExcel()

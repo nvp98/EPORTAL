@@ -61,6 +61,31 @@ namespace EPORTAL
             }
         }
 
+        // Cac endpoint chatbot user-facing (SSE stream + TTS + STT + Realtime) KHONG dung Session
+        // (auth doc tu Forms ticket qua User.Identity, khong qua Session). Mac dinh ASP.NET giu
+        // EXCLUSIVE session write-lock moi request -> serialize MOI request cung 1 user.
+        // Hau qua: TTS /Speak bi chan, khong chay duoc trong luc /AskStream (LLM SSE) con stream,
+        // va prefetch nhieu cau bi serialize -> cau sau queue/timeout -> pipeline "phun" het text.
+        // Tat Session cho cac endpoint nay de chung chay concurrent (giam tre + tranh dump).
+        // Phai goi truoc AcquireRequestState -> dat o BeginRequest.
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            var ctx = HttpContext.Current;
+            if (ctx == null) return;
+            string path;
+            try { path = ctx.Request.AppRelativeCurrentExecutionFilePath; } // ~/View360/Chatbot/Speak
+            catch { return; }
+            if (string.IsNullOrEmpty(path)) return;
+            if (path.IndexOf("/Chatbot/", StringComparison.OrdinalIgnoreCase) < 0) return;
+            if (path.IndexOf("/AskStream", StringComparison.OrdinalIgnoreCase) >= 0
+                || path.IndexOf("/Speak", StringComparison.OrdinalIgnoreCase) >= 0
+                || path.IndexOf("/Transcribe", StringComparison.OrdinalIgnoreCase) >= 0
+                || path.IndexOf("/RealtimeSession", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                ctx.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Disabled);
+            }
+        }
+
         // Cho phep [OutputCache(VaryByCustom = "User")] tao key cache rieng cho moi user.
         // Can thiet vi View360 SP tra ket qua theo permission tung user.
         public override string GetVaryByCustomString(HttpContext context, string custom)

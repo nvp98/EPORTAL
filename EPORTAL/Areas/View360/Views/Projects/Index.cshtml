@@ -1081,11 +1081,21 @@
             jQuery.post(url, { id: id })
                 .done(function (data, status, xhr) {
                     if (xhr.status === 204) {
+                        // 204 = da o bien (khong di chuyen duoc) -> flash do
                         $btn.css('color', '#dc2626');
                         setTimeout(function () { $btn.css('color', ''); $btn.prop('disabled', false); }, 500);
-                    } else {
-                        window.location.reload();
+                        return;
                     }
+                    // 200 = da doi cho ben server. Doi cho node ngay tren DOM (KHONG reload)
+                    // de giu nguyen trang thai mo/dong cua tree (truoc day reload lam cay bi
+                    // dong lai vi server chi auto-expand path toi folder hien tai).
+                    var $item = $btn.closest('.fx-tree-item');
+                    var $sibling = up ? $item.prev('.fx-tree-item') : $item.next('.fx-tree-item');
+                    if ($sibling.length) {
+                        if (up) { $item.insertBefore($sibling); }
+                        else { $item.insertAfter($sibling); }
+                    }
+                    $btn.prop('disabled', false);
                 })
                 .fail(function (xhr) {
                     alert('Lỗi: ' + (xhr.responseText || xhr.statusText));

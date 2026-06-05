@@ -129,6 +129,8 @@
     function closePanel() {
         stage.classList.remove('cb-open');
         sessionStorage.setItem('v360cb_open', '0');
+        // Dong panel -> tat mic ngay (rieng tu + tranh thu am khi khong dung).
+        if (MODE === 'voice' && typeof pttCleanup === 'function') pttCleanup();
         triggerLeafletRelayout();
     }
     fab.addEventListener('click', openPanel);
@@ -154,7 +156,7 @@
         // Basic newline-to-br; no markdown parsing for MVP
         var html = escHtml(text).replace(/\n/g, '<br>');
         if (opts.navTo) {
-            html += '<div class="v360cb__nav"><i class="fa fa-location-arrow"></i> ' +
+            html += '<div class="v360cb__nav v360cb__nav--pending"><i class="fa fa-location-arrow"></i> ' +
                     'Đang đưa bạn tới: ' + escHtml(opts.navName || opts.navTo) + '</div>';
         }
         div.innerHTML = html;
@@ -258,6 +260,7 @@
                     if (postId) {
                         console.log('[v360cb] navigate -> postId=' + postId + ' (uuid=' + uuid + ')');
                         window.kuulaSend('load', { id: postId });
+                        watchArrival(uuid, displayName);
                         return true;
                     }
                     if (tries === 1) {
@@ -271,6 +274,34 @@
             return false;
         }
         attempt();
+    }
+
+    // Sau khi kuulaSend('load'), theo doi __v360CurrentScene cho den khi scene dich load xong
+    // -> cap nhat chip "Đang đưa bạn tới" thanh "Đã tới" (xac nhan da chuyen canh thanh cong).
+    function markNavArrived(name) {
+        var pend = bodyEl.querySelectorAll('.v360cb__nav--pending');
+        var chip = pend[pend.length - 1];   // chip pending moi nhat = nav vua roi
+        if (!chip) return;
+        chip.classList.remove('v360cb__nav--pending');
+        chip.classList.add('v360cb__nav--done');
+        var label = (name && String(name).trim()) ? escHtml(name) : 'điểm đến';
+        chip.innerHTML = '<i class="fa fa-check-circle"></i> Đã tới: ' + label;
+        bodyEl.scrollTop = bodyEl.scrollHeight;
+    }
+    function watchArrival(uuid, displayName) {
+        var target = String(uuid || '').toLowerCase().replace(/-/g, '');
+        if (!target) return;
+        var tries = 0;
+        (function check() {
+            tries++;
+            var cur = currentScene();
+            var curU = String((cur && cur.uuid) || '').toLowerCase().replace(/-/g, '');
+            if (curU && curU === target) {
+                markNavArrived(displayName || (cur && cur.name) || '');
+                return;
+            }
+            if (tries < 40) setTimeout(check, 300);  // poll ~12s; het thi giu nguyen "Đang đưa..."
+        })();
     }
 
     // ===== Streaming reply rendering =====
@@ -301,7 +332,7 @@
                 if (cursor) cursor.remove();
                 if (navTarget) {
                     var chip = document.createElement('div');
-                    chip.className = 'v360cb__nav';
+                    chip.className = 'v360cb__nav v360cb__nav--pending';
                     chip.innerHTML = '<i class="fa fa-location-arrow"></i> Đang đưa bạn tới: ' +
                                      escHtml(navName || navTarget);
                     div.appendChild(chip);
@@ -365,6 +396,9 @@
         // Sau khi stream done + TTS audio loaded -> reveal text sync voi audio.
         // responseMode phai co dinh theo luc bam gui; doi tab mode giua chung chi ap dung cho cau sau.
         var ttsBuffer = '';
+        // TTS pipeline: tach cau + phat tuan tu NGAY trong luc LLM dang stream (giam do tre).
+        var ttsPipe = (responseMode === 'tts') ? createTtsPipeline() : null;
+        if (ttsPipe) ttsPipeline = ttsPipe;
 
         fetch(ASK_URL, {
             method: 'POST',
@@ -388,9 +422,9 @@
                     parsed.events.forEach(function (e) {
                         if (e.type === 'text') {
                             if (responseMode === 'tts') {
-                                // Accumulate silent; bubble se duoc tao sau khi audio start.
-                                // Giu typing indicator de UI mượt.
+                                // Accumulate cho history + feed pipeline (tach cau, phat dan).
                                 ttsBuffer += (e.data.delta || '');
+                                if (ttsPipe) ttsPipe.feed(e.data.delta || '');
                             } else {
                                 if (!bubble) {
                                     removeTyping();
@@ -415,6 +449,7 @@
                             }
                         } else if (e.type === 'error') {
                             sawError = true;
+                            if (ttsPipe) { ttsPipe.cancel(); ttsPipe = null; }
                             removeTyping();
                             appendMsg('error', e.data.error || 'Lỗi không xác định');
                         }
@@ -425,20 +460,23 @@
             return pump();
         }).then(function () {
             setBusy(false);
-            if (sawError) { removeTyping(); return; }
+            if (sawError) { removeTyping(); if (MODE === 'voice') restartListening(); return; }
 
             // TTS mode (hoac Voice PTT -> reply doc to): text da accumulate trong ttsBuffer
             if (responseMode === 'tts') {
                 var ttsCleanText = ttsBuffer.replace(/\s*---SUGGEST---[\s\S]*$/, '').trim();
                 if (!ttsCleanText) {
+                    if (ttsPipe) { ttsPipe.cancel(); ttsPipe = null; }
                     removeTyping();
                     appendMsg('bot', 'Xin lỗi, tôi chưa có câu trả lời cho câu hỏi này.');
                     history.push({ role: 'assistant', content: '' });
+                    if (MODE === 'voice') restartListening();
                     return;
                 }
                 history.push({ role: 'assistant', content: ttsCleanText });
-                // Sync reveal: keep typing -> when audio loaded, hide typing + create bubble + reveal sync
-                speakAndRevealSynced(ttsCleanText, navTarget, navName, doneSuggestions);
+                // Pipeline da phat dan trong luc stream; end() flush cau cuoi + gan nav/suggestions.
+                if (ttsPipe) ttsPipe.end(navTarget, navName, doneSuggestions);
+                else speakAndRevealSynced(ttsCleanText, navTarget, navName, doneSuggestions);
                 return;
             }
 
@@ -457,9 +495,11 @@
                 setTimeout(function () { tryNavigate(navTarget, navName); }, 700);
             }
         }).catch(function (e) {
+            if (ttsPipe) { ttsPipe.cancel(); ttsPipe = null; }
             removeTyping();
             setBusy(false);
             if (!sawError) appendMsg('error', 'Lỗi mạng: ' + e.message);
+            if (MODE === 'voice') restartListening();
         });
     }
 
@@ -482,7 +522,7 @@
     var STT_URL   = window.V360CB_STT_URL || '';
 
     // Push-to-talk state (voice mode via VBee STT batch)
-    var pttState = 'idle';  // idle | ready | recording | processing
+    var pttState = 'idle';  // idle | ready | listening (VAD dang nghe) | processing (STT+AI)
     var pttStream = null;
     var pttAudioCtx = null;
     var pttSourceNode = null;
@@ -491,6 +531,25 @@
     // pttRecorder giu lai de pttCleanup khong ref undefined (legacy MediaRecorder)
     var pttRecorder = null;
     var pttChunks = [];
+
+    // ---- VAD (voice activity detection) tuning cho che do Voice hands-free ----
+    var VAD_ABS_MIN        = 0.012;   // nguong RMS toi thieu coi la tieng noi
+    var VAD_FACTOR         = 2.5;     // RMS phai vuot noiseFloor x lan nay moi tinh la noi
+    var VAD_END_SILENCE_MS = 1500;    // im lang bao lau -> coi nhu noi xong (user yc ~3s; 1.5s muot hon, doi tai day)
+    var VAD_MIN_SPEECH_MS  = 350;     // luot noi ngan hon nay -> coi la nhieu, bo qua
+    var VAD_MAX_UTTER_MS   = 15000;   // chong noi qua dai
+    var VAD_IDLE_MS        = 25000;   // mo mic ma khong noi gi sau ngan nay -> tu tat phien
+    var VAD_PREROLL_FRAMES = 3;       // so frame giu lai truoc khi phat hien noi (tranh cut am dau)
+    // VAD runtime state
+    var vadSpeaking = false, vadEnding = false;
+    var vadNoiseFloor = 0.012, vadLevel = 0;
+    var vadLastVoiceMs = 0, vadSpeechStartMs = 0, vadListenStartMs = 0;
+    var vadPreroll = [];
+    var waveRaf = null;
+    var voiceWatchdog = null;
+    var voiceStarting = false;          // chong double-start (race giua cac restartListening async)
+    var voiceAutoTurns = 0;             // dem so luot TU DONG mo lai lien tiep (reset khi user bam mic)
+    var VOICE_MAX_AUTO_TURNS = 20;      // qua nguong -> tam dung phien (chong goi STT/LLM/TTS vo han do nhieu/loi)
 
     // PTT button (insert before send button in input wrap)
     var pttBtn = document.createElement('button');
@@ -548,40 +607,43 @@
     // ================================================================
     function pttSetState(state) {
         pttState = state;
+        voiceStarting = false;   // doi state = pttStartListening da xong/thoat -> mo khoa chong double-start
         pttBtn.classList.remove('is-recording', 'is-processing');
+        if (state !== 'listening') stopWave();
         if (state === 'ready') {
             pttBtn.innerHTML = '<i class="fa fa-microphone"></i>';
-            pttBtn.title = 'Bấm để nói';
-            voiceStatus.innerHTML = '<i class="fa fa-info-circle"></i> Bấm mic để bắt đầu ghi âm (tối đa 10 giây)';
+            pttBtn.title = 'Bấm để bắt đầu trò chuyện bằng giọng nói';
+            voiceStatus.innerHTML = '<i class="fa fa-info-circle"></i> Bấm mic để bắt đầu trò chuyện — bạn nói, mình tự nhận khi bạn dừng';
             voiceStatus.style.display = 'flex';
             voiceStatus.className = 'v360cb__voice-status';
-        } else if (state === 'recording') {
+        } else if (state === 'listening') {
             pttBtn.classList.add('is-recording');
             pttBtn.innerHTML = '<i class="fa fa-stop"></i>';
-            pttBtn.title = 'Bấm để dừng';
-            voiceStatus.innerHTML = '<span class="v360cb__voice-pulse is-user"></span> Đang ghi âm... (bấm lại để dừng)';
-            voiceStatus.style.display = 'flex';
+            pttBtn.title = 'Bấm để dừng trò chuyện';
             voiceStatus.className = 'v360cb__voice-status is-active';
+            voiceStatus.style.display = 'flex';
+            voiceStatus.innerHTML = '';
+            buildWave(voiceStatus);
+            var lbl = document.createElement('span');
+            lbl.className = 'v360cb__wave-label';
+            lbl.textContent = 'Đang nghe… cứ nói tự nhiên';
+            voiceStatus.appendChild(lbl);
+            startWave();
         } else if (state === 'processing') {
             pttBtn.classList.add('is-processing');
             pttBtn.innerHTML = '<i class="fa fa-circle-notch fa-spin"></i>';
             pttBtn.title = 'Đang xử lý';
-            voiceStatus.innerHTML = '<i class="fa fa-cog fa-spin"></i> Đang chuyển giọng nói thành văn bản...';
+            voiceStatus.innerHTML = '<i class="fa fa-cog fa-spin"></i> Đang xử lý...';
             voiceStatus.style.display = 'flex';
             voiceStatus.className = 'v360cb__voice-status is-connecting';
         }
     }
 
     function pttCleanup() {
-        try { if (pttProcessorNode) { pttProcessorNode.disconnect(); pttProcessorNode.onaudioprocess = null; } } catch (_) {}
-        try { if (pttSourceNode) pttSourceNode.disconnect(); } catch (_) {}
-        if (pttStream) { try { pttStream.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {} }
-        if (pttAudioCtx) { try { pttAudioCtx.close(); } catch (_) {} }
-        pttProcessorNode = null;
-        pttSourceNode = null;
-        pttAudioCtx = null;
-        pttStream = null;
-        pttSamples = [];
+        if (voiceWatchdog) { clearTimeout(voiceWatchdog); voiceWatchdog = null; }
+        stopCapture();
+        pttSamples = []; vadPreroll = []; vadSpeaking = false; vadEnding = false; vadLevel = 0;
+        voiceStarting = false; voiceAutoTurns = 0;   // mo khoa start + reset dem loop khi roi/dong phien
         pttState = 'idle';
         pttBtn.classList.remove('is-recording', 'is-processing');
     }
@@ -672,26 +734,136 @@
         };
     }
 
-    async function pttStart() {
-        if (pttState !== 'ready') return;
+    // ---- VAD helpers ----
+    function rmsOf(buf) {
+        var s = 0; for (var i = 0; i < buf.length; i++) s += buf[i] * buf[i];
+        return Math.sqrt(s / buf.length);
+    }
+    function mergeSamples(chunks) {
+        var t = 0, i; for (i = 0; i < chunks.length; i++) t += chunks[i].length;
+        var m = new Float32Array(t), o = 0;
+        for (i = 0; i < chunks.length; i++) { m.set(chunks[i], o); o += chunks[i].length; }
+        return m;
+    }
+    // Cat im lang dau + cuoi (giu margin ~120ms) dua tren bien do tuong doi voi peak.
+    function trimSilence(samples, sr) {
+        var n = samples.length, i, peak = 0;
+        for (i = 0; i < n; i++) { var a = samples[i] < 0 ? -samples[i] : samples[i]; if (a > peak) peak = a; }
+        if (peak < 0.02) return samples;            // gan nhu im lang -> de nguyen
+        var thr = Math.max(0.01, peak * 0.08);
+        var start = 0, end = n - 1;
+        while (start < n && (samples[start] < 0 ? -samples[start] : samples[start]) < thr) start++;
+        while (end > start && (samples[end] < 0 ? -samples[end] : samples[end]) < thr) end--;
+        var margin = Math.floor(sr * 0.12);
+        start = Math.max(0, start - margin);
+        end = Math.min(n - 1, end + margin);
+        if (end <= start) return samples;
+        return samples.subarray(start, end + 1);
+    }
+
+    // ---- Song am thanh (waveform meter) hien khi dang nghe ----
+    var WAVE_BARS = 7;
+    var waveBarEls = [];
+    function buildWave(container) {
+        var w = document.createElement('div');
+        w.className = 'v360cb__wave';
+        waveBarEls = [];
+        for (var i = 0; i < WAVE_BARS; i++) {
+            var b = document.createElement('span');
+            b.className = 'v360cb__wave-bar';
+            w.appendChild(b);
+            waveBarEls.push(b);
+        }
+        container.appendChild(w);
+    }
+    function startWave() {
+        if (waveRaf) return;
+        (function loop() {
+            waveRaf = requestAnimationFrame(loop);
+            for (var i = 0; i < waveBarEls.length; i++) {
+                var jitter = 0.45 + Math.random() * 0.55;   // nhap nhay cho song dong
+                var h = 4 + vadLevel * 26 * jitter;
+                waveBarEls[i].style.height = h.toFixed(1) + 'px';
+            }
+            vadLevel *= 0.9;   // tu tat dan khi im lang
+        })();
+    }
+    function stopWave() {
+        if (waveRaf) { cancelAnimationFrame(waveRaf); waveRaf = null; }
+        waveBarEls = [];
+    }
+
+    // ---- Giai phong mic + audio nodes ----
+    function stopCapture() {
+        stopWave();
+        try { if (pttProcessorNode) { pttProcessorNode.disconnect(); pttProcessorNode.onaudioprocess = null; } } catch (_) {}
+        try { if (pttSourceNode) pttSourceNode.disconnect(); } catch (_) {}
+        if (pttStream) { try { pttStream.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {} }
+        if (pttAudioCtx) { try { pttAudioCtx.close(); } catch (_) {} }
+        pttProcessorNode = null; pttSourceNode = null; pttAudioCtx = null; pttStream = null;
+    }
+
+    // Defer ket thuc ra ngoai onaudioprocess (tranh disconnect node ngay trong callback cua chinh no).
+    function scheduleEnd(fn) {
+        if (pttState !== 'listening' || vadEnding) return;
+        vadEnding = true;
+        setTimeout(fn, 0);
+    }
+
+    // ---- VAD callback: do RMS -> phat hien noi / im lang -> tu ket thuc luot ----
+    function vadProcess(e) {
+        if (pttState !== 'listening') return;
+        var input = e.inputBuffer.getChannelData(0);
+        var frame = new Float32Array(input);   // phai copy (buffer dung chung)
+        var rms = rmsOf(frame);
+        var nowMs = pttAudioCtx.currentTime * 1000;
+
+        // Muc do cho waveform (0..1): bat nhanh, nha cham
+        var norm = Math.min(1, rms / 0.2);
+        vadLevel = norm > vadLevel ? norm : (vadLevel * 0.6 + norm * 0.4);
+
+        var thr = Math.max(VAD_ABS_MIN, vadNoiseFloor * VAD_FACTOR);
+        if (rms > thr) {
+            if (!vadSpeaking) {
+                vadSpeaking = true;
+                vadSpeechStartMs = nowMs;
+                for (var p = 0; p < vadPreroll.length; p++) pttSamples.push(vadPreroll[p]);  // preroll -> khong cut am dau
+                vadPreroll = [];
+            }
+            vadLastVoiceMs = nowMs;
+            pttSamples.push(frame);
+            if (nowMs - vadSpeechStartMs >= VAD_MAX_UTTER_MS) scheduleEnd(endUtterance);
+        } else {
+            vadNoiseFloor = vadNoiseFloor * 0.95 + rms * 0.05;   // hoc nen nhieu khi im lang
+            if (vadSpeaking) {
+                pttSamples.push(frame);   // giu duoi (se trim sau)
+                if (nowMs - vadLastVoiceMs >= VAD_END_SILENCE_MS) {
+                    if (vadLastVoiceMs - vadSpeechStartMs >= VAD_MIN_SPEECH_MS) scheduleEnd(endUtterance);
+                    else { vadSpeaking = false; pttSamples = []; }   // qua ngan -> bo, nghe tiep
+                }
+            } else {
+                vadPreroll.push(frame);
+                if (vadPreroll.length > VAD_PREROLL_FRAMES) vadPreroll.shift();
+                if (nowMs - vadListenStartMs >= VAD_IDLE_MS) scheduleEnd(function () { stopVoiceSession(true); });
+            }
+        }
+    }
+
+    async function pttStartListening() {
+        if (pttState === 'listening' || voiceStarting) return;   // chong goi chong (race async getUserMedia)
+        voiceStarting = true;
         if (typeof stopTtsAudio === 'function') stopTtsAudio();
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             appendMsg('error', 'Trình duyệt không hỗ trợ microphone (cần HTTPS hoặc localhost).');
-            return;
+            pttSetState('ready'); return;
         }
         var Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) {
-            appendMsg('error', 'Trình duyệt không hỗ trợ Web Audio API.');
-            return;
-        }
+        if (!Ctx) { appendMsg('error', 'Trình duyệt không hỗ trợ Web Audio API.'); pttSetState('ready'); return; }
         try {
             pttStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
-                    channelCount: { ideal: 1 },
-                    sampleRate: { ideal: 16000 },
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true
+                    channelCount: { ideal: 1 }, sampleRate: { ideal: 16000 },
+                    echoCancellation: true, noiseSuppression: true, autoGainControl: true
                 }
             });
         } catch (mErr) {
@@ -704,76 +876,93 @@
                 case 'NotReadableError': msg = 'Microphone đang bị app khác sử dụng.'; break;
                 default: msg = 'Không truy cập được microphone: ' + (mErr.message || mErr.name);
             }
-            appendMsg('error', msg);
-            return;
+            appendMsg('error', msg); pttSetState('ready'); return;
         }
-        // Yeu cau 16kHz cho VBee STT; mot so browser khong honor -> dung sampleRate thuc te khi encode WAV
         try { pttAudioCtx = new Ctx({ sampleRate: 16000 }); }
         catch (_) { try { pttAudioCtx = new Ctx(); } catch (e2) {
-            appendMsg('error', 'Không khởi tạo AudioContext: ' + e2.message);
-            pttCleanup(); return;
+            appendMsg('error', 'Không khởi tạo AudioContext: ' + e2.message); stopCapture(); pttSetState('ready'); return;
         }}
-        pttSamples = [];
         try {
             pttSourceNode = pttAudioCtx.createMediaStreamSource(pttStream);
-            pttProcessorNode = pttAudioCtx.createScriptProcessor(4096, 1, 1);
+            pttProcessorNode = pttAudioCtx.createScriptProcessor(2048, 1, 1);
         } catch (e) {
-            appendMsg('error', 'Không khởi tạo Audio nodes: ' + e.message);
-            pttCleanup(); return;
+            appendMsg('error', 'Không khởi tạo Audio nodes: ' + e.message); stopCapture(); pttSetState('ready'); return;
         }
-        pttProcessorNode.onaudioprocess = function (e) {
-            var input = e.inputBuffer.getChannelData(0);
-            // Phai copy vi inputBuffer.getChannelData tra Float32Array dung chung buffer
-            pttSamples.push(new Float32Array(input));
-        };
+        // Reset VAD state
+        pttSamples = []; vadPreroll = []; vadSpeaking = false; vadEnding = false;
+        vadNoiseFloor = 0.012; vadLevel = 0;
+        vadListenStartMs = pttAudioCtx.currentTime * 1000;
+        vadLastVoiceMs = vadListenStartMs; vadSpeechStartMs = vadListenStartMs;
+        pttProcessorNode.onaudioprocess = vadProcess;
         pttSourceNode.connect(pttProcessorNode);
-        // Phai connect destination de onaudioprocess fire tren mot so browser (Chrome quirks)
-        pttProcessorNode.connect(pttAudioCtx.destination);
-        pttSetState('recording');
-        setTimeout(function () { if (pttState === 'recording') pttStop(); }, 10000);
+        pttProcessorNode.connect(pttAudioCtx.destination);  // can connect de callback fire (Chrome quirk)
+        pttSetState('listening');
     }
 
-    function pttStop() {
-        if (pttState !== 'recording') return;
-        pttSetState('processing');
-        var sampleRate = pttAudioCtx ? pttAudioCtx.sampleRate : 16000;
-        try { if (pttProcessorNode) { pttProcessorNode.disconnect(); pttProcessorNode.onaudioprocess = null; } } catch (_) {}
-        try { if (pttSourceNode) pttSourceNode.disconnect(); } catch (_) {}
-        if (pttStream) { try { pttStream.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {} }
-        if (pttAudioCtx) { try { pttAudioCtx.close(); } catch (_) {} }
-        pttProcessorNode = null;
-        pttSourceNode = null;
-        pttAudioCtx = null;
+    function armVoiceWatchdog() {
+        if (voiceWatchdog) clearTimeout(voiceWatchdog);
+        // Backstop: neu ket o 'processing' (vd pipeline treo) -> mo lai mic sau 45s.
+        // Chi mo neu KHONG con audio TTS dang phat (ttsAudioEl null) de tranh thu lai giong AI.
+        voiceWatchdog = setTimeout(function () {
+            if (MODE === 'voice' && pttState === 'processing' && !ttsAudioEl) restartListening();
+        }, 45000);
+    }
 
-        if (!pttSamples.length) {
-            appendMsg('error', 'Không ghi âm được gì.');
-            pttSetState('ready');
+    // Ket thuc 1 luot noi (VAD trigger): cat im lang -> encode -> upload STT.
+    function endUtterance() {
+        if (pttState !== 'listening') return;
+        var sr = pttAudioCtx ? pttAudioCtx.sampleRate : 16000;
+        var chunks = pttSamples; pttSamples = [];
+        pttSetState('processing');
+        armVoiceWatchdog();
+        stopCapture();
+        var merged = mergeSamples(chunks);
+        if (!merged.length) { restartListening(); return; }
+        var trimmed = trimSilence(merged, sr);
+        var durationSeconds = trimmed.length / sr;
+        if (durationSeconds < 0.25) { restartListening(); return; }   // qua ngan -> bo, nghe lai
+        var normalized = pttNormalizeForStt(trimmed);
+        console.log('[v360cb-ptt] VAD utter ' + trimmed.length + ' samples @' + sr + 'Hz = '
+            + durationSeconds.toFixed(2) + 's, gain x' + normalized.stats.gain.toFixed(2));
+        var wavBlob = encodeWav(normalized.samples, sr);
+        pttUpload(wavBlob, sr, durationSeconds, normalized.stats);
+    }
+
+    // Dung han phien thoai (bam mic de dung, hoac im lang qua lau).
+    function stopVoiceSession(isIdle) {
+        if (voiceWatchdog) { clearTimeout(voiceWatchdog); voiceWatchdog = null; }
+        stopCapture();
+        pttSetState('ready');
+        if (isIdle) {
+            voiceStatus.innerHTML = '<i class="fa fa-info-circle"></i> Tạm dừng (im lặng lâu). Bấm mic để nói tiếp.';
+            voiceStatus.style.display = 'flex';
+            voiceStatus.className = 'v360cb__voice-status';
+        }
+    }
+
+    // Mo lai mic sau khi AI tra loi xong (vong lap hoi thoai).
+    function restartListening() {
+        if (voiceWatchdog) { clearTimeout(voiceWatchdog); voiceWatchdog = null; }
+        if (MODE !== 'voice') return;
+        if (!stage.classList.contains('cb-open')) { stopCapture(); pttSetState('ready'); return; }
+        // Chong loop vo han: moi lan TU DONG mo lai dem +1; qua nguong -> tam dung, doi user chu dong bam mic.
+        // (Tieng on/loi lien tuc co the lap STT/LLM/TTS; idle 25s chi tu dung khi IM LANG, khong dung khi co on.)
+        voiceAutoTurns++;
+        if (voiceAutoTurns >= VOICE_MAX_AUTO_TURNS) {
+            stopVoiceSession(false);
+            voiceStatus.innerHTML = '<i class="fa fa-info-circle"></i> Tạm dừng để tránh lặp liên tục. Bấm mic để nói tiếp.';
+            voiceStatus.style.display = 'flex';
+            voiceStatus.className = 'v360cb__voice-status';
             return;
         }
-        // Flatten Float32 chunks
-        var total = 0;
-        for (var i = 0; i < pttSamples.length; i++) total += pttSamples[i].length;
-        var merged = new Float32Array(total);
-        var off = 0;
-        for (var k = 0; k < pttSamples.length; k++) {
-            merged.set(pttSamples[k], off);
-            off += pttSamples[k].length;
-        }
-        pttSamples = [];
-        var durationSeconds = merged.length / sampleRate;
-        var normalized = pttNormalizeForStt(merged);
-        console.log('[v360cb-ptt] WAV encode: ' + merged.length + ' samples @ ' + sampleRate + 'Hz = '
-            + durationSeconds.toFixed(2) + 's, gain x' + normalized.stats.gain.toFixed(2)
-            + ', rms ' + pttDbfs(normalized.stats.inputRms) + ' -> ' + pttDbfs(normalized.stats.outputRms) + ' dBFS');
-        var wavBlob = encodeWav(normalized.samples, sampleRate);
-        pttUpload(wavBlob, sampleRate, durationSeconds, normalized.stats);
+        vadEnding = false;
+        pttStartListening();
     }
 
     function pttUpload(blob, sampleRate, durationSeconds, gainStats) {
         if (!STT_URL) {
             appendMsg('error', 'STT URL chưa cấu hình.');
-            pttSetState('ready');
-            return;
+            pttSetState('ready'); return;
         }
         var fd = new FormData();
         fd.append('audio', blob, 'recording.wav');
@@ -785,37 +974,44 @@
             fd.append('clientGain', String(gainStats.gain || 1));
             fd.append('clientClippedPercent', String(gainStats.clippedPercent || 0));
         }
-
         fetch(STT_URL, { method: 'POST', credentials: 'same-origin', body: fd })
             .then(function (r) { return r.json(); })
             .then(function (j) {
-                if (!j.ok) throw new Error(j.error || 'STT fail');
+                if (!j.ok) {
+                    var err = new Error(j.error || 'STT fail');
+                    err.limited = !!j.limited;   // het gioi han (khac loi ky thuat)
+                    throw err;
+                }
                 var transcript = (j.transcript || '').trim();
-                if (!transcript) throw new Error('Không nhận diện được giọng nói');
+                if (!transcript) {
+                    // Khong nhan dien duoc -> nghe lai (hands-free), khong lam phien bang loi do.
+                    console.warn('[v360cb-ptt] empty transcript -> nghe lai');
+                    restartListening(); return;
+                }
                 console.log('[v360cb-ptt] transcript:', transcript);
-                voiceStatus.innerHTML = '<i class="fa fa-check"></i> "' + escHtml(transcript) + '"';
-                voiceStatus.className = 'v360cb__voice-status is-connecting';
-                // KHONG hack MODE - dung effectiveMode() trong send/SSE flow de voice mode
-                // tu dong di duong TTS (reply doc to bang VBee). Tham khao effectiveMode().
+                // send() hien transcript len bubble user. Voice mode -> effectiveMode()='tts' -> reply doc to.
+                // Sau khi AI doc xong (finalizeAll) se tu mo lai mic; giu trang thai 'processing' den luc do.
                 inputEl.value = transcript;
                 inputEl.disabled = false;
                 send();
                 inputEl.disabled = true;
-                setTimeout(function () { if (MODE === 'voice') pttSetState('ready'); }, 800);
             })
             .catch(function (e) {
                 console.warn('[v360cb-ptt]', e);
-                appendMsg('error', '🎙 Lỗi STT: ' + e.message);
-                if (MODE === 'voice') pttSetState('ready');
-            })
-            .finally(function () {
-                pttStream = null;
+                if (e && e.limited) {
+                    // Het gioi han -> bao dung sac thai + TAM DUNG phien (khong tu mo lai mic -> tranh lap).
+                    appendMsg('error', '🎙 ' + e.message);
+                    stopVoiceSession(false);
+                } else {
+                    appendMsg('error', '🎙 Lỗi nhận giọng nói: ' + e.message);
+                    restartListening();   // loi tam thoi -> nghe lai; chi reopen khi user noi tiep
+                }
             });
     }
 
     pttBtn.addEventListener('click', function () {
-        if (pttState === 'ready') pttStart();
-        else if (pttState === 'recording') pttStop();
+        if (pttState === 'listening' || pttState === 'processing') stopVoiceSession(false);
+        else { vadEnding = false; voiceAutoTurns = 0; pttStartListening(); }   // bam mic = chu dong -> reset dem loop
     });
 
     function setVoiceUI(state, msg) {
@@ -1109,118 +1305,254 @@
             .trim();
     }
 
+    var ttsPipeline = null;   // pipeline TTS dang chay (phat tung cau)
     function stopTtsAudio() {
+        if (ttsPipeline) { try { ttsPipeline.cancel(); } catch(_) {} ttsPipeline = null; }
         if (ttsRevealTicker) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; }
         if (ttsAudioEl) { try { ttsAudioEl.pause(); ttsAudioEl.srcObject = null; } catch(_) {} ttsAudioEl = null; }
         setKuulaMuted(false);  // restore Kuula audio
     }
 
+    // ====== TTS PIPELINE (tach cau + phat tuan tu + prefetch) ======
+    // VBee TTS KHONG ho tro streaming -> gia-streaming: tach cau, phat cau dau ngay,
+    // render cac cau sau song song (prefetch). Tich hop voi LLM stream qua feed()/end().
+    var TTS_PREFETCH = 2;   // so cau fetch truoc song song
+
+    function fetchSentenceAudio(text, _attempt) {
+        _attempt = _attempt || 0;
+        return fetch(TTS_URL, {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        }).then(function (r) {
+            if (!r.ok) return r.text().then(function (b) {
+                var err = new Error('TTS ' + r.status + ': ' + String(b).substring(0, 120));
+                err.status = r.status;   // 429 = het gioi han doc
+                throw err;
+            });
+            return r.blob();
+        }).then(function (blob) {
+            // Server doi khi tra 200 voi body rong (loi VBee transient) -> coi nhu that bai de retry.
+            if (!blob || blob.size === 0) throw new Error('TTS empty audio');
+            return URL.createObjectURL(blob);
+        }).catch(function (e) {
+            // Het gioi han (429) -> retry vo nghia + ton quota -> nem luon de pipeline bao 1 lan.
+            if (e && e.status === 429) throw e;
+            // Retry tu tu: tranh 1 cau loi transient (timeout/queue) lam pipeline bo audio + "phun" text.
+            if (_attempt < 2) {
+                console.warn('[v360cb-tts] retry seg fetch #' + (_attempt + 1) + ': ' + e.message);
+                return new Promise(function (res) { setTimeout(res, 400 * (_attempt + 1)); })
+                    .then(function () { return fetchSentenceAudio(text, _attempt + 1); });
+            }
+            throw e;
+        });
+    }
+
+    function createTtsPipeline() {
+        var segs = [];           // { raw, tts, audio: Promise<blobUrl|null> }
+        var rawBuf = '', consumed = 0, speakBuf = '';
+        var streamEnded = false, cancelled = false, playing = false, finalized = false;
+        var playIndex = 0, fetchUpto = 0;
+        var bubble = null, revealedBase = '', fallbackFull = '', warnedAutoplay = false, warnedLimit = false;
+        var endMeta = { navTarget: null, navName: null, suggestions: null };
+
+        function ensureBubble() { if (!bubble) { removeTyping(); bubble = createStreamingBubble(); } }
+
+        // Tach 1 cau hoan chinh tu speakBuf (boundary: . ! ? … + space, hoac newline).
+        function popSentence(force) {
+            if (!speakBuf) return null;
+            var m = /[.!?…]\s|\n/.exec(speakBuf);
+            if (m) {
+                var isNl = m[0] === '\n';
+                var keepEnd = isNl ? m.index : m.index + 1;
+                var skipTo  = isNl ? m.index + 1 : m.index + 2;
+                var s = speakBuf.slice(0, keepEnd).trim();
+                speakBuf = speakBuf.slice(skipTo);
+                return s;
+            }
+            if (force) { var rest = speakBuf.trim(); speakBuf = ''; return rest; }
+            return null;
+        }
+
+        function drain(force) {
+            var s;
+            while ((s = popSentence(force)) !== null) {
+                if (s) {
+                    var tts = cleanTextForTts(s);
+                    if (tts) segs.push({ raw: s, tts: tts, audio: null });
+                }
+            }
+            schedulePrefetch();
+            if (!playing) playNext();
+        }
+
+        function schedulePrefetch() {
+            var upto = Math.min(segs.length, playIndex + TTS_PREFETCH + 1);
+            for (; fetchUpto < upto; fetchUpto++) startFetch(segs[fetchUpto]);
+        }
+        function startFetch(seg) {
+            if (!seg || seg.audio) return;
+            seg.audio = fetchSentenceAudio(seg.tts).catch(function (e) {
+                // Het gioi han doc -> bao 1 lan/cau tra loi, roi tiep tuc hien text khong audio.
+                if (e && e.status === 429 && !warnedLimit) {
+                    warnedLimit = true;
+                    appendMsg('error', '🔊 Đã đạt giới hạn đọc to (TTS) — câu trả lời chỉ hiển thị bằng văn bản.');
+                }
+                console.warn('[v360cb-tts] seg fetch fail', e); return null;
+            });
+        }
+
+        function revealSeg(seg, progress) {
+            if (cancelled || finalized) return;   // da ket thuc -> khong render lai (tranh "1 cuc" roi ve)
+            ensureBubble();
+            var n = Math.ceil(seg.raw.length * Math.max(0, Math.min(1, progress)));
+            var sep = (revealedBase && !/\s$/.test(revealedBase)) ? ' ' : '';
+            bubble.setText(revealedBase + sep + seg.raw.substring(0, n));
+        }
+        function commitSeg(seg) {
+            var sep = (revealedBase && !/\s$/.test(revealedBase)) ? ' ' : '';
+            revealedBase += sep + seg.raw;
+        }
+
+        function playNext() {
+            if (cancelled) return;
+            if (playIndex >= segs.length) {
+                playing = false;
+                if (streamEnded) finalizeAll(false);
+                return;
+            }
+            playing = true;
+            var seg = segs[playIndex];
+            schedulePrefetch();
+            startFetch(seg);
+            seg.audio.then(function (blobUrl) {
+                if (cancelled) return;
+                if (!blobUrl) {                 // fetch loi -> reveal text, bo qua audio
+                    revealSeg(seg, 1); commitSeg(seg);
+                    playIndex++; playNext(); return;
+                }
+                ensureBubble();
+                var a = new Audio(blobUrl);
+                ttsAudioEl = a;
+                var ticker = null;
+                a.addEventListener('playing', function () { setKuulaMuted(true); });
+                a.addEventListener('loadedmetadata', function () {
+                    if (ticker) return;
+                    ticker = setInterval(function () {
+                        if (cancelled || !a.duration || !isFinite(a.duration)) return;
+                        revealSeg(seg, a.currentTime / a.duration);
+                    }, 60);
+                    ttsRevealTicker = ticker;
+                });
+                function nextSeg() {
+                    if (ticker) { clearInterval(ticker); ticker = null; ttsRevealTicker = null; }
+                    if (cancelled || finalized) return;
+                    revealSeg(seg, 1); commitSeg(seg);
+                    try { URL.revokeObjectURL(blobUrl); } catch (_) {}
+                    playIndex++; playNext();
+                }
+                a.addEventListener('ended', nextSeg);
+                a.addEventListener('error', function () { if (!cancelled) nextSeg(); });
+                a.play().catch(function () {
+                    if (ticker) { clearInterval(ticker); ticker = null; }
+                    autoplayBlocked();
+                });
+            });
+        }
+
+        // Browser chan autoplay -> bo audio, reveal het text con lai, ket thuc.
+        function autoplayBlocked() {
+            if (cancelled || finalized) return;
+            var rest = revealedBase;
+            for (var i = playIndex; i < segs.length; i++) {
+                var sep = (rest && !/\s$/.test(rest)) ? ' ' : '';
+                rest += sep + segs[i].raw;
+            }
+            revealedBase = rest;
+            cancelled = true;
+            finalizeAll(true);
+            if (!warnedAutoplay) {
+                warnedAutoplay = true;
+                appendMsg('error', 'Trình duyệt chặn auto-play audio. Bấm vào tab này 1 lần rồi thử lại.');
+            }
+        }
+
+        function finalizeAll(skipKuula) {
+            if (finalized) return;
+            finalized = true;
+            if (ttsRevealTicker) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; }
+            ensureBubble();
+            bubble.setText(revealedBase || fallbackFull);
+            bubble.finalize(endMeta.navTarget, endMeta.navName);
+            if (endMeta.suggestions) renderSuggestions(endMeta.suggestions);
+            if (endMeta.navTarget) setTimeout(function () { tryNavigate(endMeta.navTarget, endMeta.navName); }, 400);
+            if (!skipKuula) setKuulaMuted(false);
+            ttsAudioEl = null;
+            cancelled = true;   // terminal: chan moi reveal/audio con sot lai sau finalize
+            // Voice hands-free: AI doc xong -> mo lai mic cho user noi tiep.
+            if (MODE === 'voice') setTimeout(restartListening, 200);
+        }
+
+        return {
+            // Nhan text delta tu LLM stream -> tach cau dan + bat dau TTS/phat ngay.
+            feed: function (delta) {
+                if (cancelled) return;
+                rawBuf += (delta || '');
+                var mi = rawBuf.indexOf('---SUGGEST---');
+                // Chua thay marker: giu lai 16 ky tu cuoi phong marker '---SUGGEST---' dang hinh thanh.
+                var speakableEnd = mi >= 0 ? mi : Math.max(consumed, rawBuf.length - 16);
+                if (speakableEnd > consumed) {
+                    speakBuf += rawBuf.slice(consumed, speakableEnd);
+                    consumed = speakableEnd;
+                }
+                drain(false);
+            },
+            // LLM stream xong -> flush cau cuoi, gan nav/suggestions, ket thuc.
+            end: function (navTarget, navName, suggestions) {
+                if (cancelled) return;
+                endMeta = { navTarget: navTarget || null, navName: navName || null, suggestions: suggestions || null };
+                streamEnded = true;
+                var mi = rawBuf.indexOf('---SUGGEST---');
+                var speakableEnd = mi >= 0 ? mi : rawBuf.length;
+                if (speakableEnd > consumed) { speakBuf += rawBuf.slice(consumed, speakableEnd); consumed = speakableEnd; }
+                fallbackFull = (mi >= 0 ? rawBuf.slice(0, mi) : rawBuf).trim();
+                drain(true);
+                if (segs.length === 0) { finalizeAll(false); return; }
+                if (!playing) playNext();
+                // Safety: giong async (-phg) co the mat nhieu giay (POST + poll) cho audio cau dau.
+                // Chi khi sau 15s VAN chua phat duoc cau nao -> coi nhu audio loi -> hien text + ket thuc.
+                // (finalizeAll set cancelled=true nen audio toi muon se khong render lai "1 cuc".)
+                setTimeout(function () {
+                    if (!cancelled && !finalized && !bubble) { revealedBase = fallbackFull; finalizeAll(false); }
+                }, 15000);
+            },
+            cancel: function () {
+                cancelled = true;
+                if (ttsRevealTicker) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; }
+                if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (_) {} ttsAudioEl = null; }
+                segs.forEach(function (sg) {
+                    if (sg.audio) sg.audio.then(function (u) { if (u) { try { URL.revokeObjectURL(u); } catch (_) {} } });
+                });
+                setKuulaMuted(false);
+            }
+        };
+    }
+
+    // Fallback 1-phat (khi khong stream): day toan bo text qua pipeline.
     function speakAndRevealSynced(fullText, navTarget, navName, suggestions) {
         if (!TTS_URL || !fullText) {
-            // Fallback: hien luon text + finalize, khong audio
             removeTyping();
             var b = createStreamingBubble();
-            b.setText(fullText);
-            b.finalize(navTarget, navName);
+            b.setText(fullText); b.finalize(navTarget, navName);
             if (suggestions) renderSuggestions(suggestions);
-            if (navTarget) setTimeout(function(){ tryNavigate(navTarget, navName); }, 700);
+            if (navTarget) setTimeout(function () { tryNavigate(navTarget, navName); }, 700);
             return;
         }
         stopTtsAudio();
-        var speechText = cleanTextForTts(fullText);
-
-        fetch(TTS_URL, {
-            method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: speechText })
-        })
-        .then(function (r) {
-            if (!r.ok) {
-                // Doc body de bao loi cu the (server tra JSON khi loi)
-                return r.text().then(function (bodyText) {
-                    var detail = bodyText;
-                    try {
-                        var j = JSON.parse(bodyText);
-                        detail = j.detail || j.error || bodyText;
-                    } catch (_) {}
-                    console.error('[v360cb-tts] HTTP', r.status, detail);
-                    throw new Error('TTS lỗi (' + r.status + '): ' + String(detail).substring(0, 200));
-                });
-            }
-            return r.blob();
-        })
-        .then(function (blob) {
-            var blobUrl = URL.createObjectURL(blob);
-            ttsAudioEl = new Audio(blobUrl);
-            var bubble = null;
-            var revealed = 0;
-            var finalized = false;  // chong double finalize -> double nav chip
-
-            function startReveal() {
-                if (bubble) return; // already started
-                removeTyping();
-                bubble = createStreamingBubble();
-                // Tick 50ms cap nhat text theo audio.currentTime
-                ttsRevealTicker = setInterval(function () {
-                    if (!ttsAudioEl) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; return; }
-                    var dur = ttsAudioEl.duration;
-                    if (!isFinite(dur) || dur < 0.3) return;
-                    var progress = Math.min(1, ttsAudioEl.currentTime / dur);
-                    var targetCount = Math.ceil(fullText.length * progress);
-                    if (targetCount > revealed) {
-                        revealed = targetCount;
-                        bubble.setText(fullText.substring(0, revealed));
-                    }
-                    if (progress >= 1) {
-                        clearInterval(ttsRevealTicker); ttsRevealTicker = null;
-                    }
-                }, 60);
-            }
-            function finishReveal() {
-                if (finalized) return;   // idempotent - chong duplicate nav chip
-                finalized = true;
-                if (ttsRevealTicker) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; }
-                if (!bubble) {
-                    removeTyping();
-                    bubble = createStreamingBubble();
-                }
-                bubble.setText(fullText);
-                bubble.finalize(navTarget, navName);
-                if (suggestions) renderSuggestions(suggestions);
-                if (navTarget) setTimeout(function () { tryNavigate(navTarget, navName); }, 400);
-                try { URL.revokeObjectURL(blobUrl); } catch (_) {}
-            }
-
-            ttsAudioEl.addEventListener('playing', function () {
-                setKuulaMuted(true);   // mute Kuula khi TTS bat dau noi
-                startReveal();
-            });
-            ttsAudioEl.addEventListener('ended', finishReveal);
-            ttsAudioEl.addEventListener('error', function (e) {
-                console.warn('[v360cb-tts] audio err', e);
-                finishReveal();
-            });
-            // Safety: neu audio khong play duoc (no autoplay permission, error...) -> show text sau 4s
-            setTimeout(function () { if (!bubble) finishReveal(); }, 4000);
-
-            ttsAudioEl.play().catch(function (e) {
-                console.warn('[v360cb-tts] play() rejected', e);
-                // Browser autoplay policy block - hien text + bao user
-                finishReveal();
-                appendMsg('error', 'Trình duyệt chặn auto-play audio. Bấm vào tab này 1 lần rồi thử lại.');
-            });
-        })
-        .catch(function (e) {
-            console.warn('[v360cb-tts]', e);
-            // Fallback: hien text + bao loi cho user
-            removeTyping();
-            var b = createStreamingBubble();
-            b.setText(fullText);
-            b.finalize(navTarget, navName);
-            if (suggestions) renderSuggestions(suggestions);
-            if (navTarget) setTimeout(function(){ tryNavigate(navTarget, navName); }, 700);
-            appendMsg('error', '🔊 ' + (e.message || 'TTS không khả dụng'));
-        });
+        var p = createTtsPipeline();
+        ttsPipeline = p;
+        p.feed(fullText);
+        p.end(navTarget, navName, suggestions);
     }
 
     console.log('[v360cb] widget mounted, session=' + SESSION_GUID);

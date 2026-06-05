@@ -398,17 +398,16 @@
         </li>*@
                             <li class="app-sidebar__heading">  360°VIEW - VIDEO - DOCUMENT</li>
                             <li>
-                                @{
-                                    var List_GroupVT = db.Get_IDGroupVirtual(EPORTAL.Models.MyAuthentication.ID).Min(x => x.IDGroup);
-                                    int idVT = Convert.ToInt32(List_GroupVT);
-                                }
                                 <a id="ListProject" href="@Url.Action("Index", "ListProject", new { area = "View360" })">
                                     <i class="metismenu-icon fa-solid fa-list-check"></i>
                                     Dự án của bạn
                                 </a>
                             </li>
                             <li>
-                                <a id="ListVirtual" href="@Url.Action("Index", "ListVirtual", new { area = "View360",id = idVT  })">
+                                @* Khong truyen id: mac dinh xem TAT CA tour user co quyen (giong "Du an cua ban").
+                                   Truoc day truyen id=idVT = Get_IDGroupVirtual(...).Min() -> khi SP tab tra rong
+                                   (data trung MaNV) thi idVT=0 -> URL /Index/0 -> controller loc IDGroup==0 -> "0 tour". *@
+                                <a id="ListVirtual" href="@Url.Action("Index", "ListVirtual", new { area = "View360" })">
                                     <i class="metismenu-icon fa-solid fa-video-camera"></i>
                                     Virtual 360°
                                 </a>

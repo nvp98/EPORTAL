@@ -417,23 +417,57 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     return Json(new { existing = 0, notExisting = 0, total = 0, warnings = new object[0] });
                 }
-                // Merge Items + Groups (server expand groups -> items)
-                var merged = MergeItemsAndGroups(req.Items, req.Groups);
-                if (merged.Length == 0)
-                {
-                    return Json(new { existing = 0, notExisting = 0, total = 0, warnings = new object[0] });
-                }
                 var userIds = req.UserIds.Distinct().ToList();
-                var projIds = merged.Where(i => i.Type == TYPE_PROJECT).Select(i => i.Id).Distinct().ToList();
-                var virtIds = merged.Where(i => i.Type == TYPE_VIRTUAL).Select(i => i.Id).Distinct().ToList();
-                var vidIds  = merged.Where(i => i.Type == TYPE_VIDEO ).Select(i => i.Id).Distinct().ToList();
+
+                // ===== Preview phải đếm CÙNG ĐƠN VỊ với Grant (xem action Grant) =====
+                //   - Groups  -> Grant chèn 1 row/(user, nhóm) vào AuthorizationUSER_Group (auto-inherit).
+                //               => đếm ở mức NHÓM, KHÔNG expand sang content.
+                //   - Items   -> Grant chèn 1 row/(user, content) vào AuthorizationUSER/Vitual/Video.
+                //               => đếm ở mức CONTENT (file-grant lẻ).
+                // Nếu Preview expand groups -> content nhưng Grant lại ghi theo nhóm thì 2 con số
+                // sẽ không bao giờ khớp (đây chính là bug đã xảy ra).
+
+                // ----- A. GROUP-GRANT units (AuthorizationUSER_Group) -----
+                var groups = (req.Groups ?? new GroupRef[0])
+                    .Where(g => g.GroupId > 0)
+                    .GroupBy(g => g.Type + "-" + g.GroupId)
+                    .Select(g => g.First())
+                    .ToList();
+                int groupCount = groups.Count;
+                int groupProjectCount = groups.Count(g => g.Type == TYPE_PROJECT);
+                int groupVirtualCount = groups.Count(g => g.Type == TYPE_VIRTUAL);
+                int groupVideoCount   = groups.Count(g => g.Type == TYPE_VIDEO);
+
+                int groupExisting = 0;
+                if (groupCount > 0 && userIds.Count > 0)
+                {
+                    var projG = groups.Where(g => g.Type == TYPE_PROJECT).Select(g => g.GroupId).ToList();
+                    var virtG = groups.Where(g => g.Type == TYPE_VIRTUAL).Select(g => g.GroupId).ToList();
+                    var vidG  = groups.Where(g => g.Type == TYPE_VIDEO ).Select(g => g.GroupId).ToList();
+                    var conds = new List<string>();
+                    // IN-list từ int (UserIds/GroupId) đã validate -> an toàn để inline.
+                    if (projG.Count > 0) conds.Add("(g.ContentType=1 AND g.IDGroup IN (" + string.Join(",", projG) + "))");
+                    if (virtG.Count > 0) conds.Add("(g.ContentType=2 AND g.IDGroup IN (" + string.Join(",", virtG) + "))");
+                    if (vidG.Count  > 0) conds.Add("(g.ContentType=3 AND g.IDGroup IN (" + string.Join(",", vidG)  + "))");
+                    var groupExistSql = "SELECT COUNT(*) FROM dbo.AuthorizationUSER_Group g WHERE g.NhanVienID IN ("
+                        + string.Join(",", userIds) + ") AND (" + string.Join(" OR ", conds) + ")";
+                    groupExisting = db.Database.SqlQuery<int>(groupExistSql).First();
+                }
+
+                // ----- B. FILE-GRANT units (Items, KHÔNG bao gồm content expand từ groups) -----
+                var items = (req.Items ?? new ContentItem[0])
+                    .GroupBy(i => i.Type + "-" + i.Id)
+                    .Select(g => g.First())
+                    .ToList();
+                var projIds = items.Where(i => i.Type == TYPE_PROJECT).Select(i => i.Id).ToList();
+                var virtIds = items.Where(i => i.Type == TYPE_VIRTUAL).Select(i => i.Id).ToList();
+                var vidIds  = items.Where(i => i.Type == TYPE_VIDEO ).Select(i => i.Id).ToList();
 
                 // DISTINCT count - tránh case AuthorizationUSER/Vitual/Video có row trùng (NhanVienID, ContentID).
-                // Count đúng = số CẶP (user, content) đã tồn tại, không phải số ROW.
-                int existing = 0;
+                int fileExisting = 0;
                 if (projIds.Count > 0)
                 {
-                    existing += db.AuthorizationUSERs
+                    fileExisting += db.AuthorizationUSERs
                         .Where(au => au.NhanVienID.HasValue && au.ProjectID.HasValue
                             && userIds.Contains(au.NhanVienID.Value)
                             && projIds.Contains(au.ProjectID.Value))
@@ -443,7 +477,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 }
                 if (virtIds.Count > 0)
                 {
-                    existing += db.AuthorizationVituals
+                    fileExisting += db.AuthorizationVituals
                         .Where(av => av.NhanVienID.HasValue && av.VirtualID.HasValue
                             && userIds.Contains(av.NhanVienID.Value)
                             && virtIds.Contains(av.VirtualID.Value))
@@ -453,7 +487,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 }
                 if (vidIds.Count > 0)
                 {
-                    existing += db.AuthorizationVideos
+                    fileExisting += db.AuthorizationVideos
                         .Where(av => av.NhanVienID.HasValue && av.VideoID.HasValue
                             && userIds.Contains(av.NhanVienID.Value)
                             && vidIds.Contains(av.VideoID.Value))
@@ -462,10 +496,19 @@ namespace EPORTAL.Areas.View360.Controllers
                         .Count();
                 }
 
-                int total = userIds.Count * (projIds.Count + virtIds.Count + vidIds.Count);
+                int itemCount = projIds.Count + virtIds.Count + vidIds.Count;
+                int unitCount = groupCount + itemCount;
+                if (unitCount == 0)
+                    return Json(new { existing = 0, notExisting = 0, total = 0, warnings = new object[0] });
+
+                int total = userIds.Count * unitCount;
+                int existing = groupExisting + fileExisting;
                 // Defensive: nếu DB có duplicate sẽ làm existing > total → clamp.
                 if (existing > total) existing = total;
                 int notExisting = total - existing;
+
+                // Info-only: số content thực tế các NHÓM sẽ auto-inherit (để hiển thị, KHÔNG dùng để đếm).
+                int groupContentCount = groupCount > 0 ? ExpandGroupsToItems(groups.ToArray()).Count : 0;
 
                 // Warnings
                 var warnings = new List<object>();
@@ -474,28 +517,36 @@ namespace EPORTAL.Areas.View360.Controllers
                     .Count();
                 if (inactiveUsers > 0)
                     warnings.Add(new { type = "inactive_user", count = inactiveUsers,
-                        message = inactiveUsers + " user không đang hoạt động (IDTinhTrangLV ≠ 1) - vẫn cấp nếu xác nhận." });
+                        message = inactiveUsers + " người dùng không đang làm việc - vẫn cấp nếu xác nhận." });
 
                 int noDeptUsers = db.NhanViens
                     .Where(n => userIds.Contains(n.ID) && n.IDPhongBan == null)
                     .Count();
                 if (noDeptUsers > 0)
                     warnings.Add(new { type = "no_dept_user", count = noDeptUsers,
-                        message = noDeptUsers + " user chưa gán phòng ban." });
+                        message = noDeptUsers + " người dùng chưa gán phòng ban." });
 
                 return Json(new {
-                    // Tổng quyền sẽ tác động = userCount × contentCount
+                    // Tổng quyền sẽ tác động = userCount × (số nhóm + số content lẻ)
                     total,
-                    // Đã có sẵn trong DB (cặp user-content đã được cấp trước đó) - sẽ skip
+                    // Đã có sẵn trong DB (group-grant + file-grant) - sẽ skip
                     existing,
                     // Cần tạo mới
                     notExisting,
                     // Breakdown để hiển thị chi tiết
                     userCount = userIds.Count,
-                    contentCount = projIds.Count + virtIds.Count + vidIds.Count,
-                    projectCount = projIds.Count,
-                    virtualCount = virtIds.Count,
-                    videoCount = vidIds.Count,
+                    unitCount,
+                    // Group-grant breakdown (đơn vị = nhóm)
+                    groupCount,
+                    groupProjectCount,
+                    groupVirtualCount,
+                    groupVideoCount,
+                    groupContentCount,   // info-only: content được auto-inherit
+                    // File-grant breakdown (đơn vị = content lẻ)
+                    itemCount,
+                    fileProjectCount = projIds.Count,
+                    fileVirtualCount = virtIds.Count,
+                    fileVideoCount   = vidIds.Count,
                     warnings
                 });
             }
@@ -536,11 +587,11 @@ namespace EPORTAL.Areas.View360.Controllers
                     .Select(vd => new { vd.IDVideo, vd.Title }).ToDictionary(x => x.IDVideo, x => x.Title);
 
                 var result = projects.Select(x => new { type = x.type, typeName = "Project",
-                                                        id = x.id, title = pTitles.ContainsKey(x.id) ? pTitles[x.id] : "(da xoa)" })
+                                                        id = x.id, title = pTitles.ContainsKey(x.id) ? pTitles[x.id] : "(đã xoá)" })
                     .Concat(virtuals.Select(x => new { type = x.type, typeName = "Virtual",
-                                                        id = x.id, title = vTitles.ContainsKey(x.id) ? vTitles[x.id] : "(da xoa)" }))
+                                                        id = x.id, title = vTitles.ContainsKey(x.id) ? vTitles[x.id] : "(đã xoá)" }))
                     .Concat(videos.Select(x => new { type = x.type, typeName = "Video",
-                                                        id = x.id, title = vdTitles.ContainsKey(x.id) ? vdTitles[x.id] : "(da xoa)" }))
+                                                        id = x.id, title = vdTitles.ContainsKey(x.id) ? vdTitles[x.id] : "(đã xoá)" }))
                     .ToList();
                 return Json(new { total = result.Count, items = result }, JsonRequestBehavior.AllowGet);
             }
@@ -740,14 +791,14 @@ namespace EPORTAL.Areas.View360.Controllers
                         {
                             result["unusedGrants"] = new object[0];
                             result["unusedGrantsReady"] = false;
-                            result["unusedGrantsMessage"] = "Tracking chưa đủ 30 ngày để có dữ liệu chính xác.";
+                            result["unusedGrantsMessage"] = "Theo dõi chưa đủ 30 ngày để có dữ liệu chính xác.";
                         }
                     }
                     else
                     {
                         result["unusedGrants"] = new object[0];
                         result["unusedGrantsReady"] = false;
-                        result["unusedGrantsMessage"] = "Bảng tracking View360_AccessLog chưa tồn tại.";
+                        result["unusedGrantsMessage"] = "Chưa bật theo dõi truy cập (bảng dữ liệu chưa tồn tại).";
                     }
                 }
                 catch (Exception ex)
@@ -771,7 +822,7 @@ namespace EPORTAL.Areas.View360.Controllers
             {
                 var req = ReadJson<GrantRequest>();
                 if (req == null || req.UserIds == null || req.UserIds.Length == 0)
-                    return Json(new { created = 0, skipped = 0, error = "Thiếu user" });
+                    return Json(new { created = 0, skipped = 0, error = "Thiếu người dùng" });
 
                 int created = 0, skipped = 0;
                 var now = DateTime.Now;
@@ -1004,7 +1055,7 @@ namespace EPORTAL.Areas.View360.Controllers
             try
             {
                 var nv = db.NhanViens.FirstOrDefault(n => n.ID == userId);
-                if (nv == null) return Json(new { error = "Không tìm thấy user" }, JsonRequestBehavior.AllowGet);
+                if (nv == null) return Json(new { error = "Không tìm thấy người dùng" }, JsonRequestBehavior.AllowGet);
 
                 var projects = (from au in db.AuthorizationUSERs
                                 join p in db.Projects on au.ProjectID equals p.ID
