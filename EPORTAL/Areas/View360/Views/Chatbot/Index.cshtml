@@ -15,6 +15,10 @@
                     <h1><i class="fa-solid fa-robot" style="color: var(--v360-accent);"></i> Cấu hình Chatbot AI</h1>
                     <p>Soạn giới thiệu tổng quan tour + nội dung từng điểm để AI trả lời người dùng có ngữ cảnh.</p>
                 </div>
+                <a href="@Url.Action("KnowledgeBase", "Chatbot", new { area = "View360" })"
+                   class="btn btn-outline-primary" style="align-self:center;white-space:nowrap">
+                    <i class="fa-solid fa-database"></i> Knowledge Cache
+                </a>
             </div>
 
             @if (Model.Count == 0)

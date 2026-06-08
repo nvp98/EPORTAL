@@ -168,6 +168,7 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!ChatbotContentStore.SaveTourInfo(collectionId, info, MyAuthentication.ID))
                 return Json(new { ok = false, error = "DB save failed" });
             InvalidateCache(collectionId);
+            KnowledgeStore.MarkStale(collectionId);   // noi dung tour doi -> KB cu coi nhu het hieu luc
             return Json(new { ok = true });
         }
 
@@ -198,10 +199,137 @@ namespace EPORTAL.Areas.View360.Controllers
             SceneCalibrationStore.Save(collectionId, uuid, calib);
 
             InvalidateCache(collectionId);
+            KnowledgeStore.MarkStale(collectionId, uuid);   // noi dung scene doi -> KB lien quan het hieu luc
             return Json(new {
                 ok = true,
                 configuredCount = ChatbotContentStore.GetConfiguredSceneCount(collectionId)
             });
+        }
+
+        // ==================================================================
+        //   ADMIN - KNOWLEDGE BASE (quan ly cau tra loi da cache)
+        // ==================================================================
+
+        // GET: View360/Chatbot/KnowledgeBase - trang quan ly KB
+        public ActionResult KnowledgeBase(string collectionId = null, string status = "active", string q = null)
+        {
+            if (!HasAdminPerm(A_Constants.VIEW_ALL)) return new HttpUnauthorizedResult();
+            var rows = KnowledgeStore.ListForAdmin(collectionId, status, q);
+            ViewBag.FilterCollection = collectionId;
+            ViewBag.FilterStatus = status;
+            ViewBag.FilterQ = q;
+            return View(rows);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult KbSetStatus(long id, string collectionId, string status)
+        {
+            if (!HasAdminPerm(A_Constants.EDIT)) return new HttpUnauthorizedResult();
+            var ok = status == "active" || status == "disabled" || status == "pending" || status == "stale";
+            if (!ok) return Json(new { ok = false, error = "status không hợp lệ" });
+            KnowledgeStore.SetStatus(id, collectionId, status);
+            return Json(new { ok = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult KbDelete(long id, string collectionId)
+        {
+            if (!HasAdminPerm(A_Constants.DELETE)) return new HttpUnauthorizedResult();
+            KnowledgeStore.Delete(id, collectionId);
+            return Json(new { ok = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult KbEdit(long id, string collectionId, string canonicalQuestion, string answerText, int qualityScore, string suggestions)
+        {
+            if (!HasAdminPerm(A_Constants.EDIT)) return new HttpUnauthorizedResult();
+            if (string.IsNullOrWhiteSpace(answerText)) return Json(new { ok = false, error = "Câu trả lời trống" });
+            KnowledgeStore.UpdateAnswer(id, collectionId, canonicalQuestion, answerText, qualityScore, suggestions);
+            return Json(new { ok = true });
+        }
+
+        // GET: nghe audio cua 1 cau tra loi - ghep cac doan audio cache (theo tung cau) lai.
+        [HttpGet]
+        public ActionResult KbAudio(long id)
+        {
+            if (!HasAdminPerm(A_Constants.VIEW_ALL)) return new HttpUnauthorizedResult();
+            var answer = KnowledgeStore.GetAnswerById(id);
+            if (string.IsNullOrEmpty(answer)) return HttpNotFound();
+            var hashes = AnswerAudioHashes(answer);
+            if (hashes.Count == 0) return new HttpStatusCodeResult(404, "Không có nội dung đọc");
+            var map = AudioCacheStore.GetMany(hashes);
+            using (var ms = new System.IO.MemoryStream())
+            {
+                int found = 0;
+                foreach (var h in hashes)
+                    if (map.TryGetValue(h, out var bytes) && bytes != null) { ms.Write(bytes, 0, bytes.Length); found++; }
+                if (found == 0) return new HttpStatusCodeResult(404, "Chưa có audio (mở chế độ Đọc 1 lần để tạo)");
+                return new FileContentResult(ms.ToArray(), "audio/mpeg");
+            }
+        }
+
+        // POST: xoa audio cache cua 1 cau tra loi -> lan sau o che do Doc se tao + cache lai.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult KbClearAudio(long id)
+        {
+            if (!HasAdminPerm(A_Constants.EDIT)) return new HttpUnauthorizedResult();
+            var answer = KnowledgeStore.GetAnswerById(id);
+            if (string.IsNullOrEmpty(answer)) return Json(new { ok = false, error = "Không có câu trả lời" });
+            int n = AudioCacheStore.DeleteMany(AnswerAudioHashes(answer));
+            return Json(new { ok = true, deleted = n });
+        }
+
+        // Tach 1 cau tra loi thanh cac hash audio cache (theo giong/toc do/maxChars HIEN TAI) - mirror
+        // client TTS pipeline (popSentence + cleanTextForTts) de trung dung hash da cache khi user nghe.
+        private static List<string> AnswerAudioHashes(string answer)
+        {
+            var voiceCode = GetChatbotCfg("CHATBOT_VBEE_VOICE", "Chatbot.VbeeVoice") ?? "hn_female_ngochuyen_full_48k-fhg";
+            var speedStr  = GetChatbotCfg("CHATBOT_VBEE_SPEED", "Chatbot.VbeeSpeed") ?? "1.0";
+            double speed  = double.TryParse(speedStr, System.Globalization.NumberStyles.Float,
+                                            System.Globalization.CultureInfo.InvariantCulture, out var sp) ? sp : 1.0;
+            var maxChars = GetVbeeTtsMaxChars(voiceCode);
+            var hashes = new List<string>();
+            foreach (var sent in SplitTtsSentences(answer))
+            {
+                var tts = CleanTextForTts(sent);
+                if (string.IsNullOrEmpty(tts)) continue;
+                if (maxChars > 0 && tts.Length > maxChars) tts = tts.Substring(0, maxChars);
+                hashes.Add(AudioCacheStore.HashFor(voiceCode, speed, tts));
+            }
+            return hashes;
+        }
+
+        // Tach cau giong popSentence client: bien gioi [.!?…]+space hoac newline (giu dau cau).
+        private static List<string> SplitTtsSentences(string text)
+        {
+            var list = new List<string>();
+            if (string.IsNullOrEmpty(text)) return list;
+            int last = 0;
+            var rx = new System.Text.RegularExpressions.Regex(@"[.!?…]\s|\n");
+            foreach (System.Text.RegularExpressions.Match m in rx.Matches(text))
+            {
+                bool isNl = m.Value == "\n";
+                int keepEnd = isNl ? m.Index : m.Index + 1;
+                var s = text.Substring(last, keepEnd - last).Trim();
+                if (s.Length > 0) list.Add(s);
+                last = m.Index + m.Length;
+            }
+            if (last < text.Length) { var rest = text.Substring(last).Trim(); if (rest.Length > 0) list.Add(rest); }
+            return list;
+        }
+
+        // Mirror cleanTextForTts client.
+        private static string CleanTextForTts(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            s = System.Text.RegularExpressions.Regex.Replace(s, @"[*_`~]", "");
+            s = System.Text.RegularExpressions.Regex.Replace(s, @"\[.*?\]", "");
+            s = System.Text.RegularExpressions.Regex.Replace(s, @"\([\s\S]*?\)", mm => mm.Value.Length < 60 ? mm.Value : "");
+            return s.Trim();
         }
 
         // ==================================================================
@@ -406,9 +534,12 @@ namespace EPORTAL.Areas.View360.Controllers
             var vbeeAppId = Environment.GetEnvironmentVariable("VBEE_ID_APP");
             if (string.IsNullOrEmpty(vbeeToken) || string.IsNullOrEmpty(vbeeAppId))
             {
+                // Thieu key -> 503 (client tu fallback ve text, KHONG retry). KHONG loi toan cuc.
                 System.Diagnostics.Debug.WriteLine("[Speak] VBEE_API_TOKEN hoac VBEE_ID_APP chua duoc set");
-                return new HttpStatusCodeResult(500);
+                return new HttpStatusCodeResult(503, "TTS chưa cấu hình");
             }
+            if (ServiceHealth.IsDown(ServiceHealth.VBEE))
+                return new HttpStatusCodeResult(503, "TTS tạm thời không khả dụng");
 
             var voiceCode = GetChatbotCfg("CHATBOT_VBEE_VOICE", "Chatbot.VbeeVoice")
                          ?? "hn_female_ngochuyen_full_48k-fhg";   // Ngoc Huyen - flagship nu Bac
@@ -423,7 +554,16 @@ namespace EPORTAL.Areas.View360.Controllers
                 text = text.Substring(0, maxChars);
             }
 
-            // Dem usage TTS theo ngay (call +1, units = so ky tu thuc gui VBee).
+            // === Audio cache (DB): cung text+giong+toc do -> tai dung, BO QUA VBee + khong tinh usage ===
+            var ttsHash = AudioCacheStore.HashFor(voiceCode, speed, text);
+            var cachedAudio = AudioCacheStore.Get(ttsHash);
+            if (cachedAudio != null)
+            {
+                System.Diagnostics.Debug.WriteLine("[Speak] audio cache HIT " + ttsHash.Substring(0, 8) + " bytes=" + cachedAudio.Length);
+                return new FileContentResult(cachedAudio, "audio/mpeg");
+            }
+
+            // Dem usage TTS theo ngay (call +1, units = so ky tu thuc gui VBee). Chi tinh khi THUC SU goi VBee.
             ChatbotContentStore.IncrementDailyUsage(MyAuthentication.ID, "tts", text.Length);
 
             var payload = new JObject {
@@ -457,6 +597,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     var content = new System.Net.Http.StringContent(
                         payload.ToString(), System.Text.Encoding.UTF8, "application/json");
                     var resp = await http.PostAsync("https://api.vbee.vn/v1/tts", content);
+                    ServiceHealth.MarkUp(ServiceHealth.VBEE);   // co response = ket noi OK (du content co the loi)
                     if (!resp.IsSuccessStatusCode)
                     {
                         var err = await resp.Content.ReadAsStringAsync();
@@ -472,13 +613,15 @@ namespace EPORTAL.Areas.View360.Controllers
                             + JsonConvert.SerializeObject(err) + "}", "application/json");
                     }
 
-                    return await ReturnVbeeTtsAudio(http, resp, "[Speak/VBee]");
+                    return await ReturnVbeeTtsAudio(http, resp, "[Speak/VBee]", voiceCode, speed, text);
                 }
             }
             catch (Exception ex)
             {
+                // Loi ket noi (firewall chan VBee) -> mark down + 503; client tu fallback ve text.
+                if (ServiceHealth.IsConnectivityError(ex)) ServiceHealth.MarkDown(ServiceHealth.VBEE);
                 System.Diagnostics.Debug.WriteLine("[Speak/VBee] EX " + ex);
-                return new HttpStatusCodeResult(500);
+                return new HttpStatusCodeResult(503, "TTS lỗi kết nối");
             }
         }
 
@@ -540,6 +683,7 @@ namespace EPORTAL.Areas.View360.Controllers
             var content = new System.Net.Http.StringContent(
                 payload.ToString(), System.Text.Encoding.UTF8, "application/json");
             var resp = await http.PostAsync("https://api.vbee.vn/v1/tts", content);
+            ServiceHealth.MarkUp(ServiceHealth.VBEE);   // co response = ket noi OK
             var respBody = await resp.Content.ReadAsStringAsync();
             if (!resp.IsSuccessStatusCode)
             {
@@ -597,6 +741,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         return Content("{\"error\":\"VBee audioLink fetch failed\"}", "application/json");
                     }
                     System.Diagnostics.Debug.WriteLine("[Speak/VBee async] OK bytes=" + audioBytes.Length);
+                    AudioCacheStore.Save(AudioCacheStore.HashFor(voiceCode, speed, text), voiceCode, speed, text, audioBytes);
                     return new FileContentResult(audioBytes, "audio/mpeg");
                 }
                 if (status == "FAILED" || status == "FAILURE" || status == "ERROR" || status == "CANCELED")
@@ -616,13 +761,15 @@ namespace EPORTAL.Areas.View360.Controllers
                 + ",\"timeoutSeconds\":" + maxPollSeconds + "}", "application/json");
         }
 
-        private async Task<ActionResult> ReturnVbeeTtsAudio(System.Net.Http.HttpClient http, System.Net.Http.HttpResponseMessage resp, string logPrefix)
+        private async Task<ActionResult> ReturnVbeeTtsAudio(System.Net.Http.HttpClient http, System.Net.Http.HttpResponseMessage resp, string logPrefix,
+            string voiceCode, double speed, string text)
         {
             var contentType = resp.Content.Headers.ContentType?.MediaType ?? "";
             if (contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase))
             {
                 var audio = await resp.Content.ReadAsByteArrayAsync();
                 System.Diagnostics.Debug.WriteLine(logPrefix + " OK direct audio bytes=" + audio.Length);
+                AudioCacheStore.Save(AudioCacheStore.HashFor(voiceCode, speed, text), voiceCode, speed, text, audio);
                 return new FileContentResult(audio, "audio/mpeg");
             }
 
@@ -643,6 +790,7 @@ namespace EPORTAL.Areas.View360.Controllers
             var audioRes = await http.GetAsync(audioLink);
             var audioBytes = await audioRes.Content.ReadAsByteArrayAsync();
             System.Diagnostics.Debug.WriteLine(logPrefix + " OK via link bytes=" + audioBytes.Length);
+            AudioCacheStore.Save(AudioCacheStore.HashFor(voiceCode, speed, text), voiceCode, speed, text, audioBytes);
             return new FileContentResult(audioBytes, "audio/mpeg");
         }
 
@@ -679,7 +827,9 @@ namespace EPORTAL.Areas.View360.Controllers
             var vbeeToken = Environment.GetEnvironmentVariable("VBEE_API_TOKEN");
             var vbeeAppId = Environment.GetEnvironmentVariable("VBEE_ID_APP");
             if (string.IsNullOrEmpty(vbeeToken) || string.IsNullOrEmpty(vbeeAppId))
-                return Json(new { ok = false, error = "VBee credentials chua duoc set" });
+                return Json(new { ok = false, error = "Nhận giọng nói chưa được cấu hình." });
+            if (ServiceHealth.IsDown(ServiceHealth.VBEE))
+                return Json(new { ok = false, error = "Nhận giọng nói tạm thời không khả dụng." });
 
             try
             {
@@ -720,6 +870,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         form.Add(new System.Net.Http.StringContent("vi-VN"), "languageCode");
 
                         var resp = await http.PostAsync("https://api.vbee.vn/v1/stt", form);
+                        ServiceHealth.MarkUp(ServiceHealth.VBEE);   // co response = ket noi OK
                         var respBody = await resp.Content.ReadAsStringAsync();
                         if (!resp.IsSuccessStatusCode)
                         {
@@ -745,8 +896,9 @@ namespace EPORTAL.Areas.View360.Controllers
             }
             catch (Exception ex)
             {
+                if (ServiceHealth.IsConnectivityError(ex)) ServiceHealth.MarkDown(ServiceHealth.VBEE);
                 System.Diagnostics.Debug.WriteLine("[Transcribe] EX " + ex);
-                return Json(new { ok = false, error = "Exception: " + ex.Message });
+                return Json(new { ok = false, error = "Lỗi nhận giọng nói. Vui lòng thử lại." });
             }
         }
 
@@ -1101,6 +1253,63 @@ namespace EPORTAL.Areas.View360.Controllers
             var suggestBuf = new StringBuilder();
             bool inSuggest = false;
 
+            // ===== Knowledge cache (retrieval-first): cau hoi DOC LAP (history rong) -> thu tra loi tu KB =====
+            // Hit -> stream tra loi cache (+ audio cache), BO QUA OpenAI. Loi KB -> bo qua, chay luong thuong.
+            bool kbEnabled = ChatbotConfig.Get("CHATBOT_KB_ENABLED", "Chatbot.KbEnabled", "true") == "true";
+            if (kbEnabled)
+            {
+                try
+                {
+                    double simT = double.TryParse(ChatbotConfig.Get("CHATBOT_KB_SIM_THRESHOLD", "Chatbot.KbSimThreshold", "0.88"),
+                        System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var st) ? st : 0.92;
+                    int kbMinScore = ChatbotConfig.GetInt("CHATBOT_KB_MIN_SCORE", "Chatbot.KbMinScore", 85);
+
+                    // B1: exact-normalized (tuc thi, khong goi embedding) - hop cho cau mac dinh / lap nguyen van.
+                    var hit = KnowledgeStore.Lookup(collectionId, sceneUuid, null, message, simT, kbMinScore);
+                    // B2: chua trung -> semantic match qua embedding.
+                    if (hit == null)
+                    {
+                        var qEmb = await new OpenAIEmbeddingClient().EmbedAsync(message);
+                        if (qEmb != null) hit = KnowledgeStore.Lookup(collectionId, sceneUuid, qEmb, message, simT, kbMinScore);
+                    }
+
+                    // Nav cache: chong Kuula uuid DRIFT -> uuid dich khong con trong tour thi BO hit,
+                    // de OpenAI resolve lai (ten -> uuid moi) + tu cache lai dung. (drift tu lanh)
+                    if (hit != null && hit.ActionType == "navigate"
+                        && !(! string.IsNullOrEmpty(hit.ActionTarget) && allScenes.Any(x => x.Uuid == hit.ActionTarget)))
+                    {
+                        System.Diagnostics.Debug.WriteLine("[AskStream] KB nav hit BO (uuid stale): " + hit.ActionTarget);
+                        hit = null;
+                    }
+
+                    if (hit != null && !string.IsNullOrEmpty(hit.AnswerText))
+                    {
+                        writeEvent("text", new { delta = hit.AnswerText });
+                        string hitName = (hit.ActionType == "navigate" && !string.IsNullOrEmpty(hit.ActionTarget))
+                            ? GetSceneDisplayName(hit.ActionTarget, customTitles, allScenes) : null;
+                        writeEvent("done", new {
+                            action = (hit.ActionType == "navigate" && !string.IsNullOrEmpty(hit.ActionTarget))
+                                ? (object)new { type = "navigate", target = hit.ActionTarget, name = hitName }
+                                : null,
+                            suggestions = hit.Suggestions,
+                            tokensIn = 0, tokensOut = 0,
+                            latencyMs = (int)sw.ElapsedMilliseconds,
+                            cached = true
+                        });
+                        System.Diagnostics.Debug.WriteLine("[AskStream] KB HIT id=" + hit.Id + " (" + sw.ElapsedMilliseconds + "ms)");
+                        try
+                        {
+                            ChatbotContentStore.LogMessage(new ChatbotMessageLog { SessionGuid = sessionGuid, NhanVienID = MyAuthentication.ID, CollectionId = collectionId, SceneUuid = sceneUuid, Role = 0, Content = message });
+                            ChatbotContentStore.LogMessage(new ChatbotMessageLog { SessionGuid = sessionGuid, NhanVienID = MyAuthentication.ID, CollectionId = collectionId, SceneUuid = sceneUuid, Role = 1, Content = hit.AnswerText, Action = (hit.ActionType == "navigate" ? ("navigate:" + hit.ActionTarget) : "cache"), TokensIn = 0, TokensOut = 0, LatencyMs = (int)sw.ElapsedMilliseconds });
+                        }
+                        catch { }
+                        try { resp.End(); } catch { }
+                        return;
+                    }
+                }
+                catch (Exception exKb) { System.Diagnostics.Debug.WriteLine("[AskStream.KB lookup] " + exKb.Message); }
+            }
+
             var client = new OpenAIChatbotClient();
             await client.StreamAsync(new ChatbotRequest {
                 SystemPrompt = sysPrompt,
@@ -1263,6 +1472,57 @@ namespace EPORTAL.Areas.View360.Controllers
                     });
                 }
                 catch { /* dont fail */ }
+
+                // ===== Knowledge cache: Curator cham diem + (co the) luu - chay NEN, khong chan response =====
+                if (kbEnabled && string.IsNullOrEmpty(error))
+                {
+                    var qCap   = message;
+                    var rawAns = fullText.ToString();
+                    var miSug  = rawAns.IndexOf(SUGG_SENT, StringComparison.Ordinal);
+                    var aClean = (miSug >= 0 ? rawAns.Substring(0, miSug) : rawAns).TrimEnd('\r', '\n', ' ');
+                    var actCap = actionType; var tgtCap = actionTarget; var suggCap = suggestions;
+                    var collCap = collectionId; var sceneCap = sceneUuid;
+                    var hadHist = history.Count > 1;   // co hoi thoai truoc -> Curator xet ky contextDependent
+                    var curModel = ChatbotConfig.Get("CHATBOT_CURATOR_MODEL", "Chatbot.CuratorModel", "gpt-4.1-mini");
+                    int curMin   = ChatbotConfig.GetInt("CHATBOT_KB_MIN_SCORE", "Chatbot.KbMinScore", 85);
+                    if (!string.IsNullOrWhiteSpace(aClean))
+                    {
+                        System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem(async ct =>
+                        {
+                            try
+                            {
+                                // Lenh DIEU HUONG: xac dinh + hay lap -> cache THANG (bo qua Curator).
+                                // canonical = cau lenh user; target = uuid (serve se validate chong drift).
+                                if (actCap == "navigate" && !string.IsNullOrEmpty(tgtCap))
+                                {
+                                    var navEmb = await new OpenAIEmbeddingClient().EmbedAsync(qCap);
+                                    var navSugg = (suggCap != null && suggCap.Length > 0) ? string.Join("|", suggCap) : null;
+                                    KnowledgeStore.Upsert(collCap, null, "navigate", qCap, aClean,
+                                        "navigate", tgtCap, navSugg, "dieu-huong", null, 90, 1.0, "nav", navEmb);
+                                    System.Diagnostics.Debug.WriteLine("[AskStream] KB cached NAV '" + qCap + "' -> " + tgtCap);
+                                    return;
+                                }
+
+                                var cur = await new ChatbotCurator().EvaluateAsync(qCap, aClean, false, false, null, hadHist);
+                                // Cache moi cau du tot + TU THAN DAY DU (khong phu thuoc hoi thoai truoc).
+                                if (cur != null && cur.ShouldCache && !cur.Sensitive && !cur.ContextDependent && cur.QualityScore >= curMin)
+                                {
+                                    var canon = string.IsNullOrEmpty(cur.CanonicalQuestion) ? qCap : cur.CanonicalQuestion;
+                                    var emb = await new OpenAIEmbeddingClient().EmbedAsync(canon);
+                                    var suggPipe = (suggCap != null && suggCap.Length > 0) ? string.Join("|", suggCap) : null;
+                                    var sceneScope = (cur.Scope == "scene") ? sceneCap : null;
+                                    KnowledgeStore.Upsert(collCap, sceneScope, cur.Intent, canon, aClean,
+                                        actCap, tgtCap, suggPipe, cur.Category, cur.Tags,
+                                        cur.QualityScore, cur.Confidence, curModel, emb);
+                                    System.Diagnostics.Debug.WriteLine("[AskStream] KB cached '" + canon + "' score=" + cur.QualityScore);
+                                }
+                                else if (cur != null)
+                                    System.Diagnostics.Debug.WriteLine("[AskStream] KB skip cache: score=" + cur.QualityScore + " reason=" + cur.Reason);
+                            }
+                            catch (Exception exCur) { System.Diagnostics.Debug.WriteLine("[AskStream.KB curate] " + exCur.Message); }
+                        });
+                    }
+                }
             });
 
             try { resp.End(); } catch { /* client may have disconnected */ }
@@ -1659,6 +1919,8 @@ namespace EPORTAL.Areas.View360.Controllers
             sb.AppendLine("  - 'chuyển tới X', 'đi tới X', 'qua X', 'đến X', 'tới X', 'sang X'");
             sb.AppendLine("  - 'đưa tôi tới X', 'dẫn tôi tới X', 'cho tôi xem X', 'mở X', 'hiện X'");
             sb.AppendLine("  - 'tôi muốn xem X', 'tôi muốn đến X'");
+            sb.AppendLine("  - HỎI VỊ TRÍ điểm CÓ trong danh sách: 'X ở đâu', 'X nằm ở đâu', 'vị trí của X', 'tới X bằng cách nào', 'đường tới X'");
+            sb.AppendLine("    → Đây là tour 360, ĐƯA TỚI TẬN NƠI chính là cách chỉ vị trí → COI LÀ Ý ĐỊNH DI CHUYỂN, gọi navigate_to_scene tới X.");
             sb.AppendLine();
             sb.AppendLine("KHÔNG NAVIGATE khi user chỉ HỎI THÔNG TIN về một điểm (dù câu hỏi có nhắc tên điểm đó):");
             sb.AppendLine("  - 'X có đặc điểm gì?', 'X có gì?', 'giới thiệu về X', 'thông tin về X', 'mô tả X', 'X là gì?', 'X rộng/lớn bao nhiêu?', 'kể về X', 'X hoạt động thế nào?'");
@@ -1669,6 +1931,7 @@ namespace EPORTAL.Areas.View360.Controllers
             sb.AppendLine("- LUÔN trả lời bằng tiếng Việt, ngắn gọn (2-4 câu), thân thiện.");
             sb.AppendLine("- CHỈ dựa trên thông tin được cung cấp. KHÔNG bịa số liệu, không suy đoán.");
             sb.AppendLine("- Nếu không có thông tin để trả lời câu hỏi: 'Tôi chưa được cung cấp thông tin về điều này. Bạn có thể hỏi quản trị viên.'");
+            sb.AppendLine("- NGOẠI LỆ về VỊ TRÍ: nếu user hỏi 'X ở đâu / nằm đâu / vị trí X' mà X CÓ trong DANH SÁCH CÁC ĐIỂM → TUYỆT ĐỐI KHÔNG nói 'chưa có thông tin về vị trí'; hãy gọi navigate_to_scene đưa tới X (xem QUY TẮC #1).");
             sb.AppendLine("- KHÔNG trả lời ngoài chủ đề Khu Liên Hợp Hòa Phát Dung Quất và tour này.");
             sb.AppendLine("- 'ở đây / tại đây / chỗ này / khu này / nơi này / điểm này' LUÔN chỉ ĐIỂM NGƯỜI DÙNG ĐANG XEM (mục '=== ĐIỂM NGƯỜI DÙNG ĐANG XEM ==='), KHÔNG phải điểm vừa nhắc ở câu hỏi trước.");
             sb.AppendLine("- User có thể hỏi về BẤT KỲ điểm nào trong '=== DANH SÁCH CÁC ĐIỂM TRONG TOUR ===' (không riêng điểm đang xem). Hãy dùng phần 'Chi tiết' của ĐÚNG điểm user hỏi để trả lời — KHÔNG nói 'chưa có thông tin' nếu điểm đó có mô tả trong danh sách.");

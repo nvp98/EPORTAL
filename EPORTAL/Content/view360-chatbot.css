@@ -444,7 +444,9 @@
 
 /* Navigate CTA chip */
 .v360cb__nav {
-    display: inline-flex;
+    display: flex;          /* block-level -> chip nam DONG RIENG duoi text (khong dinh cung dong) */
+    width: fit-content;
+    max-width: 100%;
     align-items: center;
     gap: 6px;
     margin-top: 9px;

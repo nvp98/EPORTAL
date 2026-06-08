@@ -263,7 +263,15 @@ namespace EPORTAL.Common
                 var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
                 if (string.IsNullOrEmpty(apiKey))
                 {
-                    error = "OPENAI_API_KEY khong duoc set";
+                    // Thieu key -> degrade, KHONG loi toan cuc; bao than thien.
+                    error = "Trợ lý ảo chưa được cấu hình (thiếu API key). Vui lòng liên hệ quản trị viên.";
+                    onComplete?.Invoke(0, 0, error);
+                    return;
+                }
+                if (ServiceHealth.IsDown(ServiceHealth.OPENAI))
+                {
+                    // Vua loi ket noi gan day -> fast-fail, khong cho timeout lai.
+                    error = "Trợ lý ảo tạm thời không kết nối được. Vui lòng thử lại sau ít phút.";
                     onComplete?.Invoke(0, 0, error);
                     return;
                 }
@@ -308,10 +316,14 @@ namespace EPORTAL.Common
                         if (!resp.IsSuccessStatusCode)
                         {
                             var bodyErr = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            error = "OpenAI " + (int)resp.StatusCode + ": " + TruncateError(bodyErr);
+                            System.Diagnostics.Debug.WriteLine("[StreamAsync] OpenAI " + (int)resp.StatusCode + ": " + TruncateError(bodyErr));
+                            error = ((int)resp.StatusCode == 429)
+                                ? "Trợ lý ảo đang quá tải. Vui lòng thử lại sau giây lát."
+                                : "Trợ lý ảo gặp sự cố. Vui lòng thử lại.";
                             onComplete?.Invoke(0, 0, error);
                             return;
                         }
+                        ServiceHealth.MarkUp(ServiceHealth.OPENAI);   // 200 -> dich vu OK, mo lai circuit
                         using (var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false))
                         using (var reader = new System.IO.StreamReader(stream, Encoding.UTF8))
                         {
@@ -372,11 +384,17 @@ namespace EPORTAL.Common
             }
             catch (TaskCanceledException)
             {
-                error = "Request timeout";
+                ServiceHealth.MarkDown(ServiceHealth.OPENAI);
+                error = "Trợ lý ảo phản hồi quá lâu (mạng chậm hoặc bị chặn). Vui lòng thử lại.";
             }
             catch (Exception ex)
             {
-                error = "Exception: " + ex.Message;
+                if (ServiceHealth.IsConnectivityError(ex))
+                {
+                    ServiceHealth.MarkDown(ServiceHealth.OPENAI);
+                    error = "Trợ lý ảo tạm thời không kết nối được. Vui lòng thử lại sau.";
+                }
+                else { error = "Đã có lỗi khi xử lý câu hỏi. Vui lòng thử lại."; }
                 System.Diagnostics.Debug.WriteLine("[StreamAsync] " + ex);
             }
             onComplete?.Invoke(tokensIn, tokensOut, error);

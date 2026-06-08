@@ -77,7 +77,7 @@
 }
 
 <link href="~/Content/view360-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
-@if (ViewBag.ChatbotEnabled == true)
+@if (ViewBag.ChatbotEnabled == true && !_isAdmin)
 {
     <link href="~/Content/view360-chatbot.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
 }
@@ -228,6 +228,12 @@
                                 <div class="v360-admin__row">
                                     <label>Bán kính radar: <span id="v360-cfg-radius-val">40</span>px</label>
                                     <input type="range" id="v360-cfg-radius" min="15" max="100" step="1" />
+                                </div>
+                                <div class="v360-admin__row">
+                                    <label class="v360-admin__check">
+                                        <input type="checkbox" id="v360-cfg-minimap" checked /> Hiện minimap cho người xem
+                                    </label>
+                                    <div class="v360-admin__hint">Tắt = ẩn minimap với người dùng (admin vẫn thấy để cấu hình).</div>
                                 </div>
                                 <div class="v360-admin__actions">
                                     <button type="button" id="v360-cfg-save" class="v360-admin__primary"><i class="fa fa-save"></i> Lưu</button>
@@ -657,6 +663,7 @@
         var cfgFanVal    = document.getElementById('v360-cfg-fan-val');
         var cfgRadius    = document.getElementById('v360-cfg-radius');
         var cfgRadiusVal = document.getElementById('v360-cfg-radius-val');
+        var cfgMinimap   = document.getElementById('v360-cfg-minimap');
         var cfgBtnSave   = document.getElementById('v360-cfg-save');
         var cfgBtnReset  = document.getElementById('v360-cfg-reset');
         var cfgMsg       = document.getElementById('v360-cfg-msg');
@@ -671,6 +678,7 @@
             cfgConeColor.value = c.ConeColor     || CFG_DEFAULTS.ConeColor;
             cfgFan.value       = c.ConeFanDeg    || CFG_DEFAULTS.ConeFanDeg;
             cfgRadius.value    = c.ConeRadius    || CFG_DEFAULTS.ConeRadius;
+            if (cfgMinimap) cfgMinimap.checked = (c.ShowMinimap !== false);   // default = hien
             cfgFanVal.textContent    = cfgFan.value;
             cfgRadiusVal.textContent = cfgRadius.value;
         }
@@ -683,7 +691,8 @@
                 SelectedColor: cfgSelColor.value,
                 ConeColor: cfgConeColor.value,
                 ConeFanDeg: parseFloat(cfgFan.value),
-                ConeRadius: parseInt(cfgRadius.value, 10)
+                ConeRadius: parseInt(cfgRadius.value, 10),
+                ShowMinimap: cfgMinimap ? cfgMinimap.checked : true
             };
         }
         function cfgApplyLive() {
@@ -698,12 +707,14 @@
         [cfgPinSize, cfgPinColor, cfgSelColor, cfgConeColor, cfgFan, cfgRadius].forEach(function (el) {
             el.addEventListener('input', cfgApplyLive);
         });
+        if (cfgMinimap) cfgMinimap.addEventListener('change', function () { TOUR_CONFIG = cfgCurrent(); });
         cfgBtnSave.addEventListener('click', function () {
             var c = cfgCurrent();
             adminPost('@Url.Action("SaveTourConfig", "ListVirtual", new { area = "View360" })', {
                 collectionId: COLLECTION_ID,
                 pinSize: c.PinSize, pinColor: c.PinColor, selectedColor: c.SelectedColor,
-                coneColor: c.ConeColor, coneFanDeg: c.ConeFanDeg, coneRadius: c.ConeRadius
+                coneColor: c.ConeColor, coneFanDeg: c.ConeFanDeg, coneRadius: c.ConeRadius,
+                showMinimap: c.ShowMinimap
             }, function () { cfgMsg.style.color = '#5fdc7c'; cfgMsg.textContent = 'Đã lưu ✓'; setTimeout(function() { cfgMsg.textContent = ''; }, 2500); }, cfgMsg);
         });
         cfgBtnReset.addEventListener('click', function () {
@@ -1179,6 +1190,13 @@
     var iframe        = document.getElementById('v360-iframe');
     var loading       = document.getElementById('v360-loading');
     var minimap       = document.getElementById('v360-minimap');
+    @if (!_isAdmin)
+    {
+        <text>
+    // Admin tat minimap cho tour -> an voi NGUOI XEM (admin van thay de cau hinh huong).
+    if (minimap && TOUR_CONFIG && TOUR_CONFIG.ShowMinimap === false) minimap.style.display = 'none';
+        </text>
+    }
     var stage         = document.querySelector('.v360-viewer__stage');
     var autorotateOn  = false;
     var autorotTimer  = null;
@@ -1417,12 +1435,28 @@
             lmap.getPane('kmz-lod-' + letter).style.zIndex = 410 + idx;
             lmap.getPane('kmz-lod-' + letter).style.pointerEvents = 'none';
         });
+        // Map server bi chan/loi (firewall production) -> bao 1 lan, KHONG lam vo minimap:
+        // pin + cone van hoat dong (chi mat anh nen ve tinh).
+        function showMapOffline() {
+            if (document.getElementById('v360-map-offline')) return;
+            var host = document.getElementById('v360-minimap-body') || document.getElementById('v360-minimap');
+            if (!host) return;
+            var note = document.createElement('div');
+            note.id = 'v360-map-offline';
+            note.textContent = '⚠ Bản đồ nền không tải được';
+            note.style.cssText = 'position:absolute;left:8px;bottom:8px;z-index:600;background:rgba(0,0,0,.62);color:#ffd66e;font-size:11px;padding:3px 8px;border-radius:5px;pointer-events:none';
+            host.appendChild(note);
+        }
         // Base: Esri (low-zoom backdrop ngoai vung KMZ)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        var esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
             maxNativeZoom: 19,                 // beyond zoom 19, Leaflet upscale tile thay vi 404
             attribution: 'Esri'
         }).addTo(lmap);
+        var _tileErrCount = 0;
+        esriLayer.on('tileerror', function () {
+            if (++_tileErrCount === 8) showMapOffline();   // nhieu tile loi -> coi nhu map server khong toi duoc
+        });
 
         // Aspect ratio cua KLH bounds (mercator-aware: dx = dlng, dy = dlat / cos(lat))
         // Dung WIDE bounds (full KMZ extent) de fullscreen container fit khit KMZ overlay,
@@ -1890,7 +1924,7 @@ else
 }
 
 @* Chatbot widget: expose state cho view360-chatbot.js (mount o duoi). Chi enable khi admin bat. *@
-@if (ViewBag.ChatbotEnabled == true && !((bool?)ViewBag.AdminMode == true) && !((bool?)ViewBag.FeaturedAdminMode == true))
+@if (ViewBag.ChatbotEnabled == true && !_isAdmin)
 {
     <text>
     window.V360CB_COLLECTION_ID = COLLECTION_ID;
@@ -1913,7 +1947,7 @@ else
 }
 })();
 </script>
-@if (ViewBag.ChatbotEnabled == true && !((bool?)ViewBag.AdminMode == true) && !((bool?)ViewBag.FeaturedAdminMode == true))
+@if (ViewBag.ChatbotEnabled == true && !_isAdmin)
 {
     <script src="~/Content/view360-chatbot.js?v=@(DateTime.UtcNow.Ticks)"></script>
 }

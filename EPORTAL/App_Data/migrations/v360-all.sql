@@ -142,6 +142,7 @@ BEGIN
         ConeColor      NVARCHAR(20)      NULL,
         ConeFanDeg     FLOAT             NULL,
         ConeRadius     INT               NULL,
+        ShowMinimap    BIT               NULL,   -- NULL/1 = hien minimap (default); 0 = an cho nguoi xem
         UpdatedAt      DATETIME          NOT NULL CONSTRAINT DF_V360TC_UpdAt DEFAULT (GETDATE()),
         UpdatedBy      INT               NULL
     );
@@ -150,6 +151,14 @@ END
 ELSE
 BEGIN
     PRINT '[1] V360_TourConfig already exists - skipped';
+END
+GO
+
+-- Existing deployments: them cot ShowMinimap (admin an/hien minimap cho tour) neu chua co.
+IF COL_LENGTH('dbo.V360_TourConfig', 'ShowMinimap') IS NULL
+BEGIN
+    ALTER TABLE dbo.V360_TourConfig ADD ShowMinimap BIT NULL;
+    PRINT '[1] Added V360_TourConfig.ShowMinimap';
 END
 GO
 
@@ -252,6 +261,71 @@ END
 ELSE
 BEGIN
     PRINT '[1] V360_ChatbotUsageDaily already exists - skipped';
+END
+GO
+
+-- V360_ChatbotAudioCache: cache audio TTS (VBee) theo hash(voiceCode|speed|text) -> tai dung,
+-- bo qua goi VBee cho cac cau lap (cau mac dinh/FAQ). (Phase 0 - knowledge-cache plan)
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'V360_ChatbotAudioCache' AND schema_id = SCHEMA_ID('dbo'))
+BEGIN
+    CREATE TABLE dbo.V360_ChatbotAudioCache (
+        Id          BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        TextHash    CHAR(64)       NOT NULL,
+        VoiceCode   NVARCHAR(60)   NULL,
+        Speed       FLOAT          NULL,
+        SampleText  NVARCHAR(400)  NULL,   -- chi de admin xem nhanh (cat 400 ky tu)
+        AudioData   VARBINARY(MAX) NOT NULL,
+        Bytes       INT            NOT NULL,
+        HitCount    INT            NOT NULL CONSTRAINT DF_V360AC_Hit DEFAULT (0),
+        CreatedAt   DATETIME       NOT NULL CONSTRAINT DF_V360AC_At DEFAULT (GETDATE()),
+        LastUsedAt  DATETIME       NULL,
+        CONSTRAINT UQ_V360AC_Hash UNIQUE (TextHash)
+    );
+    PRINT '[1] Created table V360_ChatbotAudioCache';
+END
+ELSE
+BEGIN
+    PRINT '[1] V360_ChatbotAudioCache already exists - skipped';
+END
+GO
+
+-- V360_ChatbotKnowledge: kho Q&A tu hoc (LLM Curator duyet). Hit -> tra loi tu DB, bo qua OpenAI.
+-- Match theo embedding (semantic) + QuestionNorm (fallback). (Phase 1-3 - knowledge-cache plan)
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'V360_ChatbotKnowledge' AND schema_id = SCHEMA_ID('dbo'))
+BEGIN
+    CREATE TABLE dbo.V360_ChatbotKnowledge (
+        Id                BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        CollectionId      NVARCHAR(50)   NOT NULL,
+        SceneScope        NVARCHAR(100)  NULL,                 -- NULL = tour-level; uuid = rieng scene
+        Intent            VARCHAR(16)    NULL,                 -- info | navigate | smalltalk
+        CanonicalQuestion NVARCHAR(500)  NOT NULL,
+        QuestionNorm      NVARCHAR(500)  NOT NULL,             -- bo dau + lowercase (fallback match)
+        Embedding         VARBINARY(MAX) NULL,                 -- float32[] packed (semantic)
+        AnswerText        NVARCHAR(MAX)  NOT NULL,
+        ActionType        NVARCHAR(20)   NULL,                 -- 'navigate' neu dieu huong
+        ActionTarget      NVARCHAR(100)  NULL,                 -- uuid scene dich
+        Suggestions       NVARCHAR(MAX)  NULL,                 -- pipe-joined
+        Category          NVARCHAR(50)   NULL,
+        Tags              NVARCHAR(200)  NULL,
+        QualityScore      TINYINT        NOT NULL CONSTRAINT DF_V360KB_Score DEFAULT (0),
+        Confidence        FLOAT          NULL,
+        Source            VARCHAR(12)    NOT NULL CONSTRAINT DF_V360KB_Src  DEFAULT ('curator'),  -- curator|admin|seed
+        Status            VARCHAR(12)    NOT NULL CONSTRAINT DF_V360KB_St   DEFAULT ('active'),   -- active|pending|stale|disabled
+        HitCount          INT            NOT NULL CONSTRAINT DF_V360KB_Hit  DEFAULT (0),
+        Confirmations     INT            NOT NULL CONSTRAINT DF_V360KB_Cf   DEFAULT (1),
+        ModelUsed         NVARCHAR(40)   NULL,
+        KnowledgeVersion  INT            NOT NULL CONSTRAINT DF_V360KB_Ver  DEFAULT (1),
+        CreatedAt         DATETIME       NOT NULL CONSTRAINT DF_V360KB_CrAt DEFAULT (GETDATE()),
+        UpdatedAt         DATETIME       NOT NULL CONSTRAINT DF_V360KB_UpAt DEFAULT (GETDATE()),
+        LastUsedAt        DATETIME       NULL
+    );
+    CREATE INDEX IX_V360KB_Lookup ON dbo.V360_ChatbotKnowledge(CollectionId, Status);
+    CREATE INDEX IX_V360KB_Norm   ON dbo.V360_ChatbotKnowledge(CollectionId, QuestionNorm);
+    PRINT '[1] Created table V360_ChatbotKnowledge';
+END
+ELSE
+BEGIN
+    PRINT '[1] V360_ChatbotKnowledge already exists - skipped';
 END
 GO
 

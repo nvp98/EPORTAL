@@ -157,7 +157,7 @@
         var html = escHtml(text).replace(/\n/g, '<br>');
         if (opts.navTo) {
             html += '<div class="v360cb__nav v360cb__nav--pending"><i class="fa fa-location-arrow"></i> ' +
-                    'Đang đưa bạn tới: ' + escHtml(opts.navName || opts.navTo) + '</div>';
+                    'Đang chuyển cảnh…</div>';   // chung chung -> KHONG lap lai cau AI "Đang đưa bạn tới X"
         }
         div.innerHTML = html;
         bodyEl.appendChild(div);
@@ -195,9 +195,11 @@
                 : 'Xin chào! Tôi là hướng dẫn viên ảo của KLH HPDQ. Hỏi tôi bất cứ điều gì về tour!');
         appendMsg('bot', msg);
         // 3 cau hoi goi y mac dinh khi mo chatbot
-        var greetSuggestions = sc.name
-            ? ['Giới thiệu về ' + sc.name, 'Tour này có những khu nào?', 'Khu vực nổi bật?']
-            : ['Giới thiệu về KLH HPDQ', 'Tour này có những khu nào?', 'Khu vực nổi bật?'];
+        var greetSuggestions = [
+            'Giới thiệu về Khu liên hợp Hòa Phát Dung Quất',
+            'Trợ lý ảo này có những chức năng gì?',
+            'Di chuyển tới Tòa nhà hành chính'
+        ];
         renderSuggestions(greetSuggestions);
     }
 
@@ -333,8 +335,7 @@
                 if (navTarget) {
                     var chip = document.createElement('div');
                     chip.className = 'v360cb__nav v360cb__nav--pending';
-                    chip.innerHTML = '<i class="fa fa-location-arrow"></i> Đang đưa bạn tới: ' +
-                                     escHtml(navName || navTarget);
+                    chip.innerHTML = '<i class="fa fa-location-arrow"></i> Đang chuyển cảnh…';
                     div.appendChild(chip);
                 }
                 bodyEl.scrollTop = bodyEl.scrollHeight;
@@ -498,7 +499,7 @@
             if (ttsPipe) { ttsPipe.cancel(); ttsPipe = null; }
             removeTyping();
             setBusy(false);
-            if (!sawError) appendMsg('error', 'Lỗi mạng: ' + e.message);
+            if (!sawError) appendMsg('error', 'Không kết nối được tới máy chủ. Vui lòng kiểm tra mạng và thử lại.');
             if (MODE === 'voice') restartListening();
         });
     }
@@ -1336,8 +1337,8 @@
             if (!blob || blob.size === 0) throw new Error('TTS empty audio');
             return URL.createObjectURL(blob);
         }).catch(function (e) {
-            // Het gioi han (429) -> retry vo nghia + ton quota -> nem luon de pipeline bao 1 lan.
-            if (e && e.status === 429) throw e;
+            // 429 (het gioi han) / 503 (TTS chua cau hinh / chan ket noi / down) -> retry vo nghia -> nem luon.
+            if (e && (e.status === 429 || e.status === 503)) throw e;
             // Retry tu tu: tranh 1 cau loi transient (timeout/queue) lam pipeline bo audio + "phun" text.
             if (_attempt < 2) {
                 console.warn('[v360cb-tts] retry seg fetch #' + (_attempt + 1) + ': ' + e.message);
@@ -1353,7 +1354,7 @@
         var rawBuf = '', consumed = 0, speakBuf = '';
         var streamEnded = false, cancelled = false, playing = false, finalized = false;
         var playIndex = 0, fetchUpto = 0;
-        var bubble = null, revealedBase = '', fallbackFull = '', warnedAutoplay = false, warnedLimit = false;
+        var bubble = null, revealedBase = '', fallbackFull = '', warnedAutoplay = false, warnedLimit = false, warnedDown = false;
         var endMeta = { navTarget: null, navName: null, suggestions: null };
 
         function ensureBubble() { if (!bubble) { removeTyping(); bubble = createStreamingBubble(); } }
@@ -1398,8 +1399,13 @@
                     warnedLimit = true;
                     appendMsg('error', '🔊 Đã đạt giới hạn đọc to (TTS) — câu trả lời chỉ hiển thị bằng văn bản.');
                 }
+                // 503 = TTS chua cau hinh / bi chan / tam down -> bao 1 lan, hien text binh thuong.
+                else if (e && e.status === 503 && !warnedDown) {
+                    warnedDown = true;
+                    appendMsg('error', '🔊 Tính năng đọc to tạm thời không khả dụng — câu trả lời chỉ hiển thị bằng văn bản.');
+                }
                 console.warn('[v360cb-tts] seg fetch fail', e); return null;
-            });
+            }).then(function (u) { seg.fetched = true; return u; });   // danh dau da settle (de safety phan biet "dang tai" vs "fail")
         }
 
         function revealSeg(seg, progress) {
@@ -1520,11 +1526,19 @@
                 if (segs.length === 0) { finalizeAll(false); return; }
                 if (!playing) playNext();
                 // Safety: giong async (-phg) co the mat nhieu giay (POST + poll) cho audio cau dau.
-                // Chi khi sau 15s VAN chua phat duoc cau nao -> coi nhu audio loi -> hien text + ket thuc.
-                // (finalizeAll set cancelled=true nen audio toi muon se khong render lai "1 cuc".)
-                setTimeout(function () {
-                    if (!cancelled && !finalized && !bubble) { revealedBase = fallbackFull; finalizeAll(false); }
-                }, 15000);
+                // Sau 15s chua phat duoc -> NHUNG neu audio cau dau VAN DANG TAI (chua settle) thi cho them,
+                // chi bo audio + hien text khi audio THUC SU fail/khong co. (Tranh: cache HIT text tuc thi
+                // + audio lan dau cham -> safety cu huy audio dang tai -> im lang.)
+                var safetyTries = 0;
+                function safetyCheck() {
+                    if (cancelled || finalized || bubble) return;          // da phat / da ket thuc -> thoi
+                    var seg0 = segs[playIndex];
+                    if (seg0 && seg0.audio && !seg0.fetched && safetyTries < 6) {   // audio dang tai -> cho them (toi da ~45s)
+                        safetyTries++; setTimeout(safetyCheck, 5000); return;
+                    }
+                    revealedBase = fallbackFull; finalizeAll(false);       // audio that su fail/khong co -> hien text
+                }
+                setTimeout(safetyCheck, 15000);
             },
             cancel: function () {
                 cancelled = true;

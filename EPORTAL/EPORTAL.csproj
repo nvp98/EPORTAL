@@ -1037,7 +1037,12 @@
     <Compile Include="Common\SceneCalibrationStore.cs" />
     <Compile Include="Common\SceneHeadingCalibrator.cs" />
     <Compile Include="Common\ChatbotConfig.cs" />
+    <Compile Include="Common\ServiceHealth.cs" />
     <Compile Include="Common\ChatbotContentStore.cs" />
+    <Compile Include="Common\AudioCacheStore.cs" />
+    <Compile Include="Common\KnowledgeStore.cs" />
+    <Compile Include="Common\OpenAIEmbeddingClient.cs" />
+    <Compile Include="Common\ChatbotCurator.cs" />
     <Compile Include="Common\ChatbotAIClient.cs" />
     <Compile Include="Areas\View360\Controllers\ChatbotController.cs" />
     <Compile Include="ModelsView360\TabGroupViewModel.cs" />
@@ -4135,6 +4140,7 @@
     <Content Include="Areas\View360\Views\ListVirtual\Index.cshtml" />
     <Content Include="Areas\View360\Views\ListVirtual\Details.cshtml" />
     <Content Include="Areas\View360\Views\Chatbot\Index.cshtml" />
+    <Content Include="Areas\View360\Views\Chatbot\KnowledgeBase.cshtml" />
     <Content Include="Content\view360-chatbot.css" />
     <Content Include="Content\view360-chatbot.js" />
     <Content Include="Content\view360-chatbot-admin.css" />

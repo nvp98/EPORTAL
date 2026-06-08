@@ -298,7 +298,7 @@ namespace EPORTAL.Areas.View360.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SaveTourConfig(string collectionId,
             int? pinSize, string pinColor, string selectedColor,
-            string coneColor, double? coneFanDeg, int? coneRadius)
+            string coneColor, double? coneFanDeg, int? coneRadius, bool? showMinimap)
         {
             if (!HasAdminPerm(A_Constants.EDIT)) return new HttpUnauthorizedResult();
             if (string.IsNullOrEmpty(collectionId)) return Json(new { ok = false, error = "missing collectionId" });
@@ -308,7 +308,8 @@ namespace EPORTAL.Areas.View360.Controllers
                 SelectedColor = string.IsNullOrEmpty(selectedColor) ? null : selectedColor,
                 ConeColor = string.IsNullOrEmpty(coneColor) ? null : coneColor,
                 ConeFanDeg = coneFanDeg,
-                ConeRadius = coneRadius
+                ConeRadius = coneRadius,
+                ShowMinimap = showMinimap   // null = default (hien); false = an cho nguoi xem
             };
             if (!SceneCalibrationStore.SaveTourConfig(collectionId, cfg))
                 return Json(new { ok = false, error = "DB save failed (check Debug Output / SQL connection)" });

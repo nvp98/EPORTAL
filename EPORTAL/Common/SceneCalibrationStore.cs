@@ -55,15 +55,18 @@ namespace EPORTAL.Common
         public string  ConeColor     { get; set; }
         public double? ConeFanDeg    { get; set; }
         public int?    ConeRadius    { get; set; }
+        public bool?   ShowMinimap   { get; set; }   // null/true = hien (default); false = an minimap cho nguoi xem
 
         [JsonIgnore]
         public bool IsEmpty
         {
             get
             {
+                // ShowMinimap=false la cau hinh CO Y NGHIA -> KHONG coi la empty (phai luu, khong xoa row).
                 return !PinSize.HasValue && string.IsNullOrEmpty(PinColor)
                        && string.IsNullOrEmpty(SelectedColor) && string.IsNullOrEmpty(ConeColor)
-                       && !ConeFanDeg.HasValue && !ConeRadius.HasValue;
+                       && !ConeFanDeg.HasValue && !ConeRadius.HasValue
+                       && (!ShowMinimap.HasValue || ShowMinimap.Value);
             }
         }
     }
@@ -238,7 +241,7 @@ WHEN NOT MATCHED THEN
             {
                 using (var conn = OpenConnection())
                 using (var cmd = new SqlCommand(
-                    @"SELECT PinSize, PinColor, SelectedColor, ConeColor, ConeFanDeg, ConeRadius
+                    @"SELECT PinSize, PinColor, SelectedColor, ConeColor, ConeFanDeg, ConeRadius, ShowMinimap
                       FROM dbo.V360_TourConfig WHERE CollectionId=@cid", conn))
                 {
                     cmd.Parameters.AddWithValue("@cid", collectionId);
@@ -253,7 +256,8 @@ WHEN NOT MATCHED THEN
                                 SelectedColor = rd.IsDBNull(2) ? null : rd.GetString(2),
                                 ConeColor     = rd.IsDBNull(3) ? null : rd.GetString(3),
                                 ConeFanDeg    = rd.IsDBNull(4) ? (double?)null : rd.GetDouble(4),
-                                ConeRadius    = rd.IsDBNull(5) ? (int?)null : rd.GetInt32(5)
+                                ConeRadius    = rd.IsDBNull(5) ? (int?)null : rd.GetInt32(5),
+                                ShowMinimap   = rd.IsDBNull(6) ? (bool?)null : rd.GetBoolean(6)
                             };
                         }
                     }
@@ -294,10 +298,10 @@ MERGE dbo.V360_TourConfig AS T
 USING (SELECT @cid AS CollectionId) AS S ON T.CollectionId = S.CollectionId
 WHEN MATCHED THEN UPDATE SET
     PinSize=@ps, PinColor=@pc, SelectedColor=@sc, ConeColor=@cc,
-    ConeFanDeg=@cf, ConeRadius=@cr, UpdatedAt=GETDATE()
+    ConeFanDeg=@cf, ConeRadius=@cr, ShowMinimap=@mm, UpdatedAt=GETDATE()
 WHEN NOT MATCHED THEN
-    INSERT (CollectionId, PinSize, PinColor, SelectedColor, ConeColor, ConeFanDeg, ConeRadius, UpdatedAt)
-    VALUES (@cid, @ps, @pc, @sc, @cc, @cf, @cr, GETDATE());", conn))
+    INSERT (CollectionId, PinSize, PinColor, SelectedColor, ConeColor, ConeFanDeg, ConeRadius, ShowMinimap, UpdatedAt)
+    VALUES (@cid, @ps, @pc, @sc, @cc, @cf, @cr, @mm, GETDATE());", conn))
                     {
                         cmd.Parameters.AddWithValue("@cid", collectionId);
                         cmd.Parameters.AddWithValue("@ps", cfg.PinSize.HasValue ? (object)cfg.PinSize.Value : DBNull.Value);
@@ -306,6 +310,7 @@ WHEN NOT MATCHED THEN
                         cmd.Parameters.AddWithValue("@cc", string.IsNullOrEmpty(cfg.ConeColor) ? (object)DBNull.Value : cfg.ConeColor);
                         cmd.Parameters.AddWithValue("@cf", cfg.ConeFanDeg.HasValue ? (object)cfg.ConeFanDeg.Value : DBNull.Value);
                         cmd.Parameters.AddWithValue("@cr", cfg.ConeRadius.HasValue ? (object)cfg.ConeRadius.Value : DBNull.Value);
+                        cmd.Parameters.AddWithValue("@mm", cfg.ShowMinimap.HasValue ? (object)cfg.ShowMinimap.Value : DBNull.Value);
                         cmd.ExecuteNonQuery();
                     }
                 }
