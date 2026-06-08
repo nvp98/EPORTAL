@@ -1,75 +1,226 @@
-﻿
 @{
-    ViewBag.Title = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Virtual Tour 360°";
+    Layout = "~/Views/Shared/_LayoutV360Showcase.cshtml";
+    ViewBag.BodyClass = "v360-sc-fullwidth"; // Intro content full-bleed - bo max-width + padding cua main
+    ViewBag.HideSearch = true;               // an o search box - Intro la landing page focused
+    // Back: ve danh sach tour
+    ViewBag.BackLabel = "Danh sách tour";
+    ViewBag.BackHref  = Url.Action("Index", "ListVirtual", new { area = "View360" });
 }
 @model EPORTAL.ModelsView360.VirtualValidation
+@{
+    // Background Intro: anh design team gui (intro-bg.jpg).
+    // Cache-bust query bang ticks - browser luon fetch anh moi khi file thay doi.
+    var introBg = Url.Content("~/Content/assets/images/intro-bg.jpg") + "?v=" + DateTime.UtcNow.Ticks;
+    var heroBg = string.IsNullOrEmpty(Model.Images)
+        ? Url.Content("~/Content/assets/images/bg7.jpg")
+        : Url.Content("~/Images/" + System.IO.Path.GetFileName(Model.Images));
+
+    var detailsUrl = Url.Action("Details", "ListVirtual", new { id = Model.ID });
+    var featuredCards = ViewBag.FeaturedCards as List<EPORTAL.Areas.View360.Controllers.FeaturedSceneCard>
+                       ?? new List<EPORTAL.Areas.View360.Controllers.FeaturedSceneCard>();
+}
+
+<!-- Be Vietnam Pro - font Viet, dau thanh dep, 9 weights, free Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+@*view360-modern.css load by _LayoutV360Showcase.cshtml*@
+
 <div class="app-main__outer">
-    <div class="app-main__inner" style="background-image:url(/assets/images/bg1.png);background-size:cover;">
-        <div class="tab-content">
-            <div class="">
-                <div class="text-center m-5">
-                    <img src="~/assets/images/LOGO_mau.png" width="250" />
-                </div>
-                <div class="text-center m-5">
-                    <h2 class="font-weight-bold " style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; ">THAM QUAN THỰC TẾ NHÀ MÁY</h2>
-                    <h2 class="font-weight-bold" style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; ">CÔNG TY CỔ PHẦN THÉP HÒA PHÁT DUNG QUẤT</h2>
-                </div>
-                <div class="text-center m-5 row">
-                    <div class="row m-auto" style="max-width:600px;min-width:500px">
-                        <div class="col-6">
-                            <img src="~/assets/images/CHUOT.png" width="70" />
-                            <h6 class="font-weight-bold text-wrap" style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;">Nhấn giữ chuột trái <br> rồi kéo về phía cần xem</h6>
-                            <h6 class="font-weight-bold text-wrap " style="color: red; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; font-size:10px ">Hold down the left mouse <br> button and drag left/right</h6>
-                        </div>
-                        <div class="col-6">
-                            <img src="~/assets/images/DIADIEM.png" width="70" />
-                            <h6 class="font-weight-bold " style="color: #1A4588; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;">Nhấn trỏ chuột vào các  <br> điểm hotspot để di chuyển</h6>
-                            <h6 class="font-weight-bold text-wrap " style="color: red; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; font-size:10px ">Move the cursor to the hightlight <br> hotspots and click</h6>
-                        </div>
-                    </div>
+    <div class="app-main__inner" style="padding:0;">
+        <div class="v360-area v360-area--fit v360-intro">
 
-                </div>
-                <div class="text-center">
-                    <button style="background-color: #ffff; border: none; cursor:pointer" onclick="myFunction()">
-                        <img src="~/assets/images/THAMQUANNGAY.png" width="350" />
-                    </button>
-                </div>
-                <div class="text-right" style="width:85%">
-                    <img src="~/assets/images/tongdaivien.png" width="100" />
-                </div>
+            <!-- Background Intro - anh design team -->
+            <div class="v360-area--fit__bg" style="background-image: url('@introBg');"></div>
+            @*<!-- White veil - fade tu trang manh ben trai (text area) -> trong suot ben phai -->
+            <div class="v360-area--fit__veil"></div>*@
 
-            </div>
-        </div>
-    </div>
-    <div class="app-wrapper-footer">
-        <div class="app-footer">
-            <div class="app-footer__inner">
-                <div class="footer_content d-flex justify-content-between">
-                    <div class="footer_item">
-                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
+            <!-- Hero (left-aligned title + CTAs) -->
+            <div class="v360-section">
+                <div class="v360-hero-content">
+                    <div class="v360-hero__brand">
+                        <img src="~/Content/assets/images/logo.png" alt="Hòa Phát Gang Thép" loading="eager" />
                     </div>
-                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
-                        <ul class="d-flex justify-content-center">
-
-                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
-                    <div class="footer_item_copy d-flex">
-                        <span class="copyright">Copyright</span>
-                        <ul class="copyright_ul">
-                            <li>Ban công nghệ thông tin</li>
-                            <li>Hòa Phát Dung Quất</li>
-                        </ul>
+                    <div class="v360-hero__eyebrow">VIRTUAL TOUR 360°</div>
+                    <h1 class="v360-hero__title">
+                        <span>KHU LIÊN HỢP</span>
+                        <span>HÒA PHÁT DUNG QUẤT</span>
+                    </h1>
+                    <div class="v360-hero__divider"></div>
+                    <p class="v360-hero__desc">
+                        Trải nghiệm tham quan số các khu vực sản xuất,
+                        vận hành và điều hành bằng nền tảng <strong>Virtual Tour 360°</strong>.
+                    </p>
+                    <div class="v360-hero__cta">
+                        <a class="v360-btn v360-btn--primary" href="@detailsUrl">
+                            <span class="v360-btn__icon"><i class="fa fa-play"></i></span>
+                            BẮT ĐẦU THAM QUAN
+                        </a>
+                        <a class="v360-btn v360-btn--ghost" href="@(detailsUrl + (detailsUrl.Contains("?") ? "&" : "?") + "mapMode=full")">
+                            <i class="fa fa-map-marked-alt"></i>
+                            XEM BẢN ĐỒ KLH
+                        </a>
                     </div>
                 </div>
             </div>
+
+            <!-- Usage strip - panel trang trong suot -->
+            <div class="v360-section">
+                <div class="v360-usage">
+                    <div class="v360-usage__header">
+                        <span class="v360-usage__title">HƯỚNG DẪN SỬ DỤNG</span>
+                        <span class="v360-usage__underline"></span>
+                    </div>
+                    <div class="v360-usage__items">
+                        <div class="v360-usage__item">
+                            <div class="v360-usage__item-icon"><i class="fa fa-mouse-pointer"></i></div>
+                            <div class="v360-usage__item-text">
+                                <span class="v360-usage__item-title">KÉO CHUỘT</span>
+                                <span class="v360-usage__item-sub">Kéo để xoay góc nhìn</span>
+                            </div>
+                        </div>
+                        <div class="v360-usage__item">
+                            <div class="v360-usage__item-icon"><i class="fa fa-dot-circle"></i></div>
+                            <div class="v360-usage__item-text">
+                                <span class="v360-usage__item-title">NHẤP HOTSPOT</span>
+                                <span class="v360-usage__item-sub">Nhấp vào điểm tròn để di chuyển</span>
+                            </div>
+                        </div>
+                        <div class="v360-usage__item">
+                            <div class="v360-usage__item-icon"><i class="fa fa-expand"></i></div>
+                            <div class="v360-usage__item-text">
+                                <span class="v360-usage__item-title">TOÀN MÀN HÌNH</span>
+                                <span class="v360-usage__item-sub">Nhấn để xem toàn màn hình trải nghiệm</span>
+                            </div>
+                        </div>
+                        <div class="v360-usage__item">
+                            <div class="v360-usage__item-icon"><i class="fa fa-volume-up"></i></div>
+                            <div class="v360-usage__item-text">
+                                <span class="v360-usage__item-title">AUDIO</span>
+                                <span class="v360-usage__item-sub">Bật / tắt âm thanh thuyết minh</span>
+                            </div>
+                        </div>
+                        <div class="v360-usage__item">
+                            <div class="v360-usage__item-icon"><i class="fa fa-pause-circle"></i></div>
+                            <div class="v360-usage__item-text">
+                                <span class="v360-usage__item-title">TẮT XOAY HÌNH</span>
+                                <span class="v360-usage__item-sub">Tạm dừng xoay tự động</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (featuredCards.Count > 0)
+            {
+                <div class="v360-section">
+                    <div class="v360-feat-strip">
+                        <div class="v360-feat-strip__head">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span class="v360-feat-strip__title">CÁC KHU VỰC THAM QUAN CHÍNH</span>
+                        </div>
+                        <div class="v360-feat-strip__scroll" data-v360-feat-scroll>
+                            <button type="button" class="v360-feat-strip__arrow v360-feat-strip__arrow--prev" aria-label="Trước">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <div class="v360-feat-strip__track">
+                                @{ int idx = 0; }
+                                @foreach (var c in featuredCards)
+                                {
+                                    idx++;
+                                    var cardUrl = Url.Action("Details", "ListVirtual", new { id = Model.ID, scene = c.SceneHash });
+                                    var cardImg = string.IsNullOrEmpty(c.ImageUrl)
+                                        ? heroBg
+                                        : c.ImageUrl;
+                                    <a class="v360-feat-strip__card" href="@cardUrl">
+                                        <div class="v360-feat-strip__img" style="background-image:url('@cardImg');"></div>
+                                        <div class="v360-feat-strip__num">@idx.ToString("D2")</div>
+                                        <div class="v360-feat-strip__label">@c.Title</div>
+                                    </a>
+                                }
+                            </div>
+                            <button type="button" class="v360-feat-strip__arrow v360-feat-strip__arrow--next" aria-label="Sau">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Footer band - navy strip cuoi trang -->
+            <div class="v360-footer-band">
+                <div>
+                    <i class="fa fa-shield-alt"></i>
+                    <span>AN TOÀN - CHẤT LƯỢNG - HIỆU QUẢ - PHÁT TRIỂN BỀN VỮNG</span>
+                </div>
+                <div>
+                    <i class="fa fa-building"></i>
+                    <span>CÔNG TY CỔ PHẦN THÉP HÒA PHÁT DUNG QUẤT</span>
+                </div>
+                <div>
+                    <i class="fa fa-headset"></i>
+                    <span>HỖ TRỢ: 0255 361 5588</span>
+                </div>
+                <div class="v360-footer-band__cnpm">
+                    PHÒNG CNTT &amp; CĐS
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-    function myFunction() {
-         window.location.href = '@Url.Action("Details", "ListVirtual")/' + @Model.ID;
+(function () {
+    // Fit cards: tinh so luong card visible, expand card width de fit chinh xac
+    // -> KHONG bao gio co card "nua nua" o bien track. Arrow scroll theo trang day du.
+    function fitFeatStripCards(wrap) {
+        var track = wrap.querySelector('.v360-feat-strip__track');
+        if (!track) return 0;
+        var cards = track.querySelectorAll('.v360-feat-strip__card');
+        if (!cards.length) return 0;
+        // Reset bat ky inline width nao truoc khi do (de measurement tu CSS clamp goc)
+        cards.forEach(function (c) { c.style.flex = ''; });
+        var trackWidth = track.clientWidth;
+        var styles = getComputedStyle(track);
+        var gap = parseFloat(styles.columnGap) || parseFloat(styles.gap) || 14;
+        var natural = cards[0].getBoundingClientRect().width;
+        // So card whole fit voi current size
+        var N = Math.max(1, Math.floor((trackWidth + gap) / (natural + gap)));
+        // Expand moi card de chiem dung 1/N track width
+        var newW = (trackWidth - (N - 1) * gap) / N;
+        cards.forEach(function (c) {
+            c.style.flex = '0 0 ' + newW + 'px';
+        });
+        return N;
     }
+
+    document.querySelectorAll('[data-v360-feat-scroll]').forEach(function (wrap) {
+        var track = wrap.querySelector('.v360-feat-strip__track');
+        if (!track) return;
+        var visibleCount = 1;
+        var doFit = function () { visibleCount = fitFeatStripCards(wrap); };
+        // Initial fit + on window resize (debounced)
+        doFit();
+        var rzTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(rzTimer);
+            rzTimer = setTimeout(doFit, 150);
+        });
+        // Arrow scroll: jump exactly visibleCount cards (mot trang full)
+        var step = function () {
+            var card = track.querySelector('.v360-feat-strip__card');
+            if (!card) return 200;
+            return (card.getBoundingClientRect().width + 14) * visibleCount;
+        };
+        wrap.querySelector('.v360-feat-strip__arrow--prev').addEventListener('click', function () {
+            track.scrollBy({ left: -step(), behavior: 'smooth' });
+        });
+        wrap.querySelector('.v360-feat-strip__arrow--next').addEventListener('click', function () {
+            track.scrollBy({ left:  step(), behavior: 'smooth' });
+        });
+    });
+})();
 </script>

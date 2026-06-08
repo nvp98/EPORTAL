@@ -11,6 +11,8 @@ namespace EPORTAL.Common
     {
         public static string MD5Hash(string text)
         {
+            if (string.IsNullOrEmpty(text)) return string.Empty;
+
             MD5 md5 = new MD5CryptoServiceProvider();
 
             //compute hash from the bytes of text

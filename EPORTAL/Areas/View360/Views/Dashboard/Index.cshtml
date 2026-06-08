@@ -1,0 +1,1396 @@
+@{
+    ViewBag.Title = "Dashboard View360";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<style>
+    .v360db-kpi { background: #fff; border-radius: 10px; padding: 18px 20px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,.06); border-left: 4px solid #2563eb; }
+    .v360db-kpi--virtual { border-left-color: #7c3aed; }
+    .v360db-kpi--util    { border-left-color: #16a34a; }
+    .v360db-kpi__label   { font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: .04em; }
+    .v360db-kpi__value   { font-size: 32px; font-weight: 700; color: #0f172a; margin: 4px 0; line-height: 1; }
+    .v360db-kpi__sub     { font-size: 12px; color: #64748b; }
+    .v360db-kpi__delta   { font-size: 12px; font-weight: 600; margin-left: 6px; }
+    .v360db-kpi__delta--up   { color: #16a34a; }
+    .v360db-kpi__delta--down { color: #dc2626; }
+    .v360db-kpi__delta--flat { color: #94a3b8; }
+    .v360db-inv          { background: #f1f5f9; border-radius: 10px; padding: 12px 18px;
+                           display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 16px; }
+    .v360db-inv__item    { font-size: 13px; }
+    .v360db-inv__item b  { font-size: 16px; color: #0f172a; }
+    .v360db-inv__item span { color: #64748b; }
+    /* ===== Explorer ===== */
+    .v360db-explorer__header { display: flex; align-items: center; justify-content: space-between;
+                               gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .v360db-explorer-bar  { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+
+    /* Search input with icon + clear */
+    .v360db-search        { position: relative; flex: 1; min-width: 220px; max-width: 420px; }
+    .v360db-search input  { width: 100%; padding: 9px 32px 9px 36px; border: 1px solid #e2e8f0;
+                            background: #f8fafc; border-radius: 10px; font-size: 13px;
+                            transition: all .15s ease; }
+    .v360db-search input:focus { outline: none; border-color: #2563eb; background: #fff;
+                                 box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    .v360db-search__icon  { position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+                            color: #94a3b8; font-size: 14px; pointer-events: none; }
+    .v360db-search__clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+                            background: #cbd5e1; color: #fff; border: 0; border-radius: 50%;
+                            width: 18px; height: 18px; font-size: 14px; line-height: 1;
+                            cursor: pointer; padding: 0; }
+    .v360db-search__clear:hover { background: #94a3b8; }
+
+    /* Segmented control for type filter */
+    .v360db-seg           { display: inline-flex; background: #f1f5f9; border-radius: 10px; padding: 3px; }
+    .v360db-seg__btn      { padding: 6px 14px; background: transparent; border: 0; font-size: 13px;
+                            font-weight: 500; color: #64748b; border-radius: 8px; cursor: pointer;
+                            transition: all .15s ease; }
+    .v360db-seg__btn:hover { color: #1e293b; }
+    .v360db-seg__btn.active { background: #fff; color: #0f172a; font-weight: 600;
+                              box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+
+    .v360db-exp-btn       { padding: 8px 14px; border: 1px solid #2563eb; background: #2563eb; color: #fff;
+                            border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+                            transition: all .15s ease; }
+    .v360db-exp-btn:hover { background: #1d4ed8; }
+    .v360db-exp-btn--ghost { background: transparent; color: #64748b; border-color: #e2e8f0; }
+    .v360db-exp-btn--ghost:hover { background: #f1f5f9; color: #2563eb; border-color: #2563eb; }
+
+    /* Active filter chip */
+    .v360db-exp-chip      { display: inline-flex; align-items: center; gap: 8px;
+                            background: linear-gradient(135deg, #fef3c7, #fde68a); color: #78350f;
+                            padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+                            box-shadow: 0 1px 3px rgba(217,119,6,.15); }
+    .v360db-exp-chip__label { color: #92400e; font-weight: 500; }
+    .v360db-exp-chip button { background: rgba(120,53,15,.12); border: 0; color: #78350f; cursor: pointer;
+                              font-size: 12px; line-height: 1; padding: 2px 5px; border-radius: 50%;
+                              margin-left: 2px; }
+    .v360db-exp-chip button:hover { background: rgba(120,53,15,.25); }
+
+    /* Tabs */
+    .v360db-tabs          { display: flex; gap: 2px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; }
+    .v360db-tab           { padding: 10px 16px; background: transparent; border: 0; border-bottom: 2px solid transparent;
+                            color: #64748b; font-size: 13px; font-weight: 600; cursor: pointer;
+                            margin-bottom: -1px; transition: all .15s ease; display: inline-flex;
+                            align-items: center; gap: 6px; }
+    .v360db-tab:hover     { color: #2563eb; background: #f8fafc; }
+    .v360db-tab.active    { color: #2563eb; border-bottom-color: #2563eb; }
+    .v360db-tab__count    { display: inline-block; padding: 1px 8px; background: #e2e8f0; color: #64748b;
+                            border-radius: 999px; font-size: 11px; font-weight: 600; min-width: 22px; text-align: center; }
+    .v360db-tab.active .v360db-tab__count { background: #dbeafe; color: #1d4ed8; }
+
+    /* Excel-style column header with filter/sort popover */
+    .v360db-colhdr        { cursor: pointer; user-select: none; display: inline-flex;
+                            align-items: center; gap: 6px; transition: color .12s ease; }
+    .v360db-colhdr:hover  { color: #2563eb; }
+    .v360db-colhdr__caret { display: inline-flex; align-items: center; justify-content: center;
+                            width: 18px; height: 18px; border-radius: 50%; background: transparent;
+                            color: #94a3b8; font-size: 10px; transition: all .12s ease; }
+    .v360db-colhdr:hover .v360db-colhdr__caret { background: #e0e7ff; color: #2563eb; }
+    .v360db-colhdr--filtered .v360db-colhdr__caret { background: #2563eb; color: #fff; opacity: 1; }
+    .v360db-colhdr--sorted .v360db-colhdr__caret   { background: #eef2ff; color: #2563eb; }
+    .v360db-colhdr--filtered, .v360db-colhdr--sorted { color: #2563eb; }
+    .v360db-table-wrap thead th.v360db-th--right { text-align: right; }
+
+    /* Column filter popover */
+    .v360db-colpop        { position: absolute; display: none; background: #fff; border: 1px solid #e2e8f0;
+                            border-radius: 12px; box-shadow: 0 12px 36px rgba(15,23,42,.18);
+                            padding: 12px; width: 300px; z-index: 9999; font-size: 13px; }
+    .v360db-colpop__sortrow { display: flex; gap: 6px; margin-bottom: 10px; }
+    .v360db-colpop__sort   { flex: 1; padding: 7px 10px; background: #f8fafc; border: 1px solid #e2e8f0;
+                             border-radius: 8px; font-size: 12px; font-weight: 600; color: #475569;
+                             cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+    .v360db-colpop__sort:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+    .v360db-colpop__sort.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
+    .v360db-colpop__search { position: relative; margin-bottom: 8px; }
+    .v360db-colpop__search input { width: 100%; padding: 7px 10px 7px 30px; border: 1px solid #e2e8f0;
+                                    border-radius: 7px; font-size: 12px; box-sizing: border-box; }
+    .v360db-colpop__search input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.1); }
+    .v360db-colpop__search::before { content: '🔍'; position: absolute; left: 9px; top: 50%;
+                                      transform: translateY(-50%); font-size: 11px; opacity: .5; pointer-events: none; }
+    .v360db-colpop__hint   { font-size: 11px; color: #94a3b8; margin-bottom: 8px; line-height: 1.4; }
+    .v360db-colpop__list   { max-height: 240px; overflow-y: auto; border: 1px solid #f1f5f9;
+                             border-radius: 6px; padding: 4px 0; }
+    .v360db-colpop__list label { display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+                                  cursor: pointer; font-size: 12px; color: #334155; border-radius: 4px;
+                                  margin: 0 4px; line-height: 1.3; }
+    .v360db-colpop__list label:hover { background: #f1f5f9; }
+    .v360db-colpop__list label input { margin: 0; cursor: pointer; flex-shrink: 0; }
+    .v360db-colpop__list label.v360db-colpop__all { font-weight: 600; color: #0f172a; border-bottom: 1px solid #f1f5f9;
+                                                    border-radius: 0; margin-bottom: 4px; padding-bottom: 8px; }
+    .v360db-colpop__actions { display: flex; gap: 6px; justify-content: space-between; margin-top: 10px;
+                              padding-top: 10px; border-top: 1px solid #f1f5f9; }
+    .v360db-colpop__btn    { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600;
+                             cursor: pointer; border: 1px solid; transition: all .12s ease; }
+    .v360db-colpop__btn--ghost   { background: transparent; color: #64748b; border-color: #e2e8f0; }
+    .v360db-colpop__btn--ghost:hover { background: #f1f5f9; color: #2563eb; border-color: #2563eb; }
+    .v360db-colpop__btn--primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .v360db-colpop__btn--primary:hover { background: #1d4ed8; }
+    .v360db-colpop__empty  { padding: 24px 12px; text-align: center; color: #94a3b8; font-size: 12px; }
+
+    /* Table polish */
+    .v360db-table-wrap    { max-height: 560px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .v360db-table-wrap .v360db-table { margin: 0; }
+    .v360db-table-wrap thead th { position: sticky; top: 0; background: #f8fafc; z-index: 1;
+                                  border-bottom: 1px solid #e2e8f0; }
+    .v360db-table--hover tbody tr { transition: background .12s ease; }
+    .v360db-table--hover tbody tr:hover { background: #eff6ff; }
+
+    /* Pager row */
+    .v360db-pager-row     { display: flex; justify-content: space-between; align-items: center;
+                            margin-top: 12px; flex-wrap: wrap; gap: 12px; }
+    .v360db-pagesize      { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; }
+    .v360db-pagesize select { padding: 5px 8px; border: 1px solid #e2e8f0; border-radius: 6px;
+                              background: #fff; font-size: 13px; }
+    .v360db-pager         { display: flex; gap: 6px; align-items: center; font-size: 13px; color: #64748b; }
+    .v360db-pager button  { padding: 5px 12px; border: 1px solid #e2e8f0; background: #fff; color: #475569;
+                            border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer;
+                            transition: all .12s ease; }
+    .v360db-pager button:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+    .v360db-pager button:disabled { opacity: .4; cursor: not-allowed; }
+    .v360db-pager__info   { padding: 0 6px; }
+
+    /* Link button - looks like text but clickable */
+    .v360db-link-btn      { background: none; border: 0; color: #2563eb; cursor: pointer; font-size: 13px;
+                            padding: 0; text-align: left; font-family: inherit; }
+    .v360db-link-btn:hover { text-decoration: underline; }
+    .v360db-link-btn small { color: #94a3b8; font-weight: 400; }
+
+    /* Loading spinner */
+    .v360db-spinner       { display: flex; align-items: center; justify-content: center; gap: 10px;
+                            padding: 40px 24px; color: #94a3b8; font-size: 13px; }
+    .v360db-spinner::before { content: ''; width: 14px; height: 14px; border: 2px solid #e2e8f0;
+                              border-top-color: #2563eb; border-radius: 50%;
+                              animation: v360db-spin .8s linear infinite; }
+    @@keyframes v360db-spin { to { transform: rotate(360deg); } }
+
+    /* Empty state polish */
+    .v360db-empty-state   { padding: 40px 24px; text-align: center; color: #94a3b8; }
+    .v360db-empty-state__icon { font-size: 36px; opacity: .5; margin-bottom: 8px; }
+    .v360db-empty-state__title { font-size: 14px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+    .v360db-empty-state__hint { font-size: 12px; }
+
+    /* Relative time tooltip styling */
+    .v360db-time          { color: #475569; }
+    .v360db-time__rel     { font-weight: 500; }
+    .v360db-time__abs     { display: block; color: #94a3b8; font-size: 11px; }
+    .v360db-card         { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+                           padding: 16px 20px; margin-bottom: 16px; }
+    .v360db-card h5      { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 12px; }
+    .v360db-table        { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .v360db-table th     { text-align: left; font-weight: 600; color: #64748b; padding: 8px;
+                           border-bottom: 1px solid #e2e8f0; font-size: 12px; text-transform: uppercase; }
+    .v360db-table td     { padding: 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; }
+    .v360db-table tr:hover td { background: #f8fafc; }
+    .v360db-table a      { color: #2563eb; text-decoration: none; }
+    .v360db-table a:hover { text-decoration: underline; }
+    .v360db-badge        { display: inline-block; padding: 2px 8px; border-radius: 999px;
+                           font-size: 11px; font-weight: 600; }
+    .v360db-badge--proj  { background: #dbeafe; color: #1d4ed8; }
+    .v360db-badge--virt  { background: #ede9fe; color: #6d28d9; }
+    .v360db-empty        { color: #94a3b8; font-style: italic; padding: 24px; text-align: center; }
+    .v360db-error        { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca;
+                           border-radius: 6px; padding: 12px 16px; font-size: 13px; }
+    .v360db-warn         { color: #92400e; background: #fffbeb; border: 1px solid #fde68a;
+                           border-radius: 6px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; }
+    .v360db-loading      { color: #94a3b8; font-size: 13px; padding: 60px 24px; text-align: center; }
+    .v360db-filter       { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .v360db-filter label { font-size: 13px; color: #64748b; }
+    .v360db-filter select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+</style>
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="v360db-filter">
+            <label for="v360db-period">Kỳ:</label>
+            <select id="v360db-period">
+                <option value="7d">7 ngày qua</option>
+                <option value="30d" selected>30 ngày qua</option>
+                <option value="90d">90 ngày qua</option>
+                <option value="year">Năm nay</option>
+            </select>
+            <span id="v360db-fromhint" style="font-size:12px;color:#94a3b8;"></span>
+        </div>
+
+        <div id="v360db-diag" style="display:none;"></div>
+
+        <div class="v360db-inv" id="v360db-inv">
+            <div class="v360db-inv__item"><span>Project</span> <b id="v360db-inv-projects">—</b></div>
+            <div class="v360db-inv__item"><span>Virtual Tour</span> <b id="v360db-inv-virtuals">—</b></div>
+            <div class="v360db-inv__item"><span>Grant Project</span> <b id="v360db-inv-grant-p">—</b></div>
+            <div class="v360db-inv__item"><span>Grant Virtual</span> <b id="v360db-inv-grant-v">—</b></div>
+            <div class="v360db-inv__item"><span>Phòng ban hoạt động</span> <b id="v360db-inv-coverage">—</b></div>
+        </div>
+
+        <div class="row" style="margin-bottom: 16px;">
+            <div class="col-md-4">
+                <div class="v360db-kpi">
+                    <div class="v360db-kpi__label">Active users</div>
+                    <div class="v360db-kpi__value">
+                        <span id="v360db-kpi-active">—</span>
+                        <span class="v360db-kpi__delta" id="v360db-kpi-active-delta"></span>
+                    </div>
+                    <div class="v360db-kpi__sub" id="v360db-kpi-active-sub">đã mở ít nhất 1 lần</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="v360db-kpi v360db-kpi--virtual">
+                    <div class="v360db-kpi__label">Tổng lượt truy cập</div>
+                    <div class="v360db-kpi__value">
+                        <span id="v360db-kpi-views">—</span>
+                        <span class="v360db-kpi__delta" id="v360db-kpi-views-delta"></span>
+                    </div>
+                    <div class="v360db-kpi__sub">tính cả Project + Virtual</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="v360db-kpi v360db-kpi--util">
+                    <div class="v360db-kpi__label">Tỷ lệ sử dụng</div>
+                    <div class="v360db-kpi__value" id="v360db-kpi-util">—</div>
+                    <div class="v360db-kpi__sub">active / được cấp quyền (active employee)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="v360db-card">
+            <h5>Lượt truy cập theo ngày</h5>
+            <div id="v360db-trend" style="width:100%; height:320px;"><div class="v360db-loading">Đang tải...</div></div>
+        </div>
+
+        <div class="v360db-card">
+            <h5>Phòng ban — Cấp quyền vs Sử dụng thực <span id="v360db-dept-shown" style="font-size:12px;color:#94a3b8;font-weight:400;"></span></h5>
+            <div class="v360db-kpi__sub" style="margin-bottom:8px;">
+                Mỗi phòng ban có 2 bar chồng: <b style="color:#cbd5e1;">nền nhạt</b> = user được cấp quyền,
+                <b style="color:#2563eb;">đậm</b> = user đã thực sự xem trong kỳ. Khoảng trống = quyền chưa được dùng.
+                Hover để xem lượt xem tuyệt đối.
+            </div>
+            <div id="v360db-dept-usage" style="width:100%; height:520px;"><div class="v360db-loading">Đang tải...</div></div>
+        </div>
+
+        <div class="v360db-card">
+            <h5>Giờ truy cập trong ngày</h5>
+            <div class="v360db-kpi__sub" style="margin-bottom:8px;">Tổng lượt theo giờ (0-23) trong kỳ. Giúp phát hiện peak time và schedule maintenance window.</div>
+            <div id="v360db-hourly" style="width:100%; height:240px;"><div class="v360db-loading">Đang tải...</div></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="v360db-card">
+                    <h5>Phân bố theo Group (Project)</h5>
+                    <div class="v360db-kpi__sub" style="margin-bottom:8px;">Roll-up theo root group (parent), gồm tất cả sub-group. Tận dụng hierarchy mới.</div>
+                    <table class="v360db-table" id="v360db-group">
+                        <thead>
+                            <tr><th>Group</th><th style="text-align:right">Project</th><th style="text-align:right">Lượt</th><th style="text-align:right">User</th></tr>
+                        </thead>
+                        <tbody><tr><td colspan="4" class="v360db-empty">Đang tải...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="v360db-card">
+                    <h5>Content chưa ai mở (sunset candidates)</h5>
+                    <div class="v360db-kpi__sub" style="margin-bottom:8px;">Project / Virtual publish > 30 ngày nhưng 0 lượt xem từ khi tracking bật. Cân nhắc xoá/quảng bá lại.</div>
+                    <table class="v360db-table" id="v360db-unused">
+                        <thead>
+                            <tr><th>Loại</th><th>Tiêu đề</th><th>Xuất bản</th><th style="text-align:right">Ngày tuổi</th></tr>
+                        </thead>
+                        <tbody><tr><td colspan="4" class="v360db-empty">Đang tải...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="v360db-card v360db-explorer">
+            <div class="v360db-explorer__header">
+                <div>
+                    <h5 style="margin:0;">🔍 Explorer — Lịch sử truy cập</h5>
+                    <div class="v360db-kpi__sub" style="margin-top:2px;">Ai đã mở content nào, lúc nào. Bấm vào tên user / nội dung để drill-down.</div>
+                </div>
+                <div id="v360db-exp-active-filter" class="v360db-exp-chip" style="display:none;"></div>
+            </div>
+
+            <div class="v360db-explorer-bar">
+                <div class="v360db-search">
+                    <span class="v360db-search__icon">🔎</span>
+                    <input type="text" id="v360db-exp-search" placeholder="Tìm tên user / mã NV / tiêu đề..." autocomplete="off" />
+                    <button type="button" class="v360db-search__clear" id="v360db-exp-search-clear" title="Xoá tìm kiếm" style="display:none;">×</button>
+                </div>
+                <div class="v360db-seg" role="tablist" aria-label="Lọc loại">
+                    <button type="button" class="v360db-seg__btn active" data-type="">Tất cả</button>
+                    <button type="button" class="v360db-seg__btn" data-type="1">Project</button>
+                    <button type="button" class="v360db-seg__btn" data-type="2">Virtual</button>
+                </div>
+                <button type="button" class="v360db-exp-btn v360db-exp-btn--ghost" id="v360db-exp-clear">Đặt lại</button>
+            </div>
+
+            <div class="v360db-tabs" role="tablist">
+                <button type="button" class="v360db-tab active" data-mode="time" role="tab">
+                    Theo thời gian <span class="v360db-tab__count" id="v360db-tab-count-time">—</span>
+                </button>
+                <button type="button" class="v360db-tab" data-mode="user" role="tab">
+                    Theo user <span class="v360db-tab__count" id="v360db-tab-count-user">—</span>
+                </button>
+                <button type="button" class="v360db-tab" data-mode="content" role="tab">
+                    Theo nội dung <span class="v360db-tab__count" id="v360db-tab-count-content">—</span>
+                </button>
+            </div>
+
+            <div id="v360db-exp-tab-time">
+                <div class="v360db-table-wrap">
+                    <table class="v360db-table v360db-table--hover" data-coltable="time">
+                        <thead>
+                            <tr>
+                                <th><span class="v360db-colhdr" data-col="0">Thời gian<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="1">User<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="2">Phòng ban<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="3">Loại<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="4">Nội dung<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="v360db-exp-tbody-time"><tr><td colspan="6"><div class="v360db-spinner">Đang tải…</div></td></tr></tbody>
+                    </table>
+                </div>
+                <div class="v360db-pager-row">
+                    <div class="v360db-pagesize">
+                        <label for="v360db-exp-pagesize">Hiển thị:</label>
+                        <select id="v360db-exp-pagesize">
+                            <option value="25">25</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
+                    </div>
+                    <div class="v360db-pager" id="v360db-exp-pager-time"></div>
+                </div>
+            </div>
+
+            <div id="v360db-exp-tab-user" style="display:none;">
+                <div class="v360db-table-wrap">
+                    <table class="v360db-table v360db-table--hover" data-coltable="user">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><span class="v360db-colhdr" data-col="1">Họ tên<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="2">Phòng ban<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th class="v360db-th--right"><span class="v360db-colhdr" data-col="3" data-numeric="1">Lượt<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th class="v360db-th--right"><span class="v360db-colhdr" data-col="4" data-numeric="1">Content<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="5">Lần cuối<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="v360db-exp-tbody-user"><tr><td colspan="7"><div class="v360db-spinner">Đang tải…</div></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="v360db-exp-tab-content" style="display:none;">
+                <div class="v360db-table-wrap">
+                    <table class="v360db-table v360db-table--hover" data-coltable="content">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><span class="v360db-colhdr" data-col="1">Loại<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="2">Tiêu đề<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th class="v360db-th--right"><span class="v360db-colhdr" data-col="3" data-numeric="1">Lượt<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th class="v360db-th--right"><span class="v360db-colhdr" data-col="4" data-numeric="1">User<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="5">Lần đầu<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th><span class="v360db-colhdr" data-col="6">Lần cuối<span class="v360db-colhdr__caret">▾</span></span></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="v360db-exp-tbody-content"><tr><td colspan="8"><div class="v360db-spinner">Đang tải…</div></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="v360db-card">
+            <h5>⚠ Quyền có thể cần thu hồi</h5>
+            <div class="v360db-kpi__sub" style="margin-bottom:8px;">User được cấp quyền cách đây ≥ 90 ngày nhưng chưa từng mở Project/Virtual nào. Cân nhắc thu hồi để giảm bề mặt rủi ro.</div>
+            <table class="v360db-table" id="v360db-stale">
+                <thead>
+                    <tr><th>#</th><th>Mã NV</th><th>Họ tên</th><th>Phòng ban</th><th>Cấp quyền lần đầu</th><th style="text-align:right">Số ngày</th></tr>
+                </thead>
+                <tbody><tr><td colspan="6" class="v360db-empty">Đang tải...</td></tr></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function () {
+    var base = '@Url.Content("~/")' + 'View360/Dashboard/';
+    var $period = document.getElementById('v360db-period');
+    var trendChart = null, deptPermChart = null, deptViewsChart = null, hourlyChart = null;
+
+    function fmt(n) { return (n == null ? '—' : String(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function escapeHtml(s) {
+        return (s == null ? '' : String(s))
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Fetch + parse JSON. Throws helpful Error neu HTTP fail hoac response khong phai JSON.
+    function safeFetch(url) {
+        return fetch(url).then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + url);
+            return r.text().then(function (txt) {
+                try { return JSON.parse(txt); }
+                catch (e) { throw new Error('Server tra ve khong phai JSON. Co the bi loi 500 (xem F12 -> Network -> response).'); }
+            });
+        }).then(function (d) {
+            if (d && d.error) throw new Error(d.message || 'Server error');
+            return d;
+        });
+    }
+
+    function showError(elId, err) {
+        var el = document.getElementById(elId);
+        if (el) el.innerHTML = '<div class="v360db-error">⚠ ' + escapeHtml(err.message || String(err)) + '</div>';
+    }
+
+    function showTableError(selector, err, colspan) {
+        var tbody = document.querySelector(selector);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="' + (colspan || 6) +
+            '" class="v360db-error" style="text-align:left">⚠ ' + escapeHtml(err.message || String(err)) + '</td></tr>';
+    }
+
+    function renderDelta(elId, cur, prev) {
+        var el = document.getElementById(elId);
+        if (prev == null || (cur === 0 && prev === 0)) { el.textContent = ''; return; }
+        var diff = cur - prev;
+        var cls, sym;
+        if (diff > 0) { cls = 'v360db-kpi__delta--up'; sym = '▲ +' + diff; }
+        else if (diff < 0) { cls = 'v360db-kpi__delta--down'; sym = '▼ ' + diff; }
+        else { cls = 'v360db-kpi__delta--flat'; sym = '• 0'; }
+        el.className = 'v360db-kpi__delta ' + cls;
+        el.textContent = sym;
+        el.title = 'So với kỳ trước (' + fmt(prev) + ')';
+    }
+
+    function loadKpi(period) {
+        return safeFetch(base + 'Kpi?period=' + encodeURIComponent(period))
+            .then(function (d) {
+                document.getElementById('v360db-kpi-active').textContent = fmt(d.activeUsers);
+                renderDelta('v360db-kpi-active-delta', d.activeUsers, d.prevActiveUsers);
+                document.getElementById('v360db-kpi-active-sub').textContent =
+                    'trong tổng ' + fmt(d.grantedUsers) + ' user còn hoạt động được cấp quyền';
+                document.getElementById('v360db-kpi-views').textContent = fmt(d.totalViews);
+                renderDelta('v360db-kpi-views-delta', d.totalViews, d.prevTotalViews);
+                document.getElementById('v360db-kpi-util').textContent = d.utilization + '%';
+                document.getElementById('v360db-fromhint').textContent = 'từ ' + d.from;
+            })
+            .catch(function (err) {
+                document.getElementById('v360db-kpi-active').textContent = '?';
+                document.getElementById('v360db-kpi-views').textContent = '?';
+                document.getElementById('v360db-kpi-util').textContent = '?';
+                document.getElementById('v360db-kpi-active-sub').textContent = '⚠ ' + (err.message || err);
+            });
+    }
+
+    function loadTrend(period) {
+        return safeFetch(base + 'Trend?period=' + encodeURIComponent(period))
+            .then(function (d) {
+                if (!d.days || d.days.length === 0) {
+                    document.getElementById('v360db-trend').innerHTML =
+                        '<div class="v360db-empty">Chưa có lượt truy cập nào trong kỳ này.</div>';
+                    return;
+                }
+                if (trendChart) { trendChart.destroy(); trendChart = null; }
+                document.getElementById('v360db-trend').innerHTML = '';
+                trendChart = Highcharts.chart('v360db-trend', {
+                    chart: { type: 'line' },
+                    title: { text: '' },
+                    credits: { enabled: false },
+                    exporting: { enabled: false },
+                    xAxis: { categories: d.days, tickInterval: Math.max(1, Math.floor(d.days.length / 10)) },
+                    yAxis: { title: { text: 'Lượt truy cập' }, allowDecimals: false },
+                    legend: { align: 'left' },
+                    plotOptions: { line: { marker: { enabled: d.days.length <= 31 } } },
+                    series: [
+                        { name: 'Project',  data: d.project, color: '#2563eb' },
+                        { name: 'Virtual',  data: d.virtual, color: '#7c3aed' }
+                    ]
+                });
+            })
+            .catch(function (err) { showError('v360db-trend', err); });
+    }
+
+    // ===== Explorer =====
+    var explorerState = {
+        mode: 'time',      // 'time' | 'user' | 'content'
+        search: '',
+        type: '',
+        page: 1,
+        pageSize: 50,
+        userFilter: null,    // {id, hoTen}
+        contentFilter: null  // {type, id, title}
+    };
+
+    function debounce(fn, ms) {
+        var t; return function () {
+            var args = arguments, self = this;
+            clearTimeout(t); t = setTimeout(function () { fn.apply(self, args); }, ms);
+        };
+    }
+
+    // Relative time formatter ("5 phút trước", "Hôm qua 14:30").
+    function relTime(isoStr, absStr) {
+        if (!isoStr) return absStr || '';
+        var t = new Date(isoStr).getTime();
+        if (isNaN(t)) return absStr || '';
+        var diff = Date.now() - t;
+        var s = Math.floor(diff / 1000);
+        if (s < 60)   return s + ' giây trước';
+        var m = Math.floor(s / 60);
+        if (m < 60)   return m + ' phút trước';
+        var h = Math.floor(m / 60);
+        if (h < 24)   return h + ' giờ trước';
+        var d = Math.floor(h / 24);
+        if (d === 1)  return 'Hôm qua';
+        if (d < 7)    return d + ' ngày trước';
+        return absStr || '';
+    }
+
+    function renderActiveFilterChip() {
+        var $chip = document.getElementById('v360db-exp-active-filter');
+        if (explorerState.userFilter) {
+            $chip.style.display = 'inline-flex';
+            $chip.innerHTML = '<span class="v360db-exp-chip__label">Lọc user:</span> <b>' +
+                escapeHtml(explorerState.userFilter.hoTen) + '</b>' +
+                '<button type="button" title="Bỏ lọc">✕</button>';
+            $chip.querySelector('button').onclick = function () {
+                explorerState.userFilter = null; explorerState.page = 1; renderActiveFilterChip(); loadExplorer();
+            };
+        } else if (explorerState.contentFilter) {
+            $chip.style.display = 'inline-flex';
+            $chip.innerHTML = '<span class="v360db-exp-chip__label">Lọc nội dung:</span> <b>' +
+                escapeHtml(explorerState.contentFilter.title) + '</b>' +
+                '<button type="button" title="Bỏ lọc">✕</button>';
+            $chip.querySelector('button').onclick = function () {
+                explorerState.contentFilter = null; explorerState.page = 1; renderActiveFilterChip(); loadExplorer();
+            };
+        } else {
+            $chip.style.display = 'none'; $chip.innerHTML = '';
+        }
+    }
+
+    function switchExplorerTab(mode) {
+        explorerState.mode = mode;
+        explorerState.page = 1;
+        document.querySelectorAll('.v360db-tab').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.mode === mode);
+        });
+        document.getElementById('v360db-exp-tab-time').style.display = mode === 'time' ? '' : 'none';
+        document.getElementById('v360db-exp-tab-user').style.display = mode === 'user' ? '' : 'none';
+        document.getElementById('v360db-exp-tab-content').style.display = mode === 'content' ? '' : 'none';
+        loadExplorer();
+    }
+
+    function emptyState(colspan, icon, title, hint) {
+        return '<tr><td colspan="' + colspan + '"><div class="v360db-empty-state">' +
+            '<div class="v360db-empty-state__icon">' + icon + '</div>' +
+            '<div class="v360db-empty-state__title">' + escapeHtml(title) + '</div>' +
+            (hint ? '<div class="v360db-empty-state__hint">' + escapeHtml(hint) + '</div>' : '') +
+            '</div></td></tr>';
+    }
+
+    function spinnerCell(colspan) {
+        return '<tr><td colspan="' + colspan + '"><div class="v360db-spinner">Đang tải dữ liệu…</div></td></tr>';
+    }
+
+    // ===== Excel-style column filter/sort popover =====
+    // State per table: { filters: {colIdx: Set<value>}, sort: {col, dir} }
+    var tableStates = { time: {filters:{}, sort:null}, user: {filters:{}, sort:null}, content: {filters:{}, sort:null} };
+
+    function getCellText(tr, col) {
+        if (!tr.cells || !tr.cells[col]) return '';
+        var cell = tr.cells[col];
+        // Uu tien data-filter-value (set boi cell co child elements nhu time, badge, link)
+        // de filter/sort lay value sach (vd date-only thay vi "2 gio truoc2026-05-28 10:35")
+        if (cell.dataset && cell.dataset.filterValue != null) return cell.dataset.filterValue;
+        return (cell.textContent || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function applyTableState(table) {
+        if (!table) return;
+        var mode = table.dataset.coltable;
+        var state = tableStates[mode];
+        if (!state) return;
+        var tbody = table.tBodies[0];
+        var rows = Array.prototype.slice.call(tbody.rows);
+        if (rows.length === 0 || (rows[0].cells.length <= 1)) {
+            updateColumnIndicators(table);
+            return;
+        }
+
+        // 1. Sort (mutate DOM order)
+        if (state.sort) {
+            var sCol = state.sort.col;
+            var dir  = state.sort.dir === 'desc' ? -1 : 1;
+            var isNumeric = !!(table.querySelector('.v360db-colhdr[data-col="' + sCol + '"]') &&
+                               table.querySelector('.v360db-colhdr[data-col="' + sCol + '"]').dataset.numeric);
+            rows.sort(function (a, b) {
+                var ta = getCellText(a, sCol), tb = getCellText(b, sCol);
+                if (isNumeric) {
+                    var na = parseFloat(ta.replace(/[^\d.-]/g, ''));
+                    var nb = parseFloat(tb.replace(/[^\d.-]/g, ''));
+                    if (isNaN(na)) na = -Infinity; if (isNaN(nb)) nb = -Infinity;
+                    return (na - nb) * dir;
+                }
+                return ta.localeCompare(tb, 'vi', { sensitivity: 'base' }) * dir;
+            });
+            rows.forEach(function (r) { tbody.appendChild(r); });
+        }
+
+        // 2. Apply filters
+        var hidden = 0, total = 0;
+        rows.forEach(function (tr) {
+            if (!tr.cells || tr.cells.length <= 1) return;
+            total++;
+            var show = true;
+            Object.keys(state.filters).forEach(function (colKey) {
+                var allowed = state.filters[colKey];
+                if (!allowed || allowed.size === 0) return;
+                var text = getCellText(tr, parseInt(colKey, 10));
+                if (!allowed.has(text)) show = false;
+            });
+            tr.style.display = show ? '' : 'none';
+            if (!show) hidden++;
+        });
+
+        updateColumnIndicators(table);
+        renderHiddenHint(table, hidden, total);
+    }
+
+    function updateColumnIndicators(table) {
+        var state = tableStates[table.dataset.coltable];
+        if (!state) return;
+        table.querySelectorAll('.v360db-colhdr').forEach(function (hdr) {
+            var col = parseInt(hdr.dataset.col, 10);
+            var hasFilter = state.filters[col] && state.filters[col].size > 0;
+            var isSorted  = state.sort && state.sort.col === col;
+            hdr.classList.toggle('v360db-colhdr--filtered', !!hasFilter);
+            hdr.classList.toggle('v360db-colhdr--sorted', !!isSorted);
+            var caret = hdr.querySelector('.v360db-colhdr__caret');
+            if (caret) {
+                if (isSorted) caret.textContent = state.sort.dir === 'asc' ? '▴' : '▾';
+                else caret.textContent = '▾';
+            }
+        });
+    }
+
+    function renderHiddenHint(table, hidden, total) {
+        var wrap = table.closest('.v360db-card');
+        if (!wrap) return;
+        var id = 'v360db-colhint-' + table.dataset.coltable;
+        var hint = wrap.querySelector('#' + id);
+        if (hidden > 0) {
+            if (!hint) {
+                hint = document.createElement('div');
+                hint.id = id;
+                hint.style.cssText = 'font-size:12px;color:#94a3b8;margin-top:8px;';
+                wrap.appendChild(hint);
+            }
+            hint.innerHTML = '🔽 Lọc cột đang ẩn <b>' + hidden + '/' + total + '</b> dòng trong trang. ' +
+                '<button type="button" class="v360db-link-btn" data-clear-table="' + table.dataset.coltable + '">Xoá lọc cột</button>';
+            hint.querySelector('button').onclick = function () {
+                clearTableState(table.dataset.coltable);
+            };
+        } else if (hint) {
+            hint.remove();
+        }
+    }
+
+    function clearTableState(mode) {
+        tableStates[mode] = { filters: {}, sort: null };
+        var table = document.querySelector('table[data-coltable="' + mode + '"]');
+        applyTableState(table);
+    }
+
+    function reapplyColumnFilters(mode) {
+        var table = document.querySelector('table[data-coltable="' + mode + '"]');
+        applyTableState(table);
+    }
+
+    // ----- Popover -----
+    var $pop = document.createElement('div');
+    $pop.className = 'v360db-colpop';
+    document.body.appendChild($pop);
+    var popContext = null; // {table, col, hdrEl}
+
+    function closeColPop() { $pop.style.display = 'none'; popContext = null; }
+
+    function openColPop(hdrEl, table, col) {
+        var mode = table.dataset.coltable;
+        var state = tableStates[mode];
+        var rows = Array.prototype.slice.call(table.tBodies[0].rows)
+            .filter(function (r) { return r.cells && r.cells.length > 1; });
+
+        // Collect distinct values from current loaded rows
+        var values = {};
+        rows.forEach(function (tr) {
+            var t = getCellText(tr, col);
+            if (t) values[t] = (values[t] || 0) + 1;
+        });
+        var sortedVals = Object.keys(values).sort(function (a, b) {
+            return a.localeCompare(b, 'vi', { sensitivity: 'base' });
+        });
+
+        var currentFilter = state.filters[col] || new Set();
+        var nothingSelected = currentFilter.size === 0;
+        var sortDir = state.sort && state.sort.col === col ? state.sort.dir : null;
+
+        var html =
+            '<div class="v360db-colpop__sortrow">' +
+                '<button type="button" class="v360db-colpop__sort ' + (sortDir === 'asc' ? 'active' : '') + '" data-sort="asc">↑ Tăng dần</button>' +
+                '<button type="button" class="v360db-colpop__sort ' + (sortDir === 'desc' ? 'active' : '') + '" data-sort="desc">↓ Giảm dần</button>' +
+            '</div>' +
+            '<div class="v360db-colpop__search"><input type="text" placeholder="Tìm trong danh sách..." /></div>' +
+            '<div class="v360db-colpop__hint">Tích giá trị muốn lọc. Không tích gì = không lọc cột này.</div>';
+
+        if (sortedVals.length === 0) {
+            html += '<div class="v360db-colpop__empty">Không có giá trị nào trong cột này.</div>';
+        } else {
+            html += '<div class="v360db-colpop__list">' +
+                '<label class="v360db-colpop__all"><input type="checkbox" data-all ' + (nothingSelected ? 'checked' : '') + '/> (Không lọc)</label>' +
+                sortedVals.map(function (v) {
+                    var checked = currentFilter.has(v);
+                    return '<label><input type="checkbox" value="' + escapeHtml(v) + '" ' + (checked ? 'checked' : '') +
+                        '/> <span>' + escapeHtml(v) + '</span> <span style="color:#94a3b8;font-size:11px;margin-left:auto;">(' + values[v] + ')</span></label>';
+                }).join('') +
+                '</div>';
+        }
+
+        html +=
+            '<div class="v360db-colpop__actions">' +
+                '<button type="button" class="v360db-colpop__btn v360db-colpop__btn--ghost" data-act="clear">Xoá lọc cột</button>' +
+                '<button type="button" class="v360db-colpop__btn v360db-colpop__btn--primary" data-act="apply">Áp dụng</button>' +
+            '</div>';
+        $pop.innerHTML = html;
+
+        // Position
+        var rect = hdrEl.getBoundingClientRect();
+        var popWidth = 300;
+        var left = rect.left + window.scrollX;
+        if (left + popWidth > window.innerWidth - 12) left = window.innerWidth - popWidth - 12;
+        $pop.style.left = Math.max(8, left) + 'px';
+        $pop.style.top  = (rect.bottom + window.scrollY + 6) + 'px';
+        $pop.style.display = 'block';
+
+        popContext = { table: table, col: col };
+
+        // ----- Wire handlers -----
+        // Sort buttons
+        $pop.querySelectorAll('[data-sort]').forEach(function (b) {
+            b.onclick = function () {
+                state.sort = { col: col, dir: b.dataset.sort };
+                applyTableState(table);
+                closeColPop();
+            };
+        });
+
+        // Search input filters checkbox list
+        var $search = $pop.querySelector('.v360db-colpop__search input');
+        if ($search) {
+            $search.focus();
+            $search.addEventListener('input', function () {
+                var q = $search.value.toLowerCase();
+                $pop.querySelectorAll('.v360db-colpop__list label').forEach(function (lbl) {
+                    if (lbl.classList.contains('v360db-colpop__all')) return;
+                    lbl.style.display = lbl.textContent.toLowerCase().indexOf(q) >= 0 ? '' : 'none';
+                });
+            });
+        }
+
+        // "(Không lọc)" checkbox -> uncheck all others
+        var $allCb = $pop.querySelector('input[data-all]');
+        if ($allCb) {
+            $allCb.addEventListener('change', function () {
+                if (this.checked) {
+                    $pop.querySelectorAll('.v360db-colpop__list input[type="checkbox"]:not([data-all])').forEach(function (c) { c.checked = false; });
+                }
+            });
+        }
+        // Others -> uncheck "(Không lọc)"
+        $pop.querySelectorAll('.v360db-colpop__list input[type="checkbox"]:not([data-all])').forEach(function (cb) {
+            cb.addEventListener('change', function () {
+                if (this.checked && $allCb) $allCb.checked = false;
+            });
+        });
+
+        // Clear / Apply
+        $pop.querySelector('[data-act="clear"]').onclick = function () {
+            delete state.filters[col];
+            applyTableState(table);
+            closeColPop();
+        };
+        $pop.querySelector('[data-act="apply"]').onclick = function () {
+            var checked = Array.prototype.slice.call(
+                $pop.querySelectorAll('.v360db-colpop__list input[type="checkbox"]:checked'))
+                .filter(function (c) { return !c.dataset.all; })
+                .map(function (c) { return c.value; });
+            if (checked.length === 0) delete state.filters[col];
+            else state.filters[col] = new Set(checked);
+            applyTableState(table);
+            closeColPop();
+        };
+    }
+
+    // Click outside closes popover
+    document.addEventListener('click', function (e) {
+        if ($pop.style.display !== 'block') return;
+        if ($pop.contains(e.target)) return;
+        if (e.target.closest('.v360db-colhdr')) return;
+        closeColPop();
+    });
+    // ESC closes
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && $pop.style.display === 'block') closeColPop();
+    });
+
+    // Bind clicks on column headers (event delegation - works for re-rendered tables too)
+    document.querySelectorAll('table[data-coltable]').forEach(function (table) {
+        table.addEventListener('click', function (e) {
+            var hdr = e.target.closest('.v360db-colhdr');
+            if (!hdr || !table.contains(hdr)) return;
+            e.stopPropagation();
+            // Toggle: if popover already open for this header, close it
+            if (popContext && popContext.table === table &&
+                popContext.col === parseInt(hdr.dataset.col, 10)) {
+                closeColPop();
+                return;
+            }
+            openColPop(hdr, table, parseInt(hdr.dataset.col, 10));
+        });
+    });
+
+    function buildQuery(period, extra) {
+        var qs = 'period=' + encodeURIComponent(period);
+        if (explorerState.search) qs += '&search=' + encodeURIComponent(explorerState.search);
+        if (explorerState.type)   qs += '&type=' + encodeURIComponent(explorerState.type);
+        if (extra) Object.keys(extra).forEach(function (k) {
+            if (extra[k] != null) qs += '&' + k + '=' + encodeURIComponent(extra[k]);
+        });
+        return qs;
+    }
+
+    function loadExplorerTime(period) {
+        var tbody = document.getElementById('v360db-exp-tbody-time');
+        tbody.innerHTML = spinnerCell(6);
+
+        var extra = {
+            page: explorerState.page,
+            pageSize: explorerState.pageSize
+        };
+        if (explorerState.userFilter) extra.userId = explorerState.userFilter.id;
+        if (explorerState.contentFilter) {
+            extra.contentType = explorerState.contentFilter.type;
+            extra.contentId   = explorerState.contentFilter.id;
+        }
+        return safeFetch(base + 'ExplorerLog?' + buildQuery(period, extra))
+            .then(function (d) {
+                var rows = d.rows || [];
+                if (rows.length === 0) {
+                    tbody.innerHTML = emptyState(6, '🔍', 'Không có lượt truy cập nào khớp',
+                        explorerState.search || explorerState.type || explorerState.userFilter || explorerState.contentFilter
+                            ? 'Thử bỏ bớt bộ lọc hoặc đổi kỳ thời gian.'
+                            : 'Tracking chưa có data cho kỳ này.');
+                    renderPager(d.page, d.totalPages, d.total);
+                    return;
+                }
+                tbody.innerHTML = rows.map(function (r) {
+                    var cls = r.contentType === 1 ? 'v360db-badge--proj' : 'v360db-badge--virt';
+                    var rel = relTime(r.accessAtIso, r.accessAt);
+                    var dateOnly = (r.accessAt || '').split(' ')[0];   // "2026-05-28"
+                    return '<tr>' +
+                        '<td class="v360db-time" data-filter-value="' + escapeHtml(dateOnly) +
+                            '" title="' + escapeHtml(r.accessAt) + '">' +
+                            '<div class="v360db-time__rel">' + escapeHtml(rel) + '</div>' +
+                            '<div class="v360db-time__abs">' + escapeHtml(r.accessAt) + '</div>' +
+                        '</td>' +
+                        '<td><button type="button" class="v360db-link-btn" data-user-id="' + r.nhanVienId +
+                              '" data-user-name="' + escapeHtml(r.hoTen) + '">' + escapeHtml(r.hoTen) +
+                              ' <small>· ' + escapeHtml(r.maNV || '') + '</small></button></td>' +
+                        '<td>' + escapeHtml(r.phongBan || '—') + '</td>' +
+                        '<td><span class="v360db-badge ' + cls + '">' + r.contentTypeName + '</span></td>' +
+                        '<td><button type="button" class="v360db-link-btn" data-content-type="' + r.contentType +
+                              '" data-content-id="' + r.contentId +
+                              '" data-content-title="' + escapeHtml(r.title) + '">' + escapeHtml(r.title) + '</button></td>' +
+                        '<td style="text-align:right"><a href="' + escapeHtml(r.detailsUrl) + '" target="_blank" title="Mở trong tab mới">↗</a></td>' +
+                        '</tr>';
+                }).join('');
+                renderPager(d.page, d.totalPages, d.total);
+                attachExplorerLinkHandlers(tbody);
+                reapplyColumnFilters('time');
+            })
+            .catch(function (err) { showTableError('#v360db-exp-tbody-time', err, 6); });
+    }
+
+    function renderPager(page, totalPages, total) {
+        var $p = document.getElementById('v360db-exp-pager-time');
+        if (!total || total === 0) { $p.innerHTML = ''; return; }
+        var info = '<span class="v360db-pager__info">' + fmt(total) + ' lượt';
+        if (totalPages > 1) info += ' · Trang ' + page + '/' + totalPages;
+        info += '</span>';
+        if (totalPages > 1) {
+            $p.innerHTML = info +
+                '<button type="button" data-page="1"' + (page <= 1 ? ' disabled' : '') + ' title="Trang đầu">«</button>' +
+                '<button type="button" data-page="' + (page - 1) + '"' + (page <= 1 ? ' disabled' : '') + '>‹ Trước</button>' +
+                '<button type="button" data-page="' + (page + 1) + '"' + (page >= totalPages ? ' disabled' : '') + '>Sau ›</button>' +
+                '<button type="button" data-page="' + totalPages + '"' + (page >= totalPages ? ' disabled' : '') + ' title="Trang cuối">»</button>';
+            $p.querySelectorAll('button[data-page]').forEach(function (b) {
+                b.onclick = function () {
+                    var p = parseInt(b.dataset.page, 10);
+                    if (p < 1 || p > totalPages) return;
+                    explorerState.page = p;
+                    loadExplorerTime($period.value);
+                };
+            });
+        } else {
+            $p.innerHTML = info;
+        }
+    }
+
+    function loadExplorerByUser(period) {
+        var tbody = document.getElementById('v360db-exp-tbody-user');
+        tbody.innerHTML = spinnerCell(7);
+        return safeFetch(base + 'ExplorerByUser?' + buildQuery(period))
+            .then(function (rows) {
+                rows = rows || [];
+                if (rows.length === 0) {
+                    tbody.innerHTML = emptyState(7, '👥', 'Không có user nào khớp',
+                        'Thử thay đổi bộ lọc hoặc kỳ thời gian.');
+                    return;
+                }
+                tbody.innerHTML = rows.map(function (r, i) {
+                    return '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td>' + escapeHtml(r.hoTen) + ' <small style="color:#94a3b8">· ' + escapeHtml(r.maNV || '') + '</small></td>' +
+                        '<td>' + escapeHtml(r.phongBan || '—') + '</td>' +
+                        '<td style="text-align:right"><b>' + fmt(r.views) + '</b></td>' +
+                        '<td style="text-align:right">' + fmt(r.uniqueContent) + '</td>' +
+                        '<td class="v360db-time" data-filter-value="' + escapeHtml((r.lastAccess || '').split(' ')[0]) +
+                            '" title="' + escapeHtml(r.lastAccess) + '"><div class="v360db-time__rel">' +
+                            escapeHtml(relTime(r.lastAccess.replace(' ', 'T') + ':00', r.lastAccess)) + '</div></td>' +
+                        '<td><button type="button" class="v360db-link-btn" data-user-id="' + r.nhanVienId +
+                              '" data-user-name="' + escapeHtml(r.hoTen) + '">Xem chi tiết →</button></td>' +
+                        '</tr>';
+                }).join('');
+                attachExplorerLinkHandlers(tbody);
+                reapplyColumnFilters('user');
+            })
+            .catch(function (err) { showTableError('#v360db-exp-tbody-user', err, 7); });
+    }
+
+    function loadExplorerByContent(period) {
+        var tbody = document.getElementById('v360db-exp-tbody-content');
+        tbody.innerHTML = spinnerCell(8);
+        return safeFetch(base + 'ExplorerByContent?' + buildQuery(period))
+            .then(function (rows) {
+                rows = rows || [];
+                if (rows.length === 0) {
+                    tbody.innerHTML = emptyState(8, '📂', 'Không có nội dung nào khớp',
+                        'Thử thay đổi bộ lọc hoặc kỳ thời gian.');
+                    return;
+                }
+                tbody.innerHTML = rows.map(function (r, i) {
+                    var cls = r.contentType === 1 ? 'v360db-badge--proj' : 'v360db-badge--virt';
+                    return '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td><span class="v360db-badge ' + cls + '">' + r.contentTypeName + '</span></td>' +
+                        '<td><a href="' + escapeHtml(r.detailsUrl) + '" target="_blank">' + escapeHtml(r.title) + '</a></td>' +
+                        '<td style="text-align:right"><b>' + fmt(r.views) + '</b></td>' +
+                        '<td style="text-align:right">' + fmt(r.uniqueUsers) + '</td>' +
+                        '<td class="v360db-time" data-filter-value="' + escapeHtml((r.firstAccess || '').split(' ')[0]) +
+                            '" title="' + escapeHtml(r.firstAccess) + '"><div class="v360db-time__rel">' +
+                            escapeHtml(relTime(r.firstAccess.replace(' ', 'T') + ':00', r.firstAccess)) + '</div></td>' +
+                        '<td class="v360db-time" data-filter-value="' + escapeHtml((r.lastAccess || '').split(' ')[0]) +
+                            '" title="' + escapeHtml(r.lastAccess) + '"><div class="v360db-time__rel">' +
+                            escapeHtml(relTime(r.lastAccess.replace(' ', 'T') + ':00', r.lastAccess)) + '</div></td>' +
+                        '<td><button type="button" class="v360db-link-btn" data-content-type="' + r.contentType +
+                              '" data-content-id="' + r.contentId +
+                              '" data-content-title="' + escapeHtml(r.title) + '">Xem chi tiết →</button></td>' +
+                        '</tr>';
+                }).join('');
+                attachExplorerLinkHandlers(tbody);
+                reapplyColumnFilters('content');
+            })
+            .catch(function (err) { showTableError('#v360db-exp-tbody-content', err, 8); });
+    }
+
+    function attachExplorerLinkHandlers(tbody) {
+        tbody.querySelectorAll('button[data-user-id]').forEach(function (b) {
+            b.onclick = function () {
+                explorerState.userFilter = { id: parseInt(b.dataset.userId, 10), hoTen: b.dataset.userName };
+                explorerState.contentFilter = null;
+                explorerState.page = 1;
+                renderActiveFilterChip();
+                switchExplorerTab('time');
+            };
+        });
+        tbody.querySelectorAll('button[data-content-id]').forEach(function (b) {
+            b.onclick = function () {
+                explorerState.contentFilter = {
+                    type: parseInt(b.dataset.contentType, 10),
+                    id: parseInt(b.dataset.contentId, 10),
+                    title: b.dataset.contentTitle
+                };
+                explorerState.userFilter = null;
+                explorerState.page = 1;
+                renderActiveFilterChip();
+                switchExplorerTab('time');
+            };
+        });
+    }
+
+    function loadExplorerCounts() {
+        var extra = {};
+        if (explorerState.userFilter) extra.userId = explorerState.userFilter.id;
+        if (explorerState.contentFilter) {
+            extra.contentType = explorerState.contentFilter.type;
+            extra.contentId   = explorerState.contentFilter.id;
+        }
+        return safeFetch(base + 'ExplorerCounts?' + buildQuery($period.value, extra))
+            .then(function (d) {
+                document.getElementById('v360db-tab-count-time').textContent    = fmt(d.time || 0);
+                document.getElementById('v360db-tab-count-user').textContent    = fmt(d.user || 0);
+                document.getElementById('v360db-tab-count-content').textContent = fmt(d.content || 0);
+            })
+            .catch(function () {
+                document.getElementById('v360db-tab-count-time').textContent    = '!';
+                document.getElementById('v360db-tab-count-user').textContent    = '!';
+                document.getElementById('v360db-tab-count-content').textContent = '!';
+            });
+    }
+
+    function loadExplorer() {
+        var p = $period.value;
+        // Refresh badges TRUOC (rat nhanh, 1 query), roi load data tab hien tai
+        loadExplorerCounts();
+        if (explorerState.mode === 'time') return loadExplorerTime(p);
+        if (explorerState.mode === 'user') return loadExplorerByUser(p);
+        if (explorerState.mode === 'content') return loadExplorerByContent(p);
+    }
+
+    var deptUsageChart = null;
+
+    function loadDeptUsage(period) {
+        return safeFetch(base + 'DeptUsage?period=' + encodeURIComponent(period))
+            .then(function (d) {
+                var $shown = document.getElementById('v360db-dept-shown');
+                if (!d.labels || d.labels.length === 0) {
+                    document.getElementById('v360db-dept-usage').innerHTML =
+                        '<div class="v360db-empty">Chưa có dữ liệu phân quyền.</div>';
+                    if ($shown) $shown.textContent = '';
+                    return;
+                }
+                if ($shown) {
+                    $shown.textContent = '· Hiển thị ' + d.shown + ' / ' + d.totalDeptWithGrants + ' phòng ban';
+                }
+                if (deptUsageChart && deptUsageChart.destroy) deptUsageChart.destroy();
+                document.getElementById('v360db-dept-usage').innerHTML = '';
+
+                // Bullet chart: 2 series cung 1 row, overlap (grouping:false).
+                // Bar lon (Granted) la nen, bar nho (Active) la overlay.
+                deptUsageChart = Highcharts.chart('v360db-dept-usage', {
+                    chart: { type: 'bar' },
+                    title: { text: '' },
+                    credits: { enabled: false },
+                    exporting: { enabled: false },
+                    xAxis: {
+                        categories: d.labels,
+                        title: { text: null },
+                        labels: { style: { fontSize: '11px' } }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: { text: 'Số user' },
+                        allowDecimals: false,
+                        gridLineColor: '#f1f5f9'
+                    },
+                    legend: { align: 'left', verticalAlign: 'top' },
+                    tooltip: {
+                        shared: true,
+                        useHTML: true,
+                        formatter: function () {
+                            var idx = this.points && this.points[0] ? this.points[0].point.index : -1;
+                            if (idx < 0) return '';
+                            var g = d.granted[idx], a = d.active[idx], v = d.views[idx];
+                            var util = g > 0 ? Math.round(a / g * 100) : 0;
+                            return '<div style="font-weight:600;margin-bottom:6px;">' +
+                                escapeHtml(d.labels[idx]) + '</div>' +
+                                '<table style="font-size:12px;line-height:1.5;">' +
+                                '<tr><td style="color:#64748b;padding-right:14px;">Cấp quyền</td><td><b>' + fmt(g) + ' user</b></td></tr>' +
+                                '<tr><td style="color:#64748b;">Đã active</td><td><b style="color:#2563eb;">' + fmt(a) + ' user</b> (' + util + '%)</td></tr>' +
+                                '<tr><td style="color:#64748b;">Lượt xem</td><td><b>' + fmt(v) + '</b></td></tr>' +
+                                '</table>';
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                            grouping: false,    // <-- key: overlap thay vi side-by-side
+                            borderWidth: 0,
+                            states: { hover: { brightness: -.05 } }
+                        }
+                    },
+                    series: [
+                        // Background bar (Granted) - day, mau nhat
+                        { name: 'Cấp quyền',  data: d.granted, color: '#cbd5e1', pointPadding: 0.05 },
+                        // Overlay bar (Active) - mong hon, mau dam, chong len giua
+                        { name: 'Đã active', data: d.active,  color: '#2563eb', pointPadding: 0.22 }
+                    ]
+                });
+            })
+            .catch(function (err) { showError('v360db-dept-usage', err); });
+    }
+
+    function loadHourly(period) {
+        return safeFetch(base + 'HourlyActivity?period=' + encodeURIComponent(period))
+            .then(function (d) {
+                var total = (d.counts || []).reduce(function (s, x) { return s + x; }, 0);
+                if (total === 0) {
+                    document.getElementById('v360db-hourly').innerHTML =
+                        '<div class="v360db-empty">Chưa có lượt truy cập nào trong kỳ này.</div>';
+                    return;
+                }
+                if (hourlyChart && hourlyChart.destroy) hourlyChart.destroy();
+                document.getElementById('v360db-hourly').innerHTML = '';
+                var labels = [];
+                for (var i = 0; i < 24; i++) labels.push(('0' + i).slice(-2) + 'h');
+                hourlyChart = Highcharts.chart('v360db-hourly', {
+                    chart: { type: 'column' },
+                    title: { text: '' },
+                    credits: { enabled: false },
+                    exporting: { enabled: false },
+                    xAxis: { categories: labels, title: { text: null } },
+                    yAxis: { min: 0, title: { text: 'Lượt truy cập' }, allowDecimals: false },
+                    legend: { enabled: false },
+                    series: [{ name: 'Lượt', data: d.counts, color: '#16a34a' }]
+                });
+            })
+            .catch(function (err) { showError('v360db-hourly', err); });
+    }
+
+    function loadStale() {
+        return safeFetch(base + 'StalePermissions')
+            .then(function (d) {
+                var tbody = document.querySelector('#v360db-stale tbody');
+                if (d.notReady) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="v360db-empty">' +
+                        escapeHtml(d.message) + '</td></tr>';
+                    return;
+                }
+                var rows = d.rows || [];
+                if (rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="v360db-empty">Không có quyền cũ nào chưa sử dụng. 👍</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = rows.map(function (r, i) {
+                    return '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td>' + escapeHtml(r.maNV) + '</td>' +
+                        '<td>' + escapeHtml(r.hoTen) + '</td>' +
+                        '<td>' + escapeHtml(r.phongBan || '—') + '</td>' +
+                        '<td>' + escapeHtml(r.firstGrant) + '</td>' +
+                        '<td style="text-align:right">' + fmt(r.daysSinceGrant) + '</td>' +
+                        '</tr>';
+                }).join('');
+            })
+            .catch(function (err) { showTableError('#v360db-stale tbody', err, 6); });
+    }
+
+    function loadInventory() {
+        return safeFetch(base + 'Inventory')
+            .then(function (d) {
+                document.getElementById('v360db-inv-projects').textContent = fmt(d.projectCount);
+                document.getElementById('v360db-inv-virtuals').textContent = fmt(d.virtualCount);
+                document.getElementById('v360db-inv-grant-p').textContent = fmt(d.grantsProject);
+                document.getElementById('v360db-inv-grant-v').textContent = fmt(d.grantsVirtual);
+                document.getElementById('v360db-inv-coverage').textContent =
+                    fmt(d.activeDepts) + ' / ' + fmt(d.totalDepts) + ' (' + d.coverage + '%)';
+            })
+            .catch(function (err) {
+                document.getElementById('v360db-inv').innerHTML =
+                    '<div class="v360db-error">⚠ Inventory: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function loadGroup(period) {
+        return safeFetch(base + 'GroupAnalytics?period=' + encodeURIComponent(period))
+            .then(function (rows) {
+                var tbody = document.querySelector('#v360db-group tbody');
+                if (!rows || rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="v360db-empty">Chưa có group nào.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = rows.map(function (r) {
+                    return '<tr>' +
+                        '<td>' + escapeHtml(r.name || '(chưa đặt tên)') + '</td>' +
+                        '<td style="text-align:right">' + fmt(r.projectCount) + '</td>' +
+                        '<td style="text-align:right">' + fmt(r.viewCount) + '</td>' +
+                        '<td style="text-align:right">' + fmt(r.uniqueUsers) + '</td>' +
+                        '</tr>';
+                }).join('');
+            })
+            .catch(function (err) { showTableError('#v360db-group tbody', err, 4); });
+    }
+
+    function loadUnused() {
+        return safeFetch(base + 'UnusedContent')
+            .then(function (d) {
+                var tbody = document.querySelector('#v360db-unused tbody');
+                if (d.notReady) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="v360db-empty">' +
+                        escapeHtml(d.message) + '</td></tr>';
+                    return;
+                }
+                var rows = d.rows || [];
+                if (rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="v360db-empty">Mọi content đã được xem ít nhất 1 lần. 🎉</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = rows.map(function (r) {
+                    var cls = r.type === 'Project' ? 'v360db-badge--proj' : 'v360db-badge--virt';
+                    return '<tr>' +
+                        '<td><span class="v360db-badge ' + cls + '">' + r.type + '</span></td>' +
+                        '<td><a href="' + escapeHtml(r.detailsUrl) + '" target="_blank">' + escapeHtml(r.title || '(không tiêu đề)') + '</a></td>' +
+                        '<td>' + escapeHtml(r.publishedAt) + '</td>' +
+                        '<td style="text-align:right">' + fmt(r.daysOld) + '</td>' +
+                        '</tr>';
+                }).join('');
+            })
+            .catch(function (err) { showTableError('#v360db-unused tbody', err, 4); });
+    }
+
+    // Self-check truoc khi tai widget: bao truoc neu migration chua chay,
+    // thay vi de tung widget loi 500 mot cach mo ho.
+    function runDiagnostic() {
+        return safeFetch(base + 'Diagnostic')
+            .then(function (d) {
+                var $diag = document.getElementById('v360db-diag');
+                if (!d.accessLogExists) {
+                    $diag.style.display = 'block';
+                    $diag.innerHTML = '<div class="v360db-warn">' +
+                        '<strong>⚠ Migration chưa chạy.</strong> ' +
+                        'Bảng <code>View360_AccessLog</code> chưa tồn tại. ' +
+                        'Hãy chạy file <code>App_Data/migrations/v360-all.sql</code> trên DB EPORTAL. ' +
+                        'Các widget liên quan lượt xem sẽ trống cho đến khi có tracking data.</div>';
+                }
+                // Cảnh báo phụ: NhanVien chưa có IDPhongBan -> chart dept rỗng
+                if (d.nhanVienWithDept != null && d.nhanVienCount != null
+                    && d.nhanVienCount > 0 && d.nhanVienWithDept === 0) {
+                    $diag.style.display = 'block';
+                    $diag.innerHTML += '<div class="v360db-warn">' +
+                        '<strong>⚠ NhanVien chưa gán PhongBan.</strong> ' +
+                        'Toàn bộ ' + d.nhanVienCount + ' nhân viên có IDPhongBan = NULL. ' +
+                        'Chart "Phòng ban" sẽ trống.</div>';
+                }
+                return d;
+            })
+            .catch(function (err) {
+                var $diag = document.getElementById('v360db-diag');
+                $diag.style.display = 'block';
+                $diag.innerHTML = '<div class="v360db-error">⚠ Diagnostic lỗi: ' +
+                    escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function reload() {
+        var p = $period.value;
+        loadInventory();
+        loadKpi(p);
+        loadTrend(p);
+        loadDeptUsage(p);
+        loadHourly(p);
+        loadGroup(p);
+        loadUnused();
+        loadExplorer();
+        loadStale();
+    }
+
+    // ===== Wire up explorer controls =====
+    // Tabs
+    document.querySelectorAll('.v360db-tab').forEach(function (b) {
+        b.addEventListener('click', function () { switchExplorerTab(b.dataset.mode); });
+    });
+
+    // Debounced live search (300ms)
+    var $search = document.getElementById('v360db-exp-search');
+    var $searchClear = document.getElementById('v360db-exp-search-clear');
+    var debouncedSearch = debounce(function () {
+        explorerState.search = $search.value.trim();
+        explorerState.page = 1;
+        loadExplorer();
+    }, 300);
+    $search.addEventListener('input', function () {
+        $searchClear.style.display = $search.value ? 'block' : 'none';
+        debouncedSearch();
+    });
+    $searchClear.addEventListener('click', function () {
+        $search.value = '';
+        $searchClear.style.display = 'none';
+        explorerState.search = '';
+        explorerState.page = 1;
+        loadExplorer();
+        $search.focus();
+    });
+
+    // Segmented type filter (instant)
+    document.querySelectorAll('.v360db-seg__btn').forEach(function (b) {
+        b.addEventListener('click', function () {
+            document.querySelectorAll('.v360db-seg__btn').forEach(function (x) { x.classList.remove('active'); });
+            b.classList.add('active');
+            explorerState.type = b.dataset.type;
+            explorerState.page = 1;
+            loadExplorer();
+        });
+    });
+
+    // Page size selector
+    document.getElementById('v360db-exp-pagesize').addEventListener('change', function (e) {
+        explorerState.pageSize = parseInt(e.target.value, 10);
+        explorerState.page = 1;
+        if (explorerState.mode === 'time') loadExplorerTime($period.value);
+    });
+
+    // Reset all filters (including per-column filters/sorts)
+    document.getElementById('v360db-exp-clear').addEventListener('click', function () {
+        $search.value = '';
+        $searchClear.style.display = 'none';
+        document.querySelectorAll('.v360db-seg__btn').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.type === '');
+        });
+        // Clear per-column filter states
+        Object.keys(tableStates).forEach(function (k) { tableStates[k] = { filters: {}, sort: null }; });
+        document.querySelectorAll('table[data-coltable]').forEach(updateColumnIndicators);
+        document.querySelectorAll('[id^="v360db-colhint-"]').forEach(function (el) { el.remove(); });
+        explorerState.search = '';
+        explorerState.type = '';
+        explorerState.userFilter = null;
+        explorerState.contentFilter = null;
+        explorerState.page = 1;
+        renderActiveFilterChip();
+        loadExplorer();
+    });
+
+    // ESC clears focus + search
+    $search.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { $searchClear.click(); $search.blur(); }
+    });
+
+    $period.addEventListener('change', reload);
+    runDiagnostic().then(reload);
+})();
+</script>

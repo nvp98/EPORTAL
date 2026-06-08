@@ -33,7 +33,8 @@ namespace EPORTAL.Controllers
 
             string mk = Common.Encryptor.MD5Hash(u.MatKhau);
             NhanVien user = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.MatKhau == mk && x.IDTinhTrangLV == 1).FirstOrDefault();
-            var checkUser = dbNT.NT_UserTemp.Where(x => x.UserName == u.MaNV && x.MatKhau == mk && x.TinhTrang ==1).FirstOrDefault();
+            // (Da bo query dbNT.NT_UserTemp o day: server HR co the chua len (vd truoc 7h30) ->
+            //  connection timeout lam vo ca trang login. Bien checkUser cung khong duoc dung o action nay.)
             if (user != null)
             {
                 string Cookie = string.Format("{0};{1};{2};{3};{4};{5};{6}", user.ID, user.MaNV, user.HoTen, user.IDPhongBan, user.IDQuyen, user.IDQuyenHT, user.GroupQuyen);
@@ -58,12 +59,16 @@ namespace EPORTAL.Controllers
         [HttpPost]
         public ActionResult LoginUser(LoginValidation u, string returnUrl)
         {
+            if (u == null || string.IsNullOrWhiteSpace(u.MaNV) || string.IsNullOrWhiteSpace(u.MatKhau))
+            {
+                TempData["msgError"] = "<script>alert('Vui lòng nhập đầy đủ mã nhân viên và mật khẩu');</script>";
+                return RedirectToAction("Index", "Login");
+            }
 
             NhanVien user1 = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.CCCD.Substring(x.CCCD.Length - 5,5) == u.MatKhau).FirstOrDefault();
 
             string mk = Common.Encryptor.MD5Hash(u.MatKhau);
             NhanVien user = db.NhanViens.Where(x => x.MaNV == u.MaNV && x.MatKhau == mk ).FirstOrDefault();
-            var checkUser = dbNT.NT_UserTemp.Where(x => x.UserName == u.MaNV && x.MatKhau == mk && x.TinhTrang == 1).FirstOrDefault();
 
             var apiLoginResult = LoginViaAPI(u.MaNV, u.MatKhau);
             if (apiLoginResult != null && apiLoginResult.Success)
@@ -120,14 +125,29 @@ namespace EPORTAL.Controllers
                 }
 
             }
-            else if (user == null && checkUser != null)
-            {
-                string Cookie = string.Format("{0};{1}", checkUser.ID,checkUser.UserName);
-                FormsAuthentication.SetAuthCookie(Cookie, false);
-                return RedirectToAction("Index", "List_RegisterPeople_NT", new { area = "TagSign" });
-            }
             else
             {
+                // Den day = dang nhap chinh (local + API) deu that bai. Lan cuoi thu NT temp user.
+                // Query NT lazy + guarded: server HR (vd hr.hoaphatdungquat.vn / 192.168.240.3) co
+                // the chua len (vd truoc 7h30) -> KHONG de connection timeout lam vo trang login.
+                // Dang nhap chinh phia tren khong he phu thuoc NT nen luon hoat dong binh thuong.
+                NT_UserTemp checkUser = null;
+                try
+                {
+                    checkUser = dbNT.NT_UserTemp.Where(x => x.UserName == u.MaNV && x.MatKhau == mk && x.TinhTrang == 1).FirstOrDefault();
+                }
+                catch (Exception exNT)
+                {
+                    System.Diagnostics.Debug.WriteLine("[LoginUser] NT_UserTemp khong san sang: " + exNT.Message);
+                }
+
+                if (checkUser != null)
+                {
+                    string Cookie = string.Format("{0};{1}", checkUser.ID, checkUser.UserName);
+                    FormsAuthentication.SetAuthCookie(Cookie, false);
+                    return RedirectToAction("Index", "List_RegisterPeople_NT", new { area = "TagSign" });
+                }
+
                 TempData["msgSuccess"] = "<script>alert('Sai tên đăng nhập hoặc mật khẩu');window.location.href = '/Login'</script>";
                 //return View(TempData);
                 return RedirectToAction("", "Login");
@@ -337,7 +357,10 @@ namespace EPORTAL.Controllers
                 var httpRequest = (HttpWebRequest)WebRequest.Create(url);
                 httpRequest.Method = "POST";
                 httpRequest.ContentType = "application/json";
-                httpRequest.Timeout = 30000;
+                // 8s thay vi 30s: HR API (hr.hoaphatdungquat.vn) co the chua len truoc gio hanh chinh.
+                // Fail nhanh de login local khong bi treo ~30s moi sang. HR khoe response < 1-2s nen
+                // 8s du an toan; tang lai neu HR thuong xuyen cham.
+                httpRequest.Timeout = 8000;
 
                 var data = @"{
                               ""username"":""" + username + @""",

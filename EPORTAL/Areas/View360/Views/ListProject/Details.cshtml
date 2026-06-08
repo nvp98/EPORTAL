@@ -1,55 +1,180 @@
-﻿
-@{
-    ViewBag.Title = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@{
+    ViewBag.Title = Model.Title ?? "Dự án 360°";
+    Layout = "~/Views/Shared/_LayoutV360Showcase.cshtml";
+    ViewBag.BodyClass = "v360-sc-fullwidth v360-sc-viewer";
+    ViewBag.HideSearch = true;
+    // Back: ve danh sach du an (preserve scope via referrer neu same-origin)
+    var _ref = Request.UrlReferrer;
+    var _fallback = Url.Action("Index", "ListProject", new { area = "View360" });
+    ViewBag.BackLabel = "Danh sách dự án";
+    ViewBag.BackHref  = (_ref != null && _ref.Host == Request.Url.Host
+                        && _ref.AbsolutePath.IndexOf("/ListProject", StringComparison.OrdinalIgnoreCase) >= 0
+                        && _ref.AbsolutePath.IndexOf("/Details", StringComparison.OrdinalIgnoreCase) < 0)
+                       ? _ref.ToString()
+                       : _fallback;
 }
 @model EPORTAL.ModelsView360.ProjectValidation
-<div class="app-main__outer">
-    <div class="app-main__inner">
-        <div class="tab-content">
-            <div class="card">
+@{
+    var mapImg = string.IsNullOrEmpty(Model.Images)
+        ? Url.Content("~/Content/assets/images/bg9.jpg")
+        : Url.Content("~/Images/" + System.IO.Path.GetFileName(Model.Images));
 
-                <div style="padding:10px 20px;float:left;width:100%">
-                    <div style="display: flex;">
-                        <div>
-                            <img style="width: 40%;padding-top:6.5%" src="/Images/360.png">
-                        </div>
-                        <div class="page-title-actions" style="margin-left:-4%;">
-                            <b>@Model.Title</b>
-                        </div>
-                    </div>
+    var iframeUrl = Model.URL ?? "";
+    var isKuula = iframeUrl.IndexOf("kuula", StringComparison.OrdinalIgnoreCase) >= 0;
+    if (isKuula && iframeUrl.IndexOf("js-api=", StringComparison.OrdinalIgnoreCase) < 0)
+    {
+        iframeUrl += (iframeUrl.Contains("?") ? "&" : "?") + "js-api=1";
+    }
+}
 
-                    <iframe class="ku-embed" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="@Model.URL" width="100%" height="800px"></iframe>
-                </div>
+@*view360-modern.css load by _LayoutV360Showcase.cshtml*@
 
+<div class="app-main__outer v360-app-outer">
+    <div class="app-main__inner v360-app-inner" style="padding:0;">
+        <div class="v360-area v360-area--viewer">
+            <div class="v360-viewer">
 
+                <div class="v360-viewer__stage">
+                    <iframe id="v360-iframe"
+                            class="v360-viewer__iframe"
+                            src="@iframeUrl"
+                            frameborder="0"
+                            allowfullscreen
+                            allow="xr-spatial-tracking; gyroscope; accelerometer"
+                            loading="eager"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
 
-            </div>
-        </div>
-    </div>
-    <div class="app-wrapper-footer">
-        <div class="app-footer">
-            <div class="app-footer__inner">
-                <div class="footer_content d-flex justify-content-between">
-                    <div class="footer_item">
-                        <span class="div360">360°</span> <span style="color:rgba(255, 255, 255, 0.6);font-size:23px">VIEW</span>
-                    </div>
-                    <div class="footer_list_item flex-fill web_menu" style="margin-top:8px">
-                        <ul class="d-flex justify-content-center">
+                    @*
+                        ============ MINIMAP TAM AN ============
+                        Tour Kuula da co built-in "Ban do KLH" + Map (Google). Khong fetch
+                        hotspot data tu Kuula duoc (Business plan khong co API self-serve).
+                        Uncomment block ben duoi de bat lai khi co data mapping.
 
-                            <li class="web_menu_item web_name">Công ty cổ phần thép Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
-                    <div class="footer_item_copy d-flex">
-                        <span class="copyright">Copyright</span>
-                        <ul class="copyright_ul">
-                            <li>Ban công nghệ thông tin</li>
-                            <li>Hòa Phát Dung Quất</li>
-                        </ul>
-                    </div>
+                        <aside class="v360-minimap" id="v360-minimap" data-collapsed="false">
+                            <div class="v360-minimap__head">
+                                <span class="v360-minimap__title">
+                                    <i class="fa fa-map-marked-alt"></i> Bản đồ KLH
+                                </span>
+                                <button class="v360-minimap__toggle" type="button" id="v360-minimap-toggle" aria-label="Thu/mở minimap">
+                                    <i class="fa fa-minus" id="v360-minimap-icon"></i>
+                                </button>
+                            </div>
+                            <div class="v360-minimap__body">
+                                <img src="@mapImg" alt="Bản đồ vị trí" />
+                                <div class="v360-minimap__marker" id="v360-minimap-marker" style="left:50%; top:50%;">
+                                    <div class="v360-minimap__cone" id="v360-minimap-cone"></div>
+                                    <div class="v360-minimap__dot"></div>
+                                </div>
+                            </div>
+                            <div class="v360-minimap__footer">
+                                @(string.IsNullOrEmpty(Model.Title) ? "Vị trí hiện tại" : Model.Title)
+                            </div>
+                        </aside>
+                    *@
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+(function () {
+    // Minimap tam an. Skip nu khong tim thay container.
+    var minimap = document.getElementById('v360-minimap');
+    if (!minimap) {
+        // Cone xoay theo camera van hoat dong neu can - chi can listener camerasync
+        // Nhung khong co target marker -> bo qua hoan toan.
+        return;
+    }
+    var toggle  = document.getElementById('v360-minimap-toggle');
+    var icon    = document.getElementById('v360-minimap-icon');
+    var marker  = document.getElementById('v360-minimap-marker');
+    var cone    = document.getElementById('v360-minimap-cone');
+
+    toggle.addEventListener('click', function () {
+        var collapsed = minimap.classList.toggle('is-collapsed');
+        icon.className = collapsed ? 'fa fa-map' : 'fa fa-minus';
+    });
+
+    var dragging = false, dragOffsetX = 0, dragOffsetY = 0;
+    var head = minimap.querySelector('.v360-minimap__head');
+    head.addEventListener('mousedown', function (e) {
+        if (e.target.closest('.v360-minimap__toggle')) return;
+        dragging = true;
+        var rect = minimap.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', function (e) {
+        if (!dragging) return;
+        var parent = minimap.parentElement.getBoundingClientRect();
+        var x = e.clientX - parent.left - dragOffsetX;
+        var y = e.clientY - parent.top - dragOffsetY;
+        minimap.style.left = Math.max(0, Math.min(x, parent.width - minimap.offsetWidth)) + 'px';
+        minimap.style.top = Math.max(0, Math.min(y, parent.height - minimap.offsetHeight)) + 'px';
+        minimap.style.right = 'auto';
+    });
+    document.addEventListener('mouseup', function () { dragging = false; });
+
+    window.addEventListener('message', function (e) {
+        var data = e.data;
+        if (!data || data.type !== 'v360-pos') return;
+        if (typeof data.x === 'number' && typeof data.y === 'number') {
+            marker.style.left = (data.x * 100) + '%';
+            marker.style.top  = (data.y * 100) + '%';
+        }
+        if (typeof data.yaw === 'number') {
+            cone.style.transform = 'translate(-50%, -50%) rotate(' + data.yaw + 'deg)';
+        }
+    });
+
+    @if (isKuula)
+    {
+        <text>
+        (function loadKuula() {
+            if (document.getElementById('kuula-api-script')) return;
+            var s = document.createElement('script');
+            s.id = 'kuula-api-script';
+            s.src = 'https://static.kuula.io/prod/api/v1/api.js';
+            s.async = true;
+            s.onload = function () {
+                if (typeof KuulaPlayerAPI === 'undefined') return;
+                console.log('[v360] Kuula API loaded');
+                KuulaPlayerAPI.addEventListener('frameloaded', function () {
+                    console.log('[v360] Kuula viewer ready');
+                    var methods = ['getPosts', 'getCollection', 'getPost', 'getMap', 'getFloorPlan'];
+                    methods.forEach(function (m) {
+                        if (typeof KuulaPlayerAPI[m] === 'function') {
+                            try {
+                                var r = KuulaPlayerAPI[m]();
+                                console.log('[v360] KuulaPlayerAPI.' + m + '() ->', r);
+                            } catch (err) {
+                                console.log('[v360] KuulaPlayerAPI.' + m + '() error:', err.message);
+                            }
+                        }
+                    });
+                    console.log('[v360] KuulaPlayerAPI methods:',
+                        Object.keys(KuulaPlayerAPI).filter(function (k) {
+                            return typeof KuulaPlayerAPI[k] === 'function';
+                        })
+                    );
+                });
+                KuulaPlayerAPI.addEventListener('camerasync', function (data) {
+                    var d = (data && data.data) ? data.data : data;
+                    if (!d) return;
+                    var yaw = (typeof d.lng === 'number') ? d.lng
+                            : (typeof d.pan === 'number') ? d.pan : null;
+                    if (yaw !== null) window.postMessage({ type: 'v360-pos', yaw: yaw }, '*');
+                });
+                KuulaPlayerAPI.addEventListener('changedhash', function (data) {
+                    var d = (data && data.data) ? data.data : data;
+                    console.log('[v360] scene changed:', (d && d.hash) || '');
+                });
+            };
+            document.head.appendChild(s);
+        })();
+        </text>
+    }
+})();
+</script>

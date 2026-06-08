@@ -1,10 +1,9 @@
-﻿
+@using EPORTAL.Common
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Quản lý nhóm dự án";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@using EPORTAL.ModelsView360
-@model List<ProjectsGroup>
+@model List<ProjectGroupNode>
 
 @if (TempData["msgSuccess"] != null)
 {
@@ -18,6 +17,132 @@
 <script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
 <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
 <link href="~/Content/PagedList.css" rel="stylesheet" />
+
+<style>
+    /* ============================================================
+       Tree view: folder/file metaphor, indent theo Depth, click row
+       de expand/collapse, action buttons hover-aware
+       ============================================================ */
+    .pg-tree { background: #fff; border-radius: 8px; }
+    .pg-tree__head {
+        display: grid;
+        grid-template-columns: 1fr 110px 110px 220px;
+        gap: 12px;
+        padding: 12px 18px;
+        font-weight: 600;
+        font-size: 13px;
+        color: #5f6b7c;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        border-bottom: 2px solid #eef1f5;
+        background: #fafbfc;
+    }
+    .pg-tree__row {
+        display: grid;
+        grid-template-columns: 1fr 110px 110px 220px;
+        gap: 12px;
+        padding: 10px 18px;
+        align-items: center;
+        border-bottom: 1px solid #f0f2f5;
+        transition: background .12s ease;
+    }
+    .pg-tree__row:hover { background: #f6f9ff; }
+    .pg-tree__row[data-depth="0"] { background: #fcfdff; font-weight: 600; }
+    .pg-tree__row[data-depth="0"]:hover { background: #eef4ff; }
+
+    .pg-tree__name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+    .pg-tree__indent { display: inline-flex; align-items: center; gap: 4px; }
+    .pg-tree__rail {
+        width: 24px;
+        height: 1px;
+        border-top: 1px dashed #cfd6e0;
+        flex-shrink: 0;
+    }
+    .pg-tree__toggle {
+        width: 22px; height: 22px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border: none; background: transparent;
+        color: #6b7c93; cursor: pointer;
+        border-radius: 4px;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+    .pg-tree__toggle:hover { background: #e8edf5; color: #2563eb; }
+    .pg-tree__toggle--leaf { visibility: hidden; }
+    .pg-tree__icon {
+        width: 22px; height: 22px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+    .pg-tree__icon--folder { color: #2563eb; }
+    .pg-tree__icon--folder-empty { color: #cdd5e0; }
+    .pg-tree__label {
+        font-size: 14px;
+        color: #1f2937;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .pg-tree__count {
+        font-size: 12px;
+        color: #6b7c93;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #eef2f7;
+        font-weight: 500;
+    }
+    .pg-tree__count--zero { opacity: .5; }
+    .pg-tree__actions {
+        display: flex; gap: 6px; justify-content: flex-end;
+        opacity: .55;
+        transition: opacity .15s;
+    }
+    .pg-tree__row:hover .pg-tree__actions { opacity: 1; }
+    .pg-btn {
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        color: #374151;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all .12s;
+    }
+    .pg-btn:hover { background: #f3f6fb; border-color: #c1cad6; }
+    .pg-btn--primary { color: #2563eb; border-color: #c7d6ff; background: #eef4ff; }
+    .pg-btn--primary:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .pg-btn--danger { color: #dc2626; }
+    .pg-btn--danger:hover { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+    .pg-btn--icon { padding: 5px 8px; }
+    .pg-btn--icon i { font-size: 11px; }
+    .pg-btn:disabled, .pg-btn[disabled] { opacity: .35; cursor: not-allowed; }
+    .pg-tree__row.is-collapsed + .pg-tree__children { display: none; }
+
+    /* Empty state */
+    .pg-empty { padding: 48px 24px; text-align: center; color: #6b7c93; }
+    .pg-empty i { font-size: 48px; color: #cdd5e0; display: block; margin-bottom: 12px; }
+
+    @@media (max-width: 768px) {
+        .pg-tree__head { display: none; }
+        .pg-tree__row {
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+        .pg-tree__count { grid-column: 2; }
+        .pg-tree__actions { grid-column: 1 / -1; justify-content: flex-start; }
+    }
+</style>
+
 <div class="app-main__outer">
     <div class="app-main__inner">
 
@@ -25,93 +150,64 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
-                        </i>
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early"></i>
                     </div>
                     <div>
                         Danh sách nhóm dự án
                         <div class="page-title-subheading">
+                            Quản lý nhóm dự án phân cấp (nhóm cha &rarr; nhóm con &rarr; dự án)
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
+
         <div class="tab-content">
             <div class="row">
                 <div class="card">
-
                     <div class="card-header">
                         <div class="row" style="width:100%">
-                            <div class="col-md-10 col-lg-10">
-                                <div class="row">
-                                    @*<div class="col-md-5">
-                                            <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
-                                        </div>
-                                        <div class="col-md-5">
-                                            @Html.DropDownList("NTList", null, "Chọn nhà thầu", new { id = "IDNT", @class = "form-control", })
-                                        </div>
-                                        <div class="col-md-2">
-                                            <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
-                                        </div>*@
+                            <div class="col-md-8 col-lg-9">
+                                <div style="display:flex;gap:8px;align-items:center;color:#6b7c93;font-size:13px">
+                                    <i class="fa fa-info-circle"></i>
+                                    <span>Mỗi nhóm có thể chứa nhiều nhóm con và nhiều dự án. Bấm <i class="fa fa-caret-down"></i> để mở/đóng nhánh.</span>
                                 </div>
                             </div>
-                            @*@if (nd.IDQuyen == 2 || nd.IDQuyen == 1)
-                                {*@
-                            <div class="col-md-2">
-
-                                <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
-                                <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","ProjectsGroup")' style="margin-top:50px"></div>
-
-                                <button type="button" id="btn-TV" class="btn btn-warning m-l-auto pull-right"><i class="fa fa-list">&nbsp;</i>&nbsp;QL dự án </button>
+                            <div class="col-md-4 col-lg-3" style="text-align:right">
+                                <button type="button" id="btn-add" class="btn btn-primary" style="margin-left:6px">
+                                    <i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm nhóm gốc
+                                </button>
+                                <div class="modal" id="myModal" role="dialog"
+                                     data-url='@Url.Action("Create","ProjectsGroup")' style="margin-top:50px"></div>
+                                <button type="button" id="btn-TV" class="btn btn-warning" style="margin-left:6px">
+                                    <i class="fa fa-list">&nbsp;</i>&nbsp;QL dự án
+                                </button>
                             </div>
-                            @*}*@
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                                    <thead>
-                                        <tr>
-                                            <th width="30px" class="text-center">STT</th>
-                                            <th class="text-center">Tên nhóm dự án</th>
-                                            <th class="text-center">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @{
-                                            int RowNo = 1;
-                                            foreach (var item in Model)
-                                            {
-                                                <tr>
-                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
-                                                    <td class="text-center">@item.GroupName</td>
-                                                    <td class="text-center">
-                                                        <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "ProjectsGroup", new { id = item.IDGroup })"
-                                                           onclick="return confirm('Bạn muốn xóa Thông tin  : @item.GroupName')">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </a>
-
-                                                        <a id="btn-edit_@item.IDGroup" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
-                                                        <div class="modal " id="myModaleEdit_@item.IDGroup" role="dialog" data-url='@Url.Action("Edit", "ProjectsGroup", new { id = item.IDGroup })'></div>
-                                                        <script type="text/javascript">
-                                                                $('#btn-edit_@item.IDGroup').click(function () {
-                                                                    var url = $('#myModaleEdit_@item.IDGroup').data('url');
-                                                                    $.get(url, function (data) {
-                                                                        $("#myModal").html(data);
-                                                                        $("#ModalTitle").html("Cập nhật Thông Tin nhóm dự án");
-                                                                        $("#myModal").modal('show');
-                                                                    });
-                                                                });
-                                                        </script>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
+                    <div class="card-body" style="padding:0">
+                        <div class="pg-tree">
+                            <div class="pg-tree__head">
+                                <div>Tên nhóm</div>
+                                <div style="text-align:center">Nhóm con</div>
+                                <div style="text-align:center">Dự án</div>
+                                <div style="text-align:right">Thao tác</div>
                             </div>
+                            @if (Model == null || Model.Count == 0)
+                            {
+                                <div class="pg-empty">
+                                    <i class="fa fa-folder-open"></i>
+                                    <div>Chưa có nhóm dự án nào.</div>
+                                    <div style="margin-top:8px;font-size:13px">Bấm <strong>Thêm nhóm gốc</strong> để bắt đầu.</div>
+                                </div>
+                            }
+                            else
+                            {
+                                foreach (var root in Model)
+                                {
+                                    @RenderNode(root)
+                                }
+                            }
                         </div>
                     </div>
                 </div>
@@ -119,38 +215,156 @@
         </div>
     </div>
 
-
     <div class="app-wrapper-footer">
         <div class="app-footer">
-            <div class="app-footer__inner">
-
-            </div>
+            <div class="app-footer__inner"></div>
         </div>
     </div>
-
-
 </div>
 
+@helper RenderNode(ProjectGroupNode node)
+{
+    var hasChildren = node.Children != null && node.Children.Count > 0;
+    var childCount = hasChildren ? node.Children.Count : 0;
+    var projCount = node.ProjectCount;
+    <div class="pg-tree__row" data-depth="@node.Depth" data-id="@node.IDGroup">
+        <div class="pg-tree__name">
+            <span class="pg-tree__indent">
+                @for (int i = 0; i < node.Depth; i++)
+                {
+                    <span class="pg-tree__rail"></span>
+                }
+            </span>
+            @if (hasChildren)
+            {
+                <button type="button" class="pg-tree__toggle" data-toggle-target="@node.IDGroup" title="Mở/đóng">
+                    <i class="fa fa-caret-down"></i>
+                </button>
+            }
+            else
+            {
+                <span class="pg-tree__toggle pg-tree__toggle--leaf"><i class="fa fa-caret-right"></i></span>
+            }
+            <span class="pg-tree__icon @(hasChildren ? "pg-tree__icon--folder" : "pg-tree__icon--folder-empty")">
+                <i class="fa @(hasChildren ? "fa-folder" : "fa-folder-o")"></i>
+            </span>
+            <span class="pg-tree__label" title="@node.GroupName">@node.GroupName</span>
+        </div>
+        <div style="text-align:center">
+            <span class="pg-tree__count @(childCount == 0 ? "pg-tree__count--zero" : "")">@childCount</span>
+        </div>
+        <div style="text-align:center">
+            <span class="pg-tree__count @(projCount == 0 ? "pg-tree__count--zero" : "")">@projCount</span>
+        </div>
+        <div class="pg-tree__actions">
+            <button type="button" class="pg-btn pg-btn--icon btn-move-up" data-id="@node.IDGroup" title="Lên">
+                <i class="fa fa-arrow-up"></i>
+            </button>
+            <button type="button" class="pg-btn pg-btn--icon btn-move-down" data-id="@node.IDGroup" title="Xuống">
+                <i class="fa fa-arrow-down"></i>
+            </button>
+            <a href="#" class="pg-btn pg-btn--primary btn-add-child" data-parent="@node.IDGroup" title="Thêm nhóm con">
+                <i class="fa fa-plus"></i> Nhóm con
+            </a>
+            <a href="#" id="btn-edit_@node.IDGroup" class="pg-btn" title="Chỉnh sửa">
+                <i class="fa fa-edit"></i> Sửa
+            </a>
+            <div class="modal" id="myModaleEdit_@node.IDGroup" role="dialog"
+                 data-url='@Url.Action("Edit", "ProjectsGroup", new { id = node.IDGroup })'></div>
+            <a class="pg-btn pg-btn--danger" href="@Url.Action("Delete", "ProjectsGroup", new { id = node.IDGroup })"
+               onclick="return confirm('Xóa nhóm: @node.GroupName ?\n(Nhóm phải rỗng - không có nhóm con và không có dự án)')" title="Xóa">
+                <i class="fa fa-trash"></i>
+            </a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function(){
+            var btn = document.getElementById('btn-edit_@node.IDGroup');
+            if (!btn) return;
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var url = document.getElementById('myModaleEdit_@node.IDGroup').getAttribute('data-url');
+                jQuery.get(url, function (data) {
+                    jQuery("#myModal").html(data);
+                    jQuery("#ModalTitle").html("Cập nhật nhóm dự án");
+                    jQuery("#myModal").modal('show');
+                });
+            });
+        })();
+    </script>
+    if (hasChildren)
+    {
+        <div class="pg-tree__children" data-parent="@node.IDGroup">
+            @foreach (var child in node.Children)
+            {
+                @RenderNode(child)
+            }
+        </div>
+    }
+}
+
 <script type="text/javascript">
+    // Toggle expand/collapse - dung data-toggle-target id de tim children container
+    jQuery(document).on('click', '.pg-tree__toggle[data-toggle-target]', function (e) {
+        e.preventDefault();
+        var id = jQuery(this).attr('data-toggle-target');
+        var $children = jQuery('.pg-tree__children[data-parent="' + id + '"]');
+        var $icon = jQuery(this).find('i');
+        if ($children.is(':visible')) {
+            $children.hide();
+            $icon.removeClass('fa-caret-down').addClass('fa-caret-right');
+        } else {
+            $children.show();
+            $icon.removeClass('fa-caret-right').addClass('fa-caret-down');
+        }
+    });
 
-
-    $('#btn-add').click(function () {
-        var url = $('#myModal').data('url');
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#ModalTitle").html("Thêm nhóm dự án");
-            $("#myModal").modal('show');
+    // Add root group
+    jQuery('#btn-add').click(function () {
+        var url = jQuery('#myModal').data('url');
+        jQuery.get(url, function (data) {
+            jQuery("#myModal").html(data);
+            jQuery("#ModalTitle").html("Thêm nhóm dự án gốc");
+            jQuery("#myModal").modal('show');
         });
     });
-     $('#btn-TV').click(function () {
 
+    // Add child group - pre-select parent
+    jQuery(document).on('click', '.btn-add-child', function (e) {
+        e.preventDefault();
+        var parentId = jQuery(this).data('parent');
+        var url = '@Url.Action("Create", "ProjectsGroup")' + '?parentId=' + parentId;
+        jQuery.get(url, function (data) {
+            jQuery("#myModal").html(data);
+            jQuery("#ModalTitle").html("Thêm nhóm con");
+            jQuery("#myModal").modal('show');
+        });
+    });
+
+    jQuery('#btn-TV').click(function () {
         window.location.href = '@Url.Action("index", "Projects")';
     });
+
+    // Move up/down - reload to reflect new order
+    jQuery(document).on('click', '.btn-move-up, .btn-move-down', function () {
+        var $btn = jQuery(this);
+        var id = $btn.data('id');
+        var up = $btn.hasClass('btn-move-up');
+        $btn.prop('disabled', true);
+        var url = up ? '@Url.Action("MoveUp", "ProjectsGroup")' : '@Url.Action("MoveDown", "ProjectsGroup")';
+        jQuery.post(url, { id: id })
+            .done(function (data, status, xhr) {
+                if (xhr.status === 204) {
+                    // Da o dau/cuoi - chi flash visual, khong reload
+                    $btn.css('background', '#fecaca');
+                    setTimeout(function () { $btn.css('background', ''); $btn.prop('disabled', false); }, 600);
+                } else {
+                    window.location.reload();
+                }
+            })
+            .fail(function (xhr) {
+                alert('Lỗi: ' + (xhr.responseText || xhr.statusText));
+                $btn.prop('disabled', false);
+            });
+    });
 </script>
-
-
-
-
-
-
-

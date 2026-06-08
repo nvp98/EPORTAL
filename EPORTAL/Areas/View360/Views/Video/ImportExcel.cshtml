@@ -1,7 +1,8 @@
-﻿@model EPORTAL.Models.VideoView
+@model EPORTAL.Models.VideoView
 
 @using (Html.BeginForm("ImportExcel", "Video", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return myFunction()" }))
 {
+    @Html.AntiForgeryToken()
     <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
     <div class="modal-dialog">
         <div class="modal-content">

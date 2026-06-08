@@ -1,4 +1,5 @@
-﻿using EPORTAL.ModelsView360;
+using EPORTAL.Common;
+using EPORTAL.ModelsView360;
 using PagedList;
 using System;
 using System.Collections.Generic;
@@ -17,26 +18,46 @@ namespace EPORTAL.Areas.View360.Controllers
         {
             if (search == null) search = "";
             ViewBag.search = search;
-            var res = from a in db.Album_select(search)
-                      select new AlbumValidation
-                      {
-                          IDAlbum = a.IDAlbum,
-                          TenAlbum = a.TenAlbum,
-                          Images = a.Images
-                      };
+
+            // 1 SP call lay TAT CA video accessible cua user, group theo album.
+            // Truoc kia: view tu new EPORTALEntities() trong foreach => N+1.
+            // Gio: 1 query + in-memory GroupBy, pass tinh sang view.
+            var videoCounts = db.Video_select("", Models.MyAuthentication.ID)
+                .Where(v => v.AlbumID.HasValue)
+                .GroupBy(v => v.AlbumID.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Chi hien album co it nhat 1 video user thay duoc (giu hanh vi cu cua view).
+            var res = (from a in db.Album_select(search)
+                       let count = videoCounts.ContainsKey(a.IDAlbum) ? videoCounts[a.IDAlbum] : 0
+                       where count > 0
+                       select new AlbumValidation
+                       {
+                           IDAlbum = a.IDAlbum,
+                           TenAlbum = a.TenAlbum,
+                           Images = a.Images,
+                           SoLuongVideo = count
+                       }).ToList();
 
             if (page == null) page = 1;
             int pageSize = 50;
             int pageNumber = (page ?? 1);
-            return View(res.ToList().ToPagedList(pageNumber, pageSize));
+            return View(res.ToPagedList(pageNumber, pageSize));
         }
         public ActionResult Create()
         {
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(AlbumValidation _DO)
         {
+            var uploadError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (uploadError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + uploadError + "');</script>";
+                return RedirectToAction("Index", "Album");
+            }
 
             try
             {
@@ -45,19 +66,12 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-                //Use Namespace called :  System.IO  
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
 
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
-
-
-                ////Add Current Date To Attached File Name  
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
 
                 var a = db.Album_insert(_DO.TenAlbum, _DO.Images);
@@ -99,33 +113,33 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(AlbumValidation _DO)
         {
+            var uploadError = FileUploadValidator.ValidateImage(_DO.ImageFile);
+            if (uploadError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + uploadError + "');</script>";
+                return RedirectToAction("Index", "Album");
+            }
 
             try
             {
                 string path = Server.MapPath("~/Images/");
-                //string path ="~/Images/";
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
 
-                string FileName = _DO.ImageFile != null ? DateTime.Now.ToString("yyyyMMddHHmm") : "";
-                //To Get File Extension  
-                string FileExtension = _DO.ImageFile != null ? Path.GetExtension(_DO.ImageFile.FileName) : "";
-
-                if (_DO.ImageFile != null)
+                if (_DO.ImageFile != null && _DO.ImageFile.ContentLength > 0)
                 {
-                    FileName = FileName.Trim() + FileExtension;
-                    _DO.ImageFile.SaveAs(path + FileName);
-                    _DO.Images = "~/Images/" + FileName;
+                    var safeName = FileUploadValidator.SafeFileName(_DO.ImageFile.FileName);
+                    _DO.ImageFile.SaveAs(Path.Combine(path, safeName));
+                    _DO.Images = "~/Images/" + safeName;
                 }
 
-                //Upload file pdf
-           
-                    var a = db.Album_update(_DO.IDAlbum, _DO.TenAlbum, _DO.Images);
-                    TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
+                var a = db.Album_update(_DO.IDAlbum, _DO.TenAlbum, _DO.Images);
+                TempData["msgSuccess"] = "<script>alert('Chỉnh sửa thành công');</script>";
            
             }
             catch (Exception e)

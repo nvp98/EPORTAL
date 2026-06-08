@@ -1,0 +1,302 @@
+@{
+    ViewBag.Title = "Cấu hình khu vực tham quan chính";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var tourId       = (int)(ViewBag.TourId ?? 0);
+    var tourTitle    = (string)ViewBag.TourTitle ?? "";
+    var collectionId = (string)ViewBag.CollectionId ?? "";
+    var allScenes    = ViewBag.AllScenes as List<EPORTAL.Areas.View360.Controllers.FeaturedSceneOption>
+                       ?? new List<EPORTAL.Areas.View360.Controllers.FeaturedSceneOption>();
+    var saved        = ViewBag.Saved as List<EPORTAL.Common.FeaturedScene> ?? new List<EPORTAL.Common.FeaturedScene>();
+}
+
+<link href="~/Content/view360-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="v360-feat-wrap">
+            @Html.AntiForgeryToken()
+
+            <div class="v360-feat-head">
+                <div>
+                    <a href="@Url.Action("FeaturedIndex", "ListVirtual", new { area = "View360" })" class="v360-feat-back">
+                        <i class="fa fa-arrow-left"></i> Danh sách tour
+                    </a>
+                    <h1><i class="fa-solid fa-star"></i> @tourTitle</h1>
+                    <p class="v360-feat-sub">
+                        Cấu hình danh sách "Các khu vực tham quan chính" hiển thị ở trang giới thiệu tour.
+                        Kéo thả để sắp xếp thứ tự, upload ảnh card và đặt tên hiển thị.
+                    </p>
+                </div>
+                <div class="v360-feat-actions">
+                    <a class="v360-btn v360-btn--ghost"
+                       href="@Url.Action("Intro", "ListVirtual", new { area = "View360", id = tourId })"
+                       target="_blank">
+                        <i class="fa fa-external-link-alt"></i> Xem trang giới thiệu
+                    </a>
+                    <button type="button" class="v360-btn v360-btn--primary" id="feat-save">
+                        <i class="fa fa-save"></i> Lưu cấu hình
+                    </button>
+                </div>
+            </div>
+
+            @if (string.IsNullOrEmpty(collectionId))
+            {
+                <div class="v360-empty">
+                    <i class="fa fa-link-slash"></i>
+                    <h3>Tour không có collection Kuula hợp lệ</h3>
+                    <p>URL tour cần là dạng kuula.co/share/collection/{id}.</p>
+                </div>
+            }
+            else
+            {
+                <div class="v360-feat-grid">
+                    <!-- LEFT: scene picker -->
+                    <div class="v360-feat-col">
+                        <div class="v360-feat-col__head">
+                            <h2><i class="fa fa-list"></i> Tất cả điểm trong tour</h2>
+                            <input type="text" id="feat-search" placeholder="Tìm điểm..." />
+                        </div>
+                        <div class="v360-feat-pool" id="feat-pool">
+                            @foreach (var sc in allScenes)
+                            {
+                                <div class="v360-feat-pool__item" data-uuid="@sc.Uuid" data-title="@sc.Title">
+                                    <div class="v360-feat-pool__title">@sc.Title</div>
+                                    <div class="v360-feat-pool__uuid">@sc.Uuid</div>
+                                    <button type="button" class="v360-feat-pool__add" title="Thêm vào featured">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: featured list (selected) -->
+                    <div class="v360-feat-col">
+                        <div class="v360-feat-col__head">
+                            <h2><i class="fa fa-star"></i> Khu vực hiển thị ở Intro</h2>
+                            <span class="v360-feat-counter"><b id="feat-count">0</b> mục</span>
+                        </div>
+                        <div class="v360-feat-selected" id="feat-selected">
+                            <!-- JS render -->
+                        </div>
+                        <div class="v360-feat-empty" id="feat-empty">
+                            <i class="fa fa-inbox"></i>
+                            <p>Chưa có khu vực nào. Bấm <i class="fa fa-plus"></i> bên trái để thêm.</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var COLLECTION_ID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(collectionId));
+    var SAVED         = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(saved));
+    var SAVE_URL      = '@Url.Action("SaveFeatured", "ListVirtual", new { area = "View360" })';
+    var UPLOAD_URL    = '@Url.Action("UploadFeaturedImage", "ListVirtual", new { area = "View360" })';
+    var POOL_TITLES   = {}; // uuid -> kuula scene title (fallback khi admin chua override)
+    document.querySelectorAll('.v360-feat-pool__item').forEach(function (el) {
+        POOL_TITLES[el.dataset.uuid] = el.dataset.title;
+    });
+    var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+    // State: list cua featured items
+    var state = SAVED.map(function (s) {
+        return {
+            SceneUuid:   s.SceneUuid,
+            CustomTitle: s.CustomTitle || '',
+            HasImage:    !!s.HasImage,
+            ImageUrl:    s.ImageUrl || ''
+        };
+    });
+
+    var selected = document.getElementById('feat-selected');
+    var emptyEl  = document.getElementById('feat-empty');
+    var counter  = document.getElementById('feat-count');
+    var pool     = document.getElementById('feat-pool');
+
+    function render() {
+        selected.innerHTML = '';
+        state.forEach(function (item, idx) {
+            var titleFallback = POOL_TITLES[item.SceneUuid] || '(không tên)';
+            var displayTitle  = item.CustomTitle || titleFallback;
+            var imgUrl        = item.ImageUrl || '';
+
+            var card = document.createElement('div');
+            card.className = 'v360-feat-item';
+            card.dataset.idx = idx;
+            card.draggable = true;
+            card.innerHTML =
+                '<div class="v360-feat-item__num">' + String(idx + 1).padStart(2, '0') + '</div>' +
+                '<div class="v360-feat-item__thumb">' +
+                    (imgUrl
+                        ? '<img src="' + imgUrl + '" alt="" />'
+                        : '<div class="v360-feat-item__no-img"><i class="fa fa-image"></i><span>Chưa có ảnh</span></div>'
+                    ) +
+                    '<label class="v360-feat-item__upload" title="Đổi ảnh">' +
+                        '<i class="fa fa-camera"></i>' +
+                        '<input type="file" accept="image/*" hidden />' +
+                    '</label>' +
+                '</div>' +
+                '<div class="v360-feat-item__fields">' +
+                    '<input type="text" class="v360-feat-item__title-input" ' +
+                           'placeholder="Tên hiển thị (mặc định: ' + titleFallback.replace(/"/g, '&quot;') + ')" ' +
+                           'value="' + (item.CustomTitle || '').replace(/"/g, '&quot;') + '" />' +
+                    '<div class="v360-feat-item__uuid">UUID: ' + item.SceneUuid + '</div>' +
+                '</div>' +
+                '<div class="v360-feat-item__ctrl">' +
+                    '<button type="button" class="v360-feat-item__up"   title="Lên"><i class="fa fa-chevron-up"></i></button>' +
+                    '<button type="button" class="v360-feat-item__down" title="Xuống"><i class="fa fa-chevron-down"></i></button>' +
+                    '<button type="button" class="v360-feat-item__del"  title="Xóa"><i class="fa fa-trash"></i></button>' +
+                '</div>';
+            selected.appendChild(card);
+        });
+        counter.textContent = state.length;
+        emptyEl.style.display = state.length === 0 ? 'block' : 'none';
+
+        // Pool: dim items already added
+        var addedSet = {};
+        state.forEach(function (s) { addedSet[s.SceneUuid] = true; });
+        pool.querySelectorAll('.v360-feat-pool__item').forEach(function (el) {
+            el.classList.toggle('is-added', !!addedSet[el.dataset.uuid]);
+        });
+    }
+
+    // Add from pool
+    pool.addEventListener('click', function (e) {
+        var btn = e.target.closest('.v360-feat-pool__add');
+        if (!btn) return;
+        var item = btn.closest('.v360-feat-pool__item');
+        var uuid = item.dataset.uuid;
+        if (state.some(function (s) { return s.SceneUuid === uuid; })) return;
+        state.push({ SceneUuid: uuid, CustomTitle: '', HasImage: false, ImageUrl: '' });
+        render();
+    });
+
+    // Search filter
+    document.getElementById('feat-search').addEventListener('input', function (e) {
+        var q = e.target.value.trim().toLowerCase();
+        pool.querySelectorAll('.v360-feat-pool__item').forEach(function (el) {
+            var txt = (el.dataset.title + ' ' + el.dataset.uuid).toLowerCase();
+            el.style.display = (!q || txt.indexOf(q) >= 0) ? '' : 'none';
+        });
+    });
+
+    // Selected list events
+    selected.addEventListener('click', function (e) {
+        var card = e.target.closest('.v360-feat-item');
+        if (!card) return;
+        var idx = parseInt(card.dataset.idx, 10);
+        if (e.target.closest('.v360-feat-item__del')) {
+            state.splice(idx, 1); render(); return;
+        }
+        if (e.target.closest('.v360-feat-item__up') && idx > 0) {
+            var tmp = state[idx - 1]; state[idx - 1] = state[idx]; state[idx] = tmp; render(); return;
+        }
+        if (e.target.closest('.v360-feat-item__down') && idx < state.length - 1) {
+            var tmp2 = state[idx + 1]; state[idx + 1] = state[idx]; state[idx] = tmp2; render(); return;
+        }
+    });
+    selected.addEventListener('input', function (e) {
+        if (e.target.classList.contains('v360-feat-item__title-input')) {
+            var card = e.target.closest('.v360-feat-item');
+            var idx = parseInt(card.dataset.idx, 10);
+            state[idx].CustomTitle = e.target.value;
+        }
+    });
+    selected.addEventListener('change', function (e) {
+        if (e.target.type === 'file') {
+            var card = e.target.closest('.v360-feat-item');
+            var idx = parseInt(card.dataset.idx, 10);
+            var file = e.target.files && e.target.files[0];
+            if (!file) return;
+            uploadImage(state[idx].SceneUuid, file, function (url) {
+                state[idx].HasImage = true;
+                state[idx].ImageUrl = url;
+                render();
+            });
+        }
+    });
+
+    function uploadImage(uuid, file, done) {
+        var fd = new FormData();
+        fd.append('collectionId', COLLECTION_ID);
+        fd.append('sceneUuid',    uuid);
+        fd.append('__RequestVerificationToken', token);
+        fd.append('file', file);
+        fetch(UPLOAD_URL, { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                if (j.ok) done(j.url);
+                else alert('Upload thất bại: ' + (j.error || 'unknown'));
+            })
+            .catch(function (err) { alert('Lỗi upload: ' + err.message); });
+    }
+
+    // Save all
+    document.getElementById('feat-save').addEventListener('click', function () {
+        var btn = this;
+        btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang lưu...';
+        var fd = new FormData();
+        fd.append('collectionId', COLLECTION_ID);
+        fd.append('itemsJson', JSON.stringify(state.map(function (item) {
+            return { SceneUuid: item.SceneUuid, CustomTitle: item.CustomTitle || '' };
+        })));
+        fd.append('__RequestVerificationToken', token);
+        fetch(SAVE_URL, { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-save"></i> Lưu cấu hình';
+                if (j.ok) alert('Đã lưu ' + j.count + ' khu vực.');
+                else alert('Lưu thất bại: ' + (j.error || 'unknown'));
+            })
+            .catch(function (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-save"></i> Lưu cấu hình';
+                alert('Lỗi: ' + err.message);
+            });
+    });
+
+    // Drag reorder (simple: dragstart/dragover/drop)
+    var dragSrc = null;
+    selected.addEventListener('dragstart', function (e) {
+        var card = e.target.closest('.v360-feat-item');
+        if (!card) return;
+        dragSrc = parseInt(card.dataset.idx, 10);
+        card.classList.add('is-dragging');
+    });
+    selected.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        var card = e.target.closest('.v360-feat-item');
+        if (!card) return;
+        card.classList.add('is-drop-target');
+    });
+    selected.addEventListener('dragleave', function (e) {
+        var card = e.target.closest('.v360-feat-item');
+        if (card) card.classList.remove('is-drop-target');
+    });
+    selected.addEventListener('drop', function (e) {
+        e.preventDefault();
+        var card = e.target.closest('.v360-feat-item');
+        if (!card || dragSrc === null) return;
+        var dst = parseInt(card.dataset.idx, 10);
+        if (dst === dragSrc) { dragSrc = null; render(); return; }
+        var moved = state.splice(dragSrc, 1)[0];
+        state.splice(dst, 0, moved);
+        dragSrc = null;
+        render();
+    });
+    selected.addEventListener('dragend', function () {
+        selected.querySelectorAll('.is-dragging,.is-drop-target').forEach(function (el) {
+            el.classList.remove('is-dragging', 'is-drop-target');
+        });
+        dragSrc = null;
+    });
+
+    render();
+})();
+</script>

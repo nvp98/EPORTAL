@@ -1,8 +1,16 @@
-﻿@model EPORTAL.ModelsView360.ProjectsGroupValidation
+@model EPORTAL.ModelsView360.ProjectsGroupValidation
+@{
+    var parentOpts = ViewBag.ParentOptions as List<SelectListItem> ?? new List<SelectListItem>();
+    var currentParent = Model != null && Model.ParentIDGroup.HasValue ? Model.ParentIDGroup.Value.ToString() : "";
+}
 
 @using (Html.BeginForm("Create", "ProjectsGroup", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
+    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string))
+    {
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+    }
     <div class="modal-dialog" id="form">
         <div class="modal-content">
             <div class="modal-header">
@@ -14,9 +22,29 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="small mb-1">Tên nhóm tài liệu</label>
-                                @Html.EditorFor(model => model.GroupName, new { htmlAttributes = new { @class = "form-control", placeholder = "", @id = "GroupName", @text = "", @required = true } })
+                                <label class="small mb-1">Tên nhóm dự án <span style="color:#dc2626">*</span></label>
+                                @Html.EditorFor(model => model.GroupName, new { htmlAttributes = new { @class = "form-control", placeholder = "VD: Dự án thuộc HPDQ 1", @id = "GroupName", @required = true } })
                                 <span id="ErrorFullName" style="color: red; text-transform: none; font-weight: normal "></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="small mb-1">Nhóm cha <span style="color:#6b7c93;font-weight:normal">(để trống = nhóm gốc)</span></label>
+                                <select name="ParentIDGroup" id="ParentIDGroup" class="form-control" style="font-family: Consolas, monospace">
+                                    <option value="">— Không có (nhóm gốc) —</option>
+                                    @foreach (var opt in parentOpts)
+                                    {
+                                        if (opt.Value == currentParent)
+                                        {
+                                            <option value="@opt.Value" selected="selected">@opt.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@opt.Value">@opt.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <small style="color:#6b7c93;font-size:11px">Chọn nhóm cha nếu muốn đây là nhóm con. Cấu trúc nhiều cấp được hỗ trợ.</small>
                             </div>
                         </div>
                     </div>
@@ -28,5 +56,3 @@
         </div>
     </div>
 }
-
-

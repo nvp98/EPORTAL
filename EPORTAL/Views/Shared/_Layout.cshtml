@@ -10,6 +10,7 @@
     <meta name="description" content="This is an example dashboard created using build-in elements and components.">
     <meta name="msapplication-tap-highlight" content="no">
     <link href="~/Content/main.css" rel="stylesheet" />
+    <link href="~/Content/layout-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
     <script src="~/Content/assets/plotly-latest.min.js"></script>
     <script src="~/Content/jquery-3.0.0.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
@@ -33,25 +34,29 @@
                             PhanQuyenHTEntities dbP = new PhanQuyenHTEntities();
                             EPORTAL_REGISTEREntities db_dk = new EPORTAL_REGISTEREntities();
                             int IDQuyenHT = EPORTAL.Models.MyAuthentication.IDQuyenHT;
-                            //var listControll = dbP.A_QuyenCT.Where(x => x.IDQuyenHT == IDQuyenHT).Select(x => x.A_ListController.Controller).ToList();
-
                             var ListQuyen = EPORTAL.Models.MyAuthentication.GroupQuyen;
-                            var listControll = dbP.A_QuyenCT.Where(x => x.IDQuyenHT == IDQuyenHT).Select(x => x.A_ListController.Controller).ToList();
-                            if (ListQuyen != null && !String.IsNullOrEmpty(ListQuyen))
+
+                            // Cache listControll trong Session - permission hiem doi trong 1 session login.
+                            // Key gom IDQuyenHT + GroupQuyen -> neu admin doi quyen, key thay, recompute.
+                            // Default ASP.NET session expire 20 phut. Logout/relogin se reset.
+                            var permCacheKey = "v360_listControll_" + IDQuyenHT + "_" + (ListQuyen ?? "");
+                            var listControll = Session[permCacheKey] as List<string>;
+                            if (listControll == null)
                             {
-                                var grQuyen = ListQuyen.Split(',');
-                                foreach (var item in grQuyen)
+                                listControll = dbP.A_QuyenCT.Where(x => x.IDQuyenHT == IDQuyenHT)
+                                    .Select(x => x.A_ListController.Controller).ToList();
+                                if (!String.IsNullOrEmpty(ListQuyen))
                                 {
-                                    int idq = Convert.ToInt32(item);
-                                    var listControll2 = dbP.A_QuyenCT.Where(x => x.IDQuyenHT == idq).Select(x => x.A_ListController.Controller).ToList();
-                                    if (listControll2.Count > 0)
+                                    var grQuyen = ListQuyen.Split(',');
+                                    foreach (var item in grQuyen)
                                     {
-                                        foreach (var ls in listControll2)
-                                        {
-                                            listControll.Add(ls);
-                                        }
+                                        int idq = Convert.ToInt32(item);
+                                        var listControll2 = dbP.A_QuyenCT.Where(x => x.IDQuyenHT == idq)
+                                            .Select(x => x.A_ListController.Controller).ToList();
+                                        if (listControll2.Count > 0) { listControll.AddRange(listControll2); }
                                     }
                                 }
+                                Session[permCacheKey] = listControll;
                             }
 
                             var showquanTri = 0;
@@ -182,7 +187,7 @@
                         <ul class="vertical-nav-menu">
                             <li class="app-sidebar__heading">Tổng quan</li>
                             <li>
-                                <a id="Home" class="mm-active" href="@Url.Action("Index", "Home", new { area = "" })">
+                                <a id="Home" href="@Url.Action("Index", "Home", new { area = "" })">
 
                                     <i class="fa-solid fa-bar-chart metismenu-icon"></i>
                                     Nhà thầu
@@ -259,6 +264,24 @@
                                                 Virtual 360°
                                             </a>
                                         </li>
+                                        <li>
+                                            <a id="CalibrateVirtual" href="@Url.Action("CalibrateIndex", "ListVirtual", new { area = "View360" })">
+                                                <i class="fa-solid fa-compass p-lg-1"></i>
+                                                Cấu hình hướng 360°
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a id="ChatbotConfig" href="@Url.Action("Index", "Chatbot", new { area = "View360" })">
+                                                <i class="fa-solid fa-robot p-lg-1"></i>
+                                                Cấu hình Chatbot AI
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a id="FeaturedVirtual" href="@Url.Action("FeaturedIndex", "ListVirtual", new { area = "View360" })">
+                                                <i class="fa-solid fa-star p-lg-1"></i>
+                                                Cấu hình KVTQ chính
+                                            </a>
+                                        </li>
                                         showquanTri = 1;
                                     }
 
@@ -272,23 +295,12 @@
                                         </li>
                                         showquanTri = 1;
                                     }
-                                    @if (listControll.Contains("Calendar"))
-                                    {
-                                        <li>
-                                            <a id="Calendar" href="@Url.Action("Index", "Calendar", new { area = "TagSign" })">
-                                                <i class="fa-solid fa-plane p-lg-1"></i>
-                                                Kế hoạch bay
-                                            </a>
-                                        </li>
-                                        showquanTri = 1;
-                                    }
-
                                     @if (listControll.Contains("Report"))
                                     {
                                         <li>
-                                            <a id="Report" href="@Url.Action("Index", "Report", new { area = "TagSign" })">
+                                            <a id="Report" href="@Url.Action("Index", "Dashboard", new { area = "View360" })">
                                                 <i class="fa-solid fa-line-chart p-lg-1"></i>
-                                                Report User
+                                                Dashboard View360
                                             </a>
                                         </li>
                                         showquanTri = 1;
@@ -386,19 +398,16 @@
         </li>*@
                             <li class="app-sidebar__heading">  360°VIEW - VIDEO - DOCUMENT</li>
                             <li>
-                                @{
-                                    var List_Group = db.Get_IDGroup(EPORTAL.Models.MyAuthentication.ID).Min(x => x.IDGroup);
-                                    int id = Convert.ToInt32(List_Group);
-                                    var List_GroupVT = db.Get_IDGroupVirtual(EPORTAL.Models.MyAuthentication.ID).Min(x => x.IDGroup);
-                                    int idVT = Convert.ToInt32(List_GroupVT);
-                                }
-                                <a id="ListProject" href="@Url.Action("Index", "ListProject", new { area = "View360", id = id })">
+                                <a id="ListProject" href="@Url.Action("Index", "ListProject", new { area = "View360" })">
                                     <i class="metismenu-icon fa-solid fa-list-check"></i>
                                     Dự án của bạn
                                 </a>
                             </li>
                             <li>
-                                <a id="ListVirtual" href="@Url.Action("Index", "ListVirtual", new { area = "View360",id = idVT  })">
+                                @* Khong truyen id: mac dinh xem TAT CA tour user co quyen (giong "Du an cua ban").
+                                   Truoc day truyen id=idVT = Get_IDGroupVirtual(...).Min() -> khi SP tab tra rong
+                                   (data trung MaNV) thi idVT=0 -> URL /Index/0 -> controller loc IDGroup==0 -> "0 tour". *@
+                                <a id="ListVirtual" href="@Url.Action("Index", "ListVirtual", new { area = "View360" })">
                                     <i class="metismenu-icon fa-solid fa-video-camera"></i>
                                     Virtual 360°
                                 </a>
@@ -717,212 +726,40 @@
                                 Đăng ký thẻ người
                             </a>
                         </li>*@
+                                            @* Badges loaded lazily via AJAX (/Home/LayoutBadges) - tranh block first-paint *@
                                             <li>
-                                                @{
-                                                    var TheNguoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 0 && x.TinhTrang_ID == 1 || x.TrinhKy_ID == null && x.TinhTrang_ID == 1).ToList();
-                                                    List<int> Sum_TheNguoi = new List<int>();
-                                                    foreach (var thenguoi in TheNguoi_)
-                                                    {
-                                                        var TheNguoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).ToList();
-                                                        foreach (var item in TheNguoi)
-                                                        {
-                                                            if (item.CapDuyet == 1)
-                                                            {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).Count();
-                                                                if (Count > 0)
-                                                                {
-                                                                    Sum_TheNguoi.Add(Count);
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                int Duyet_Check = (int)item.CapDuyet - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.CapDuyet <= Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == item.DKTN_ID).FirstOrDefault();
-                                                                if (Check == null)
-                                                                {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == thenguoi.ID_DKTN).Count();
-                                                                    if (Count > 0)
-                                                                    {
-                                                                        Sum_TheNguoi.Add(Count);
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        }
-                                                    }
-                                                }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 0})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Thẻ dài ngày
-                                                    <span style="color: red; margin-left: 5%;"> @Sum_TheNguoi.Sum() </span>
+                                                    <span style="color: red; margin-left: 5%;" data-badge="TheNguoi">0</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                @{
-                                                    var CapMoi_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 1 && x.TinhTrang_ID == 1).ToList();
-                                                    List<int> Sum_CapMoi = new List<int>();
-                                                    foreach (var capmoi in CapMoi_)
-                                                    {
-                                                        var CapMoi = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).ToList();
-                                                        foreach (var item in CapMoi)
-                                                        {
-                                                            if (item.CapDuyet == 1)
-                                                            {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).Count();
-                                                                if (Count > 0)
-                                                                {
-                                                                    Sum_CapMoi.Add(Count);
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                int Duyet_Check = (int)item.CapDuyet - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == item.DKTN_ID).FirstOrDefault();
-                                                                if (Check == null)
-                                                                {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == capmoi.ID_DKTN).Count();
-                                                                    if (Count > 0)
-                                                                    {
-                                                                        Sum_CapMoi.Add(Count);
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        }
-
-
-                                                    }
-
-                                                }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 1})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Cấp mới
-                                                    <span style="color: red; margin-left: 5%;"> @Sum_CapMoi.Sum() </span>
+                                                    <span style="color: red; margin-left: 5%;" data-badge="CapMoi">0</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                @{ var GiaHan_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 2 && x.TinhTrang_ID == 1).ToList();
-                                                    List<int> Sum_GiaHan = new List<int>();
-                                                    foreach (var giahan in GiaHan_)
-                                                    {
-                                                        var GiaHan = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).ToList();
-                                                        foreach (var item in GiaHan)
-                                                        {
-                                                            if (item.CapDuyet == 1)
-                                                            {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).Count();
-                                                                if (Count > 0)
-                                                                {
-                                                                    Sum_GiaHan.Add(Count);
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                int Duyet_Check = (int)item.CapDuyet - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == giahan.ID_DKTN).FirstOrDefault();
-                                                                if (Check == null)
-                                                                {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == giahan.ID_DKTN).Count();
-                                                                    if (Count > 0)
-                                                                    {
-                                                                        Sum_GiaHan.Add(Count);
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        }
-
-                                                    }
-
-                                                }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 2})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Gia hạn
-                                                    <span style="color: red; margin-left: 5%;"> @Sum_GiaHan.Sum() </span>
+                                                    <span style="color: red; margin-left: 5%;" data-badge="GiaHan">0</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                @{ var BoSung_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 3 && x.TinhTrang_ID == 1).ToList();
-                                                    List<int> Sum_BoSung = new List<int>();
-                                                    foreach (var bosung in BoSung_)
-                                                    {
-                                                        var BoSung = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).ToList();
-                                                        foreach (var item in BoSung)
-                                                        {
-                                                            if (item.CapDuyet == 1)
-                                                            {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).Count();
-                                                                if (Count > 0)
-                                                                {
-                                                                    Sum_BoSung.Add(Count);
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                int Duyet_Check = (int)item.CapDuyet - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == bosung.ID_DKTN).FirstOrDefault();
-                                                                if (Check == null)
-                                                                {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == bosung.ID_DKTN).Count();
-                                                                    if (Count > 0)
-                                                                    {
-                                                                        Sum_BoSung.Add(Count);
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        }
-
-                                                    }
-
-                                                }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 3})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Bổ sung cổng
-                                                    <span style="color: red; margin-left: 5%;"> @Sum_BoSung.Sum() </span>
+                                                    <span style="color: red; margin-left: 5%;" data-badge="BoSung">0</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                @{
-
-                                                    var CapLai_ = db_dk.RegisterPeoples.Where(x => x.TrinhKy_ID == 4 && x.TinhTrang_ID == 1).ToList();
-                                                    List<int> Sum_CapLai = new List<int>();
-                                                    foreach (var caplai in CapLai_)
-                                                    {
-                                                        var CapLai = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).ToList();
-                                                        foreach (var item in CapLai)
-                                                        {
-                                                            if (item.CapDuyet == 1)
-                                                            {
-                                                                var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).Count();
-                                                                if (Count > 0)
-                                                                {
-                                                                    Sum_CapLai.Add(Count);
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                int Duyet_Check = (int)item.CapDuyet - 1;
-                                                                var Check = db_dk.SignOff_Flow.Where(x => x.ID_TK_TN == Duyet_Check && x.TinhTrangID != 1 && x.DKTN_ID == caplai.ID_DKTN).FirstOrDefault();
-                                                                if (Check == null)
-                                                                {
-                                                                    var Count = db_dk.SignOff_Flow.Where(x => x.TinhTrangID == 0 && x.NhanVienID == IDNV && x.DKTN_ID == caplai.ID_DKTN).Count();
-                                                                    if (Count > 0)
-                                                                    {
-                                                                        Sum_CapLai.Add(Count);
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        }
-
-                                                    }
-
-                                                }
                                                 <a id="Contract" href="@Url.Action("Index", "Approve_RegisterPeople", new {area="TagSign", id = 4})">
                                                     <i class="fa fa-newspaper p-lg-1"></i>
                                                     Cấp lại
-                                                    <span style="color: red; margin-left: 5%;"> @Sum_CapLai.Sum() </span>
+                                                    <span style="color: red; margin-left: 5%;" data-badge="CapLai">0</span>
                                                 </a>
                                             </li>
                                             @*<li>
@@ -1298,6 +1135,36 @@
 
     <script>
         $(document).ready(function () {
+            // Tooltip cho sidebar collapsed - copy text noi dung menu sang data-tooltip
+            // de CSS hien thi tooltip khi user hover icon (layout-modern.css).
+            $('.vertical-nav-menu li > a').each(function () {
+                var $a = $(this);
+                // Lay text noi (loai bo icon + caret), trim de tooltip sach
+                var txt = $a.clone().children('i').remove().end().text().trim();
+                if (txt) $a.attr('data-tooltip', txt);
+            });
+
+            // User profile pill: click outside anchor (vd name area) -> trigger native
+            // click() tren anchor. PHAI stopPropagation cua original event de tranh
+            // double-toggle (synthetic click bubble + original click bubble = 2 toggles).
+            $('.app-header-right .header-btn-lg .widget-content-wrapper').on('click', function (e) {
+                var trigger = $(this).find('a.btn[data-toggle="dropdown"]')[0];
+                if (!trigger) return;
+                // Click TRONG trigger anchor (avatar/img) - de BS xu ly tu nhien, no-op
+                if (trigger === e.target || trigger.contains(e.target)) return;
+                // Click ngoai trigger -> chan original event va fire native click tren trigger
+                e.preventDefault();
+                e.stopPropagation();
+                trigger.click();
+            });
+
+            // Sync 'is-open' class voi dropdown state - cho phep CSS animate chevron rotate
+            $('.app-header-right .header-btn-lg').on('show.bs.dropdown', function () {
+                $(this).find('.widget-content-wrapper').addClass('is-open');
+            }).on('hide.bs.dropdown', function () {
+                $(this).find('.widget-content-wrapper').removeClass('is-open');
+            });
+
             if (@showquanTri == 1) {
                 $("#quanTri").css("display", "block");
             };
@@ -1436,12 +1303,7 @@
                     $("#listatld").addClass("mm-collapse mm-show");
                     $("#Result").addClass("mm-active");
 
-                } else if (pathArray[2] == "Calendar") {
-                    $("a").removeClass("mm-active");
-                    $("#list360-V-D").addClass("mm-collapse mm-show");
-                    $("#Calendar").addClass("mm-active");
-
-                } else if (pathArray[2] == "Report") {
+                } else if (pathArray[2] == "Dashboard") {
                     $("a").removeClass("mm-active");
                     $("#list360-V-D").addClass("mm-collapse mm-show");
                     $("#Report").addClass("mm-active");
@@ -1524,6 +1386,92 @@
                 $('#Video').addClass('mm-active');
             }
 
+            // === Generic fallback: neu chain o tren khong match route hien tai,
+            // tu dong match menu item theo href. 2-pass algorithm:
+            //   Pass 1: Tim FULL PREFIX MATCH (moi segment cua href = segment tuong ung cua URL)
+            //           -> highlight item co duong dan dai nhat khop het.
+            //   Pass 2: Neu khong co full match, fallback controller-level (3 segments khop)
+            //           va CHI chap nhan item co action='Index' (main listing).
+            //           Tranh false-positive nhu: tren /Intro/1 lai highlight /CalibrateIndex
+            //           chi vi cung controller ListVirtual. ===
+            if ($('.vertical-nav-menu a.mm-active').length === 0) {
+                var currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+                var curParts = currentPath.split('/').filter(Boolean);
+
+                // === Override: admin tool actions (Featured/{id}, Calibrate/{id}) map ve
+                // menu listing tuong ung (FeaturedIndex, CalibrateIndex) thay vi parent
+                // Index (vd ListVirtual/Index) ===
+                var adminActionToIndex = {
+                    'featured':  'featuredindex',
+                    'calibrate': 'calibrateindex'
+                };
+                if (curParts.length >= 4 && adminActionToIndex[curParts[3]]) {
+                    var targetAct = adminActionToIndex[curParts[3]];
+                    // Tim menu item co href ket thuc bang /Controller/TargetAction
+                    var $forcePick = $('.vertical-nav-menu a[href]').filter(function () {
+                        var h = ($(this).attr('href') || '').toLowerCase().replace(/\/+$/, '').split('?')[0].split('#')[0];
+                        var hp = h.split('/').filter(Boolean);
+                        return hp.length === curParts.length - 1
+                            && hp[0] === curParts[0]
+                            && hp[1] === curParts[1]
+                            && hp[2] === curParts[2]
+                            && hp[3] === targetAct;
+                    }).first();
+                    if ($forcePick.length) {
+                        $forcePick.addClass('mm-active');
+                        $forcePick.closest('ul').addClass('mm-collapse mm-show');
+                        $forcePick.closest('li').parent('ul').prev('a').addClass('mm-active');
+                        $('.vertical-nav-menu').css('visibility', 'visible');
+                        return; // skip generic matching
+                    }
+                }
+
+                var fullMatch = null,   fullLen   = 0;
+                var ctrlMatch = null,   ctrlLen   = 0;
+                $('.vertical-nav-menu a[href]').each(function () {
+                    var href = ($(this).attr('href') || '').toLowerCase().replace(/\/+$/, '');
+                    if (!href || href === '#' || href.indexOf('http') === 0) return;
+                    href = href.split('?')[0].split('#')[0];
+                    if (!href) return;
+                    var hrefParts = href.split('/').filter(Boolean);
+                    if (hrefParts.length < 3) return;
+
+                    // Pass 1: full prefix - ALL hrefParts phai match curParts cung index
+                    var isFullPrefix = hrefParts.length <= curParts.length;
+                    if (isFullPrefix) {
+                        for (var i = 0; i < hrefParts.length; i++) {
+                            if (hrefParts[i] !== curParts[i]) { isFullPrefix = false; break; }
+                        }
+                    }
+                    if (isFullPrefix && hrefParts.length > fullLen) {
+                        fullLen = hrefParts.length;
+                        fullMatch = $(this);
+                        return;
+                    }
+
+                    // Pass 2: controller-level (3 first segments match) + action=Index
+                    var ctrlOk = curParts.length >= 3
+                              && hrefParts[0] === curParts[0]
+                              && hrefParts[1] === curParts[1]
+                              && hrefParts[2] === curParts[2]
+                              && hrefParts.length >= 4
+                              && hrefParts[3] === 'index';
+                    if (ctrlOk && hrefParts.length > ctrlLen) {
+                        ctrlLen = hrefParts.length;
+                        ctrlMatch = $(this);
+                    }
+                });
+                var picked = fullMatch || ctrlMatch;
+                if (picked) {
+                    picked.addClass('mm-active');
+                    picked.closest('ul').addClass('mm-collapse mm-show');
+                    picked.closest('li').parent('ul').prev('a').addClass('mm-active');
+                }
+            }
+
+            // Hide menu lan dau tien de tranh flicker giua hardcoded state va JS-set
+            // state. Sidebar visibility hidden o init, show sau khi active state da set.
+            $('.vertical-nav-menu').css('visibility', 'visible');
         });
         //window.onload = function () {
         //    document.addEventListener("contextmenu", function (e) {
@@ -1564,7 +1512,7 @@
         //    }
         //};
         $(document).ready(function () {
-            $.getJSON('/TagSign/TheXeCoDong_NT/HPDQ_Notify', function (data) {
+            $.getJSON('@Url.Action("HPDQ_Notify", "TheXeCoDong_NT", new { area = "TagSign" })', function (data) {
                 $('#duyetdon-label').text(data.Total);
                 $('#cdnt-count').text(data.Total > 0 ? data.Total : '');
                 if (data.Total > 0) {
@@ -1590,6 +1538,24 @@
 
 
         });
+    </script>
+    <script>
+        // Lazy fetch badge counts cho _Layout sidebar - tach khoi sync render giam first-paint.
+        (function () {
+            try {
+                var url = '@Url.Action("LayoutBadges", "Home", new { area = "" })';
+                fetch(url, { credentials: 'same-origin' })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (j) {
+                        if (!j || !j.ok) return;
+                        ['TheNguoi','CapMoi','GiaHan','BoSung','CapLai'].forEach(function (k) {
+                            var els = document.querySelectorAll('[data-badge="' + k + '"]');
+                            for (var i = 0; i < els.length; i++) els[i].textContent = j[k];
+                        });
+                    })
+                    .catch(function () { /* silent fail - badges stay 0 */ });
+            } catch (e) { /* fetch not supported - badges stay 0 */ }
+        })();
     </script>
 
 </body>

@@ -1,7 +1,8 @@
-﻿@model EPORTAL.Models.NhanVienView
+@model EPORTAL.Models.NhanVienView
 
 @using (Html.BeginForm("ImportExcel", "Projects", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return myFunction()" }))
 {
+    @Html.AntiForgeryToken()
     <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
     <div class="modal-dialog">
         <div class="modal-content">

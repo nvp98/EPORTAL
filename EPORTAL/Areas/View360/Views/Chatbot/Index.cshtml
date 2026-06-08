@@ -1,0 +1,67 @@
+@model List<EPORTAL.ModelsView360.VirtualValidation>
+@{
+    ViewBag.Title = "Cấu hình Chatbot AI";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var counts = ViewBag.ChatbotCounts as Dictionary<int, Tuple<int, int>> ?? new Dictionary<int, Tuple<int, int>>();
+}
+
+<link href="~/Content/view360-modern.css" rel="stylesheet" />
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="v360-list-wrap">
+            <div class="v360-list-header">
+                <div class="v360-list-title">
+                    <h1><i class="fa-solid fa-robot" style="color: var(--v360-accent);"></i> Cấu hình Chatbot AI</h1>
+                    <p>Soạn giới thiệu tổng quan tour + nội dung từng điểm để AI trả lời người dùng có ngữ cảnh.</p>
+                </div>
+                <a href="@Url.Action("KnowledgeBase", "Chatbot", new { area = "View360" })"
+                   class="btn btn-outline-primary" style="align-self:center;white-space:nowrap">
+                    <i class="fa-solid fa-database"></i> Knowledge Cache
+                </a>
+            </div>
+
+            @if (Model.Count == 0)
+            {
+                <div class="v360-empty">
+                    <i class="fa fa-inbox"></i>
+                    <h3>Không có tour nào</h3>
+                    <p>Tạo tour Virtual 360° trước khi cấu hình chatbot.</p>
+                </div>
+            }
+            else
+            {
+                <div class="v360-grid">
+                    @foreach (var t in Model)
+                    {
+                        var pair = counts.ContainsKey(t.ID) ? counts[t.ID] : Tuple.Create(0, 0);
+                        var configured = pair.Item1;
+                        var total = pair.Item2;
+                        var img = string.IsNullOrEmpty(t.Images)
+                            ? Url.Content("~/Content/assets/images/bg9.jpg")
+                            : Url.Content("~/Images/" + System.IO.Path.GetFileName(t.Images));
+                        <a class="v360-card" href="@Url.Action("Configure", "Chatbot", new { area = "View360", id = t.ID })">
+                            <div class="v360-card__media">
+                                <img src="@img" alt="@t.Title" />
+                                <div class="v360-card__badge">
+                                    <i class="fa-solid fa-robot"></i> @configured / @total điểm
+                                </div>
+                                <div class="v360-card__overlay">
+                                    <span class="v360-card__overlay-action">
+                                        <i class="fa fa-edit"></i> Cấu hình chatbot
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="v360-card__body">
+                                <h3 class="v360-card__title">@t.Title</h3>
+                                <div class="v360-card__meta">
+                                    <span><i class="fa fa-calendar"></i> @t.Date.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

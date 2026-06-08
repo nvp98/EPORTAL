@@ -21,6 +21,25 @@ namespace EPORTAL.Controllers
             return View();
         }
 
+        // GET /Home/LayoutBadges - lazy load badge counts cho _Layout sidebar via AJAX.
+        // Tach khoi sync render giam first-paint ~500ms-1s.
+        [HttpGet]
+        public ActionResult LayoutBadges()
+        {
+            if (!Request.IsAuthenticated)
+                return Json(new { ok = false }, JsonRequestBehavior.AllowGet);
+            var badges = EPORTAL.Common.LayoutBadgeCache.Get(
+                EPORTAL.Models.MyAuthentication.ID, Session);
+            return Json(new {
+                ok = true,
+                TheNguoi = badges.TheNguoi,
+                CapMoi   = badges.CapMoi,
+                GiaHan   = badges.GiaHan,
+                BoSung   = badges.BoSung,
+                CapLai   = badges.CapLai
+            }, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

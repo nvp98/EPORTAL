@@ -1,4 +1,5 @@
-﻿using EPORTAL.Models;
+using EPORTAL.Common;
+using EPORTAL.Models;
 using EPORTAL.ModelsEquipment;
 using EPORTAL.ModelsView360;
 using ExcelDataReader;
@@ -86,22 +87,27 @@ namespace EPORTAL.Areas.View360.Controllers
             return regex.Replace(temp, String.Empty).Replace('\u0111', 'd').Replace('\u0110', 'D');
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(L_ThuVienFileValidation _DO)
         {
+            var uploadError = FileUploadValidator.ValidateDocument(_DO.FileUpload);
+            if (uploadError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + uploadError + "');</script>";
+                return RedirectToAction("Index", "DocumentLibrary");
+            }
+
             try
             {
                 if ((_DO.FileUpload != null) && (_DO.FileUpload.ContentLength > 0) && !string.IsNullOrEmpty(_DO.FileUpload.FileName))
                 {
                     string path = Server.MapPath("~/UploadedFiles/Document/");
-                    string filePath = string.Empty;
-                    string fileName = string.Empty;
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
-                    fileName = Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmm")) + "-" + convertToUnSign(_DO.FileUpload.FileName);
-                    filePath = path + fileName;
-                    _DO.FileUpload.SaveAs(path + fileName);
+                    var fileName = FileUploadValidator.SafeFileName(_DO.FileUpload.FileName);
+                    _DO.FileUpload.SaveAs(Path.Combine(path, fileName));
                     _DO.FileName = fileName;
                 }
                 else
@@ -156,23 +162,27 @@ namespace EPORTAL.Areas.View360.Controllers
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(L_ThuVienFileValidation _DO)
         {
+            var uploadError = FileUploadValidator.ValidateDocument(_DO.FileUpload);
+            if (uploadError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + uploadError + "');</script>";
+                return RedirectToAction("Index", "DocumentLibrary");
+            }
 
             try
             {
                 if ((_DO.FileUpload != null) && (_DO.FileUpload.ContentLength > 0) && !string.IsNullOrEmpty(_DO.FileUpload.FileName))
                 {
                     string path = Server.MapPath("~/UploadedFiles/Document/");
-                    string filePath = string.Empty;
-                    string fileName = string.Empty;
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
-                    fileName = Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmm")) + "-" + convertToUnSign(_DO.FileUpload.FileName);
-                    filePath = path + fileName;
-                    _DO.FileUpload.SaveAs(path + fileName);
+                    var fileName = FileUploadValidator.SafeFileName(_DO.FileUpload.FileName);
+                    _DO.FileUpload.SaveAs(Path.Combine(path, fileName));
                     _DO.FileName = fileName;
                 }
                 else
@@ -196,7 +206,7 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public ActionResult Delete(int? id)
         {
-            if (listQuyen.Contains(A_Constants.ADD) == false)
+            if (listQuyen.Contains(A_Constants.DELETE) == false)
             {
                 TempData["msgError"] = "<script>alert('Bạn không có quyền thực hiện chức năng này');</script>";
                 return RedirectToAction("Logout", "Login", new { area = "" });
@@ -251,6 +261,7 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddPermission(AuthorizationTVValidation _DO)
         {
             L_AuthorizationTV aus = new L_AuthorizationTV();
@@ -308,8 +319,16 @@ namespace EPORTAL.Areas.View360.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ImportExcel(AuthorizationTVValidation _DO)
         {
+            HttpPostedFileBase excelFile = Request != null ? Request.Files["FileUpload"] : null;
+            var excelError = FileUploadValidator.ValidateExcel(excelFile);
+            if (excelError != null)
+            {
+                TempData["msgError"] = "<script>alert('" + excelError + "');</script>";
+                return RedirectToAction("Index", "DocumentLibrary");
+            }
 
             string filePath = string.Empty;
             if (Request != null)
@@ -322,7 +341,8 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         Directory.CreateDirectory(path);
                     }
-                    filePath = path + Path.GetFileName(file.FileName);
+                    var safeName = FileUploadValidator.SafeFileName(file.FileName);
+                    filePath = Path.Combine(path, safeName);
 
                     file.SaveAs(filePath);
                     Stream stream = file.InputStream;

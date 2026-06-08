@@ -1,11 +1,24 @@
-﻿
-@{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+@using EPORTAL.Common
 @using EPORTAL.ModelsView360
-@model PagedList.IPagedList<ProjectValidation>
 @using PagedList.Mvc
+@{
+    ViewBag.Title = "Quản lý dự án";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var tree = ViewBag.HierarchyTree as List<ProjectGroupNode> ?? new List<ProjectGroupNode>();
+    var crumbs = ViewBag.Breadcrumb as List<ProjectGroupNode> ?? new List<ProjectGroupNode>();
+    // Tree node tren sidebar mac dinh fold het. Auto-expand path tu root den current folder.
+    var expandedSet = new HashSet<int>();
+    foreach (var c in crumbs) { expandedSet.Add(c.IDGroup); }
+    var subfolders = ViewBag.Subfolders as List<ProjectGroupNode> ?? new List<ProjectGroupNode>();
+    var currentFolder = ViewBag.CurrentFolder as ProjectGroupNode;
+    int? currentGid = ViewBag.CurrentGid as int?;
+    var sortKey = (ViewBag.Sort as string) ?? "date-desc";
+    var viewMode = (ViewBag.View as string) ?? "grid";
+    var searchText = (ViewBag.search as string) ?? "";
+    bool isSearching = !string.IsNullOrEmpty(searchText);
+}
+@model PagedList.IPagedList<ProjectValidation>
 
 @if (TempData["msgSuccess"] != null)
 {
@@ -15,202 +28,1259 @@
 {
     @Html.Raw(TempData["msgError"])
 }
+
 <script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
 <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
 <link href="~/Content/PagedList.css" rel="stylesheet" />
+
+<style>
+    /* ============================================================
+       FILE EXPLORER — Folder/File metaphor cho admin Projects.
+       Layout: sidebar tree + main (toolbar + folders + files).
+       ============================================================ */
+    .fx { font-size: 14px; color: #1f2937; }
+
+    /* ---------- Top toolbar (breadcrumb + actions) ---------- */
+    .fx-topbar {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 18px;
+        background: #fff;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 1px solid #eef1f5;
+        flex-wrap: wrap;
+    }
+    .fx-crumbs {
+        display: flex; align-items: center; flex-wrap: wrap;
+        gap: 4px; flex: 1; min-width: 240px;
+        font-size: 14px;
+    }
+    .fx-crumb {
+        color: #4b5563; text-decoration: none;
+        padding: 4px 8px; border-radius: 6px;
+        transition: background .12s;
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    .fx-crumb:hover { background: #eef4ff; color: #2563eb; text-decoration: none; }
+    .fx-crumb--current { color: #111827; font-weight: 600; pointer-events: none; }
+    .fx-crumb-sep { color: #cdd5e0; font-size: 11px; padding: 0 2px; }
+
+    .fx-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fx-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px; border-radius: 6px;
+        font-size: 13px; font-weight: 500;
+        border: 1px solid #e2e8f0;
+        background: #fff; color: #374151;
+        cursor: pointer; text-decoration: none;
+        transition: all .12s;
+    }
+    .fx-btn:hover { background: #f3f6fb; border-color: #c1cad6; color: #1f2937; text-decoration: none; }
+    .fx-btn--primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .fx-btn--primary:hover { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+    .fx-btn--warning { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+    .fx-btn--warning:hover { background: #d97706; border-color: #d97706; color: #fff; }
+    .fx-btn--ghost { background: transparent; border-color: transparent; }
+    .fx-btn--ghost:hover { background: #f3f6fb; }
+
+    /* ---------- Workspace: sidebar + main ---------- */
+    .fx-workspace {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 0;
+        background: #fff;
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+    }
+    .fx-sidebar {
+        background: #fafbfc;
+        border-right: 1px solid #eef1f5;
+        padding: 14px 8px;
+        overflow-y: auto;
+        max-height: calc(100vh - 200px);
+    }
+    .fx-sidebar__title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #6b7c93;
+        padding: 4px 10px 10px;
+    }
+    .fx-tree-item { position: relative; }
+    .fx-tree-row {
+        display: flex; align-items: center; gap: 2px;
+        padding: 5px 8px;
+        border-radius: 6px;
+        transition: background .1s;
+    }
+    .fx-tree-row:hover { background: #eef4ff; }
+    .fx-tree-row.is-active { background: #2563eb; }
+    .fx-tree-row.is-active .fx-tree-node,
+    .fx-tree-row.is-active .fx-tree-toggle { color: #fff; }
+    .fx-tree-row.is-active .fx-tree-node .ic { color: #fff; }
+    .fx-tree-toggle {
+        width: 18px; height: 18px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border: none; background: transparent;
+        color: #9ca3af; cursor: pointer;
+        border-radius: 4px;
+        font-size: 10px;
+        flex-shrink: 0;
+        padding: 0;
+        transition: transform .12s;
+    }
+    .fx-tree-toggle:hover { background: rgba(0,0,0,.06); color: #2563eb; }
+    .fx-tree-toggle.is-leaf { visibility: hidden; }
+    .fx-tree-toggle.is-collapsed i { transform: rotate(-90deg); }
+    .fx-tree-node {
+        display: flex; align-items: center; gap: 6px;
+        padding: 2px 4px;
+        color: #374151;
+        text-decoration: none;
+        font-size: 13px;
+        cursor: pointer;
+        flex: 1; min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .fx-tree-node:hover { color: #2563eb; text-decoration: none; }
+    .fx-tree-row.is-active .fx-tree-node { font-weight: 600; }
+    .fx-tree-node .ic { width: 16px; text-align: center; flex-shrink: 0; color: #2563eb; }
+    .fx-tree-node .count {
+        font-size: 10px; color: #9ca3af;
+        background: rgba(0,0,0,.04); padding: 1px 6px;
+        border-radius: 999px;
+    }
+    .fx-tree-row.is-active .fx-tree-node .count { background: rgba(255,255,255,.2); color: #fff; }
+    .fx-tree-children.is-collapsed { display: none; }
+
+    /* Reorder buttons - chi hien khi hover row */
+    .fx-tree-reorder {
+        display: flex; gap: 2px;
+        opacity: 0;
+        transition: opacity .12s;
+        flex-shrink: 0;
+    }
+    .fx-tree-row:hover .fx-tree-reorder { opacity: 1; }
+    .fx-tree-row.is-active .fx-tree-reorder { opacity: .8; }
+    .fx-tree-reorder button {
+        width: 18px; height: 18px;
+        border: none; background: transparent;
+        color: inherit; cursor: pointer;
+        border-radius: 3px;
+        font-size: 10px; padding: 0;
+        opacity: .6;
+    }
+    .fx-tree-reorder button:hover { opacity: 1; background: rgba(0,0,0,.08); }
+    .fx-tree-row.is-active .fx-tree-reorder button:hover { background: rgba(255,255,255,.2); }
+    .fx-tree-reorder button:disabled { opacity: .25; cursor: not-allowed; }
+
+    .fx-main {
+        padding: 18px;
+        min-height: 480px;
+    }
+
+    /* ---------- Sub-toolbar (search + sort + view) ---------- */
+    .fx-subtoolbar {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .fx-search {
+        flex: 1; min-width: 240px; max-width: 420px;
+        position: relative;
+    }
+    .fx-search input {
+        width: 100%; padding: 8px 12px 8px 36px;
+        border: 1px solid #d1d5db; border-radius: 6px;
+        font-size: 13px;
+        background: #fff;
+    }
+    .fx-search input:focus {
+        outline: none; border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+    .fx-search i {
+        position: absolute; left: 12px; top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    .fx-spacer { flex: 1; }
+    .fx-sort, .fx-pgfilter {
+        padding: 7px 10px;
+        border: 1px solid #d1d5db; border-radius: 6px;
+        background: #fff; font-size: 13px;
+        cursor: pointer;
+    }
+    .fx-viewtoggle {
+        display: inline-flex;
+        border: 1px solid #d1d5db; border-radius: 6px;
+        overflow: hidden; background: #fff;
+    }
+    .fx-viewtoggle button {
+        padding: 7px 12px; border: none; background: transparent;
+        color: #6b7c93; cursor: pointer; font-size: 13px;
+    }
+    .fx-viewtoggle button:hover { background: #f3f6fb; }
+    .fx-viewtoggle button.is-active { background: #2563eb; color: #fff; }
+
+    /* ---------- Section labels ---------- */
+    .fx-section {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #6b7c93;
+        margin: 18px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #f0f2f5;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .fx-section:first-child { margin-top: 0; }
+    .fx-section .count { color: #9ca3af; font-weight: 500; }
+
+    /* ---------- Folder grid ---------- */
+    .fx-folders {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+    }
+    .fx-folder {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px;
+        border: 1px solid #eef1f5;
+        border-radius: 8px;
+        background: #fcfdff;
+        text-decoration: none;
+        color: #1f2937;
+        transition: all .14s;
+        cursor: pointer;
+        position: relative;
+    }
+    .fx-folder:hover {
+        border-color: #2563eb;
+        background: #eff5ff;
+        text-decoration: none; color: #1f2937;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, .08);
+    }
+    .fx-folder__icon { font-size: 28px; color: #2563eb; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.2)); }
+    .fx-folder__body { min-width: 0; flex: 1; }
+    .fx-folder__name {
+        font-weight: 600; font-size: 13px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fx-folder__meta { font-size: 11px; color: #6b7c93; margin-top: 2px; }
+
+    /* ---------- Project cards (grid) ---------- */
+    .fx-files {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+    }
+    .fx-file {
+        background: #fff;
+        border: 1px solid #eef1f5;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all .14s;
+        position: relative;
+        display: flex; flex-direction: column;
+    }
+    .fx-file:hover {
+        border-color: #2563eb;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, .12);
+        transform: translateY(-2px);
+    }
+    .fx-file__thumb {
+        position: relative;
+        aspect-ratio: 16 / 10;
+        background: #f3f6fb;
+        overflow: hidden;
+    }
+    .fx-file__thumb img {
+        width: 100%; height: 100%; object-fit: cover;
+        display: block;
+    }
+    .fx-file__thumb .placeholder {
+        display: flex; align-items: center; justify-content: center;
+        height: 100%; color: #cdd5e0; font-size: 32px;
+    }
+    .fx-file__body {
+        padding: 10px 12px 12px;
+        display: flex; flex-direction: column; gap: 4px;
+        flex: 1;
+    }
+    .fx-file__title {
+        font-size: 14px; font-weight: 600; color: #111827;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 38px;
+    }
+    .fx-file__meta {
+        display: flex; gap: 6px; flex-wrap: wrap;
+        font-size: 11px; color: #6b7c93;
+        margin-top: auto;
+    }
+    .fx-file__chip {
+        background: #eef2f7; padding: 2px 7px;
+        border-radius: 999px; font-weight: 500;
+    }
+    .fx-file__actions {
+        position: absolute; top: 8px; right: 8px;
+        display: flex; gap: 4px;
+        opacity: 0; transform: translateY(-4px);
+        transition: all .15s;
+    }
+    .fx-file:hover .fx-file__actions { opacity: 1; transform: translateY(0); }
+    .fx-act {
+        width: 28px; height: 28px;
+        background: rgba(255, 255, 255, .96);
+        border: 1px solid rgba(0,0,0,.06);
+        backdrop-filter: blur(6px);
+        border-radius: 6px;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #374151; text-decoration: none;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    }
+    .fx-act:hover { background: #fff; color: #2563eb; text-decoration: none; }
+    .fx-act--danger:hover { color: #dc2626; }
+
+    /* ---------- List view (Windows-explorer style) ---------- */
+    .fx-listview {
+        background: #fff;
+        border: 1px solid #eef1f5;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .fx-listrow {
+        display: grid;
+        grid-template-columns: 60px 1fr 200px 160px 120px;
+        gap: 12px; align-items: center;
+        padding: 8px 14px;
+        border-bottom: 1px solid #f0f2f5;
+        font-size: 13px;
+        transition: background .1s;
+    }
+    .fx-listrow:hover { background: #f6f9ff; }
+    .fx-listrow--header {
+        background: #fafbfc;
+        font-weight: 600; font-size: 12px;
+        text-transform: uppercase; letter-spacing: .04em;
+        color: #6b7c93;
+    }
+    .fx-listrow--header:hover { background: #fafbfc; }
+    .fx-listrow img {
+        width: 50px; height: 36px; object-fit: cover;
+        border-radius: 4px; background: #f3f6fb;
+    }
+    .fx-listrow .actions { display: flex; gap: 6px; justify-content: flex-end; }
+    .fx-list-folder .ic { color: #2563eb; font-size: 20px; margin-right: 6px; }
+
+    /* ---------- Empty state ---------- */
+    .fx-empty {
+        padding: 48px 24px; text-align: center; color: #6b7c93;
+    }
+    .fx-empty i { font-size: 56px; color: #d1d5db; display: block; margin-bottom: 14px; }
+    .fx-empty h3 { font-size: 18px; color: #374151; margin: 0 0 6px; }
+    .fx-empty p { margin: 0; font-size: 13px; }
+
+    /* ---------- Pager ---------- */
+    .fx-pager { margin-top: 18px; }
+    .fx-pager .pageoff { color: #6b7c93; margin-left: 10px; font-size: 13px; }
+
+    @@media (max-width: 992px) {
+        .fx-workspace { grid-template-columns: 1fr; }
+        .fx-sidebar { max-height: 200px; border-right: none; border-bottom: 1px solid #eef1f5; }
+        .fx-listrow { grid-template-columns: 50px 1fr 100px; }
+        .fx-listrow .col-group, .fx-listrow .col-pb { display: none; }
+    }
+
+    /* List view lazy: native CSS - browser skip rendering offscreen rows */
+    .fx-listview .fx-listrow:not(.fx-listrow--header) {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 56px;
+    }
+    .fx-files .fx-file {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 320px;
+    }
+
+    /* Context menu - right-click on folder/file */
+    .fx-ctxmenu {
+        position: fixed;
+        z-index: 9999;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
+        padding: 6px;
+        min-width: 200px;
+        display: none;
+        font-size: 13px;
+    }
+    .fx-ctxmenu.is-open { display: block; }
+    .fx-ctxmenu__item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        color: #374151;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .08s;
+    }
+    .fx-ctxmenu__item:hover { background: #f3f6fb; color: #2563eb; text-decoration: none; }
+    .fx-ctxmenu__item.is-danger:hover { background: #fef2f2; color: #b91c1c; }
+    .fx-ctxmenu__item.is-disabled { opacity: .4; pointer-events: none; }
+    .fx-ctxmenu__item i { width: 16px; text-align: center; color: #6b7c93; }
+    .fx-ctxmenu__item:hover i { color: inherit; }
+    .fx-ctxmenu__sep { height: 1px; background: #eef1f5; margin: 4px 6px; }
+    .fx-ctxmenu__header {
+        padding: 8px 12px 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #9ca3af;
+        font-weight: 600;
+        max-width: 240px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Move modal - folder picker tree */
+    .fx-move-tree {
+        max-height: 360px;
+        overflow-y: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 8px 4px;
+        background: #fafbfc;
+    }
+    .fx-move-node {
+        display: flex; align-items: center; gap: 6px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    .fx-move-node:hover { background: #eef4ff; color: #2563eb; }
+    .fx-move-node.is-selected { background: #2563eb; color: #fff; font-weight: 600; }
+    .fx-move-node.is-disabled { opacity: .35; cursor: not-allowed; }
+    .fx-move-node .ic { width: 16px; text-align: center; color: #2563eb; }
+    .fx-move-node.is-selected .ic { color: #fff; }
+
+    /* Right-clickable cards: hint cursor on hover */
+    .ctx-target { user-select: none; }
+</style>
+
 <div class="app-main__outer">
     <div class="app-main__inner">
 
-        <div class="app-page-title">
+        <div class="app-page-title" style="background:transparent;border:0;padding-bottom:8px">
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
-                        </i>
+                        <i class="pe-7s-portfolio icon-gradient bg-grow-early"></i>
                     </div>
                     <div>
-                        Danh sách dự án
+                        Quản lý dự án
                         <div class="page-title-subheading">
+                            Duyệt theo cấu trúc thư mục (nhóm dự án &rarr; dự án).
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <div class="tab-content">
-            <div class="row">
-                <div class="card">
+        <div class="fx" style="background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
 
-                    <div class="card-header">
-                        <div class="row" style="width:100%">
-                            <div class="col-md-8 col-lg-8">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
-                                    </div>
-                                    <div class="col-md-3">
-                                        @Html.DropDownList("IDGroup", ViewBag.PGList as SelectList, "--Chọn Nhóm dự án--", new { @id = "IDGroup", @class = "form-control" })
-                                    </div>
-                                    <div class="col-md-5">
-                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="button" id="btn-List" class="btn btn-warning m-l-auto" style="margin-left: 10px;"><i class="fa fa-list">&nbsp;</i>&nbsp;Nhóm dự án </button>
-                                <button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
-                                <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","Projects")' style="margin-top:50px"></div>
+            @* ============================================================
+               TOP TOOLBAR: Breadcrumb + actions (luon o top, sticky-able)
+               ============================================================ *@
+            <div class="fx-topbar">
+                <div class="fx-crumbs">
+                    @if (currentGid.HasValue && crumbs.Count > 0)
+                    {
+                        <a href="@Url.Action("Index", "Projects")" class="fx-btn fx-btn--ghost" title="Quay lại">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                    }
+                    <a href="@Url.Action("Index", "Projects")" class="fx-crumb @(currentGid.HasValue ? "" : "fx-crumb--current")">
+                        <i class="fa fa-home"></i> Tất cả
+                    </a>
+                    @for (int i = 0; i < crumbs.Count; i++)
+                    {
+                        var c = crumbs[i];
+                        var isLast = (i == crumbs.Count - 1);
+                        <span class="fx-crumb-sep"><i class="fa fa-chevron-right"></i></span>
+                        if (isLast)
+                        {
+                            <span class="fx-crumb fx-crumb--current"><i class="fa fa-folder-open"></i> @c.GroupName</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "Projects", new { gid = c.IDGroup })" class="fx-crumb">
+                                <i class="fa fa-folder"></i> @c.GroupName
+                            </a>
+                        }
+                    }
+                </div>
+                <div class="fx-actions">
+                    <button type="button" id="btn-add-folder" class="fx-btn">
+                        <i class="fa fa-folder-plus"></i> Nhóm mới
+                    </button>
+                    <button type="button" id="btn-add" class="fx-btn fx-btn--primary">
+                        <i class="fa fa-plus"></i> Dự án mới
+                    </button>
+                    <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","Projects")' style="margin-top:50px"></div>
+                    <button type="button" id="btn-Import" class="fx-btn">
+                        <i class="fa fa-upload"></i> Upload
+                    </button>
+                    <div class="modal" id="myModalImport" role="dialog" data-url='@Url.Action("ImportExcel","Projects")' style="margin-top:50px"></div>
+                    <button type="button" id="btn-Export" class="fx-btn">
+                        <i class="fa fa-download"></i> Excel
+                    </button>
+                    <a href="@Url.Action("Index", "Permission")" class="fx-btn fx-btn--primary" title="Cấp/thu hồi quyền truy cập">
+                        <i class="fa fa-key"></i> Phân quyền
+                    </a>
+                </div>
+            </div>
 
-                                <button type="button" id="btn-Import" class="btn btn-primary m-l-auto pull-right"><i class="fa fa-upload">&nbsp;</i>&nbsp;Upload </button>
-                                <div class="modal" id="myModalImport" role="dialog" data-url='@Url.Action("ImportExcel","Projects")' style="margin-top:50px"></div>
+            @* ============================================================
+               WORKSPACE: Sidebar tree + Main grid
+               ============================================================ *@
+            <div class="fx-workspace">
 
-                                <button type="button" id="btn-Export" class="btn btn-primary m-l-auto" style="margin-right: 10px; float: right"><i class="fa fa-download">&nbsp;</i>&nbsp;Download</button>
-                            </div>
+                <aside class="fx-sidebar">
+                    <div class="fx-sidebar__title"><i class="fa fa-sitemap"></i>&nbsp; Cấu trúc</div>
+                    <a href="@Url.Action("Index", "Projects")"
+                       class="fx-tree-node @(currentGid.HasValue ? "" : "is-active")">
+                        <span class="ic"><i class="fa fa-home"></i></span>
+                        <span>Tất cả</span>
+                    </a>
+                    @foreach (var node in tree)
+                    {
+                        @SidebarNode(node, currentGid, expandedSet)
+                    }
+                </aside>
+
+                <main class="fx-main">
+
+                    @* ---------- Sub-toolbar: search + sort + view ---------- *@
+                    <div class="fx-subtoolbar">
+                        <div class="fx-search">
+                            <i class="fa fa-search"></i>
+                            <input type="text" id="txtsearch" placeholder="Tìm dự án theo tên..." value="@searchText" />
+                        </div>
+                        <select id="fx-sort" class="fx-sort">
+                            <option value="date-desc" @(sortKey == "date-desc" ? "selected" : "")>Mới nhất trước</option>
+                            <option value="date-asc" @(sortKey == "date-asc" ? "selected" : "")>Cũ nhất trước</option>
+                            <option value="name-asc" @(sortKey == "name-asc" ? "selected" : "")>Tên A &rarr; Z</option>
+                            <option value="name-desc" @(sortKey == "name-desc" ? "selected" : "")>Tên Z &rarr; A</option>
+                        </select>
+                        <div class="fx-spacer"></div>
+                        <div class="fx-viewtoggle">
+                            <button type="button" data-view="grid" class="@(viewMode == "grid" ? "is-active" : "")" title="Lưới">
+                                <i class="fa fa-th"></i>
+                            </button>
+                            <button type="button" data-view="list" class="@(viewMode == "list" ? "is-active" : "")" title="Danh sách">
+                                <i class="fa fa-list"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                                    <thead>
-                                        <tr>
-                                            <th width="30px" class="text-center">STT</th>
-                                            <th class="text-center" width="100px">Thao tác</th>
-                                            <th class="text-center" width="180px">Hình ảnh</th>
-                                            <th class="text-center">Tên dự án</th>
-                                            <th class="text-center">Nhóm dự án</th>
-                                            <th class="text-center" width="200px">Ngày thực hiên</th>
-                                            <th class="text-center" width="200px">BP yêu cầu</th>
-                                            <th class="text-center" style="width:150px">Tờ trình</th>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @{
-                                            int pageno = (int)Model.PageNumber;
-                                            int itemperpage = (int)Model.PageSize;
-                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
-                                            List<ProjectsGroup> listPG = ViewBag.listPG as List<ProjectsGroup>;
+                    @* ---------- Subfolders section ---------- *@
+                    @if (subfolders.Count > 0 && !isSearching)
+                    {
+                        <div class="fx-section">
+                            <i class="fa fa-folder"></i> Nhóm con
+                            <span class="count">(@subfolders.Count)</span>
+                        </div>
+                        if (viewMode == "list")
+                        {
+                            <div class="fx-listview">
+                                <div class="fx-listrow fx-listrow--header">
+                                    <div></div>
+                                    <div>Tên</div>
+                                    <div></div>
+                                    <div></div>
+                                    <div style="text-align:right">Thao tác</div>
+                                </div>
+                                @foreach (var sf in subfolders)
+                                {
+                                    <a href="@Url.Action("Index", "Projects", new { gid = sf.IDGroup })" class="fx-listrow fx-list-folder ctx-target"
+                                       style="text-decoration:none;color:inherit"
+                                       data-type="folder" data-id="@sf.IDGroup" data-name="@sf.GroupName"
+                                       data-parent="@(sf.ParentIDGroup.HasValue ? sf.ParentIDGroup.Value.ToString() : "")"
+                                       data-has-children="@(sf.Children.Count > 0 ? "1" : "0")"
+                                       data-project-count="@sf.ProjectCount">
+                                        <div><i class="fa fa-folder ic"></i></div>
+                                        <div style="font-weight:600">@sf.GroupName</div>
+                                        <div class="col-group" style="color:#6b7c93">@sf.Children.Count nhóm con · @sf.ProjectCount dự án</div>
+                                        <div></div>
+                                        <div></div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="fx-folders">
+                                @foreach (var sf in subfolders)
+                                {
+                                    <a href="@Url.Action("Index", "Projects", new { gid = sf.IDGroup })" class="fx-folder ctx-target"
+                                       data-type="folder" data-id="@sf.IDGroup" data-name="@sf.GroupName"
+                                       data-parent="@(sf.ParentIDGroup.HasValue ? sf.ParentIDGroup.Value.ToString() : "")"
+                                       data-has-children="@(sf.Children.Count > 0 ? "1" : "0")"
+                                       data-project-count="@sf.ProjectCount">
+                                        <div class="fx-folder__icon"><i class="fa fa-folder"></i></div>
+                                        <div class="fx-folder__body">
+                                            <div class="fx-folder__name">@sf.GroupName</div>
+                                            <div class="fx-folder__meta">
+                                                @if (sf.Children.Count > 0)
+                                                {
+                                                    <span>@sf.Children.Count nhóm con</span>
+                                                    <span> · </span>
+                                                }
+                                                <span>@sf.ProjectCount dự án</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                    }
+
+                    @* ---------- Search hits: folders matching by name ---------- *@
+                    @if (isSearching && subfolders.Count > 0)
+                    {
+                        <div class="fx-section">
+                            <i class="fa fa-folder"></i> Nhóm khớp với &quot;@searchText&quot;
+                            <span class="count">(@subfolders.Count)</span>
+                        </div>
+                        <div class="fx-folders">
+                            @foreach (var sf in subfolders)
+                            {
+                                <a href="@Url.Action("Index", "Projects", new { gid = sf.IDGroup })" class="fx-folder">
+                                    <div class="fx-folder__icon"><i class="fa fa-folder"></i></div>
+                                    <div class="fx-folder__body">
+                                        <div class="fx-folder__name">@sf.GroupName</div>
+                                        <div class="fx-folder__meta">@sf.ProjectCount dự án</div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    @* ---------- Projects section ---------- *@
+                    @{
+                        var sectionLabel = isSearching
+                            ? "Dự án khớp với \"" + searchText + "\""
+                            : (currentFolder != null ? "Dự án trong " + currentFolder.GroupName : "Dự án (chưa phân nhóm)");
+                    }
+                    <div class="fx-section">
+                        <i class="fa fa-file-alt"></i> @sectionLabel
+                        <span class="count">(@Model.TotalItemCount)</span>
+                    </div>
+
+                    @if (Model.TotalItemCount == 0 && subfolders.Count == 0)
+                    {
+                        <div class="fx-empty">
+                            <i class="fa fa-folder-open"></i>
+                            <h3>Chưa có nội dung</h3>
+                            <p>
+                                @if (isSearching)
+                                {
+                                    <text>Không tìm thấy kết quả nào cho &quot;@searchText&quot;.</text>
+                                }
+                                else if (currentFolder != null)
+                                {
+                                    <text>Nhóm này chưa có dự án. Bấm <strong>Dự án mới</strong> để thêm.</text>
+                                }
+                                else
+                                {
+                                    <text>Bấm <strong>Nhóm mới</strong> hoặc <strong>Dự án mới</strong> để bắt đầu.</text>
+                                }
+                            </p>
+                        </div>
+                    }
+                    else if (Model.TotalItemCount == 0)
+                    {
+                        <div class="fx-empty" style="padding:24px">
+                            <p>Nhóm này chưa có dự án trực tiếp.</p>
+                        </div>
+                    }
+                    else if (viewMode == "list")
+                    {
+                        <div class="fx-listview">
+                            <div class="fx-listrow fx-listrow--header">
+                                <div></div>
+                                <div>Tên dự án</div>
+                                <div class="col-group">Nhóm</div>
+                                <div class="col-pb">BP yêu cầu</div>
+                                <div style="text-align:right">Thao tác</div>
+                            </div>
+                            @foreach (var item in Model)
+                            {
+                                var grpName = "";
+                                ProjectGroupNode grpNode;
+                                var byIdLocal = (ViewBag.HierarchyFlat as List<ProjectGroupNode>) ?? new List<ProjectGroupNode>();
+                                var found = byIdLocal.FirstOrDefault(n => n.IDGroup == item.IDGroup);
+                                if (found != null) { grpName = found.GroupName; }
+                                <div class="fx-listrow ctx-target"
+                                     data-type="file" data-id="@item.ID" data-name="@item.Title"
+                                     data-parent="@item.IDGroup">
+                                    <div>
+                                        <img src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.Images))" alt="" loading="lazy" />
+                                    </div>
+                                    <div style="font-weight:500">
+                                        <a href="@item.URL" target="_blank" style="color:inherit;text-decoration:none">@item.Title</a>
+                                        <div style="font-size:11px;color:#9ca3af">@item.Date.ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                    <div class="col-group" style="color:#6b7c93">@grpName</div>
+                                    <div class="col-pb" style="color:#6b7c93">@item.TenPhongBan</div>
+                                    <div class="actions">
+                                        <a id="btn-edit_@item.ID" href="#" class="fx-act" title="Sửa"><i class="fa fa-edit"></i></a>
+                                        <div class="modal" id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "Projects", new { id = item.ID })'></div>
+                                        <a href="@Url.Action("Authorization", "Projects", new { id = item.ID })" class="fx-act" title="Phân quyền"><i class="fa-solid fa-user-plus"></i></a>
+                                        <a href="@Url.Action("ExportToExceldetail", "Projects", new { id = item.ID })" class="fx-act" title="Xuất Excel"><i class="fa-solid fa-file-excel"></i></a>
+                                        @if (item.FilePDF != null && item.FilePDF.Length > 0)
+                                        {
+                                            <a href="@Url.Content("~/UploadedFiles/" + System.IO.Path.GetFileName(item.FilePDF))" target="_blank" class="fx-act" title="Xem PDF"><i class="fa fa-file-pdf"></i></a>
                                         }
-                                        @{
-
-                                            foreach (var item in Model)
+                                        <a href="@Url.Action("Delete", "Projects", new { id = item.ID })"
+                                           onclick="return confirm('Xóa dự án: @item.Title ?')"
+                                           class="fx-act fx-act--danger" title="Xóa"><i class="fa fa-trash"></i></a>
+                                    </div>
+                                </div>
+                                <script type="text/javascript">
+                                    (function () {
+                                        var b = document.getElementById('btn-edit_@item.ID');
+                                        if (!b) return;
+                                        b.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            var url = document.getElementById('myModaleEdit_@item.ID').getAttribute('data-url');
+                                            jQuery.get(url, function (data) {
+                                                jQuery("#myModal").html(data);
+                                                jQuery("#ModalTitle").html("Cập nhật dự án");
+                                                jQuery("#myModal").modal('show');
+                                            });
+                                        });
+                                    })();
+                                </script>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="fx-files">
+                            @foreach (var item in Model)
+                            {
+                                <div class="fx-file ctx-target"
+                                     data-type="file" data-id="@item.ID" data-name="@item.Title"
+                                     data-parent="@item.IDGroup">
+                                    <div class="fx-file__actions">
+                                        <a id="btn-edit_@item.ID" href="#" class="fx-act" title="Sửa"><i class="fa fa-edit"></i></a>
+                                        <div class="modal" id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "Projects", new { id = item.ID })'></div>
+                                        <a href="@Url.Action("Authorization", "Projects", new { id = item.ID })" class="fx-act" title="Phân quyền"><i class="fa-solid fa-user-plus"></i></a>
+                                        <a href="@Url.Action("Delete", "Projects", new { id = item.ID })"
+                                           onclick="return confirm('Xóa dự án: @item.Title ?')"
+                                           class="fx-act fx-act--danger" title="Xóa"><i class="fa fa-trash"></i></a>
+                                    </div>
+                                    <a href="@item.URL" target="_blank" class="fx-file__thumb" style="text-decoration:none">
+                                        @if (!string.IsNullOrEmpty(item.Images))
+                                        {
+                                            <img src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.Images))" alt="@item.Title" onerror="this.style.display='none';this.nextElementSibling && (this.nextElementSibling.style.display='flex')" />
+                                            <div class="placeholder" style="display:none"><i class="fa fa-image"></i></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="placeholder"><i class="fa fa-image"></i></div>
+                                        }
+                                    </a>
+                                    <div class="fx-file__body">
+                                        <div class="fx-file__title" title="@item.Title">@item.Title</div>
+                                        <div class="fx-file__meta">
+                                            <span class="fx-file__chip"><i class="fa fa-calendar"></i> @item.Date.ToString("dd/MM/yyyy")</span>
+                                            @if (!string.IsNullOrEmpty(item.TenPhongBan))
                                             {
-                                                <tr>
-                                                    <td class="text-center"> @RowNo@{RowNo++;}</td>
-                                                    <td class="text-center">
-                                                        <a title="Xóa" class="btn-action" href="@Url.Action("Delete", "Projects", new { id = item.ID })"
-                                                           onclick="return confirm('Bạn muốn xóa Thông tin  : @item.Title')">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </a>
-
-                                                        <a id="btn-edit_@item.ID" href="#" title="Chỉnh sửa" class="btn-action"><i class="fa fa-edit"></i> </a>
-                                                        <div class="modal " id="myModaleEdit_@item.ID" role="dialog" data-url='@Url.Action("Edit", "Projects", new { id = item.ID })'></div>
-                                                        <script type="text/javascript">
-                                                            $('#btn-edit_@item.ID').click(function () {
-                                                                var url = $('#myModaleEdit_@item.ID').data('url');
-                                                                $.get(url, function (data) {
-                                                                    $("#myModal").html(data);
-                                                                    $("#ModalTitle").html("Cập nhật Thông Tin dự án");
-                                                                    $("#myModal").modal('show');
-                                                                });
-                                                            });
-                                                        </script>
-                                                        <a href="@Url.Action("Authorization", "Projects", new { id = item.ID })" class="btn-action" title="Thêm tài khoản"><i class="fa-solid fa-user-plus"></i></a>
-
-                                                        <a href="@Url.Action("ExportToExceldetail", "Projects", new { id = item.ID })" class="btn-action" title="xuất file"><i class="fa-solid fa-file-excel"></i></a>
-
-                                                    </td>
-                                                    <td>
-                                                        <a href="@item.URL" target="_blank"><img src="@Url.Content("~/Images/" + System.IO.Path.GetFileName(item.Images))" class="d-block m-auto" width="150px" alt="no Image" /></a>
-                                                    </td>
-                                                    <td>@item.Title</td>
-                                                    <td class="text-center">
-                                                        @{var nhom = listPG.Where(x => x.IDGroup == item.IDGroup).FirstOrDefault();
-                                                            if (nhom != null) {@nhom.GroupName;}
-                                                        }
-                                                    </td>
-                                                    <td class="text-center">@item.Date.ToString("dd-MM-yyyy")</td>
-                                                    <td>@item.TenPhongBan</td>
-                                                    <td class="text-center">
-                                                        @if (item.FilePDF != null && item.FilePDF.Length > 0)
-                                                        {
-
-                                                            <i class="fa-solid fa-eye mr-2"></i><a class="text-download" target="_blank" href="@Url.Content("~/UploadedFiles/" + System.IO.Path.GetFileName(item.FilePDF))">Xem file</a>
-                                                        }
-
-                                                    </td>
-                                                </tr>
+                                                <span class="fx-file__chip">@item.TenPhongBan</span>
                                             }
-                                        }
-                                    </tbody>
-                                </table>
-                                <div class="pager">
-                                    @Html.PagedListPager(Model, page => Url.Action("Index", "Projects", new { area = "View360", page }))
-                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
+                                            @if (item.FilePDF != null && item.FilePDF.Length > 0)
+                                            {
+                                                <a href="@Url.Content("~/UploadedFiles/" + System.IO.Path.GetFileName(item.FilePDF))" target="_blank" class="fx-file__chip" style="background:#fee2e2;color:#b91c1c;text-decoration:none"><i class="fa fa-file-pdf"></i> PDF</a>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <script type="text/javascript">
+                                    (function () {
+                                        var b = document.getElementById('btn-edit_@item.ID');
+                                        if (!b) return;
+                                        b.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            var url = document.getElementById('myModaleEdit_@item.ID').getAttribute('data-url');
+                                            jQuery.get(url, function (data) {
+                                                jQuery("#myModal").html(data);
+                                                jQuery("#ModalTitle").html("Cập nhật dự án");
+                                                jQuery("#myModal").modal('show');
+                                            });
+                                        });
+                                    })();
+                                </script>
+                            }
                         </div>
-                    </div>
-                </div>
+                    }
+
+                    @* Pagination chi cho grid view. List view: lazy scroll, render het. *@
+                    @if (viewMode != "list")
+                    {
+                        <div class="fx-pager">
+                            @Html.PagedListPager(Model, page => Url.Action("Index", "Projects", new { area = "View360", page, search = searchText, gid = currentGid, sort = sortKey, view = viewMode }))
+                            @if (Model.PageCount > 0)
+                            {
+                                <span class="pageoff">Trang @Model.PageNumber / @Model.PageCount</span>
+                            }
+                        </div>
+                    }
+                    else if (Model.TotalItemCount > 0)
+                    {
+                        <div style="text-align:center;color:#9ca3af;font-size:12px;padding:16px 0">
+                            Hiển thị tất cả @Model.TotalItemCount dự án
+                        </div>
+                    }
+
+                </main>
             </div>
         </div>
-
     </div>
-
 
     <div class="app-wrapper-footer">
         <div class="app-footer">
-            <div class="app-footer__inner">
+            <div class="app-footer__inner"></div>
+        </div>
+    </div>
+</div>
 
+@* ============================================================
+   Context menu (right-click) - dung chung cho folder/file
+   ============================================================ *@
+<div id="fx-ctxmenu" class="fx-ctxmenu" role="menu">
+    <div class="fx-ctxmenu__header" id="ctx-header">—</div>
+    <div class="fx-ctxmenu__sep"></div>
+    <a href="#" class="fx-ctxmenu__item" data-ctx-action="open"><i class="fa fa-folder-open"></i> Mở</a>
+    <a href="#" class="fx-ctxmenu__item" data-ctx-action="edit"><i class="fa fa-edit"></i> Đổi tên / chỉnh sửa</a>
+    <a href="#" class="fx-ctxmenu__item" data-ctx-action="move"><i class="fa fa-arrows-alt"></i> Di chuyển đến…</a>
+    <div class="fx-ctxmenu__sep"></div>
+    <a href="#" class="fx-ctxmenu__item is-danger" data-ctx-action="delete"><i class="fa fa-trash"></i> Xóa</a>
+</div>
+
+@* ============================================================
+   Move modal - folder picker, dung chung folder/file
+   ============================================================ *@
+<div class="modal" id="fx-move-modal" role="dialog" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="fx-move-title">Di chuyển đến…</h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:10px;color:#6b7c93;font-size:13px">
+                    Đang di chuyển: <strong id="fx-move-source">—</strong>
+                </div>
+                <input type="text" id="fx-move-filter" class="form-control" placeholder="Lọc nhóm…" style="margin-bottom:10px" />
+                <div class="fx-move-tree" id="fx-move-tree">
+                    @{
+                        var moveTreeFlat = ViewBag.HierarchyFlat as List<ProjectGroupNode> ?? new List<ProjectGroupNode>();
+                    }
+                    <div class="fx-move-node" data-target-id="" data-target-name="(gốc)">
+                        <span class="ic"><i class="fa fa-home"></i></span>
+                        <span><strong>Nhóm gốc</strong> (không thuộc nhóm nào)</span>
+                    </div>
+                    @foreach (var n in moveTreeFlat)
+                    {
+                        <div class="fx-move-node" data-target-id="@n.IDGroup" data-target-name="@n.GroupName"
+                             style="padding-left:@(10 + n.Depth * 18)px">
+                            <span class="ic"><i class="fa fa-folder"></i></span>
+                            <span>@n.GroupName</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" id="fx-move-confirm" class="btn btn-primary" disabled>Di chuyển</button>
             </div>
         </div>
     </div>
-
-
 </div>
 
+@helper SidebarNode(ProjectGroupNode node, int? currentGid, HashSet<int> expandedSet)
+{
+    var isActive = currentGid.HasValue && currentGid.Value == node.IDGroup;
+    var hasChildren = node.Children != null && node.Children.Count > 0;
+    var indentPx = node.Depth * 14;
+    var isExpanded = expandedSet.Contains(node.IDGroup);
+    <div class="fx-tree-item">
+        <div class="fx-tree-row @(isActive ? "is-active" : "")" style="padding-left:@(indentPx)px">
+            <button type="button"
+                    class="fx-tree-toggle @(hasChildren ? "" : "is-leaf") @(isExpanded ? "" : "is-collapsed")"
+                    data-toggle-tree="@node.IDGroup"
+                    title="@(isExpanded ? "Đóng" : "Mở")">
+                <i class="fa fa-caret-down"></i>
+            </button>
+            @{
+                var subtreeMap = ViewBag.SubtreeCount as Dictionary<int, int>;
+                int subtreeC = subtreeMap != null && subtreeMap.ContainsKey(node.IDGroup) ? subtreeMap[node.IDGroup] : node.ProjectCount;
+                bool hasSubtreeMore = subtreeC > node.ProjectCount;
+                // C# 5 (Razor MVC 5) khong support $"..." interpolation - dung string.Format
+                var tooltipExtra = hasSubtreeMore
+                    ? string.Format(" — {0} trực tiếp · {1} cả cây con", node.ProjectCount, subtreeC)
+                    : "";
+            }
+            <a href="@Url.Action("Index", "Projects", new { gid = node.IDGroup })"
+               class="fx-tree-node"
+               title="@(node.GroupName + tooltipExtra)">
+                <span class="ic"><i class="fa fa-folder"></i></span>
+                <span style="overflow:hidden;text-overflow:ellipsis">@node.GroupName</span>
+                @if (node.ProjectCount > 0 || subtreeC > 0)
+                {
+                    if (hasSubtreeMore)
+                    {
+                        <span class="count" style="background:rgba(37,99,235,.08);color:#2563eb;">@node.ProjectCount<span style="opacity:.5">/@subtreeC</span></span>
+                    }
+                    else
+                    {
+                        <span class="count">@node.ProjectCount</span>
+                    }
+                }
+            </a>
+            <span class="fx-tree-reorder">
+                <button type="button" class="btn-tree-move-up" data-id="@node.IDGroup" title="Lên"><i class="fa fa-chevron-up"></i></button>
+                <button type="button" class="btn-tree-move-down" data-id="@node.IDGroup" title="Xuống"><i class="fa fa-chevron-down"></i></button>
+            </span>
+        </div>
+        @if (hasChildren)
+        {
+            <div class="fx-tree-children @(isExpanded ? "" : "is-collapsed")" data-children-of="@node.IDGroup">
+                @foreach (var c in node.Children)
+                {
+                    @SidebarNode(c, currentGid, expandedSet)
+                }
+            </div>
+        }
+    </div>
+}
+
 <script type="text/javascript">
-    $('#btn-add').click(function () {
-        var url = $('#myModal').data('url');
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#ModalTitle").html("Thêm Dự án");
-            $("#myModal").modal('show');
-        });
-    });
-    $('#btn-Import').click(function () {
-        var url = $('#myModalImport').data('url');
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#ModalTitle").html("Add Permission");
-            $("#myModal").modal('show');
-        });
-    });
-    $("#btn-search").on('click', function () {
-        var IDGroup = $('#IDGroup').val();
-        var search = $('#txtsearch').val();
-        if (IDGroup == "") {
-            window.location.href = '@Url.Action("Index", "Projects")?search=' + search;
-        } else window.location.href = '@Url.Action("Index", "Projects")?search=' + search + "&IDGroup=" + IDGroup;
+    (function () {
+        var currentGid = @(currentGid.HasValue ? currentGid.Value.ToString() : "null");
+        var currentSort = '@sortKey';
+        var currentView = '@viewMode';
 
-     });
-    $('#btn-Export').click(function () {
-        var IDGroup = $('#IDGroup').val();
-        var search = $('#txtsearch').val();
-        ////window.location.href = '@Url.Action("ExportToExcel", "Projects")?search=' + search;
-        if (IDGroup == "") {
-            window.location.href = '@Url.Action("ExportToExcel", "Projects")?search=' + search;
-        } else window.location.href = '@Url.Action("ExportToExcel", "Projects")?search=' + search + "&IDGroup=" + IDGroup;
-    });
-    $('#btn-List').click(function () {
+        function buildUrl(overrides) {
+            var params = {
+                search: jQuery('#txtsearch').val() || '',
+                gid: currentGid,
+                sort: currentSort,
+                view: currentView
+            };
+            for (var k in overrides) params[k] = overrides[k];
+            var q = [];
+            for (var k in params) {
+                if (params[k] === null || params[k] === undefined || params[k] === '') continue;
+                q.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+            }
+            return '@Url.Action("Index", "Projects")' + (q.length ? '?' + q.join('&') : '');
+        }
 
-        window.location.href = '@Url.Action("index", "ProjectsGroup")';
-    });
+        // Search: Enter or button-less - submit on enter
+        jQuery('#txtsearch').on('keypress', function (e) {
+            if (e.which === 13) { window.location.href = buildUrl({ page: 1 }); }
+        });
+        // Sort change
+        jQuery('#fx-sort').on('change', function () {
+            window.location.href = buildUrl({ sort: jQuery(this).val(), page: 1 });
+        });
+        // View toggle
+        jQuery('.fx-viewtoggle button').on('click', function () {
+            window.location.href = buildUrl({ view: jQuery(this).attr('data-view'), page: 1 });
+        });
+
+        // Add project
+        jQuery('#btn-add').click(function () {
+            var url = jQuery('#myModal').data('url');
+            // Pass current folder as default group
+            if (currentGid !== null) url += '?gid=' + currentGid;
+            jQuery.get(url, function (data) {
+                jQuery("#myModal").html(data);
+                jQuery("#ModalTitle").html("Thêm dự án");
+                jQuery("#myModal").modal('show');
+            });
+        });
+        // Add subfolder - reuse ProjectsGroup create with parentId
+        jQuery('#btn-add-folder').click(function () {
+            var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            var url = '@Url.Action("Create", "ProjectsGroup")?returnUrl=' + returnUrl;
+            if (currentGid !== null) url += '&parentId=' + currentGid;
+            jQuery.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'html',
+                success: function (data) {
+                    // Detect server redirect tra ve trang Login (full HTML) - dau hieu permission deny
+                    if (data && (data.indexOf('<title') !== -1 && data.toLowerCase().indexOf('login') !== -1)) {
+                        alert('Bạn không có quyền tạo nhóm dự án. Liên hệ admin để cấp quyền "ProjectsGroup → ADD".');
+                        return;
+                    }
+                    jQuery("#myModal").html(data);
+                    jQuery("#ModalTitle").html("Thêm nhóm con");
+                    jQuery("#myModal").modal('show');
+                },
+                error: function (xhr) {
+                    alert('Không thể mở form tạo nhóm. ' +
+                          'Status: ' + xhr.status + ' ' + xhr.statusText);
+                }
+            });
+        });
+        // Import
+        jQuery('#btn-Import').click(function () {
+            var url = jQuery('#myModalImport').data('url');
+            jQuery.get(url, function (data) {
+                jQuery("#myModal").html(data);
+                jQuery("#ModalTitle").html("Upload");
+                jQuery("#myModal").modal('show');
+            });
+        });
+        // Export Excel - server tu mo rong subtree neu user dang trong 1 folder
+        // (vd dang o HPDQ 2 -> export ca HPDQ 2 + Can 4 + Duc 4 + ...)
+        jQuery('#btn-Export').click(function () {
+            var search = jQuery('#txtsearch').val() || '';
+            var url = '@Url.Action("ExportToExcel", "Projects")?search=' + encodeURIComponent(search);
+            if (currentGid !== null) url += '&IDGroup=' + currentGid;
+            window.location.href = url;
+        });
+
+        // ====================================================
+        // Sidebar tree: reorder (up/down buttons)
+        // ====================================================
+        jQuery(document).on('click', '.btn-tree-move-up, .btn-tree-move-down', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var $btn = jQuery(this);
+            var id = $btn.data('id');
+            var up = $btn.hasClass('btn-tree-move-up');
+            $btn.prop('disabled', true);
+            var url = up ? '@Url.Action("MoveUp", "ProjectsGroup")' : '@Url.Action("MoveDown", "ProjectsGroup")';
+            jQuery.post(url, { id: id })
+                .done(function (data, status, xhr) {
+                    if (xhr.status === 204) {
+                        // 204 = da o bien (khong di chuyen duoc) -> flash do
+                        $btn.css('color', '#dc2626');
+                        setTimeout(function () { $btn.css('color', ''); $btn.prop('disabled', false); }, 500);
+                        return;
+                    }
+                    // 200 = da doi cho ben server. Doi cho node ngay tren DOM (KHONG reload)
+                    // de giu nguyen trang thai mo/dong cua tree (truoc day reload lam cay bi
+                    // dong lai vi server chi auto-expand path toi folder hien tai).
+                    var $item = $btn.closest('.fx-tree-item');
+                    var $sibling = up ? $item.prev('.fx-tree-item') : $item.next('.fx-tree-item');
+                    if ($sibling.length) {
+                        if (up) { $item.insertBefore($sibling); }
+                        else { $item.insertAfter($sibling); }
+                    }
+                    $btn.prop('disabled', false);
+                })
+                .fail(function (xhr) {
+                    alert('Lỗi: ' + (xhr.responseText || xhr.statusText));
+                    $btn.prop('disabled', false);
+                });
+        });
+
+        // ====================================================
+        // Sidebar tree: collapsible toggle
+        // ====================================================
+        jQuery(document).on('click', '.fx-tree-toggle:not(.is-leaf)', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = jQuery(this).attr('data-toggle-tree');
+            var $children = jQuery('.fx-tree-children[data-children-of="' + id + '"]');
+            var collapsed = $children.hasClass('is-collapsed');
+            if (collapsed) {
+                $children.removeClass('is-collapsed');
+                jQuery(this).removeClass('is-collapsed');
+            } else {
+                $children.addClass('is-collapsed');
+                jQuery(this).addClass('is-collapsed');
+            }
+        });
+
+        // ====================================================
+        // Right-click context menu
+        // ====================================================
+        var $ctx = jQuery('#fx-ctxmenu');
+        var ctxTarget = null;
+
+        function showCtx(x, y, target) {
+            ctxTarget = target;
+            var type = target.getAttribute('data-type');
+            var name = target.getAttribute('data-name') || '';
+            var hasChildren = target.getAttribute('data-has-children') === '1';
+            var projCount = parseInt(target.getAttribute('data-project-count') || '0', 10);
+
+            jQuery('#ctx-header').text((type === 'folder' ? '📁 ' : '📄 ') + name);
+
+            // Disable Delete folder neu co children hoac co projects (server cung block, UI chi hint)
+            var $del = jQuery('[data-ctx-action="delete"]', $ctx);
+            if (type === 'folder' && (hasChildren || projCount > 0)) {
+                $del.addClass('is-disabled').attr('title', 'Phải xóa hết nhóm con / dự án trước');
+            } else {
+                $del.removeClass('is-disabled').removeAttr('title');
+            }
+
+            // Position - clamp vao viewport
+            $ctx.addClass('is-open').css({ left: x + 'px', top: y + 'px' });
+            var rect = $ctx[0].getBoundingClientRect();
+            if (rect.right > window.innerWidth) $ctx.css('left', (x - rect.width) + 'px');
+            if (rect.bottom > window.innerHeight) $ctx.css('top', (y - rect.height) + 'px');
+        }
+
+        function hideCtx() { $ctx.removeClass('is-open'); ctxTarget = null; }
+
+        jQuery(document).on('contextmenu', '.ctx-target', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showCtx(e.clientX, e.clientY, this);
+            return false;
+        });
+
+        // Action handler MUST fire before the "hide on click outside" handler.
+        // Dat truoc + dung delegated click voi target check trong "hide" handler.
+        jQuery(document).on('click', '.fx-ctxmenu__item', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!ctxTarget) { hideCtx(); return; }
+            if (jQuery(this).hasClass('is-disabled')) { hideCtx(); return; }
+            var action = jQuery(this).attr('data-ctx-action');
+            var type = ctxTarget.getAttribute('data-type');
+            var id = ctxTarget.getAttribute('data-id');
+            var name = ctxTarget.getAttribute('data-name') || '';
+            var parent = ctxTarget.getAttribute('data-parent') || '';
+            // Bao luu target truoc khi hide (vi action move dung async modal)
+            var savedCtx = { type: type, id: id, name: name, parent: parent };
+            hideCtx();
+            // Re-route bang savedCtx
+            type = savedCtx.type; id = savedCtx.id; name = savedCtx.name; parent = savedCtx.parent;
+
+            if (action === 'open') {
+                if (type === 'folder') {
+                    window.location.href = '@Url.Action("Index", "Projects")?gid=' + id;
+                } else {
+                    // file: edit dialog
+                    var url = '@Url.Action("Edit", "Projects")/' + id;
+                    jQuery.get(url, function (data) {
+                        jQuery("#myModal").html(data);
+                        jQuery("#ModalTitle").html("Chi tiết dự án");
+                        jQuery("#myModal").modal('show');
+                    });
+                }
+            } else if (action === 'edit') {
+                // returnUrl: sau khi sua xong, server redirect ve dung trang nay (giu UI moi)
+                var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                var editUrl = (type === 'folder')
+                    ? '@Url.Action("Edit", "ProjectsGroup")/' + id + '?returnUrl=' + returnUrl
+                    : '@Url.Action("Edit", "Projects")/' + id;
+                jQuery.get(editUrl, function (data) {
+                    jQuery("#myModal").html(data);
+                    jQuery("#ModalTitle").html(type === 'folder' ? "Đổi tên nhóm" : "Cập nhật dự án");
+                    jQuery("#myModal").modal('show');
+                });
+            } else if (action === 'move') {
+                openMoveModal(type, id, name, parent);
+            } else if (action === 'delete') {
+                if (!confirm('Xóa ' + (type === 'folder' ? 'nhóm' : 'dự án') + ': ' + name + ' ?')) return;
+                var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                var delUrl = (type === 'folder')
+                    ? '@Url.Action("Delete", "ProjectsGroup")?id=' + id + '&returnUrl=' + returnUrl
+                    : '@Url.Action("Delete", "Projects")?id=' + id;
+                window.location.href = delUrl;
+            }
+        });
+
+        // Hide-on-click-outside (must be AFTER action handler so it doesn't pre-empt clicks on items)
+        jQuery(document).on('click', function (e) {
+            if (jQuery(e.target).closest('#fx-ctxmenu').length === 0) hideCtx();
+        });
+        jQuery(document).on('scroll wheel', function () { hideCtx(); });
+        jQuery(document).on('keydown', function (e) { if (e.key === 'Escape') hideCtx(); });
+
+        // ====================================================
+        // Move modal
+        // ====================================================
+        var moveCtx = { type: null, id: null, name: null, currentParent: null };
+        var moveTargetId = null;
+
+        function openMoveModal(type, id, name, parent) {
+            moveCtx = { type: type, id: id, name: name, currentParent: parent };
+            moveTargetId = null;
+            jQuery('#fx-move-source').text(name);
+            jQuery('#fx-move-confirm').prop('disabled', true);
+            jQuery('#fx-move-filter').val('');
+            jQuery('.fx-move-node', '#fx-move-tree').removeClass('is-selected is-disabled').show();
+            // Voi folder: disable chinh no + descendants (tranh chu trinh)
+            if (type === 'folder') {
+                // Server validate descendants. UI chi disable chinh no.
+                jQuery('.fx-move-node[data-target-id="' + id + '"]').addClass('is-disabled');
+            }
+            // Highlight current parent
+            var curParent = parent || '';
+            jQuery('.fx-move-node[data-target-id="' + curParent + '"]').css('background', '#fef3c7');
+            jQuery('#fx-move-modal').modal('show');
+        }
+
+        jQuery(document).on('click', '#fx-move-tree .fx-move-node', function () {
+            if (jQuery(this).hasClass('is-disabled')) return;
+            jQuery('.fx-move-node', '#fx-move-tree').removeClass('is-selected');
+            jQuery(this).addClass('is-selected');
+            moveTargetId = jQuery(this).attr('data-target-id') || '';
+            jQuery('#fx-move-confirm').prop('disabled', false);
+        });
+
+        jQuery('#fx-move-filter').on('input', function () {
+            var q = jQuery(this).val().toLowerCase();
+            jQuery('#fx-move-tree .fx-move-node').each(function () {
+                var t = (jQuery(this).attr('data-target-name') || '').toLowerCase();
+                jQuery(this).toggle(q === '' || t.indexOf(q) >= 0);
+            });
+        });
+
+        jQuery('#fx-move-confirm').on('click', function () {
+            if (moveTargetId === null) return;
+            var url = (moveCtx.type === 'folder')
+                ? '@Url.Action("Move", "ProjectsGroup")'
+                : '@Url.Action("Move", "Projects")';
+            var token = jQuery('input[name="__RequestVerificationToken"]').val() || '';
+            jQuery.post(url, {
+                id: moveCtx.id,
+                targetId: moveTargetId,
+                __RequestVerificationToken: token
+            }).done(function () {
+                window.location.reload();
+            }).fail(function (xhr) {
+                alert('Di chuyển thất bại: ' + (xhr.responseText || xhr.statusText));
+            });
+        });
+    })();
 </script>
 
-
-
-
-
+@* Anti-forgery token cho AJAX POST Move *@
+@using (Html.BeginForm("Move", "Projects", FormMethod.Post, new { id = "fx-token-form", style = "display:none" }))
+{
+    @Html.AntiForgeryToken()
+}

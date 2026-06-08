@@ -1,0 +1,100 @@
+/* ===================================================================
+ *  V360 Chatbot admin panel - inject vao Details.cshtml qua flag
+ *  ChatbotAdminMode. Style noi tiep v360-admin (panel trai overlay)
+ *  voi tabs 2-buoc Tour / Scene rieng cho chatbot.
+ * =================================================================== */
+
+/* Panel mac dinh la v360-admin (block lon hon de chua textarea nhieu dong) */
+.v360-admin--chatbot {
+    width: 380px;
+    max-width: 92vw;
+}
+
+/* Tabs */
+.v360-cb-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(0, 0, 0, .15);
+    flex-shrink: 0;
+}
+.v360-cb-tab {
+    flex: 1;
+    padding: 10px 8px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: rgba(255, 255, 255, .65);
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.v360-cb-tab i { font-size: 12px; }
+.v360-cb-tab:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+.v360-cb-tab.is-active {
+    color: #fff;
+    border-bottom-color: var(--v360-accent, #2cc1e8);
+    background: rgba(44, 193, 232, .12);
+}
+
+/* Panes */
+.v360-cb-pane { display: none; }
+.v360-cb-pane.is-active { display: block; }
+
+/* Details/summary su dung trong tab tour */
+.v360-cb-pane details {
+    background: rgba(0, 0, 0, .18);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+.v360-cb-pane details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #fff;
+    font-size: 13px;
+    padding: 2px 0;
+    list-style: none;
+}
+.v360-cb-pane details summary::-webkit-details-marker { display: none; }
+.v360-cb-pane details summary::before {
+    content: '\25B6';
+    margin-right: 6px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, .55);
+    transition: transform .15s;
+    display: inline-block;
+}
+.v360-cb-pane details[open] summary::before { transform: rotate(90deg); }
+.v360-cb-pane details textarea { margin-top: 10px; }
+
+/* Textarea trong v360-admin can override default (small height) */
+.v360-admin--chatbot textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .18);
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 60px;
+    box-sizing: border-box;
+}
+.v360-admin--chatbot textarea:focus {
+    outline: none;
+    border-color: var(--v360-accent, #2cc1e8);
+    box-shadow: 0 0 0 2px rgba(44, 193, 232, .15);
+}
+.v360-admin--chatbot textarea:disabled,
+.v360-admin--chatbot input[type="text"]:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+.v360-admin--chatbot textarea::placeholder,
+.v360-admin--chatbot input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, .4);
+}
