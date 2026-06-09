@@ -92,9 +92,7 @@ BEGIN
         SceneUuid     NVARCHAR(100)     NOT NULL,
         DisplayOrder  INT               NOT NULL CONSTRAINT DF_V360FS_Ord DEFAULT (0),
         CustomTitle   NVARCHAR(500)     NULL,
-        ImagePath     NVARCHAR(500)     NULL, -- legacy fallback; new uploads use ImageData
-        ImageData     VARBINARY(MAX)    NULL,
-        ImageContentType NVARCHAR(100)  NULL,
+        ImagePath     NVARCHAR(500)     NULL, -- RULE: anh luu FILE tren server, DB chi giu duong dan (~/Content/view360-featured/...)
         ImageFileName NVARCHAR(255)     NULL,
         UpdatedAt     DATETIME          NOT NULL CONSTRAINT DF_V360FS_UpdAt DEFAULT (GETDATE()),
         UpdatedBy     INT               NULL,
@@ -109,21 +107,23 @@ BEGIN
 END
 GO
 
--- Existing deployments: add DB-backed featured image columns without dropping legacy ImagePath.
-IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageData') IS NULL
+-- RULE: anh featured luu FILE tren server (DB chi giu ImagePath). DROP cot BLOB cu neu ton tai.
+-- (Idempotent: chi drop khi cot con; DB moi tao theo CREATE phia tren khong co cot nay.)
+IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageData') IS NOT NULL
 BEGIN
-    ALTER TABLE dbo.V360_FeaturedScene ADD ImageData VARBINARY(MAX) NULL;
-    PRINT '[1] Added V360_FeaturedScene.ImageData';
+    ALTER TABLE dbo.V360_FeaturedScene DROP COLUMN ImageData;
+    PRINT '[1] Dropped V360_FeaturedScene.ImageData (BLOB -> file storage)';
 END
 GO
 
-IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageContentType') IS NULL
+IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageContentType') IS NOT NULL
 BEGIN
-    ALTER TABLE dbo.V360_FeaturedScene ADD ImageContentType NVARCHAR(100) NULL;
-    PRINT '[1] Added V360_FeaturedScene.ImageContentType';
+    ALTER TABLE dbo.V360_FeaturedScene DROP COLUMN ImageContentType;
+    PRINT '[1] Dropped V360_FeaturedScene.ImageContentType';
 END
 GO
 
+-- ImageFileName: van giu (luu ten file goc). Them neu DB cu chua co.
 IF COL_LENGTH('dbo.V360_FeaturedScene', 'ImageFileName') IS NULL
 BEGIN
     ALTER TABLE dbo.V360_FeaturedScene ADD ImageFileName NVARCHAR(255) NULL;

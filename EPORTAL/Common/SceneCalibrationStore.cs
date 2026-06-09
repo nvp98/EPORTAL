@@ -40,10 +40,8 @@ namespace EPORTAL.Common
 
     public class FeaturedSceneImage
     {
-        public byte[]   Data            { get; set; }
-        public string   ContentType     { get; set; }
         public string   FileName        { get; set; }
-        public string   LegacyImagePath { get; set; }
+        public string   LegacyImagePath { get; set; }   // duong dan file tren server (~/Content/view360-featured/...)
         public DateTime UpdatedAt       { get; set; }
     }
 
@@ -334,7 +332,7 @@ WHEN NOT MATCHED THEN
                 using (var conn = OpenConnection())
                 using (var cmd = new SqlCommand(
                     @"SELECT SceneUuid, DisplayOrder, CustomTitle, ImagePath,
-                             CASE WHEN DATALENGTH(ImageData) > 0 OR NULLIF(ImagePath, N'') IS NOT NULL
+                             CASE WHEN NULLIF(ImagePath, N'') IS NOT NULL
                                   THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS HasImage,
                              UpdatedAt
                       FROM dbo.V360_FeaturedScene
@@ -456,7 +454,7 @@ WHERE F.CollectionId=@cid
             {
                 using (var conn = OpenConnection())
                 using (var cmd = new SqlCommand(@"
-SELECT ImageData, ImageContentType, ImageFileName, ImagePath, UpdatedAt
+SELECT ImageFileName, ImagePath, UpdatedAt
 FROM dbo.V360_FeaturedScene
 WHERE CollectionId=@cid AND SceneUuid=@u;", conn))
                 {
@@ -467,11 +465,9 @@ WHERE CollectionId=@cid AND SceneUuid=@u;", conn))
                         if (!rd.Read()) return null;
                         return new FeaturedSceneImage
                         {
-                            Data            = rd.IsDBNull(0) ? null : (byte[])rd.GetValue(0),
-                            ContentType     = rd.IsDBNull(1) ? null : rd.GetString(1),
-                            FileName        = rd.IsDBNull(2) ? null : rd.GetString(2),
-                            LegacyImagePath = rd.IsDBNull(3) ? null : rd.GetString(3),
-                            UpdatedAt       = rd.GetDateTime(4)
+                            FileName        = rd.IsDBNull(0) ? null : rd.GetString(0),
+                            LegacyImagePath = rd.IsDBNull(1) ? null : rd.GetString(1),
+                            UpdatedAt       = rd.GetDateTime(2)
                         };
                     }
                 }
@@ -483,13 +479,12 @@ WHERE CollectionId=@cid AND SceneUuid=@u;", conn))
             }
         }
 
-        public static bool SaveFeaturedImage(string collectionId, string sceneUuid, byte[] data,
-            string contentType, string fileName)
+        // RULE: anh featured luu thanh FILE tren server, DB chi giu DUONG DAN (ImagePath).
+        public static bool SaveFeaturedImagePath(string collectionId, string sceneUuid, string imagePath, string fileName)
         {
             if (string.IsNullOrEmpty(collectionId) || collectionId.Length > 50
                 || string.IsNullOrEmpty(sceneUuid) || sceneUuid.Length > 100
-                || data == null || data.Length == 0
-                || string.IsNullOrEmpty(contentType) || contentType.Length > 100)
+                || string.IsNullOrEmpty(imagePath) || imagePath.Length > 500)
                 return false;
 
             EnsureLegacyImported();
@@ -504,16 +499,14 @@ MERGE dbo.V360_FeaturedScene AS T
 USING (SELECT @cid AS CollectionId, @u AS SceneUuid) AS S
   ON T.CollectionId = S.CollectionId AND T.SceneUuid = S.SceneUuid
 WHEN MATCHED THEN
-    UPDATE SET ImageData=@data, ImageContentType=@contentType, ImageFileName=@fileName,
-               ImagePath=NULL, UpdatedAt=GETDATE()
+    UPDATE SET ImagePath=@path, ImageFileName=@fileName, UpdatedAt=GETDATE()
 WHEN NOT MATCHED THEN
-    INSERT (CollectionId, SceneUuid, DisplayOrder, ImageData, ImageContentType, ImageFileName, UpdatedAt)
-    VALUES (@cid, @u, @ord, @data, @contentType, @fileName, GETDATE());", conn))
+    INSERT (CollectionId, SceneUuid, DisplayOrder, ImagePath, ImageFileName, UpdatedAt)
+    VALUES (@cid, @u, @ord, @path, @fileName, GETDATE());", conn))
                 {
                     cmd.Parameters.Add("@cid", SqlDbType.NVarChar, 50).Value = collectionId;
                     cmd.Parameters.Add("@u", SqlDbType.NVarChar, 100).Value = sceneUuid;
-                    cmd.Parameters.Add("@data", SqlDbType.VarBinary, -1).Value = data;
-                    cmd.Parameters.Add("@contentType", SqlDbType.NVarChar, 100).Value = contentType;
+                    cmd.Parameters.Add("@path", SqlDbType.NVarChar, 500).Value = imagePath;
                     cmd.Parameters.Add("@fileName", SqlDbType.NVarChar, 255).Value =
                         string.IsNullOrEmpty(fileName) ? (object)DBNull.Value : fileName;
                     cmd.ExecuteNonQuery();
@@ -522,7 +515,7 @@ WHEN NOT MATCHED THEN
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.SaveFeaturedImage] " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.SaveFeaturedImagePath] " + ex.Message);
                 return false;
             }
         }
