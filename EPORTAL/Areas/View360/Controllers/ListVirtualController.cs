@@ -552,24 +552,20 @@ namespace EPORTAL.Areas.View360.Controllers
                     var byUuid = scenes
                         .Where(s => !string.IsNullOrEmpty(s.Uuid))
                         .GroupBy(s => s.Uuid).ToDictionary(g => g.Key, g => g.First());
-                    // Title priority: ten rieng cua featured card -> calibration title
-                    //                 -> Kuula scene title -> "Khu vuc".
+                    // Title priority: calibration.CustomTitle (chung voi tooltip minimap)
+                    //                 -> Kuula scene.Title -> "Khu vuc".
                     var calib = SceneCalibrationStore.Get(collectionId);
                     foreach (var f in saved)
                     {
                         KuulaCollectionFetcher.SceneInfo sc;
                         byUuid.TryGetValue(f.SceneUuid, out sc);
-                        string title = f.CustomTitle;
+                        string title = null;
                         SceneCalibration cal;
-                        if (string.IsNullOrWhiteSpace(title)
-                            && calib.TryGetValue(f.SceneUuid, out cal)
-                            && !string.IsNullOrWhiteSpace(cal.CustomTitle))
+                        if (calib.TryGetValue(f.SceneUuid, out cal) && !string.IsNullOrEmpty(cal.CustomTitle))
                             title = cal.CustomTitle;
-                        if (string.IsNullOrWhiteSpace(title)
-                            && sc != null
-                            && !string.IsNullOrWhiteSpace(sc.Title))
+                        if (string.IsNullOrEmpty(title) && sc != null && !string.IsNullOrEmpty(sc.Title))
                             title = sc.Title;
-                        if (string.IsNullOrWhiteSpace(title)) title = "Khu vực";
+                        if (string.IsNullOrEmpty(title)) title = "Khu vực";
 
                         // Deep-link: pass scene uuid - Details.cshtml JS se postMessage('load')
                         // sau khi iframe ban tin 'frameloaded' (giong minimap pin click).
