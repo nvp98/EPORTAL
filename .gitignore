@@ -49,3 +49,6 @@ dist/
 
 # Bỏ theo dõi thư mục package
 packages/
+
+# Local/production secrets
+.env
