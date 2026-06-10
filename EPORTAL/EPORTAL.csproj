@@ -3733,6 +3733,7 @@
     <Content Include="Content\assets\font-awesome\scss\_screen-reader.scss" />
     <Content Include="Content\assets\font-awesome\scss\_stacked.scss" />
     <Content Include="Content\assets\font-awesome\scss\_variables.scss" />
+    <Content Include="Content\assets\fonts\AvenirLTStd-Black.ttf" />
     <Content Include="Content\assets\fonts\fa-solid-900.eot" />
     <Content Include="Content\assets\fonts\fa-solid-900.ttf" />
     <Content Include="Content\assets\fonts\fa-solid-900.woff" />
