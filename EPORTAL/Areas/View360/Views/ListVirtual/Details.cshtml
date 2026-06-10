@@ -87,8 +87,8 @@
 }
 @* Leaflet for real-GPS minimap with satellite tiles. Self-host (~/Content/leaflet) thay vi unpkg CDN
    de prod khong phu thuoc internet ben ngoai (corporate firewall co the chan unpkg). *@
-<link rel="stylesheet" href="~/Content/leaflet/leaflet.css" />
-<script src="~/Content/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="@Url.Content("~/Content/leaflet/leaflet.css")?v=1.9.4" />
+<script src="@Url.Content("~/Content/leaflet/leaflet.js")?v=1.9.4"></script>
 
 <div class="app-main__outer v360-app-outer">
     <div class="app-main__inner v360-app-inner" style="padding:0;">
