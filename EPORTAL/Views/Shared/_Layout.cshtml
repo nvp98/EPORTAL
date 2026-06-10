@@ -1,6 +1,10 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    @{
+        var currentArea = Convert.ToString(ViewContext.RouteData.DataTokens["area"]);
+        var useModernLayout = string.Equals(currentArea, "View360", StringComparison.OrdinalIgnoreCase);
+    }
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="en">
@@ -10,7 +14,10 @@
     <meta name="description" content="This is an example dashboard created using build-in elements and components.">
     <meta name="msapplication-tap-highlight" content="no">
     <link href="~/Content/main.css" rel="stylesheet" />
-    <link href="~/Content/layout-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+    @if (useModernLayout)
+    {
+        <link href="~/Content/layout-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+    }
     <script src="~/Content/assets/plotly-latest.min.js"></script>
     <script src="~/Content/jquery-3.0.0.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
