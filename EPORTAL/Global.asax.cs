@@ -21,7 +21,7 @@ namespace EPORTAL
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
 
-        // Load `.env` file tu solution root (1 cap tren ~/) -> process env vars.
+        // Load `.env` tu thu muc ung dung (cung cap Global.asax/Web.config) -> process env vars.
         // Format don gian: KEY=value moi dong, # = comment. Khong overwrite var da co
         // (he thong > .env -> deploy co the dat qua IIS app pool / system env).
         private static void LoadDotEnv()
@@ -30,10 +30,11 @@ namespace EPORTAL
             {
                 var appRoot = HostingEnvironment.ApplicationPhysicalPath;
                 if (string.IsNullOrEmpty(appRoot)) return;
-                // Try ./../.env (solution root) first, then ./.env (project root fallback)
+                // Production dat .env trong application root. Thu muc cha chi la fallback
+                // cho cac may local cu dang dat .env o solution root.
                 var candidates = new[] {
-                    Path.Combine(appRoot, "..", ".env"),
-                    Path.Combine(appRoot, ".env")
+                    Path.Combine(appRoot, ".env"),
+                    Path.GetFullPath(Path.Combine(appRoot, "..", ".env"))
                 };
                 foreach (var path in candidates)
                 {
@@ -45,7 +46,7 @@ namespace EPORTAL
                         var eq = line.IndexOf('=');
                         if (eq <= 0) continue;
                         var key = line.Substring(0, eq).Trim();
-                        var val = line.Substring(eq + 1).Trim();
+                        var val = ParseDotEnvValue(line.Substring(eq + 1));
                         if (val.Length >= 2 && ((val[0] == '"' && val[val.Length-1] == '"')
                                               || (val[0] == '\'' && val[val.Length-1] == '\'')))
                             val = val.Substring(1, val.Length - 2);
@@ -59,6 +60,26 @@ namespace EPORTAL
             {
                 System.Diagnostics.Debug.WriteLine("[DotEnv] load err: " + ex.Message);
             }
+        }
+
+        private static string ParseDotEnvValue(string raw)
+        {
+            var value = (raw ?? string.Empty).Trim();
+            char quote = '\0';
+            for (var i = 0; i < value.Length; i++)
+            {
+                var ch = value[i];
+                if ((ch == '"' || ch == '\'') && (i == 0 || value[i - 1] != '\\'))
+                {
+                    if (quote == '\0') quote = ch;
+                    else if (quote == ch) quote = '\0';
+                    continue;
+                }
+
+                if (ch == '#' && quote == '\0' && (i == 0 || char.IsWhiteSpace(value[i - 1])))
+                    return value.Substring(0, i).TrimEnd();
+            }
+            return value;
         }
 
         // Cac endpoint chatbot user-facing (SSE stream + TTS + STT + Realtime) KHONG dung Session
