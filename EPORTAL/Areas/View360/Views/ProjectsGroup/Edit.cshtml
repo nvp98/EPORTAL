@@ -1,4 +1,4 @@
-@model EPORTAL.ModelsView360.ProjectsGroupValidation
+﻿@model EPORTAL.ModelsView360.ProjectsGroupValidation
 @{
     var parentOpts = ViewBag.ParentOptions as List<SelectListItem> ?? new List<SelectListItem>();
     var currentParent = Model != null && Model.ParentIDGroup.HasValue ? Model.ParentIDGroup.Value.ToString() : "";
