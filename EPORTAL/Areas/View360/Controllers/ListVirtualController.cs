@@ -97,6 +97,35 @@ namespace EPORTAL.Areas.View360.Controllers
             }
         }
 
+        private const string FEATURED_DIR = "~/Content/view360-featured/";
+
+        // Lam sach 1 segment (collectionId / sceneUuid) de dung an toan trong ten thu muc/file.
+        private static string SafeSeg(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "_";
+            var sb = new System.Text.StringBuilder(s.Length);
+            foreach (var c in s) sb.Append(char.IsLetterOrDigit(c) || c == '-' || c == '_' ? c : '_');
+            var r = sb.ToString();
+            return r.Length > 80 ? r.Substring(0, 80) : r;
+        }
+
+        // Xoa file featured cu (guard: chi cho phep trong ~/Content/view360-featured/) - tranh rac dia.
+        private void TryDeleteFeaturedFile(string relPath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(relPath)
+                    || !relPath.StartsWith(FEATURED_DIR, StringComparison.OrdinalIgnoreCase)) return;
+                var root = System.IO.Path.GetFullPath(Server.MapPath(FEATURED_DIR));
+                var full = System.IO.Path.GetFullPath(Server.MapPath(relPath));
+                var prefix = root.TrimEnd(System.IO.Path.DirectorySeparatorChar,
+                    System.IO.Path.AltDirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
+                if (!full.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return;
+                if (System.IO.File.Exists(full)) System.IO.File.Delete(full);
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("[FeaturedImage] delete old file err: " + ex.Message); }
+        }
+
         private static void PopulateFeaturedImageUrls(Controller ctrl, string collectionId,
             IEnumerable<FeaturedScene> items)
         {
@@ -104,6 +133,8 @@ namespace EPORTAL.Areas.View360.Controllers
             foreach (var item in items)
             {
                 if (item == null || !item.HasImage || string.IsNullOrEmpty(item.SceneUuid)) continue;
+                // Serve qua action FeaturedImage (action doc FILE tren server hoac BLOB cu, tu set
+                // content-type + cache 1 ngay) -> khong phu thuoc MIME map IIS (vd .webp), khong sua Web.config.
                 item.ImageUrl = ctrl.Url.Action("FeaturedImage", "ListVirtual", new
                 {
                     area = "View360",
@@ -664,14 +695,37 @@ namespace EPORTAL.Areas.View360.Controllers
             if (!IsValidFeaturedImage(imageData, ext))
                 return Json(new { ok = false, error = "file khong phai anh hop le hoac khong khop extension" });
 
-            var contentType = FeaturedImageContentType(ext);
             var fileName = System.IO.Path.GetFileName(file.FileName);
             if (string.IsNullOrEmpty(fileName)) fileName = "featured" + ext;
             if (fileName.Length > 255) fileName = fileName.Substring(fileName.Length - 255);
 
-            if (!SceneCalibrationStore.SaveFeaturedImage(
-                collectionId, sceneUuid, imageData, contentType, fileName))
+            // RULE: luu ANH thanh FILE tren server, DB chi giu DUONG DAN (khong luu BLOB vao DB).
+            var relDir  = FEATURED_DIR + SafeSeg(collectionId);
+            var storedName = SafeSeg(sceneUuid) + "_" + DateTime.UtcNow.Ticks + ext;
+            var relPath = relDir + "/" + storedName;
+            try
+            {
+                var absDir = Server.MapPath(relDir);
+                if (!System.IO.Directory.Exists(absDir)) System.IO.Directory.CreateDirectory(absDir);
+                System.IO.File.WriteAllBytes(Server.MapPath(relPath), imageData);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[UploadFeaturedImage] write file err: " + ex.Message);
+                return Json(new { ok = false, error = "Không ghi được file ảnh lên server (kiểm tra quyền ghi thư mục Content/view360-featured)" });
+            }
+
+            // Xoa file cu (neu lan truoc cung luu file) -> tranh rac.
+            var oldImg = SceneCalibrationStore.GetFeaturedImage(collectionId, sceneUuid);
+            if (oldImg != null && !string.IsNullOrEmpty(oldImg.LegacyImagePath)
+                && !oldImg.LegacyImagePath.Equals(relPath, StringComparison.OrdinalIgnoreCase))
+                TryDeleteFeaturedFile(oldImg.LegacyImagePath);
+
+            if (!SceneCalibrationStore.SaveFeaturedImagePath(collectionId, sceneUuid, relPath, fileName))
+            {
+                TryDeleteFeaturedFile(relPath);   // rollback file vua ghi
                 return Json(new { ok = false, error = "DB save failed" });
+            }
 
             var imageUrl = Url.Action("FeaturedImage", "ListVirtual", new
             {
@@ -691,35 +745,20 @@ namespace EPORTAL.Areas.View360.Controllers
                 return HttpNotFound();
 
             var image = SceneCalibrationStore.GetFeaturedImage(collectionId, sceneUuid);
-            if (image == null) return HttpNotFound();
+            if (image == null || string.IsNullOrEmpty(image.LegacyImagePath)) return HttpNotFound();
 
-            if (image.Data == null || image.Data.Length == 0)
-            {
-                byte[] legacyData;
-                string legacyContentType;
-                string legacyFileName;
-                if (!TryReadLegacyFeaturedImage(
-                    image.LegacyImagePath, out legacyData, out legacyContentType, out legacyFileName))
-                    return HttpNotFound();
-
-                image.Data = legacyData;
-                image.ContentType = legacyContentType;
-                image.FileName = legacyFileName;
-
-                // Lazy one-time migration: after this succeeds the row no longer depends on server files.
-                SceneCalibrationStore.SaveFeaturedImage(
-                    collectionId, sceneUuid, legacyData, legacyContentType, legacyFileName);
-            }
-
-            var contentType = image.ContentType;
-            if (contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/webp")
-                contentType = FeaturedImageContentType(System.IO.Path.GetExtension(image.FileName));
+            // RULE: anh luu FILE tren server -> doc file tu duong dan (ImagePath) roi serve. KHONG co BLOB trong DB.
+            byte[] data;
+            string contentType;
+            string fileName;
+            if (!TryReadLegacyFeaturedImage(image.LegacyImagePath, out data, out contentType, out fileName))
+                return HttpNotFound();
             if (string.IsNullOrEmpty(contentType)) contentType = "application/octet-stream";
 
             Response.Cache.SetCacheability(HttpCacheability.Public);
             Response.Cache.SetMaxAge(TimeSpan.FromDays(1));
             Response.Cache.SetSlidingExpiration(false);
-            return File(image.Data, contentType);
+            return File(data, contentType);
         }
 
     }
