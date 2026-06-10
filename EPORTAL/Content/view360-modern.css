@@ -456,8 +456,9 @@ html:has(.v360-intro), body:has(.v360-intro) {
     font-size: clamp(10px, 1.4cqh, 14px);
     letter-spacing: 0.4px;
     text-transform: uppercase;
-    line-height: 1.2;
+    line-height: 1.45;              /* 1.2 -> 1.45: du khong gian cho dau thanh tieng Viet (sac, huyen, hoi, nga) */
     text-shadow: 0 2px 6px rgba(0,0,0,0.55);
+    padding-top: 0.15em;            /* extra safety cho diacritics uppercase (A, O, E...) */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -983,8 +984,9 @@ html:has(.v360-intro), body:has(.v360-intro) {
     font-size: clamp(11px, 0.82vw, 14px);
     letter-spacing: 0.3px;
     text-transform: uppercase;
-    line-height: 1.25;
+    line-height: 1.45;              /* 1.25 -> 1.45: du khong gian cho dau thanh tieng Viet */
     text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    padding-top: 0.15em;            /* extra safety cho diacritics uppercase */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
