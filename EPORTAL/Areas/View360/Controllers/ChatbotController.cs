@@ -610,7 +610,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         Response.StatusCode = (int)resp.StatusCode;
                         Response.ContentType = "application/json";
                         return Content("{\"error\":\"VBee " + (int)resp.StatusCode + "\",\"detail\":"
-                            + JsonConvert.SerializeObject(err) + "}", "application/json");
+                            + JsonConvert.SerializeObject(ExternalContentGuard.SafeErrorDetail(err)) + "}", "application/json");
                     }
 
                     return await ReturnVbeeTtsAudio(http, resp, "[Speak/VBee]", voiceCode, speed, text);
@@ -691,7 +691,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 Response.StatusCode = (int)resp.StatusCode;
                 Response.ContentType = "application/json";
                 return Content("{\"error\":\"VBee async " + (int)resp.StatusCode + "\",\"detail\":"
-                    + JsonConvert.SerializeObject(respBody) + "}", "application/json");
+                    + JsonConvert.SerializeObject(ExternalContentGuard.SafeErrorDetail(respBody)) + "}", "application/json");
             }
 
             var j = JObject.Parse(respBody);
@@ -701,7 +701,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 Response.StatusCode = 502;
                 Response.ContentType = "application/json";
                 return Content("{\"error\":\"VBee async response missing requestId\",\"detail\":"
-                    + JsonConvert.SerializeObject(respBody) + "}", "application/json");
+                    + JsonConvert.SerializeObject(ExternalContentGuard.SafeErrorDetail(respBody)) + "}", "application/json");
             }
 
             int maxPollSeconds = ChatbotConfig.GetInt("CHATBOT_VBEE_ASYNC_POLL_SECONDS", "Chatbot.VbeeAsyncPollSeconds", 60);
@@ -733,12 +733,28 @@ namespace EPORTAL.Areas.View360.Controllers
                              ?? (string)pj["data"]?["audio_link"];
                 if (!string.IsNullOrEmpty(audioLink))
                 {
+                    // Guard SSRF: audioLink tu response ngoai - chi fetch HTTPS toi host public
+                    // (khong cho tro ve IP noi bo/localhost; siet them qua CHATBOT_VBEE_AUDIO_HOSTS).
+                    if (!ExternalContentGuard.IsSafeAudioUrl(audioLink))
+                    {
+                        System.Diagnostics.Debug.WriteLine("[Speak/VBee async] audioLink BI CHAN (SSRF guard): " + audioLink);
+                        Response.StatusCode = 502;
+                        return Content("{\"error\":\"VBee audioLink rejected\"}", "application/json");
+                    }
                     var audioRes = await http.GetAsync(audioLink);
                     var audioBytes = await audioRes.Content.ReadAsByteArrayAsync();
                     if (!audioRes.IsSuccessStatusCode || audioBytes.Length == 0)
                     {
                         Response.StatusCode = 502;
                         return Content("{\"error\":\"VBee audioLink fetch failed\"}", "application/json");
+                    }
+                    // Guard noi dung: phai dung la MP3 (magic bytes) + duoi nguong kich thuoc
+                    // truoc khi cache DB va phat cho moi user.
+                    if (!ExternalContentGuard.IsLikelyMp3(audioBytes))
+                    {
+                        System.Diagnostics.Debug.WriteLine("[Speak/VBee async] bytes KHONG phai MP3 hop le, bo qua. len=" + audioBytes.Length);
+                        Response.StatusCode = 502;
+                        return Content("{\"error\":\"VBee audio invalid\"}", "application/json");
                     }
                     System.Diagnostics.Debug.WriteLine("[Speak/VBee async] OK bytes=" + audioBytes.Length);
                     AudioCacheStore.Save(AudioCacheStore.HashFor(voiceCode, speed, text), voiceCode, speed, text, audioBytes);
@@ -749,7 +765,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     Response.StatusCode = 502;
                     Response.ContentType = "application/json";
                     return Content("{\"error\":\"VBee async failed\",\"detail\":"
-                        + JsonConvert.SerializeObject(pollBody) + "}", "application/json");
+                        + JsonConvert.SerializeObject(ExternalContentGuard.SafeErrorDetail(pollBody)) + "}", "application/json");
                 }
             }
 
@@ -768,6 +784,14 @@ namespace EPORTAL.Areas.View360.Controllers
             if (contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase))
             {
                 var audio = await resp.Content.ReadAsByteArrayAsync();
+                // Guard noi dung: header noi audio nhung bytes phai dung la MP3 + duoi nguong
+                // kich thuoc -> moi duoc cache DB va phat cho user.
+                if (!ExternalContentGuard.IsLikelyMp3(audio))
+                {
+                    System.Diagnostics.Debug.WriteLine(logPrefix + " bytes KHONG phai MP3 hop le, bo qua. len=" + (audio?.Length ?? 0));
+                    Response.StatusCode = 502;
+                    return Content("{\"error\":\"VBee audio invalid\"}", "application/json");
+                }
                 System.Diagnostics.Debug.WriteLine(logPrefix + " OK direct audio bytes=" + audio.Length);
                 AudioCacheStore.Save(AudioCacheStore.HashFor(voiceCode, speed, text), voiceCode, speed, text, audio);
                 return new FileContentResult(audio, "audio/mpeg");
@@ -787,8 +811,24 @@ namespace EPORTAL.Areas.View360.Controllers
                     + JsonConvert.SerializeObject(respBody) + "}", "application/json");
             }
 
+            // Guard SSRF: audio_link tu response ngoai - chi fetch HTTPS toi host public.
+            if (!ExternalContentGuard.IsSafeAudioUrl(audioLink))
+            {
+                System.Diagnostics.Debug.WriteLine(logPrefix + " audio_link BI CHAN (SSRF guard): " + audioLink);
+                Response.StatusCode = 502;
+                Response.ContentType = "application/json";
+                return Content("{\"error\":\"VBee audio_link rejected\"}", "application/json");
+            }
             var audioRes = await http.GetAsync(audioLink);
             var audioBytes = await audioRes.Content.ReadAsByteArrayAsync();
+            // Guard noi dung: phai dung la MP3 truoc khi cache + phat.
+            if (!audioRes.IsSuccessStatusCode || !ExternalContentGuard.IsLikelyMp3(audioBytes))
+            {
+                System.Diagnostics.Debug.WriteLine(logPrefix + " audio via link KHONG hop le. status=" + (int)audioRes.StatusCode + " len=" + (audioBytes?.Length ?? 0));
+                Response.StatusCode = 502;
+                Response.ContentType = "application/json";
+                return Content("{\"error\":\"VBee audio invalid\"}", "application/json");
+            }
             System.Diagnostics.Debug.WriteLine(logPrefix + " OK via link bytes=" + audioBytes.Length);
             AudioCacheStore.Save(AudioCacheStore.HashFor(voiceCode, speed, text), voiceCode, speed, text, audioBytes);
             return new FileContentResult(audioBytes, "audio/mpeg");
@@ -875,7 +915,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         if (!resp.IsSuccessStatusCode)
                         {
                             System.Diagnostics.Debug.WriteLine("[Transcribe/VBee] " + (int)resp.StatusCode + " " + respBody);
-                            return Json(new { ok = false, error = "VBee " + (int)resp.StatusCode + ": " + TruncateForLog(respBody), debugAudio = debugAudio });
+                            return Json(new { ok = false, error = "VBee " + (int)resp.StatusCode + ": " + ExternalContentGuard.SafeErrorDetail(respBody), debugAudio = debugAudio });
                         }
                         var j = JObject.Parse(respBody);
                         // Tim transcript - thu nhieu field name variations
@@ -888,8 +928,10 @@ namespace EPORTAL.Areas.View360.Controllers
                         if (string.IsNullOrEmpty(transcript))
                         {
                             System.Diagnostics.Debug.WriteLine("[Transcribe/VBee] khong tim thay transcript: " + respBody);
-                            return Json(new { ok = false, error = "Khong tim thay transcript", raw = TruncateForLog(respBody), debugAudio = debugAudio });
+                            return Json(new { ok = false, error = "Khong tim thay transcript", raw = ExternalContentGuard.SafeErrorDetail(respBody), debugAudio = debugAudio });
                         }
+                        // Guard: transcript tu dich vu ngoai - loc ky tu dieu khien/an + cap do dai.
+                        transcript = ExternalContentGuard.SanitizeText(transcript, ExternalContentGuard.MAX_TRANSCRIPT_CHARS);
                         return Json(new { ok = true, transcript = transcript, debugAudio = debugAudio });
                     }
                 }
@@ -1353,8 +1395,12 @@ namespace EPORTAL.Areas.View360.Controllers
                 {
                     var args = JObject.Parse(argsJson ?? "{}");
                     // Tool moi: `scene` = ten chinh xac tu enum. Fallback `query` (tool cu).
-                    var scene = (string)args["scene"] ?? (string)args["query"];
-                    var reason = (string)args["reason"];
+                    // Guard: gia tri tu model - loc ky tu dieu khien/an + cap do dai truoc khi
+                    // dung lam text hien thi / lookup.
+                    var scene = ExternalContentGuard.SanitizeText(
+                        (string)args["scene"] ?? (string)args["query"], ExternalContentGuard.MAX_ACTION_CHARS);
+                    var reason = ExternalContentGuard.SanitizeText(
+                        (string)args["reason"], ExternalContentGuard.MAX_REASON_CHARS);
                     if (string.IsNullOrEmpty(scene)) return;
 
                     // Uu tien lookup ten chinh xac -> uuid; neu lech thi FindSceneByQuery (fuzzy) lam luoi do.
@@ -1376,7 +1422,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         System.Diagnostics.Debug.WriteLine("[AskStream] navigate '" + scene + "' -> " + mUuid + " (" + mName + ")");
 
                         // Bubble text: dung reason; them ten thuc te neu khac
-                        var bubbleText = reason ?? "Đang đưa bạn tới điểm đó.";
+                        var bubbleText = !string.IsNullOrEmpty(reason) ? reason : "Đang đưa bạn tới điểm đó.";
                         if (fullText.Length == 0)
                         {
                             fullText.Append(bubbleText);

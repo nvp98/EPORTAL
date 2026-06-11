@@ -1040,6 +1040,7 @@
     <Compile Include="Common\ServiceHealth.cs" />
     <Compile Include="Common\ChatbotContentStore.cs" />
     <Compile Include="Common\AudioCacheStore.cs" />
+    <Compile Include="Common\ExternalContentGuard.cs" />
     <Compile Include="Common\KnowledgeStore.cs" />
     <Compile Include="Common\OpenAIEmbeddingClient.cs" />
     <Compile Include="Common\ChatbotCurator.cs" />
