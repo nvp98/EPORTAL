@@ -130,7 +130,15 @@
         stage.classList.remove('cb-open');
         sessionStorage.setItem('v360cb_open', '0');
         // Dong panel -> tat mic ngay (rieng tu + tranh thu am khi khong dung).
-        if (MODE === 'voice' && typeof pttCleanup === 'function') pttCleanup();
+        // Dung CA realtime (OpenAI WebRTC: RTCPeerConnection + mic stream + timer 3 phut)
+        // lan VBee PTT. Truoc day chi goi pttCleanup -> dong panel khong qua nut close
+        // (FAB toggle / restore) lam ro ri mic + peer connection.
+        if (MODE === 'voice') {
+            if (voiceState !== 'idle' && typeof stopVoice === 'function') { try { stopVoice(); } catch (_) {} }
+            if (typeof pttCleanup === 'function') { try { pttCleanup(); } catch (_) {} }
+        }
+        // Dung audio TTS dang phat khi dong panel (tranh bot doc tiep + leak).
+        stopTtsAudio();
         triggerLeafletRelayout();
     }
     fab.addEventListener('click', openPanel);
@@ -1359,6 +1367,17 @@
 
         function ensureBubble() { if (!bubble) { removeTyping(); bubble = createStreamingBubble(); } }
 
+        // Revoke MOI blob URL audio da settle (current + prefetch chua phat). Goi khi ket thuc/huy
+        // de tranh leak: truoc day autoplay-blocked / finalize bo qua cac seg da prefetch -> blob
+        // audio khong duoc giai phong, tich luy MB qua moi luot dung giong noi.
+        function revokeSegUrls() {
+            segs.forEach(function (sg) {
+                if (sg && sg.audio) sg.audio.then(function (u) {
+                    if (u) { try { URL.revokeObjectURL(u); } catch (_) {} }
+                });
+            });
+        }
+
         // Tach 1 cau hoan chinh tu speakBuf (boundary: . ! ? … + space, hoac newline).
         function popSentence(force) {
             if (!speakBuf) return null;
@@ -1487,6 +1506,9 @@
             if (finalized) return;
             finalized = true;
             if (ttsRevealTicker) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; }
+            // Dung + giai phong audio dang phat va MOI seg da prefetch (chong leak blob/timer).
+            if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (_) {} }
+            revokeSegUrls();
             ensureBubble();
             bubble.setText(revealedBase || fallbackFull);
             bubble.finalize(endMeta.navTarget, endMeta.navName);
@@ -1544,9 +1566,7 @@
                 cancelled = true;
                 if (ttsRevealTicker) { clearInterval(ttsRevealTicker); ttsRevealTicker = null; }
                 if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (_) {} ttsAudioEl = null; }
-                segs.forEach(function (sg) {
-                    if (sg.audio) sg.audio.then(function (u) { if (u) { try { URL.revokeObjectURL(u); } catch (_) {} } });
-                });
+                revokeSegUrls();
                 setKuulaMuted(false);
             }
         };
