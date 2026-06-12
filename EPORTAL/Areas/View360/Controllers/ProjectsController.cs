@@ -643,25 +643,24 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public int countListAuthorization(int id)
         {
-            var rs = (from a in db.AuthorizationUSERs.Where(a => a.ProjectID == id)
-                      join b in db.NhanViens on a.NhanVienID equals b.ID
-                      select new AuthorizationUSERValidation
-                      {
-                          ID = a.ID,
-                          NhanVienID = b.ID,
-                          ProjectID = (int)a.ProjectID,
-                          Createdate = (DateTime)a.Createdate,
-                          MaNV = b.MaNV,
-                          HoTen = b.HoTen
-                      }).ToList().Count();
-
-            return rs;
+            // COUNT truc tiep tren DB (truoc day ToList() ca bang join roi moi .Count() trong RAM).
+            // Join NhanVien de chi dem quyen tro toi nhan vien con ton tai.
+            return (from a in db.AuthorizationUSERs.Where(a => a.ProjectID == id)
+                    join b in db.NhanViens on a.NhanVienID equals b.ID
+                    select a.ID).Count();
         }
         // ==================================================================
         //  "NGUOI DUOC XEM" - loai tru quyen xem theo TUNG du an
         //  (bang AuthorizationUSER_Exclude - deny-list phu len group/file-grant).
         //  KHONG dung den du lieu phan quyen o View360/Permission: user giu nguyen
         //  group-grant, chi rieng du an bi exclude la an di (SP _select_USER loc).
+        //
+        //  VI SAO RAW SQL (Database.SqlQuery/ExecuteSqlCommand) o cac method duoi:
+        //   - AuthorizationUSER_Exclude la BANG MOI, chua map vao EDMX -> khong co db.* (EF) de goi.
+        //   - ViewersList con UNION file-grant + group-grant (gom ca to tien Recursive) + dedupe theo
+        //     MaNV; IncludeViewer/Details guard phai resolve TAT CA NhanVienID cung MaNV (data trung
+        //     MaNV) -> cau co self-join NhanVien, kho/khong gon neu lam bang LINQ.
+        //   - Moi tham so qua SqlParameter -> khong injection.
         // ==================================================================
 
         /// <summary>Danh sach nguoi dang duoc xem du an (tu file-grant + group-grant phu du an).</summary>
@@ -882,6 +881,15 @@ namespace EPORTAL.Areas.View360.Controllers
                 else { ViewBag.PGList = new SelectList(listpg, "IDGroup", "GroupName"); }
                 if (list_Projects.Count > 0)
                 {
+                    // Dem so quyen theo TUNG du an bang 1 query gom nhom (tranh N+1: truoc day goi
+                    // countListAuthorization() moi du an -> moi lan ToList().Count() ca bang join).
+                    var projIds = list_Projects.Select(x => x.ID).ToList();
+                    var authCounts = db.AuthorizationUSERs
+                        .Where(a => a.ProjectID.HasValue && projIds.Contains(a.ProjectID.Value))
+                        .GroupBy(a => a.ProjectID.Value)
+                        .Select(g => new { ProjectID = g.Key, C = g.Count() })
+                        .ToDictionary(x => x.ProjectID, x => x.C);
+
                     int row = 2, rowlast = 2, stt = 0;
                     foreach (var item in list_Projects)
                     {
@@ -919,7 +927,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         Worksheet.Cell("E" + row).Style.Alignment.WrapText = true;
 
 
-                        Worksheet.Cell("F" + row).Value = countListAuthorization(item.ID);
+                        Worksheet.Cell("F" + row).Value = authCounts.TryGetValue(item.ID, out var ac) ? ac : 0;
                         Worksheet.Cell("F" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.WrapText = true;
@@ -1073,6 +1081,17 @@ namespace EPORTAL.Areas.View360.Controllers
             };
             walk(rootNode);
             return allowed;
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

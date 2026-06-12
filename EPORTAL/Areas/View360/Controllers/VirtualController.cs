@@ -493,19 +493,10 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public int countListAuthorization(int id)
         {
-            var rs = (from a in db.AuthorizationVituals.Where(a => a.VirtualID == id)
-                      join b in db.NhanViens on a.NhanVienID equals b.ID
-                      select new AuthorizationVirtualValidation
-                      {
-                          ID = a.ID,
-                          NhanVienID = b.ID,
-                          VirtualID = (int)a.VirtualID,
-                          Createdate = (DateTime)a.Createdate,
-                          MaNV = b.MaNV,
-                          HoTen = b.HoTen
-                      }).ToList().Count();
-
-            return rs;
+            // COUNT truc tiep tren DB (truoc day ToList() ca bang join roi moi .Count() trong RAM).
+            return (from a in db.AuthorizationVituals.Where(a => a.VirtualID == id)
+                    join b in db.NhanViens on a.NhanVienID equals b.ID
+                    select a.ID).Count();
         }
         public ActionResult ExportToExcel(String search, string IDGroup)
         {
@@ -549,6 +540,14 @@ namespace EPORTAL.Areas.View360.Controllers
                 else { ViewBag.PGList = new SelectList(listpg, "IDGroup", "GroupName"); }
                 if (list_Projects.Count > 0)
                 {
+                    // Dem quyen theo tung tour bang 1 query gom nhom (tranh N+1 per row).
+                    var virtIds = list_Projects.Select(x => x.ID).ToList();
+                    var authCounts = db.AuthorizationVituals
+                        .Where(a => a.VirtualID.HasValue && virtIds.Contains(a.VirtualID.Value))
+                        .GroupBy(a => a.VirtualID.Value)
+                        .Select(g => new { Id = g.Key, C = g.Count() })
+                        .ToDictionary(x => x.Id, x => x.C);
+
                     int row = 2, rowlast = 2, stt = 0;
                     foreach (var item in list_Projects)
                     {
@@ -586,7 +585,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         Worksheet.Cell("E" + row).Style.Alignment.WrapText = true;
 
 
-                        Worksheet.Cell("F" + row).Value = countListAuthorization(item.ID);
+                        Worksheet.Cell("F" + row).Value = authCounts.TryGetValue(item.ID, out var ac) ? ac : 0;
                         Worksheet.Cell("F" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.WrapText = true;
@@ -713,6 +712,17 @@ namespace EPORTAL.Areas.View360.Controllers
                 return RedirectToAction("Index", "Virtual");
             }
 
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

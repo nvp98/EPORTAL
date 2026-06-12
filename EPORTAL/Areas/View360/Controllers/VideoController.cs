@@ -444,19 +444,10 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public int countListAuthorization(int id)
         {
-            var rs = (from a in db.AuthorizationVideos.Where(a => a.VideoID == id)
-                      join b in db.NhanViens on a.NhanVienID equals b.ID
-                      select new AuthorizationVideoValidation
-                      {
-                          ID = a.ID,
-                          NhanVienID = b.ID,
-                          VideoID = (int)a.VideoID,
-                          Createdate = (DateTime)a.Createdate,
-                          MaNV = b.MaNV,
-                          HoTen = b.HoTen
-                      }).ToList().Count();
-
-            return rs;
+            // COUNT truc tiep tren DB (truoc day ToList() ca bang join roi moi .Count() trong RAM).
+            return (from a in db.AuthorizationVideos.Where(a => a.VideoID == id)
+                    join b in db.NhanViens on a.NhanVienID equals b.ID
+                    select a.ID).Count();
         }
         public ActionResult ExportToExcel(String search, string AlbumID)
         {
@@ -501,6 +492,14 @@ namespace EPORTAL.Areas.View360.Controllers
                 else { ViewBag.ALList = new SelectList(al, "IDAlbum", "TenAlbum"); }
                 if (list_Video.Count > 0)
                 {
+                    // Dem quyen theo tung video bang 1 query gom nhom (tranh N+1 per row).
+                    var videoIds = list_Video.Select(x => x.IDVideo).ToList();
+                    var authCounts = db.AuthorizationVideos
+                        .Where(a => a.VideoID.HasValue && videoIds.Contains(a.VideoID.Value))
+                        .GroupBy(a => a.VideoID.Value)
+                        .Select(g => new { Id = g.Key, C = g.Count() })
+                        .ToDictionary(x => x.Id, x => x.C);
+
                     int row = 2, rowlast = 2, stt = 0;
                     foreach (var item in list_Video)
                     {
@@ -529,7 +528,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         Worksheet.Cell("D" + row).Style.DateFormat.Format = "dd/MM/yyyy";
                         Worksheet.Cell("D" + row).Style.Alignment.WrapText = true;
 
-                        Worksheet.Cell("E" + row).Value = countListAuthorization(item.IDVideo);
+                        Worksheet.Cell("E" + row).Value = authCounts.TryGetValue(item.IDVideo, out var ac) ? ac : 0;
                         Worksheet.Cell("E" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                         Worksheet.Cell("E" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("E" + row).Style.Alignment.WrapText = true;
@@ -655,6 +654,17 @@ namespace EPORTAL.Areas.View360.Controllers
                 return RedirectToAction("Index", "Video");
             }
 
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
