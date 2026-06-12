@@ -419,12 +419,8 @@
                                     Virtual 360°
                                 </a>
                             </li>
-                            <li>
-                                <a id="ListVideo" href="@Url.Action("Index", "Album", new { area = "View360" })">
-                                    <i class="metismenu-icon fa-solid fa-video-camera"></i>
-                                    Video của bạn
-                                </a>
-                            </li>
+                            @* Bo "Video cua ban" (View360/Album) khoi menu theo yeu cau 06/2026.
+                               Trang van ton tai (URL truc tiep) - chi an entry o sidebar. *@
                             <li>
                                 <a id="MyDocument" href="@Url.Action("Index", "MyDocument", new { area = "View360" })">
                                     <i class="metismenu-icon fa fa-folder"></i>

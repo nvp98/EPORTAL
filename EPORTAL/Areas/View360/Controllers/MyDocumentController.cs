@@ -27,7 +27,8 @@ namespace EPORTAL.Areas.View360.Controllers
            listQuyen = db.A_CheckListQuyen(IDQuyenHT, controll).ToList();
         }
         // KHONG cache HTML output - dua vao Session cache SP `L_ThuVienFile_selectbyUser` (per-user inherent).
-        public ActionResult Index(int? page, string search)
+        // id = IDNhom dang chon (tab) - null = tat ca nhom.
+        public ActionResult Index(int? page, string search, int? id)
         {
             if (search == null) search = "";
             ViewBag.search = search;
@@ -62,6 +63,23 @@ namespace EPORTAL.Areas.View360.Controllers
                 if (sess != null) sess[sessKey] = Tuple.Create(DateTime.UtcNow, docList, listNhom);
             }
             ViewBag.listNhom = listNhom;
+
+            // Tabs theo nhom (chi nhom co tai lieu user xem duoc) - giong ListVirtual/ListProject
+            var groupIdsWithDocs = new HashSet<int>(docList.Select(d => d.IDNhom));
+            ViewBag.TabGroups = listNhom
+                .Where(n => groupIdsWithDocs.Contains(n.IDNhom))
+                .Select(n => new TabGroupViewModel
+                {
+                    IDGroup = n.IDNhom,
+                    GroupName = n.TenNhomTV,
+                    Active = id.HasValue && id.Value == n.IDNhom
+                })
+                .ToList();
+            ViewBag.CurrentId = id;
+
+            // Filter theo tab nhom dang chon
+            if (id.HasValue)
+                docList = docList.Where(d => d.IDNhom == id.Value).ToList();
 
             if (page == null) page = 1;
             int pageSize = 30;
