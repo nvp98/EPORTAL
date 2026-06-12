@@ -8,7 +8,8 @@
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.IDGroup)
-    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string))
+    @* Trong code block cua @using: dung "if" tran, KHONG "@if" - Razor parser se vo (HttpParseException -> 500) *@
+    if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string))
     {
         <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
     }
