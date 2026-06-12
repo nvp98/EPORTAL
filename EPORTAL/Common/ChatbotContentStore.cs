@@ -34,6 +34,9 @@ namespace EPORTAL.Common
     /// <summary>
     /// Persist tour-level + scene-level content cho V360 Chatbot AI.
     /// Schema duoc tao boi migration v360-all.sql SECTION 1 (deploy-time).
+    ///
+    /// VI SAO RAW ADO.NET: bang V360_* moi, chua map vao EDMX -> khong query qua EF duoc.
+    /// Pattern store chuan cua View360
     /// </summary>
     public static class ChatbotContentStore
     {

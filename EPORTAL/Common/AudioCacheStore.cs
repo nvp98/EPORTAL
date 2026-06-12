@@ -10,6 +10,9 @@ namespace EPORTAL.Common
     /// Cache audio TTS (VBee) theo hash(voiceCode|speed|text) -> luu DB (V360_ChatbotAudioCache).
     /// Cung text + giong + toc do => cung audio, nen tai dung duoc giua cac user/luot -> BO QUA goi VBee.
     /// (Phase 0 cua plan docs/v360-chatbot-knowledge-cache-plan.md)
+    ///
+    /// VI SAO RAW ADO.NET: bang V360_* moi, chua map vao EDMX -> khong query qua EF duoc.
+    /// Pattern store chuan cua View360
     /// </summary>
     public static class AudioCacheStore
     {

@@ -22,6 +22,9 @@ namespace EPORTAL.Common
     /// Kho Q&A tu hoc (V360_ChatbotKnowledge). Lookup theo embedding (semantic) + QuestionNorm (exact fallback).
     /// Upsert do LLM Curator goi sau moi luot MISS. (Phase 1-3 - knowledge-cache plan)
     /// Moi loi deu nuot (try/catch) -> KHONG bao gio lam vo luong chat.
+    ///
+    /// VI SAO RAW ADO.NET: bang V360_* moi, chua map vao EDMX -> khong query qua EF duoc.
+    /// Pattern store chuan cua View360
     /// </summary>
     public static class KnowledgeStore
     {
