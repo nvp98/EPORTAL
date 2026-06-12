@@ -1,9 +1,10 @@
-﻿
-@{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@{
+    ViewBag.Title = "Tài liệu của bạn";
+    Layout = "~/Views/Shared/_LayoutV360Showcase.cshtml";
+    ViewBag.BodyClass = "v360-sc-fit";  // viewport-fit layout, pager fixed bottom
 }
 @using EPORTAL.Models
+@using EPORTAL.ModelsView360
 @model PagedList.IPagedList<L_ThuVienFileValidation>
 @using PagedList.Mvc
 
@@ -15,164 +16,261 @@
 {
     @Html.Raw(TempData["msgError"])
 }
+
 @{
-    //var quyenAdd = (int)ViewBag.Quyen;
-    //var quyenEdit = (int)ViewBag.QuyenEdit;
+    var tabs = (List<TabGroupViewModel>)ViewBag.TabGroups ?? new List<TabGroupViewModel>();
+    var search = (string)ViewBag.search ?? "";
+    ViewBag.SearchPlaceholder = "Tìm tài liệu theo tên...";
+    var activeTab = tabs.FirstOrDefault(t => t.Active);
+    int? currentId = ViewBag.CurrentId;
+    var listNhom = ViewBag.listNhom as List<L_NhomThuVienFile> ?? new List<L_NhomThuVienFile>();
+    var nhomName = new Dictionary<int, string>();
+    foreach (var n in listNhom) { if (!nhomName.ContainsKey(n.IDNhom)) { nhomName.Add(n.IDNhom, n.TenNhomTV); } }
+
+    // Icon + mau theo duoi file (PDF do, Word xanh duong, Excel xanh la, ...)
+    Func<string, string[]> fileMeta = fileName =>
+    {
+        var ext = (System.IO.Path.GetExtension(fileName ?? "") ?? "").ToLowerInvariant();
+        if (ext == ".pdf") { return new[] { "fa-file-pdf", "#dc2626", "#fef2f2" }; }
+        if (ext == ".doc" || ext == ".docx") { return new[] { "fa-file-word", "#2563eb", "#eff6ff" }; }
+        if (ext == ".xls" || ext == ".xlsx" || ext == ".csv") { return new[] { "fa-file-excel", "#16a34a", "#f0fdf4" }; }
+        if (ext == ".ppt" || ext == ".pptx") { return new[] { "fa-file-powerpoint", "#ea580c", "#fff7ed" }; }
+        if (ext == ".zip" || ext == ".rar" || ext == ".7z") { return new[] { "fa-file-archive", "#92400e", "#fffbeb" }; }
+        if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") { return new[] { "fa-file-image", "#7c3aed", "#f5f3ff" }; }
+        if (ext == ".mp4" || ext == ".avi" || ext == ".mkv") { return new[] { "fa-file-video", "#0891b2", "#ecfeff" }; }
+        return new[] { "fa-file-lines", "#64748b", "#f8fafc" };
+    };
+
+    // Icon tab theo keyword ten nhom
+    Func<string, string> getTabIcon = name =>
+    {
+        var n = (name ?? "").ToLowerInvariant();
+        if (n.Contains("quy") || n.Contains("noi quy") || n.Contains("nội quy")) { return "fa-gavel"; }
+        if (n.Contains("huong dan") || n.Contains("hướng dẫn")) { return "fa-circle-info"; }
+        if (n.Contains("bieu mau") || n.Contains("biểu mẫu")) { return "fa-file-pen"; }
+        if (n.Contains("an toan") || n.Contains("an toàn")) { return "fa-shield-halved"; }
+        return "fa-folder-open";
+    };
 }
+
 <link href="~/Content/PagedList.css" rel="stylesheet" />
-<div class="app-main__outer">
-    <div class="app-main__inner">
 
-        <div class="app-page-title">
-            <div class="page-title-wrapper">
-                <div class="page-title-heading">
-                    <div class="page-title-icon">
-                        <i class="pe-7s-portfolio icon-gradient bg-grow-early">
-                        </i>
-                    </div>
-                    <div>
-                        Thư viện tài liệu
-                        <div class="page-title-subheading">
-                        </div>
-                    </div>
-                </div>
+<style>
+    /* Doc cards - cung ngon ngu thiet ke voi v360-card nhung toi uu cho FILE (khong co anh) */
+    .v360-docgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 14px;
+    }
+    .v360-doccard {
+        display: flex; gap: 12px; align-items: flex-start;
+        background: #fff; border: 1px solid #e6ecf3; border-radius: 12px;
+        padding: 14px; text-decoration: none; color: inherit;
+        transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+    }
+    .v360-doccard:hover {
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .10);
+        transform: translateY(-2px);
+        border-color: #c7d6ea;
+        text-decoration: none; color: inherit;
+    }
+    .v360-doccard__icon {
+        width: 46px; height: 46px; border-radius: 10px; flex: 0 0 auto;
+        display: flex; align-items: center; justify-content: center; font-size: 21px;
+    }
+    .v360-doccard__main { flex: 1; min-width: 0; }
+    .v360-doccard__title {
+        font-size: 14px; font-weight: 700; color: #1e293b; margin: 1px 0 4px;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .v360-doccard__note {
+        font-size: 12px; color: #64748b; margin: 0 0 6px;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .v360-doccard__meta { font-size: 12px; color: #94a3b8; display: flex; gap: 12px; flex-wrap: wrap; }
+    .v360-doccard__meta i { margin-right: 3px; }
+    .v360-doccard__dl {
+        flex: 0 0 auto; align-self: center;
+        border: 1px solid #2563eb; color: #2563eb; background: #fff;
+        border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700;
+        white-space: nowrap;
+    }
+    .v360-doccard:hover .v360-doccard__dl { background: #2563eb; color: #fff; }
+    .v360-doccard--nofile .v360-doccard__dl {
+        border-color: #cbd5e1; color: #94a3b8; background: #f8fafc;
+    }
+    .v360-doccard--nofile:hover .v360-doccard__dl { background: #f8fafc; color: #94a3b8; }
 
-            </div>
+    /* Section heading khi xem "tat ca" (nhom theo nhom tai lieu) */
+    .v360-docsec {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+        color: #475569; margin: 18px 0 10px;
+    }
+    .v360-docsec:first-child { margin-top: 0; }
+    .v360-docsec i { color: #2563eb; }
+    .v360-docsec__count { color: #94a3b8; font-weight: 600; text-transform: none; letter-spacing: 0; }
+</style>
+
+<div class="v360-sc-fit__head">
+
+    @* Tabs theo nhom tai lieu - giong ListVirtual *@
+    @if (tabs.Count > 0)
+    {
+        <div class="v360-tabs-wrap" data-v360-tabs data-visible="9">
+            <button type="button" class="v360-tabs-arrow v360-tabs-arrow--prev" aria-label="Trước">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+            <nav class="v360-sc-tabs" aria-label="Nhóm tài liệu">
+                @* id = "" de GHI DE ambient route value (URL dang /Index/{id});
+                   neu khong, MVC tu mang id hien tai theo -> bam "Tat ca" van ke t nhom cu *@
+                <a class="v360-sc-tab @(currentId == null ? "active" : "")"
+                   href="@Url.Action("Index", "MyDocument", new { id = "", search })" title="Tất cả tài liệu">
+                    <i class="fa fa-layer-group v360-sc-tab__icon"></i>
+                    Tất cả
+                </a>
+                @foreach (var tab in tabs)
+                {
+                    <a class="v360-sc-tab @(tab.Active ? "active" : "")"
+                       href="@Url.Action("Index", "MyDocument", new { id = tab.IDGroup, search })"
+                       title="@tab.GroupName">
+                        <i class="fa @getTabIcon(tab.GroupName) v360-sc-tab__icon"></i>
+                        @tab.GroupName
+                    </a>
+                }
+            </nav>
+            <button type="button" class="v360-tabs-arrow v360-tabs-arrow--next" aria-label="Sau">
+                <i class="fa fa-chevron-right"></i>
+            </button>
         </div>
-        <div class="tab-content">
-            <div class="row">
-                <div class="card">
+    }
 
-                    <div class="card-header">
-                        <div class="row" style="width:100%">
-                            <div class="col-md-8 col-lg-8">
-                                <div class="row">
-                                    <div class="col-md-7">
-                                        <input type="text" id="txtsearch" name="" placeholder="Tìm kiếm" class="form-control" value="@ViewBag.search">
-                                    </div>
-                                    <div class="col-md-5">
-                                        <button class="btn btn-primary" id="btn-search"><i class="fa fa-search"></i> Tìm kiếm</button>
-                                    </div>
-                                </div>
-                            </div>
-                            @*@if (quyenAdd != 0)
-                                {*@
-                            <div class="col-md-4">
-                                @*<button type="button" id="btn-add" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Thêm mới </button>
-                                <div class="modal" id="myModal" role="dialog" data-url='@Url.Action("Create","DocumentLibrary")' style="margin-top:50px"></div>*@
-
-                               
-
-                                    <button type="button" id="btn-Export" class="btn btn-primary m-l-auto" style="margin-right: 10px; float: right"><i class="fa fa-download">&nbsp;</i>&nbsp;Download</button>
-                                @*<button type="button" id="btn-Export" class="btn btn-primary " style="margin-left:10px;float:right"><i class="fa fa-plus">&nbsp;</i>&nbsp;Xuất DS</button>*@
-                            </div>
-                            @* }*@
-
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="table" width="100%" cellpadding="0">
-                                    <thead>
-                                        <tr>
-                                            <th width="30px" class="text-center">STT</th>
-                                            
-                                            <th class="text-center">Tên tài liệu</th>
-                                            <th class="text-center" width="100px">File</th>
-                                            <th class="text-center" width="200px">Ngày cấp</th>
-                                            <th class="text-center" width="200px">Ghi chú</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @{
-                                            int pageno = (int)Model.PageNumber;
-                                            int itemperpage = (int)Model.PageSize;
-                                            int RowNo = ((pageno - 1) * itemperpage) + 1;
-                                        }
-                                        @{
-                                            var listNhom = ViewBag.listNhom as List<L_NhomThuVienFile>;
-                                            foreach (var l in listNhom)
-                                            {
-                                                var listTV = Model.Where(x => x.IDNhom == l.IDNhom).ToList();
-                                                RowNo = 1;
-                                                if (listTV.Count > 0)
-                                                {
-                                                    <tr>
-                                                         <td colspan="5">@l.TenNhomTV</td>
-                                                    </tr>
-                                                    foreach (var item in listTV)
-                                                    {
-                                                        <tr>
-                                                            <td class="text-center"> @RowNo@{RowNo++;}</td>
-
-                                                            <td class="">@item.TenTaiLieu</td>
-                                                            <td class="text-center">
-                                                                @if (item.FileName != null && item.FileName.Length > 0)
-                                                                {
-
-                                                                    <a class="" target="_blank" href="@Url.Content("~/UploadedFiles/Document/" + item.FileName)"><b>Tải về</b> <i class="fa-solid fa-download"></i></a>
-                                                                }
-                                                            </td>
-                                                            <td class="text-center">
-                                                                @item.Createdate.Value.ToString("dd-MM-yyyy")
-                                                                @*@if (item.Createdate.HasValue) { item.Createdate.Value.ToString("dd-MM-yyyy"); }*@
-                                                            </td>
-                                                            <td class="text-center">@item.GhiChu</td>
-
-                                                        </tr>
-                                                    }
-                                                }
-
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                                <div class="pager">
-                                    @Html.PagedListPager(Model, page => Url.Action("Index", "MyDocument", new { area = "View360", page }))
-                                    <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    @* Filter bar *@
+    <div class="v360-sc-filterbar">
+        <div class="v360-sc-filterbar__left">
+            <span class="v360-sc-crumb__current">
+                @(!string.IsNullOrEmpty(search) ? "Kết quả tìm kiếm" : (activeTab != null ? activeTab.GroupName : "Tất cả tài liệu"))
+            </span>
+            <span class="v360-sc-crumb__meta">· @Model.TotalItemCount tài liệu</span>
+            @if (!string.IsNullOrEmpty(search))
+            {
+                @* (object)"" khi khong co tab: ghi de ambient id, tranh giu nhom cu trong URL *@
+                var clearSearchUrl = Url.Action("Index", "MyDocument", new { id = activeTab != null ? (object)activeTab.IDGroup : (object)"" });
+                <a href="@clearSearchUrl" class="v360-sc-searchchip" title="Bỏ từ khoá tìm kiếm này">
+                    <i class="fa fa-search v360-sc-searchchip__icon"></i>
+                    <span>Tìm: <b>@search</b></span>
+                    <span class="v360-sc-searchchip__close" aria-label="Xoá tìm kiếm">×</span>
+                </a>
+            }
         </div>
     </div>
-
-    <div class="app-wrapper-footer">
-        <div class="app-footer">
-            <div class="app-footer__inner">
-
-            </div>
-        </div>
-    </div>
-
 
 </div>
 
-<script type="text/javascript">
-    
-     $("#btn-search").on('click', function () {
-        var search = $('#txtsearch').val();
-        window.location.href = '@Url.Action("Index", "MyDocument")?search=' + search;
-     });
-    
-    $('#btn-Import').click(function () {
-        var url = $('#myModalImport').data('url');
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#ModalTitle").html("Add MyDocument");
-            $("#myModal").modal('show');
-        });
-    });
+<div class="v360-sc-fit__body">
 
-</script>
+    @if (Model.Count == 0)
+    {
+        <div class="v360-sc-empty">
+            <i class="fa fa-folder-open"></i>
+            <h3>Chưa có tài liệu</h3>
+            <p>
+                @if (!string.IsNullOrEmpty(search))
+                {
+                    <text>Không tìm thấy kết quả cho "@search". Thử từ khóa khác hoặc đổi nhóm.</text>
+                }
+                else
+                {
+                    <text>Bạn chưa được cấp tài liệu nào trong nhóm này. Chọn nhóm khác trên thanh tab phía trên.</text>
+                }
+            </p>
+        </div>
+    }
+    else
+    {
+        // Xem "Tat ca": nhom card theo nhom tai lieu (section heading).
+        // Da chon 1 tab: bo heading, chi hien grid.
+        var sections = currentId == null
+            ? Model.GroupBy(x => x.IDNhom).ToList()
+            : null;
 
+        if (sections != null && sections.Count > 1)
+        {
+            foreach (var sec in sections)
+            {
+                var secName = nhomName.ContainsKey(sec.Key) ? nhomName[sec.Key] : "(Chưa phân nhóm)";
+                <div class="v360-docsec">
+                    <i class="fa @getTabIcon(secName)"></i> @secName
+                    <span class="v360-docsec__count">· @sec.Count() tài liệu</span>
+                </div>
+                <div class="v360-docgrid" style="margin-bottom:6px;">
+                    @foreach (var item in sec)
+                    {
+                        @DocCard(item, fileMeta)
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="v360-docgrid">
+                @foreach (var item in Model)
+                {
+                    @DocCard(item, fileMeta)
+                }
+            </div>
+        }
+    }
 
+</div>
 
+@if (Model.Count > 0 && Model.PageCount > 1)
+{
+    <div class="v360-sc-fit__pager v360-pagination">
+        @Html.PagedListPager(Model,
+            page => Url.Action("Index", "MyDocument", new { area = "View360", page, id = currentId, search }))
+    </div>
+}
 
+@helper DocCard(L_ThuVienFileValidation item, Func<string, string[]> fileMeta)
+{
+    var meta = fileMeta(item.FileName);
+    var hasFile = !string.IsNullOrEmpty(item.FileName);
+    var href = hasFile ? Url.Content("~/UploadedFiles/Document/" + item.FileName) : "#";
+    var note = (item.GhiChu ?? "").Trim();
 
-
-
+    <a class="v360-doccard @(hasFile ? "" : "v360-doccard--nofile")"
+       href="@href" @(hasFile ? Html.Raw("target=\"_blank\"") : Html.Raw("onclick=\"return false;\""))
+       title="@(hasFile ? "Tải về: " + item.TenTaiLieu : "Chưa có file đính kèm")">
+        <div class="v360-doccard__icon" style="color:@meta[1];background:@meta[2];">
+            <i class="fa-solid @meta[0]"></i>
+        </div>
+        <div class="v360-doccard__main">
+            <div class="v360-doccard__title">@item.TenTaiLieu</div>
+            @if (!string.IsNullOrEmpty(note))
+            {
+                <p class="v360-doccard__note">@note</p>
+            }
+            <div class="v360-doccard__meta">
+                @if (item.Createdate.HasValue)
+                {
+                    <span><i class="fa fa-calendar"></i>@item.Createdate.Value.ToString("dd/MM/yyyy")</span>
+                }
+                @if (!string.IsNullOrEmpty(item.TenNhomTV))
+                {
+                    <span><i class="fa fa-folder"></i>@item.TenNhomTV</span>
+                }
+            </div>
+        </div>
+        <span class="v360-doccard__dl">
+            @if (hasFile)
+            {
+                <text><i class="fa-solid fa-download"></i> Tải về</text>
+            }
+            else
+            {
+                <text>Chưa có file</text>
+            }
+        </span>
+    </a>
+}

@@ -643,20 +643,198 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public int countListAuthorization(int id)
         {
-            var rs = (from a in db.AuthorizationUSERs.Where(a => a.ProjectID == id)
-                      join b in db.NhanViens on a.NhanVienID equals b.ID
-                      select new AuthorizationUSERValidation
-                      {
-                          ID = a.ID,
-                          NhanVienID = b.ID,
-                          ProjectID = (int)a.ProjectID,
-                          Createdate = (DateTime)a.Createdate,
-                          MaNV = b.MaNV,
-                          HoTen = b.HoTen
-                      }).ToList().Count();
-
-            return rs;
+            // COUNT truc tiep tren DB (truoc day ToList() ca bang join roi moi .Count() trong RAM).
+            // Join NhanVien de chi dem quyen tro toi nhan vien con ton tai.
+            return (from a in db.AuthorizationUSERs.Where(a => a.ProjectID == id)
+                    join b in db.NhanViens on a.NhanVienID equals b.ID
+                    select a.ID).Count();
         }
+        // ==================================================================
+        //  "NGUOI DUOC XEM" - loai tru quyen xem theo TUNG du an
+        //  (bang AuthorizationUSER_Exclude - deny-list phu len group/file-grant).
+        //  KHONG dung den du lieu phan quyen o View360/Permission: user giu nguyen
+        //  group-grant, chi rieng du an bi exclude la an di (SP _select_USER loc).
+        //
+        //  VI SAO RAW SQL (Database.SqlQuery/ExecuteSqlCommand) o cac method duoi:
+        //   - AuthorizationUSER_Exclude la BANG MOI, chua map vao EDMX -> khong co db.* (EF) de goi.
+        //   - ViewersList con UNION file-grant + group-grant (gom ca to tien Recursive) + dedupe theo
+        //     MaNV; IncludeViewer/Details guard phai resolve TAT CA NhanVienID cung MaNV (data trung
+        //     MaNV) -> cau co self-join NhanVien, kho/khong gon neu lam bang LINQ.
+        //   - Moi tham so qua SqlParameter -> khong injection.
+        // ==================================================================
+
+        /// <summary>Danh sach nguoi dang duoc xem du an (tu file-grant + group-grant phu du an).</summary>
+        public JsonResult ViewersList(int id)
+        {
+            var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.VIEW_ALL).First();
+            if (check == 0)
+            {
+                Response.StatusCode = 403;
+                return Json(new { ok = false, error = "Không có quyền" }, JsonRequestBehavior.AllowGet);
+            }
+            try
+            {
+                var proj = db.Projects.FirstOrDefault(p => p.ID == id);
+                if (proj == null)
+                    return Json(new { ok = false, error = "Không tìm thấy dự án" }, JsonRequestBehavior.AllowGet);
+                int gid = proj.IDGroup ?? -1;
+
+                // Grant nhom phu du an nay = grant tren CHINH group cua du an (moi Recursive)
+                // + grant Recursive=1 tren BAT KY to tien nao (theo dung logic SP _select_USER).
+                var ancestorCsv = "-1";
+                if (gid > 0)
+                {
+                    var flat = ProjectsGroupHierarchy.GetAllFlat();
+                    var byId = flat.ToDictionary(n => n.IDGroup);
+                    var ancestors = new List<int>();
+                    var cur = byId.ContainsKey(gid) ? byId[gid] : null;
+                    for (int lv = 0; lv < 10 && cur != null && cur.ParentIDGroup.HasValue; lv++)
+                    {
+                        var pid = cur.ParentIDGroup.Value;
+                        if (ancestors.Contains(pid)) break; // chong vong lap data ban
+                        ancestors.Add(pid);
+                        cur = byId.ContainsKey(pid) ? byId[pid] : null;
+                    }
+                    if (ancestors.Count > 0) ancestorCsv = string.Join(",", ancestors);
+                }
+
+                // ancestorCsv chi gom int tu hierarchy DB -> ghep literal an toan.
+                var sql = @"
+                    SELECT n.ID AS NhanVienID, n.MaNV, n.HoTen, pb.TenPhongBan,
+                           MAX(src.IsGroup) AS HasGroupGrant,
+                           MAX(1 - src.IsGroup) AS HasFileGrant,
+                           MAX(CASE WHEN n.IDTinhTrangLV = 1 THEN 1 ELSE 0 END) AS IsActive
+                    FROM (
+                        SELECT au.NhanVienID, 0 AS IsGroup
+                          FROM dbo.AuthorizationUSER au
+                         WHERE au.ProjectID = @pid AND au.NhanVienID IS NOT NULL
+                        UNION ALL
+                        SELECT ag.NhanVienID, 1
+                          FROM dbo.AuthorizationUSER_Group ag
+                         WHERE ag.ContentType = 1
+                           AND (ag.IDGroup = @gid OR (ag.[Recursive] = 1 AND ag.IDGroup IN (" + ancestorCsv + @")))
+                    ) src
+                    JOIN dbo.NhanVien n ON n.ID = src.NhanVienID
+                    LEFT JOIN dbo.PhongBan pb ON n.IDPhongBan = pb.IDPhongBan
+                    GROUP BY n.ID, n.MaNV, n.HoTen, pb.TenPhongBan";
+                var raw = db.Database.SqlQuery<ViewerRow>(sql,
+                    new System.Data.SqlClient.SqlParameter("@pid", id),
+                    new System.Data.SqlClient.SqlParameter("@gid", gid)).ToList();
+
+                // Exclusions hien co cua du an
+                var exclusions = db.Database.SqlQuery<ViewerExcludeRow>(@"
+                    SELECT e.NhanVienID, ISNULL(n.MaNV, '') AS MaNV
+                      FROM dbo.AuthorizationUSER_Exclude e
+                      LEFT JOIN dbo.NhanVien n ON n.ID = e.NhanVienID
+                     WHERE e.ContentType = 1 AND e.ContentID = @pid",
+                    new System.Data.SqlClient.SqlParameter("@pid", id)).ToList();
+                var exclMaNV = new HashSet<string>(exclusions
+                    .Where(e => !string.IsNullOrWhiteSpace(e.MaNV))
+                    .Select(e => e.MaNV.Trim().ToUpper()));
+                var exclIds = new HashSet<int>(exclusions.Select(e => e.NhanVienID));
+
+                // Dedupe theo MaNV (data co MaNV trung, khac ID): giu ID nho nhat, OR cac flag.
+                // Excluded check theo MaNV -> 1 ban ghi trung bi exclude = ca nguoi do bi exclude
+                // (khop voi cach SP resolve @Ids theo MaNV).
+                var rows = raw
+                    .GroupBy(r => string.IsNullOrWhiteSpace(r.MaNV) ? ("__id_" + r.NhanVienID) : r.MaNV.Trim().ToUpper())
+                    .Select(g => {
+                        var first = g.OrderBy(r => r.NhanVienID).First();
+                        var key = string.IsNullOrWhiteSpace(first.MaNV) ? null : first.MaNV.Trim().ToUpper();
+                        return new
+                        {
+                            nhanVienId = first.NhanVienID,
+                            maNV = first.MaNV,
+                            hoTen = first.HoTen,
+                            phongBan = first.TenPhongBan,
+                            hasGroupGrant = g.Max(r => r.HasGroupGrant) == 1,
+                            hasFileGrant = g.Max(r => r.HasFileGrant) == 1,
+                            active = g.Max(r => r.IsActive) == 1,
+                            excluded = (key != null && exclMaNV.Contains(key)) || g.Any(r => exclIds.Contains(r.NhanVienID))
+                        };
+                    })
+                    .OrderBy(r => r.hoTen)
+                    .ToList();
+
+                return Json(new { ok = true, rows = rows, total = rows.Count }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>Loai tru 1 nguoi khoi DUY NHAT du an nay (khong dung quyen nhom/le khac).</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult ExcludeViewer(int id, int userId)
+        {
+            var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.EDIT).First();
+            if (check == 0)
+            {
+                Response.StatusCode = 403;
+                return Json(new { ok = false, error = "Không có quyền" });
+            }
+            try
+            {
+                // 1 dong la du: SP check exclusion theo TAP ID cung MaNV cua user dang login.
+                db.Database.ExecuteSqlCommand(@"
+                    IF NOT EXISTS (SELECT 1 FROM dbo.AuthorizationUSER_Exclude
+                                    WHERE NhanVienID = @uid AND ContentType = 1 AND ContentID = @pid)
+                        INSERT INTO dbo.AuthorizationUSER_Exclude (NhanVienID, ContentType, ContentID, CreatedByID)
+                        VALUES (@uid, 1, @pid, @admin)",
+                    new System.Data.SqlClient.SqlParameter("@uid", userId),
+                    new System.Data.SqlClient.SqlParameter("@pid", id),
+                    new System.Data.SqlClient.SqlParameter("@admin", EPORTAL.Models.MyAuthentication.ID));
+                return Json(new { ok = true });
+            }
+            catch (Exception ex) { return Json(new { ok = false, error = ex.Message }); }
+        }
+
+        /// <summary>Bo loai tru - cho nguoi do xem lai du an (xoa theo MOI ID cung MaNV).</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult IncludeViewer(int id, int userId)
+        {
+            var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.EDIT).First();
+            if (check == 0)
+            {
+                Response.StatusCode = 403;
+                return Json(new { ok = false, error = "Không có quyền" });
+            }
+            try
+            {
+                var deleted = db.Database.ExecuteSqlCommand(@"
+                    DELETE e FROM dbo.AuthorizationUSER_Exclude e
+                     WHERE e.ContentType = 1 AND e.ContentID = @pid
+                       AND e.NhanVienID IN (
+                           SELECT n2.ID FROM dbo.NhanVien n1
+                           JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+                           WHERE n1.ID = @uid AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> ''
+                           UNION SELECT @uid)",
+                    new System.Data.SqlClient.SqlParameter("@pid", id),
+                    new System.Data.SqlClient.SqlParameter("@uid", userId));
+                return Json(new { ok = true, deleted = deleted });
+            }
+            catch (Exception ex) { return Json(new { ok = false, error = ex.Message }); }
+        }
+
+        public class ViewerRow
+        {
+            public int NhanVienID { get; set; }
+            public string MaNV { get; set; }
+            public string HoTen { get; set; }
+            public string TenPhongBan { get; set; }
+            public int HasGroupGrant { get; set; }
+            public int HasFileGrant { get; set; }
+            public int IsActive { get; set; }
+        }
+        public class ViewerExcludeRow
+        {
+            public int NhanVienID { get; set; }
+            public string MaNV { get; set; }
+        }
+
         public ActionResult ExportToExcel(String search, string IDGroup)
         {
             var check = dbP.A_CheckQuyen(IDQuyenHT, controll, A_Constants.EX).First();
@@ -703,6 +881,15 @@ namespace EPORTAL.Areas.View360.Controllers
                 else { ViewBag.PGList = new SelectList(listpg, "IDGroup", "GroupName"); }
                 if (list_Projects.Count > 0)
                 {
+                    // Dem so quyen theo TUNG du an bang 1 query gom nhom (tranh N+1: truoc day goi
+                    // countListAuthorization() moi du an -> moi lan ToList().Count() ca bang join).
+                    var projIds = list_Projects.Select(x => x.ID).ToList();
+                    var authCounts = db.AuthorizationUSERs
+                        .Where(a => a.ProjectID.HasValue && projIds.Contains(a.ProjectID.Value))
+                        .GroupBy(a => a.ProjectID.Value)
+                        .Select(g => new { ProjectID = g.Key, C = g.Count() })
+                        .ToDictionary(x => x.ProjectID, x => x.C);
+
                     int row = 2, rowlast = 2, stt = 0;
                     foreach (var item in list_Projects)
                     {
@@ -740,7 +927,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         Worksheet.Cell("E" + row).Style.Alignment.WrapText = true;
 
 
-                        Worksheet.Cell("F" + row).Value = countListAuthorization(item.ID);
+                        Worksheet.Cell("F" + row).Value = authCounts.TryGetValue(item.ID, out var ac) ? ac : 0;
                         Worksheet.Cell("F" + row).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                         Worksheet.Cell("F" + row).Style.Alignment.WrapText = true;
@@ -894,6 +1081,17 @@ namespace EPORTAL.Areas.View360.Controllers
             };
             walk(rootNode);
             return allowed;
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using EPORTAL.Common;
 using EPORTAL.Models;
 using EPORTAL.ModelsView360;
@@ -60,7 +61,10 @@ namespace EPORTAL.Areas.View360.Controllers
         /// Vd user A co 54 quyen Project trong nhom "Du an Can 4" -> 1 row "Can 4 (54 du an)".
         /// </summary>
         public JsonResult ListGrants(string search, int? phongBanId, int? type,
-                                       int? rootGroupId, int page = 1, int pageSize = 50)
+                                       int? rootGroupId, bool exactGroup = false,
+                                       string types = null, string grantTypes = null,
+                                       string phongBanIds = null, string groups = null,
+                                       int page = 1, int pageSize = 50)
         {
             if (!HasPerm(A_Constants.VIEW_ALL)) return Forbid();
             try
@@ -69,19 +73,106 @@ namespace EPORTAL.Areas.View360.Controllers
                 if (pageSize < 10 || pageSize > 200) pageSize = 50;
 
                 var paramValues = new Dictionary<string, object>();
-                var where = " WHERE 1=1";
-                if (phongBanId.HasValue)
+                var where = BuildGrantsWhere(search, phongBanId, type, rootGroupId, exactGroup,
+                                             types, grantTypes, phongBanIds, groups, paramValues);
+
+                var fromJoin = GrantsFromJoin();
+
+                // Total count = number of DISTINCT (User, Type, Group) tuples
+                var totalSql = "SELECT COUNT(*) FROM (SELECT g.NhanVienID, g.Type, g.GroupId " +
+                               fromJoin + where + @" GROUP BY g.NhanVienID, g.Type, g.GroupId) x";
+                var total = db.Database.SqlQuery<int>(totalSql, MakeParams(paramValues)).First();
+
+                var offset = (page - 1) * pageSize;
+                paramValues["@offset"] = offset;
+                paramValues["@pageSize"] = pageSize;
+                var pagedSql = @"
+                    SELECT g.Type, g.NhanVienID, g.GroupId,
+                           MAX(g.GroupName) AS GroupName,
+                           COUNT(*) AS ContentCount,
+                           MAX(g.Createdate) AS LastCreatedate,
+                           MAX(n.MaNV) AS MaNV,
+                           MAX(n.HoTen) AS HoTen,
+                           MAX(pb.TenPhongBan) AS TenPhongBan,
+                           MAX(CAST(g.GrantType AS INT)) AS GrantType,
+                           MAX(CAST(g.IsRecursive AS INT)) AS IsRecursive "
+                    + fromJoin + where +
+                    @" GROUP BY g.Type, g.NhanVienID, g.GroupId
+                       ORDER BY MAX(g.Createdate) DESC, g.NhanVienID, g.Type, g.GroupId
+                       OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
+
+                var sqlRows = db.Database.SqlQuery<GrantGroupRow>(pagedSql, MakeParams(paramValues)).ToList();
+
+                var projectPathMap = BuildProjectPathMap(sqlRows);
+
+                var rows = sqlRows.Select(r => {
+                    string displayName;
+                    if (r.Type == 1 && projectPathMap.ContainsKey(r.GroupId))
+                        displayName = projectPathMap[r.GroupId];
+                    else
+                        displayName = r.GroupName ?? "(không tên nhóm)";
+                    return new {
+                        type = r.Type,
+                        typeName = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video"),
+                        groupId = r.GroupId,
+                        groupName = displayName,
+                        groupNameLeaf = r.GroupName ?? "(không tên nhóm)",
+                        contentCount = r.ContentCount,
+                        nhanVienId = r.NhanVienID,
+                        maNV = r.MaNV,
+                        hoTen = r.HoTen,
+                        phongBan = r.TenPhongBan,
+                        lastCreatedate = r.LastCreatedate.HasValue ? r.LastCreatedate.Value.ToString("yyyy-MM-dd HH:mm") : "",
+                        grantType = r.GrantType,                // 1 = group-grant, 0 = file-grants only
+                        isRecursive = r.IsRecursive == 1
+                    };
+                });
+
+                return Json(new {
+                    rows, total, page, pageSize,
+                    totalPages = (int)Math.Ceiling((double)total / pageSize)
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex) { return Err(ex); }
+        }
+
+        /// <summary>
+        /// WHERE chung cho ListGrants + ExportGrants.
+        /// Filter don le (phongBanId/type/rootGroupId): giu tuong thich cu.
+        /// Filter da chon kieu Excel (csv): types "1,3" / grantTypes "0,1" /
+        /// phongBanIds "2,5" / groups "type:groupId,..." vd "1:12,2:7".
+        ///
+        /// VI SAO RAW SQL: filter da-chon kieu Excel sinh menh de IN(...) co SO LUONG phan tu
+        /// DONG theo runtime (user tich bao nhieu gia tri) -> khong the tham so hoa co dinh hay
+        /// dat trong SP. AN TOAN: moi gia tri ghep vao IN deu da parse sang int (ParseIntCsv);
+        /// rieng `search` van tham so hoa (@search) vi la chuoi tu do.
+        /// </summary>
+        private string BuildGrantsWhere(string search, int? phongBanId, int? type,
+            int? rootGroupId, bool exactGroup,
+            string types, string grantTypes, string phongBanIds, string groups,
+            Dictionary<string, object> paramValues)
+        {
+            var where = " WHERE 1=1";
+            if (phongBanId.HasValue)
+            {
+                where += " AND n.IDPhongBan = @phongBanId";
+                paramValues["@phongBanId"] = phongBanId.Value;
+            }
+            if (type.HasValue && (type.Value == 1 || type.Value == 2 || type.Value == 3))
+            {
+                where += " AND g.Type = @type";
+                paramValues["@type"] = type.Value;
+            }
+            // Filter theo group (chỉ áp dụng Project)
+            if (rootGroupId.HasValue && rootGroupId.Value > 0)
+            {
+                if (exactGroup)
                 {
-                    where += " AND n.IDPhongBan = @phongBanId";
-                    paramValues["@phongBanId"] = phongBanId.Value;
+                    // Chỉ đúng nhóm đã chọn - KHÔNG gồm nhóm con
+                    where += " AND (g.Type = 1 AND g.GroupId = @rootGroupId)";
+                    paramValues["@rootGroupId"] = rootGroupId.Value;
                 }
-                if (type.HasValue && (type.Value == 1 || type.Value == 2 || type.Value == 3))
-                {
-                    where += " AND g.Type = @type";
-                    paramValues["@type"] = type.Value;
-                }
-                // Filter theo parent group (chỉ áp dụng Project): include rootGroupId + tất cả descendants
-                if (rootGroupId.HasValue && rootGroupId.Value > 0)
+                else
                 {
                     var descendants = ExpandGroupDescendants(rootGroupId.Value);
                     if (descendants.Count > 0)
@@ -91,17 +182,80 @@ namespace EPORTAL.Areas.View360.Controllers
                         where += " AND (g.Type = 1 AND g.GroupId IN (" + idList + "))";
                     }
                 }
-                if (!string.IsNullOrWhiteSpace(search))
-                {
-                    where += @" AND (n.HoTen LIKE @search OR n.MaNV LIKE @search OR g.GroupName LIKE @search)";
-                    paramValues["@search"] = "%" + search.Trim() + "%";
-                }
+            }
+            // === Multi-select kieu Excel (csv) - chi nhung gia tri parse duoc thanh int
+            // moi vao SQL (literal IN list, khong co duong injection) ===
+            var typeList = ParseIntCsv(types).Where(t => t >= 1 && t <= 3).Distinct().ToList();
+            if (typeList.Count > 0 && typeList.Count < 3)
+                where += " AND g.Type IN (" + string.Join(",", typeList) + ")";
 
-                // Hybrid: UNION
-                //   (1) Group-grants moi tu AuthorizationUSER_Group
-                //   (2) File-grants legacy aggregate (CHI khi user khong co group-grant tren cung (type, group))
-                // GrantType: 1 = group-grant (auto-inherit), 0 = file-grants only (no inherit)
-                var unionSql = @"
+            var gtList = ParseIntCsv(grantTypes).Where(t => t == 0 || t == 1).Distinct().ToList();
+            if (gtList.Count == 1)
+                where += " AND g.GrantType = " + gtList[0];
+
+            var pbList = ParseIntCsv(phongBanIds).Distinct().ToList();
+            if (pbList.Count > 0)
+                where += " AND n.IDPhongBan IN (" + string.Join(",", pbList) + ")";
+
+            // groups = "type:groupId,..." -> OR theo tung type (GroupId chi unique trong pham vi type)
+            if (!string.IsNullOrWhiteSpace(groups))
+            {
+                var byType = new Dictionary<int, List<int>>();
+                foreach (var pair in groups.Split(','))
+                {
+                    var idx = pair.IndexOf(':');
+                    if (idx <= 0) continue;
+                    int t, gid;
+                    if (!int.TryParse(pair.Substring(0, idx).Trim(), out t)) continue;
+                    if (!int.TryParse(pair.Substring(idx + 1).Trim(), out gid)) continue;
+                    if (t < 1 || t > 3) continue;
+                    if (!byType.ContainsKey(t)) byType[t] = new List<int>();
+                    byType[t].Add(gid);
+                }
+                if (byType.Count > 0)
+                {
+                    var ors = byType.Select(kv =>
+                        "(g.Type = " + kv.Key + " AND g.GroupId IN (" + string.Join(",", kv.Value.Distinct()) + "))");
+                    where += " AND (" + string.Join(" OR ", ors) + ")";
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                where += @" AND (n.HoTen LIKE @search OR n.MaNV LIKE @search OR g.GroupName LIKE @search)";
+                paramValues["@search"] = "%" + search.Trim() + "%";
+            }
+            return where;
+        }
+
+        private static List<int> ParseIntCsv(string csv)
+        {
+            var list = new List<int>();
+            if (string.IsNullOrWhiteSpace(csv)) return list;
+            foreach (var p in csv.Split(','))
+            {
+                int v;
+                if (int.TryParse(p.Trim(), out v)) list.Add(v);
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// FROM + JOIN chung cho ListGrants + ExportGrants. Hybrid UNION:
+        ///   (1) Group-grants moi tu AuthorizationUSER_Group
+        ///   (2) File-grants legacy aggregate (CHI khi user khong co group-grant tren cung (type, group))
+        /// GrantType: 1 = group-grant (auto-inherit), 0 = file-grants only (no inherit)
+        ///
+        /// VI SAO RAW SQL (khong EF LINQ / SP-EDMX):
+        ///  - Cau la UNION 6 nhanh tu 4 bang (AuthorizationUSER_Group + AuthorizationUSER/Vitual/Video
+        ///    + ProjectsGroup/VirtualGroup/Album) voi NOT EXISTS de an file-grant trung group-grant.
+        ///    LINQ dien dat cuc kho doc va sinh SQL kem; tach thanh SP thi WHERE (filter) lai DONG
+        ///    (xem BuildGrantsWhere) nen khong the co dinh trong SP.
+        ///  - Bang AuthorizationUSER_Group la BANG MOI, chua duoc map vao EDMX -> khong goi qua db.* duoc.
+        /// </summary>
+        private static string GrantsFromJoin()
+        {
+            const string unionSql = @"
                     -- (1) GROUP-GRANTS
                     SELECT 1 AS Type, ag.NhanVienID, ag.IDGroup AS GroupId,
                            pg.GroupName AS GroupName, ag.Createdate,
@@ -156,19 +310,62 @@ namespace EPORTAL.Areas.View360.Controllers
                            WHERE g.NhanVienID = avi.NhanVienID AND g.ContentType = 3 AND g.IDGroup = vd.AlbumID
                        )";
 
-                var fromJoin = "FROM (" + unionSql + @") g
+            return "FROM (" + unionSql + @") g
                     JOIN dbo.NhanVien n ON g.NhanVienID = n.ID
                     LEFT JOIN dbo.PhongBan pb ON n.IDPhongBan = pb.IDPhongBan";
+        }
 
-                // Total count = number of DISTINCT (User, Type, Group) tuples
-                var totalSql = "SELECT COUNT(*) FROM (SELECT g.NhanVienID, g.Type, g.GroupId " +
-                               fromJoin + where + @" GROUP BY g.NhanVienID, g.Type, g.GroupId) x";
-                var total = db.Database.SqlQuery<int>(totalSql, MakeParams(paramValues)).First();
+        /// <summary>
+        /// Resolve full path cho Project groups (hierarchy ProjectsGroup).
+        /// Vd: groupId 100 (Can 4) -> parent 50 (HPDQ 2) -> "HPDQ 2 / Can 4"
+        /// </summary>
+        private static Dictionary<int, string> BuildProjectPathMap(List<GrantGroupRow> sqlRows)
+        {
+            var projectPathMap = new Dictionary<int, string>();
+            if (sqlRows.Any(r => r.Type == 1))
+            {
+                var flat = ProjectsGroupHierarchy.FlattenPreOrder(ProjectsGroupHierarchy.GetAllTree());
+                var byId = flat.ToDictionary(n => n.IDGroup);
+                foreach (var r in sqlRows.Where(r => r.Type == 1).Select(r => r.GroupId).Distinct())
+                {
+                    if (!byId.ContainsKey(r)) continue;
+                    var parts = new List<string>();
+                    var node = byId[r];
+                    // Walk up tree (max 10 levels safety)
+                    for (int lv = 0; lv < 10 && node != null; lv++)
+                    {
+                        parts.Insert(0, node.GroupName);
+                        node = node.ParentIDGroup.HasValue && byId.ContainsKey(node.ParentIDGroup.Value)
+                            ? byId[node.ParentIDGroup.Value] : null;
+                    }
+                    projectPathMap[r] = string.Join(" / ", parts);
+                }
+            }
+            return projectPathMap;
+        }
 
-                var offset = (page - 1) * pageSize;
-                paramValues["@offset"] = offset;
-                paramValues["@pageSize"] = pageSize;
-                var pagedSql = @"
+        /// <summary>
+        /// Xuat Excel TOAN BO ket qua theo bo loc hien tai (khong phan trang).
+        /// Dung chung BuildGrantsWhere/GrantsFromJoin voi ListGrants nen ket qua khop voi bang.
+        /// </summary>
+        public ActionResult ExportGrants(string search, int? phongBanId, int? type,
+                                         int? rootGroupId, bool exactGroup = false,
+                                         string types = null, string grantTypes = null,
+                                         string phongBanIds = null, string groups = null)
+        {
+            if (!HasPerm(A_Constants.VIEW_ALL))
+            {
+                TempData["msgError"] = "<script>alert('Bạn không có quyền thực hiện chức năng này');</script>";
+                return RedirectToAction("Index");
+            }
+            try
+            {
+                var paramValues = new Dictionary<string, object>();
+                var where = BuildGrantsWhere(search, phongBanId, type, rootGroupId, exactGroup,
+                                             types, grantTypes, phongBanIds, groups, paramValues);
+                var fromJoin = GrantsFromJoin();
+
+                var sql = @"
                     SELECT g.Type, g.NhanVienID, g.GroupId,
                            MAX(g.GroupName) AS GroupName,
                            COUNT(*) AS ContentCount,
@@ -180,61 +377,110 @@ namespace EPORTAL.Areas.View360.Controllers
                            MAX(CAST(g.IsRecursive AS INT)) AS IsRecursive "
                     + fromJoin + where +
                     @" GROUP BY g.Type, g.NhanVienID, g.GroupId
-                       ORDER BY MAX(g.Createdate) DESC, g.NhanVienID, g.Type, g.GroupId
-                       OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
+                       ORDER BY MAX(g.Createdate) DESC, g.NhanVienID, g.Type, g.GroupId";
 
-                var sqlRows = db.Database.SqlQuery<GrantGroupRow>(pagedSql, MakeParams(paramValues)).ToList();
+                var sqlRows = db.Database.SqlQuery<GrantGroupRow>(sql, MakeParams(paramValues)).ToList();
+                var projectPathMap = BuildProjectPathMap(sqlRows);
 
-                // Resolve full path cho Project groups (hierarchy ProjectsGroup)
-                // Vd: groupId 100 (Can 4) -> parent 50 (HPDQ 2) -> "HPDQ 2 / Can 4"
-                var projectPathMap = new Dictionary<int, string>();
-                if (sqlRows.Any(r => r.Type == 1))
+                using (var wb = new XLWorkbook())
                 {
-                    var flat = ProjectsGroupHierarchy.FlattenPreOrder(ProjectsGroupHierarchy.GetAllTree());
-                    var byId = flat.ToDictionary(n => n.IDGroup);
-                    foreach (var r in sqlRows.Where(r => r.Type == 1).Select(r => r.GroupId).Distinct())
+                    var ws = wb.Worksheets.Add("PhanQuyenView360");
+                    string[] heads = { "STT", "Loại", "Hình thức cấp", "Mã NV", "Họ tên",
+                                       "Phòng ban", "Nhóm nội dung", "Số nội dung", "Cấp lúc (mới nhất)" };
+                    for (int i = 0; i < heads.Length; i++) ws.Cell(1, i + 1).Value = heads[i];
+                    var hd = ws.Range(1, 1, 1, heads.Length);
+                    hd.Style.Font.Bold = true;
+                    hd.Style.Fill.BackgroundColor = XLColor.FromHtml("#DBEAFE");
+                    hd.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    int row = 2, stt = 0;
+                    foreach (var r in sqlRows)
                     {
-                        if (!byId.ContainsKey(r)) continue;
-                        var parts = new List<string>();
-                        var node = byId[r];
-                        // Walk up tree (max 10 levels safety)
-                        for (int lv = 0; lv < 10 && node != null; lv++)
+                        stt++;
+                        string groupDisplay = (r.Type == 1 && projectPathMap.ContainsKey(r.GroupId))
+                            ? projectPathMap[r.GroupId]
+                            : (r.GroupName ?? "(không tên nhóm)");
+                        string grantKind = r.GrantType == 1
+                            ? ("Nhóm" + (r.IsRecursive == 1 ? " (gồm nhóm con)" : ""))
+                            : "Lẻ";
+
+                        ws.Cell(row, 1).Value = stt;
+                        ws.Cell(row, 2).Value = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video");
+                        ws.Cell(row, 3).Value = grantKind;
+                        ws.Cell(row, 4).Value = r.MaNV ?? "";
+                        ws.Cell(row, 5).Value = r.HoTen ?? "";
+                        ws.Cell(row, 6).Value = r.TenPhongBan ?? "";
+                        ws.Cell(row, 7).Value = groupDisplay;
+                        ws.Cell(row, 8).Value = r.ContentCount;
+                        if (r.LastCreatedate.HasValue)
                         {
-                            parts.Insert(0, node.GroupName);
-                            node = node.ParentIDGroup.HasValue && byId.ContainsKey(node.ParentIDGroup.Value)
-                                ? byId[node.ParentIDGroup.Value] : null;
+                            ws.Cell(row, 9).Value = r.LastCreatedate.Value;
+                            ws.Cell(row, 9).Style.DateFormat.Format = "dd/MM/yyyy HH:mm";
                         }
-                        projectPathMap[r] = string.Join(" / ", parts);
+                        row++;
+                    }
+
+                    if (row > 2)
+                    {
+                        var body = ws.Range(1, 1, row - 1, heads.Length);
+                        body.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        body.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                        body.Style.Font.SetFontName("Arial");
+                        body.Style.Font.SetFontSize(10);
+                    }
+                    // Set width co dinh - AdjustToContents cham voi data lon
+                    ws.Column(1).Width = 6;   ws.Column(2).Width = 10;  ws.Column(3).Width = 20;
+                    ws.Column(4).Width = 12;  ws.Column(5).Width = 28;  ws.Column(6).Width = 34;
+                    ws.Column(7).Width = 40;  ws.Column(8).Width = 12;  ws.Column(9).Width = 18;
+                    ws.SheetView.FreezeRows(1);
+
+                    using (var ms = new MemoryStream())
+                    {
+                        wb.SaveAs(ms);
+                        var fileName = "PhanQuyenView360_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx";
+                        return File(ms.ToArray(),
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                return new HttpStatusCodeResult(500, "Lỗi xuất Excel: " + ex.Message);
+            }
+        }
 
-                var rows = sqlRows.Select(r => {
-                    string displayName;
-                    if (r.Type == 1 && projectPathMap.ContainsKey(r.GroupId))
-                        displayName = projectPathMap[r.GroupId];
-                    else
-                        displayName = r.GroupName ?? "(không tên nhóm)";
-                    return new {
+        /// <summary>
+        /// Danh sach gia tri cot "Nhóm nội dung" DANG CO trong du lieu quyen (distinct type+group),
+        /// kem so nguoi duoc cap - lam options cho filter kieu Excel tren UI.
+        /// </summary>
+        public JsonResult GrantGroupOptions()
+        {
+            if (!HasPerm(A_Constants.VIEW_ALL)) return Forbid();
+            try
+            {
+                var sql = @"SELECT g.Type, g.GroupId,
+                                   MAX(g.GroupName) AS GroupName,
+                                   COUNT(DISTINCT g.NhanVienID) AS UserCount "
+                    + GrantsFromJoin() +
+                    " GROUP BY g.Type, g.GroupId";
+                var rows = db.Database.SqlQuery<GroupOptionRow>(sql).ToList();
+
+                // Resolve full path cho Project groups (tai dung helper qua shim GrantGroupRow)
+                var shim = rows.Select(r => new GrantGroupRow { Type = r.Type, GroupId = r.GroupId, GroupName = r.GroupName }).ToList();
+                var pathMap = BuildProjectPathMap(shim);
+
+                var result = rows.Select(r => new {
                         type = r.Type,
-                        typeName = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video"),
                         groupId = r.GroupId,
-                        groupName = displayName,
-                        groupNameLeaf = r.GroupName ?? "(không tên nhóm)",
-                        contentCount = r.ContentCount,
-                        nhanVienId = r.NhanVienID,
-                        maNV = r.MaNV,
-                        hoTen = r.HoTen,
-                        phongBan = r.TenPhongBan,
-                        lastCreatedate = r.LastCreatedate.HasValue ? r.LastCreatedate.Value.ToString("yyyy-MM-dd HH:mm") : "",
-                        grantType = r.GrantType,                // 1 = group-grant, 0 = file-grants only
-                        isRecursive = r.IsRecursive == 1
-                    };
-                });
-
-                return Json(new {
-                    rows, total, page, pageSize,
-                    totalPages = (int)Math.Ceiling((double)total / pageSize)
-                }, JsonRequestBehavior.AllowGet);
+                        typeName = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video"),
+                        label = (r.Type == 1 && pathMap.ContainsKey(r.GroupId))
+                            ? pathMap[r.GroupId]
+                            : (r.GroupName ?? "(không tên nhóm)"),
+                        count = r.UserCount
+                    })
+                    .OrderBy(x => x.type).ThenBy(x => x.label)
+                    .ToList();
+                return Json(result, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex) { return Err(ex); }
         }
@@ -1414,6 +1660,13 @@ namespace EPORTAL.Areas.View360.Controllers
             public int GrantType { get; set; }    // 1=group-grant (auto-inherit), 0=file-grant only
             public int IsRecursive { get; set; }  // 1=recursive (Project), 0=direct only
         }
+        public class GroupOptionRow
+        {
+            public int Type { get; set; }
+            public int GroupId { get; set; }
+            public string GroupName { get; set; }
+            public int UserCount { get; set; }
+        }
         public class AnomalyDeptRow
         {
             public int Id { get; set; }
@@ -1427,6 +1680,17 @@ namespace EPORTAL.Areas.View360.Controllers
             public string HoTen { get; set; }
             public string TenPhongBan { get; set; }
             public int GrantCount { get; set; }
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

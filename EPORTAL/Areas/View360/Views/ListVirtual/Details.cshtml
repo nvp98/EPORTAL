@@ -76,14 +76,14 @@
     }
 }
 
-<link href="~/Content/view360-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+<link href="~/Content/view360-modern.css?v=@EPORTAL.Common.AssetVersion.Token" rel="stylesheet" />
 @if (ViewBag.ChatbotEnabled == true && !_isAdmin)
 {
-    <link href="~/Content/view360-chatbot.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+    <link href="~/Content/view360-chatbot.css?v=@EPORTAL.Common.AssetVersion.Token" rel="stylesheet" />
 }
 @if (ViewBag.ChatbotAdminMode == true)
 {
-    <link href="~/Content/view360-chatbot-admin.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+    <link href="~/Content/view360-chatbot-admin.css?v=@EPORTAL.Common.AssetVersion.Token" rel="stylesheet" />
 }
 @* Leaflet for real-GPS minimap with satellite tiles. Self-host (~/Content/leaflet) thay vi unpkg CDN
    de prod khong phu thuoc internet ben ngoai (corporate firewall co the chan unpkg). *@
@@ -1949,5 +1949,5 @@ else
 </script>
 @if (ViewBag.ChatbotEnabled == true && !_isAdmin)
 {
-    <script src="~/Content/view360-chatbot.js?v=@(DateTime.UtcNow.Ticks)"></script>
+    <script src="~/Content/view360-chatbot.js?v=@EPORTAL.Common.AssetVersion.Token"></script>
 }

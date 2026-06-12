@@ -73,6 +73,9 @@ namespace EPORTAL.Common
     /// Persist trong cung DB voi EPORTALEntities (V360_SceneCalibration + V360_FeaturedScene + V360_TourConfig).
     /// Schema duoc tao boi migration v360-all.sql SECTION 1 (deploy-time).
     /// One-time import file JSON cu (App_Data/v360-calibration.json) chay lazy lan dau khi co data.
+    ///
+    /// VI SAO RAW ADO.NET: cac bang V360_* la bang MOI, chua map vao EDMX -> khong query qua EF duoc.
+    /// Pattern store chuan cua View360 (static class + ADO.NET tham so hoa + using)
     /// </summary>
     public static class SceneCalibrationStore
     {
@@ -174,6 +177,60 @@ namespace EPORTAL.Common
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.Get] " + ex.Message);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Dem so scene da calibrate cho NHIEU collection trong 1 query (GROUP BY).
+        /// Tranh N+1: truoc day trang admin goi Get(cid).Count moi tour -> moi tour 1 connection.
+        /// Tra dict collectionId -> count (chi cac collection co du lieu).
+        /// </summary>
+        public static Dictionary<string, int> GetCalibratedCounts(IEnumerable<string> collectionIds)
+        {
+            var result = new Dictionary<string, int>(StringComparer.Ordinal);
+            return CountByCollection("dbo.V360_SceneCalibration", collectionIds, result);
+        }
+
+        /// <summary>Dem so featured scene cho NHIEU collection trong 1 query (GROUP BY).</summary>
+        public static Dictionary<string, int> GetFeaturedCounts(IEnumerable<string> collectionIds)
+        {
+            var result = new Dictionary<string, int>(StringComparer.Ordinal);
+            return CountByCollection("dbo.V360_FeaturedScene", collectionIds, result);
+        }
+
+        private static Dictionary<string, int> CountByCollection(string table, IEnumerable<string> collectionIds, Dictionary<string, int> result)
+        {
+            var ids = new List<string>();
+            if (collectionIds != null)
+                foreach (var c in collectionIds)
+                    if (!string.IsNullOrEmpty(c) && !result.ContainsKey(c)) { result[c] = 0; ids.Add(c); }
+            if (ids.Count == 0) return result;
+            EnsureLegacyImported();
+            try
+            {
+                var sb = new System.Text.StringBuilder();
+                using (var conn = OpenConnection())
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.Connection = conn;
+                    for (int i = 0; i < ids.Count; i++)
+                    {
+                        if (i > 0) sb.Append(',');
+                        sb.Append("@c").Append(i);
+                        cmd.Parameters.AddWithValue("@c" + i, ids[i]);
+                    }
+                    // table la literal noi bo (khong phai input user) -> an toan ghep chuoi
+                    cmd.CommandText = "SELECT CollectionId, COUNT(*) FROM " + table +
+                                      " WHERE CollectionId IN (" + sb + ") GROUP BY CollectionId";
+                    using (var rd = cmd.ExecuteReader())
+                        while (rd.Read())
+                            if (!rd.IsDBNull(0)) result[rd.GetString(0)] = rd.GetInt32(1);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[SceneCalibrationStore.CountByCollection] " + ex.Message);
             }
             return result;
         }

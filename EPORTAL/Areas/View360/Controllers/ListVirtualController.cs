@@ -264,13 +264,21 @@ namespace EPORTAL.Areas.View360.Controllers
                     Date = (DateTime)a.Date
                 })
                 .ToList();
-            // Inject so scene da calibrate per tour (cho hien thi tren list)
-            var savedCounts = new Dictionary<int, int>();
+            // Inject so scene da calibrate per tour. Dem TAT CA collection trong 1 query
+            // (truoc day goi Get(cid).Count moi tour -> N connection/query per page load).
+            var cidByTour = new Dictionary<int, string>();
             foreach (var t in tours)
             {
                 var cid = KuulaCollectionFetcher.ExtractCollectionId(t.URL);
-                if (string.IsNullOrEmpty(cid)) { savedCounts[t.ID] = 0; continue; }
-                savedCounts[t.ID] = SceneCalibrationStore.Get(cid).Count;
+                if (!string.IsNullOrEmpty(cid)) cidByTour[t.ID] = cid;
+            }
+            var calCounts = SceneCalibrationStore.GetCalibratedCounts(cidByTour.Values);
+            var savedCounts = new Dictionary<int, int>();
+            foreach (var t in tours)
+            {
+                string cid;
+                savedCounts[t.ID] = (cidByTour.TryGetValue(t.ID, out cid)
+                    && calCounts.TryGetValue(cid, out var c)) ? c : 0;
             }
             ViewBag.SavedCounts = savedCounts;
             return View(tours);
@@ -596,11 +604,20 @@ namespace EPORTAL.Areas.View360.Controllers
                     ID = a.ID, Title = a.Title, Images = a.Images, URL = a.URL,
                     Date = (DateTime)a.Date
                 }).ToList();
-            var savedCounts = new Dictionary<int, int>();
+            // Dem featured cho TAT CA collection trong 1 query (tranh N+1 per tour).
+            var cidByTour = new Dictionary<int, string>();
             foreach (var t in tours)
             {
                 var cid = KuulaCollectionFetcher.ExtractCollectionId(t.URL);
-                savedCounts[t.ID] = string.IsNullOrEmpty(cid) ? 0 : SceneCalibrationStore.GetFeatured(cid).Count;
+                if (!string.IsNullOrEmpty(cid)) cidByTour[t.ID] = cid;
+            }
+            var featCounts = SceneCalibrationStore.GetFeaturedCounts(cidByTour.Values);
+            var savedCounts = new Dictionary<int, int>();
+            foreach (var t in tours)
+            {
+                string cid;
+                savedCounts[t.ID] = (cidByTour.TryGetValue(t.ID, out cid)
+                    && featCounts.TryGetValue(cid, out var c)) ? c : 0;
             }
             ViewBag.SavedCounts = savedCounts;
             return View(tours);
@@ -761,6 +778,16 @@ namespace EPORTAL.Areas.View360.Controllers
             return File(data, contentType);
         }
 
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 
     public class FeaturedSceneCard

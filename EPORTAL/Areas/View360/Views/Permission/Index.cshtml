@@ -228,20 +228,10 @@
     <div class="pm-toolbar">
         <div class="pm-toolbar__filter">
             <input type="text" id="pm-q" class="pm-input" placeholder="🔎 Tìm tên NV / mã NV / tên nhóm..." />
-            <select id="pm-f-dept" class="pm-select">
-                <option value="">Tất cả phòng ban</option>
-            </select>
-            <select id="pm-f-type" class="pm-select">
-                <option value="">Tất cả loại</option>
-                <option value="1">Project</option>
-                <option value="2">Virtual</option>
-                <option value="3">Video</option>
-            </select>
-            <select id="pm-f-pgroup" class="pm-select" title="Lọc theo nhóm Project (gồm nhóm con)">
-                <option value="">Tất cả nhóm Project</option>
-            </select>
-            <button type="button" class="pm-btn pm-btn--ghost" id="pm-f-apply">Lọc</button>
+            <button type="button" class="pm-btn pm-btn--ghost" id="pm-f-apply">Tìm</button>
             <button type="button" class="pm-btn pm-btn--ghost" id="pm-f-reset">Đặt lại</button>
+            <button type="button" class="pm-btn pm-btn--ghost" id="pm-export" title="Xuất Excel toàn bộ kết quả theo bộ lọc hiện tại (không chỉ trang đang xem)">📥 Xuất Excel</button>
+            <span style="color:#94a3b8;font-size:12px;margin-left:4px;">Lọc cột kiểu Excel: bấm <i class="fa fa-filter"></i> trên tiêu đề cột, tích chọn nhiều giá trị</span>
         </div>
     </div>
 
@@ -265,10 +255,10 @@
                 <thead>
                     <tr>
                         <th style="width:36px;"><input type="checkbox" id="pm-check-all" /></th>
-                        <th style="width:90px;">Loại</th>
+                        <th style="width:110px;">Loại <button type="button" class="pm-fbtn" data-fcol="type" title="Lọc cột (chọn nhiều như Excel)"><i class="fa fa-filter"></i></button></th>
                         <th>Người được cấp</th>
-                        <th>Phòng ban</th>
-                        <th>Nhóm nội dung</th>
+                        <th>Phòng ban <button type="button" class="pm-fbtn" data-fcol="dept" title="Lọc cột (chọn nhiều như Excel)"><i class="fa fa-filter"></i></button></th>
+                        <th>Nhóm nội dung <button type="button" class="pm-fbtn" data-fcol="group" title="Lọc cột (chọn nhiều như Excel)"><i class="fa fa-filter"></i></button></th>
                         <th style="width:90px;text-align:right;">Số nội dung</th>
                         <th style="width:130px;">Cấp lúc (mới nhất)</th>
                         <th style="width:80px;"></th>
@@ -284,6 +274,30 @@
 
 </div>
 </div>
+</div>
+
+@* ===== EXCEL-STYLE COLUMN FILTER PANEL (dung chung cho moi cot) ===== *@
+<style>
+    .pm-fbtn { border: none; background: transparent; color: #94a3b8; cursor: pointer; padding: 2px 5px; font-size: 11px; border-radius: 4px; }
+    .pm-fbtn:hover { color: #2563eb; background: #eff6ff; }
+    .pm-fbtn.is-active { color: #fff; background: #2563eb; }
+    .pm-fpanel { position: absolute; z-index: 1060; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 10px 28px rgba(15,23,42,.18); width: 300px; display: none; }
+    .pm-fpanel.show { display: block; }
+    .pm-fpanel__list { max-height: 280px; overflow: auto; padding: 6px 12px; }
+    .pm-fpanel__item { display: flex; gap: 8px; align-items: flex-start; padding: 3px 0; font-size: 13px; cursor: pointer; margin: 0; font-weight: 400; }
+    .pm-fpanel__item input { margin-top: 3px; flex: 0 0 auto; }
+    .pm-fpanel__section { font-weight: 700; font-size: 11px; color: #64748b; text-transform: uppercase; margin: 8px 0 2px; }
+    .pm-fpanel__ft { display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px; border-top: 1px solid #eef2f7; }
+</style>
+<div class="pm-fpanel" id="pm-fpanel">
+    <div style="padding:10px 12px 0;">
+        <input type="text" id="pm-fpanel-q" class="pm-input" placeholder="🔎 Tìm giá trị..." style="width:100%;" />
+    </div>
+    <div class="pm-fpanel__list" id="pm-fpanel-list"></div>
+    <div class="pm-fpanel__ft">
+        <button type="button" class="pm-btn pm-btn--ghost" id="pm-fpanel-clear">Bỏ lọc cột</button>
+        <button type="button" class="pm-btn pm-btn--primary" id="pm-fpanel-ok">Áp dụng</button>
+    </div>
 </div>
 
 @* ===== MODAL CONTAINER ===== *@
@@ -314,7 +328,7 @@ var canRevoke = @(canRevoke ? "true" : "false");
 
 var state = {
     page: 1, pageSize: 50,
-    filter: { search: '', phongBanId: '', type: '', rootGroupId: '' },
+    filter: { search: '' },
     selected: new Set(),  // key = type-userId-groupId
     cachedDepts: null
 };
@@ -385,35 +399,31 @@ function loadPhongBans() {
     return api('PhongBans').then(function (rows) { state.cachedDepts = rows; return rows; });
 }
 
-// Populate dept dropdown in main filter
-loadPhongBans().then(function (rows) {
-    var $sel = $('#pm-f-dept');
-    rows.forEach(function (r) {
-        var o = document.createElement('option');
-        o.value = r.id; o.textContent = r.name;
-        $sel.appendChild(o);
-    });
-});
+// ========== Excel-style column filters: selection state ==========
+// Moi cot = 1 (hoac 2) Set gia tri da tich. Set rong = khong loc cot do.
+var fSel = {
+    types: new Set(),        // "1"|"2"|"3"  (cot Loại)
+    grantTypes: new Set(),   // "1" nhom | "0" le (cot Loại - hình thức cấp)
+    phongBanIds: new Set(),  // id phong ban
+    groups: new Set()        // "type:groupId"
+};
 
-// Populate Project group dropdown (with hierarchy indent)
-api('Groups?type=1').then(function (rows) {
-    var $sel = $('#pm-f-pgroup');
-    rows.forEach(function (g) {
-        var o = document.createElement('option');
-        o.value = g.id;
-        o.textContent = (g.depth > 0 ? '— '.repeat(g.depth) + ' ' : '') + g.name;
-        $sel.appendChild(o);
-    });
-});
+// Query string phan filter - DUNG CHUNG cho bang + xuat Excel (export luon khop bang)
+function buildFilterQs() {
+    var qs = [];
+    if (state.filter.search) qs.push('search=' + encodeURIComponent(state.filter.search));
+    if (fSel.types.size) qs.push('types=' + Array.from(fSel.types).join(','));
+    if (fSel.grantTypes.size) qs.push('grantTypes=' + Array.from(fSel.grantTypes).join(','));
+    if (fSel.phongBanIds.size) qs.push('phongBanIds=' + Array.from(fSel.phongBanIds).join(','));
+    if (fSel.groups.size) qs.push('groups=' + encodeURIComponent(Array.from(fSel.groups).join(',')));
+    return qs.join('&');
+}
 
 // ========== Main table ==========
 function loadTable() {
-    var f = state.filter;
     var qs = 'page=' + state.page + '&pageSize=' + state.pageSize;
-    if (f.search) qs += '&search=' + encodeURIComponent(f.search);
-    if (f.phongBanId) qs += '&phongBanId=' + f.phongBanId;
-    if (f.type) qs += '&type=' + f.type;
-    if (f.rootGroupId) qs += '&rootGroupId=' + f.rootGroupId;
+    var fq = buildFilterQs();
+    if (fq) qs += '&' + fq;
     // Selection theo PHẠM VI TRANG hiện tại: rowData được dựng lại mỗi lần render nên key
     // ở trang/bộ lọc khác sẽ thành "mồ côi" -> đếm sai (vd 16 chọn / 15 dòng) và bulk revoke
     // rơi vào nhánh fallback. Clear khi tải lại bảng để selection luôn khớp dòng đang thấy.
@@ -603,12 +613,9 @@ $('#pm-bulk-revoke').addEventListener('click', function () {
     });
 });
 
-// Filter handlers
+// Filter handlers (o tim kiem text + reset)
 function applyFilter() {
     state.filter.search = $('#pm-q').value.trim();
-    state.filter.phongBanId = $('#pm-f-dept').value;
-    state.filter.type = $('#pm-f-type').value;
-    state.filter.rootGroupId = $('#pm-f-pgroup').value;
     state.page = 1;
     state.selected.clear();
     updateSelectedUI();
@@ -616,14 +623,179 @@ function applyFilter() {
 }
 $('#pm-f-apply').addEventListener('click', applyFilter);
 $('#pm-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') applyFilter(); });
-$('#pm-f-dept').addEventListener('change', applyFilter);
-$('#pm-f-type').addEventListener('change', applyFilter);
-$('#pm-f-pgroup').addEventListener('change', applyFilter);
 $('#pm-f-reset').addEventListener('click', function () {
-    $('#pm-q').value = ''; $('#pm-f-dept').value = ''; $('#pm-f-type').value = '';
-    $('#pm-f-pgroup').value = '';
+    $('#pm-q').value = '';
+    fSel.types.clear(); fSel.grantTypes.clear(); fSel.phongBanIds.clear(); fSel.groups.clear();
+    syncFunnelState();
     applyFilter();
 });
+
+// Xuất Excel: TOÀN BỘ kết quả theo bộ lọc hiện tại (server bỏ phân trang).
+$('#pm-export').addEventListener('click', function () {
+    var fq = buildFilterQs();
+    window.location.href = base + 'ExportGrants' + (fq ? '?' + fq : '');
+});
+
+// ========== Excel-style column filter panel ==========
+// 1 panel dung chung, dung noi dung theo cot dang mo. Chot chon khi bam "Áp dụng"
+// (giong Excel), khong ap ngay khi tich.
+var fpColumn = null;            // 'type' | 'dept' | 'group'
+var fpItems = [];               // [{k, v, label, sub} | {section}]
+var fpTemp = new Set();         // selection tam: "k|v"
+var groupOptionsCache = null;   // options "Nhóm nội dung" - fetch 1 lan
+
+function colKeys(col) {
+    return col === 'type' ? ['types', 'grantTypes'] : (col === 'dept' ? ['phongBanIds'] : ['groups']);
+}
+
+function openFilterPanel(col, btn) {
+    fpColumn = col;
+    var load;
+    if (col === 'type') {
+        load = Promise.resolve([
+            { section: 'Loại nội dung' },
+            { k: 'types', v: '1', label: 'Project' },
+            { k: 'types', v: '2', label: 'Virtual' },
+            { k: 'types', v: '3', label: 'Video' },
+            { section: 'Hình thức cấp' },
+            { k: 'grantTypes', v: '1', label: '📂 Nhóm (tự kế thừa nội dung mới)' },
+            { k: 'grantTypes', v: '0', label: '📄 Lẻ (quyền từng nội dung)' }
+        ]);
+    } else if (col === 'dept') {
+        load = loadPhongBans().then(function (rows) {
+            return rows.map(function (r) { return { k: 'phongBanIds', v: String(r.id), label: r.name }; });
+        });
+    } else {
+        load = (groupOptionsCache
+                ? Promise.resolve(groupOptionsCache)
+                : api('GrantGroupOptions').then(function (rows) { groupOptionsCache = rows; return rows; })
+            ).then(function (rows) {
+                return rows.map(function (g) {
+                    return { k: 'groups', v: g.type + ':' + g.groupId, label: g.label,
+                             sub: g.typeName + ' · ' + g.count + ' người' };
+                });
+            });
+    }
+
+    // Selection tam = ban sao selection hien tai cua RIENG cot nay
+    fpTemp = new Set();
+    colKeys(col).forEach(function (k) { fSel[k].forEach(function (v) { fpTemp.add(k + '|' + v); }); });
+
+    var $p = $('#pm-fpanel');
+    $('#pm-fpanel-q').value = '';
+    $('#pm-fpanel-list').innerHTML = '<div style="padding:10px;color:#94a3b8;font-size:12px;">Đang tải...</div>';
+    var r = btn.getBoundingClientRect();
+    var left = Math.min(r.left + window.pageXOffset,
+                        window.pageXOffset + document.documentElement.clientWidth - 310);
+    $p.style.left = Math.max(8, left) + 'px';
+    $p.style.top = (r.bottom + window.pageYOffset + 4) + 'px';
+    $p.classList.add('show');
+
+    load.then(function (items) {
+        if (fpColumn !== col) return; // user da mo cot khac trong luc cho
+        fpItems = items;
+        renderFpList();
+    }).catch(function (err) {
+        $('#pm-fpanel-list').innerHTML = '<div style="padding:10px;color:#dc2626;font-size:12px;">' + escapeHtml(err.message) + '</div>';
+    });
+}
+
+function fpVisible(it, q) {
+    return !q || it.label.toLowerCase().indexOf(q) >= 0;
+}
+
+function renderFpList() {
+    var q = $('#pm-fpanel-q').value.trim().toLowerCase();
+    var html = '', visibleCount = 0, visibleChecked = 0;
+    fpItems.forEach(function (it, i) {
+        if (it.section) { if (!q) html += '<div class="pm-fpanel__section">' + escapeHtml(it.section) + '</div>'; return; }
+        if (!fpVisible(it, q)) return;
+        visibleCount++;
+        var on = fpTemp.has(it.k + '|' + it.v);
+        if (on) visibleChecked++;
+        html += '<label class="pm-fpanel__item"><input type="checkbox" data-idx="' + i + '"' + (on ? ' checked' : '') + ' />' +
+            '<span>' + escapeHtml(it.label) +
+            (it.sub ? ' <small style="color:#94a3b8;">' + escapeHtml(it.sub) + '</small>' : '') + '</span></label>';
+    });
+    var allOn = visibleCount > 0 && visibleChecked === visibleCount;
+    $('#pm-fpanel-list').innerHTML =
+        '<label class="pm-fpanel__item" style="border-bottom:1px solid #eef2f7;padding-bottom:6px;margin-bottom:4px;">' +
+        '<input type="checkbox" id="pm-fpanel-all"' + (allOn ? ' checked' : '') + ' /><span><b>(Chọn tất cả' + (q ? ' kết quả tìm' : '') + ')</b></span></label>' +
+        (html || '<div style="padding:8px;color:#94a3b8;font-size:12px;">Không có giá trị khớp</div>');
+
+    var $all = $('#pm-fpanel-all');
+    if ($all) $all.addEventListener('change', function () {
+        var on = this.checked;
+        fpItems.forEach(function (it) {
+            if (it.section || !fpVisible(it, q)) return;
+            var key = it.k + '|' + it.v;
+            if (on) fpTemp.add(key); else fpTemp.delete(key);
+        });
+        renderFpList();
+    });
+    $$('#pm-fpanel-list input[data-idx]').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            var it = fpItems[parseInt(cb.dataset.idx, 10)];
+            var key = it.k + '|' + it.v;
+            if (cb.checked) fpTemp.add(key); else fpTemp.delete(key);
+        });
+    });
+}
+
+$('#pm-fpanel-q').addEventListener('input', renderFpList);
+
+function closeFilterPanel() { $('#pm-fpanel').classList.remove('show'); fpColumn = null; }
+
+function refreshAfterFilterChange() {
+    syncFunnelState();
+    state.page = 1;
+    state.selected.clear();
+    updateSelectedUI();
+    loadTable();
+}
+
+$('#pm-fpanel-ok').addEventListener('click', function () {
+    if (!fpColumn) return;
+    var keys = colKeys(fpColumn);
+    keys.forEach(function (k) { fSel[k].clear(); });
+    fpTemp.forEach(function (key) {
+        var k = key.substring(0, key.indexOf('|'));
+        var v = key.substring(key.indexOf('|') + 1); // v co the chua ':' (groups)
+        if (fSel[k]) fSel[k].add(v);
+    });
+    // Tich DU het gia tri = khong loc -> clear cho query gon
+    if (fSel.types.size === 3) fSel.types.clear();
+    if (fSel.grantTypes.size === 2) fSel.grantTypes.clear();
+    closeFilterPanel();
+    refreshAfterFilterChange();
+});
+
+$('#pm-fpanel-clear').addEventListener('click', function () {
+    if (!fpColumn) return;
+    colKeys(fpColumn).forEach(function (k) { fSel[k].clear(); });
+    closeFilterPanel();
+    refreshAfterFilterChange();
+});
+
+function syncFunnelState() {
+    $$('.pm-fbtn').forEach(function (b) {
+        var active = colKeys(b.dataset.fcol).some(function (k) { return fSel[k].size > 0; });
+        b.classList.toggle('is-active', active);
+    });
+}
+
+$$('.pm-fbtn').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (fpColumn === b.dataset.fcol && $('#pm-fpanel').classList.contains('show')) { closeFilterPanel(); return; }
+        openFilterPanel(b.dataset.fcol, b);
+    });
+});
+document.addEventListener('click', function (e) {
+    if ($('#pm-fpanel').classList.contains('show')
+        && !e.target.closest('#pm-fpanel') && !e.target.closest('.pm-fbtn')) closeFilterPanel();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeFilterPanel(); });
 
 // ========== Group picker (shared inside modals) ==========
 // Cap quyen o muc NHOM (group/album), KHONG xuong tung content le.

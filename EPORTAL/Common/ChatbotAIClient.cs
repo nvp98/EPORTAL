@@ -177,7 +177,10 @@ namespace EPORTAL.Common
                         var message = choice?["message"] as JObject;
                         if (message != null)
                         {
-                            reply.Text = (string)message["content"] ?? "";
+                            // Guard: loc ky tu dieu khien/an + cap do dai truoc khi text di tiep
+                            // (ve client, vao DB log, sang VBee TTS).
+                            reply.Text = ExternalContentGuard.SanitizeText(
+                                (string)message["content"] ?? "", ExternalContentGuard.MAX_REPLY_CHARS);
 
                             // Tool call -> set navigate action
                             var toolCalls = message["tool_calls"] as JArray;
@@ -189,12 +192,17 @@ namespace EPORTAL.Common
                                 if (fnName == "navigate_to_scene")
                                 {
                                     var argsRaw = (string)fn["arguments"];
+                                    // Guard: args qua lon = bat thuong (enum scene + reason ngan) -> bo qua
+                                    if (argsRaw != null && argsRaw.Length > ExternalContentGuard.MAX_TOOL_ARGS_CHARS)
+                                        argsRaw = null;
                                     try
                                     {
                                         var args = JObject.Parse(argsRaw ?? "{}");
                                         // Tool moi dung `scene` (ten chinh xac tu enum); fallback `query` (tool cu).
-                                        var query = (string)args["scene"] ?? (string)args["query"];
-                                        var reason = (string)args["reason"];
+                                        var query = ExternalContentGuard.SanitizeText(
+                                            (string)args["scene"] ?? (string)args["query"], ExternalContentGuard.MAX_ACTION_CHARS);
+                                        var reason = ExternalContentGuard.SanitizeText(
+                                            (string)args["reason"], ExternalContentGuard.MAX_REASON_CHARS);
                                         if (!string.IsNullOrEmpty(query))
                                         {
                                             reply.ActionType   = "navigate";
@@ -328,8 +336,17 @@ namespace EPORTAL.Common
                         using (var reader = new System.IO.StreamReader(stream, Encoding.UTF8))
                         {
                             string line;
+                            int emittedChars = 0;       // tong text da emit -> cap MAX_STREAM_CHARS
+                            long totalReadChars = 0;    // tong du lieu doc tu stream -> chong stream vo han
                             while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                             {
+                                // Guard: stream bat thuong (qua lon) -> cat, khong de treo worker/ngon RAM.
+                                totalReadChars += line.Length;
+                                if (totalReadChars > 2_000_000)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("[StreamAsync] stream vuot 2MB - cat som");
+                                    break;
+                                }
                                 if (line.Length == 0) continue;
                                 if (!line.StartsWith("data:", StringComparison.Ordinal)) continue;
                                 var data = line.Substring(5).TrimStart();
@@ -352,14 +369,19 @@ namespace EPORTAL.Common
                                 var delta = choices[0]?["delta"] as JObject;
                                 if (delta == null) continue;
 
-                                var content = (string)delta["content"];
-                                if (!string.IsNullOrEmpty(content))
+                                // Guard: sanitize tung delta (loc control/bidi/zero-width) + cap tong text.
+                                var content = ExternalContentGuard.SanitizeText(
+                                    (string)delta["content"], 0);
+                                if (!string.IsNullOrEmpty(content) && emittedChars < ExternalContentGuard.MAX_STREAM_CHARS)
                                 {
+                                    if (emittedChars + content.Length > ExternalContentGuard.MAX_STREAM_CHARS)
+                                        content = content.Substring(0, ExternalContentGuard.MAX_STREAM_CHARS - emittedChars);
+                                    emittedChars += content.Length;
                                     try { onTextDelta?.Invoke(content); }
                                     catch (Exception ex) { System.Diagnostics.Debug.WriteLine("[StreamAsync] onTextDelta err: " + ex.Message); }
                                 }
 
-                                // Tool calls stream theo tung delta - accumulate
+                                // Tool calls stream theo tung delta - accumulate (co cap kich thuoc)
                                 var toolCalls = delta["tool_calls"] as JArray;
                                 if (toolCalls != null && toolCalls.Count > 0)
                                 {
@@ -368,7 +390,8 @@ namespace EPORTAL.Common
                                     var fname = (string)fn?["name"];
                                     if (!string.IsNullOrEmpty(fname)) toolName = fname;
                                     var fargs = (string)fn?["arguments"];
-                                    if (!string.IsNullOrEmpty(fargs)) toolArgsBuf.Append(fargs);
+                                    if (!string.IsNullOrEmpty(fargs) && toolArgsBuf.Length < ExternalContentGuard.MAX_TOOL_ARGS_CHARS)
+                                        toolArgsBuf.Append(fargs);
                                 }
                             }
                         }

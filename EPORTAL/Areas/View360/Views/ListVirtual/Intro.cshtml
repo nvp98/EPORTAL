@@ -11,7 +11,7 @@
 @{
     // Background Intro: anh design team gui (intro-bg.jpg).
     // Cache-bust query bang ticks - browser luon fetch anh moi khi file thay doi.
-    var introBg = Url.Content("~/Content/assets/images/intro-bg.jpg") + "?v=" + DateTime.UtcNow.Ticks;
+    var introBg = Url.Content("~/Content/assets/images/intro-bg.jpg") + "?v=" + EPORTAL.Common.AssetVersion.Token;
     var heroBg = string.IsNullOrEmpty(Model.Images)
         ? Url.Content("~/Content/assets/images/bg7.jpg")
         : Url.Content("~/Images/" + System.IO.Path.GetFileName(Model.Images));

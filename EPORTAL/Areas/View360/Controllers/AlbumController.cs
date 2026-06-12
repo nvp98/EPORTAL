@@ -13,6 +13,23 @@ namespace EPORTAL.Areas.View360.Controllers
     public class AlbumController : Controller
     {
         EPORTALEntities db = new EPORTALEntities();
+        EPORTAL.Models.PhanQuyenHTEntities dbP = new EPORTAL.Models.PhanQuyenHTEntities();
+        int IDQuyenHT = EPORTAL.Models.MyAuthentication.IDQuyenHT;
+        // Album = nhom video -> quan tri chung quyen admin video ("Video", 1.4 QT - Danh sach video).
+        // Truoc day Create/Edit/Delete KHONG co check quyen -> bat ky user dang nhap deu sua/xoa duoc.
+        const string controll = "Video";
+
+        private bool HasPerm(string action)
+        {
+            try { return dbP.A_CheckQuyen(IDQuyenHT, controll, action).First() != 0; }
+            catch { return false; }
+        }
+        private ActionResult DenyToIndex()
+        {
+            TempData["msgError"] = "<script>alert('Bạn không có quyền thực hiện chức năng này');</script>";
+            return RedirectToAction("Index", "Album");
+        }
+
         // GET: View360/Album
         public ActionResult Index(int? page, string search)
         {
@@ -46,12 +63,14 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public ActionResult Create()
         {
+            if (!HasPerm(EPORTAL.Models.A_Constants.ADD)) return DenyToIndex();
             return PartialView();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(AlbumValidation _DO)
         {
+            if (!HasPerm(EPORTAL.Models.A_Constants.ADD)) return DenyToIndex();
             var uploadError = FileUploadValidator.ValidateImage(_DO.ImageFile);
             if (uploadError != null)
             {
@@ -86,6 +105,7 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public ActionResult Edit(int id)
         {
+            if (!HasPerm(EPORTAL.Models.A_Constants.EDIT)) return DenyToIndex();
             var res = (from a in db.Album_searchByID(id)
                        select new AlbumValidation
                        {
@@ -116,6 +136,7 @@ namespace EPORTAL.Areas.View360.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(AlbumValidation _DO)
         {
+            if (!HasPerm(EPORTAL.Models.A_Constants.EDIT)) return DenyToIndex();
             var uploadError = FileUploadValidator.ValidateImage(_DO.ImageFile);
             if (uploadError != null)
             {
@@ -151,6 +172,7 @@ namespace EPORTAL.Areas.View360.Controllers
         }
         public ActionResult Delete(int? id)
         {
+            if (!HasPerm(EPORTAL.Models.A_Constants.DELETE)) return DenyToIndex();
             try
             {
                 db.Album_delete(id);
@@ -160,6 +182,17 @@ namespace EPORTAL.Areas.View360.Controllers
                 TempData["msgSuccess"] = "<script>alert('Xóa dữ liệu thất bại: " + e.Message + "');</script>";
             }
             return RedirectToAction("Index", "Album");
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

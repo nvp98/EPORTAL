@@ -8,6 +8,9 @@ namespace EPORTAL.Common
     /// Ghi log truy cap View360 content (Project / Virtual). Fire-and-forget,
     /// khong block request. Dedupe 30 phut/session de tranh dem F5.
     /// Bang: View360_AccessLog (migration: App_Data/migrations/v360-all.sql SECTION 7).
+    ///
+    /// VI SAO RAW ADO.NET: bang V360_* moi, chua map vao EDMX -> khong query qua EF duoc.
+    /// Pattern store chuan cua View360
     /// </summary>
     public static class View360AccessTracker
     {
