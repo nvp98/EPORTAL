@@ -84,14 +84,14 @@
                                             DateTime EndDate = DateTime.Parse(end);
                                         }
                                         Căn cứ theo hợp đồng số: @hp.Somecontracts giữa Nhà thầu: @nt.FullName và HPDQ (Thời hạn hợp đồng: đến ngày   @BeginDate.ToString("dd-MM-yyyy") ) <br />
-                                        Nhà thầu đang thực hiện gói thầu :  @hp.Contract, thời hạn gói thầu từ ngày @EndDate.ToString("dd-MM-yyyy") đến ngày @BeginDate.ToString("dd-MM-yyyy") do BP @pb.TenPhongBan quản lý.
+                                      @*  Nhà thầu đang thực hiện gói thầu :  @hp.Contract, thời hạn gói thầu từ ngày @EndDate.ToString("dd-MM-yyyy") đến ngày @BeginDate.ToString("dd-MM-yyyy") do BP @pb.TenPhongBan quản lý.*@
                                     </h6>
                                 }
                                 else
                                 {
                                     <h6>
                                         Căn cứ theo hợp đồng số: ..... giữa Nhà thầu: @nt.FullName và HPDQ (Thời hạn hợp đồng: đến ngày ..... ) <br />
-                                        Nhà thầu đang thực hiện gói thầu : ....., thời hạn gói thầu từ ngày ..... đến ngày ..... do BP @pb.TenPhongBan quản lý.
+                                       @* Nhà thầu đang thực hiện gói thầu : ....., thời hạn gói thầu từ ngày ..... đến ngày ..... do BP @pb.TenPhongBan quản lý.*@
                                     </h6>
                                 }
 
