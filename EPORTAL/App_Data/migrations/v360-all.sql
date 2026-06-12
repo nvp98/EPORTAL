@@ -741,6 +741,30 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_AuthUserGroup_Group' A
         ON dbo.AuthorizationUSER_Group (ContentType, IDGroup);
 GO
 
+-- 9.2b AuthorizationUSER_Exclude: LOAI TRU 1 noi dung cu the khoi quyen xem cua 1 user.
+-- Tinh nang "Nguoi duoc xem" (right-click du an -> bo 1 nguoi khoi DUY NHAT du an do):
+--   - KHONG dung den group-grant/file-grant (View360/Permission giu nguyen logic).
+--   - SP _select_USER them dieu kien NOT EXISTS tren bang nay -> chi noi dung bi
+--     exclude la an voi user do; cac noi dung khac trong nhom van thay binh thuong.
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'AuthorizationUSER_Exclude' AND schema_id = SCHEMA_ID('dbo'))
+BEGIN
+    CREATE TABLE dbo.AuthorizationUSER_Exclude (
+        ID          INT IDENTITY(1,1) NOT NULL,
+        NhanVienID  INT      NOT NULL,
+        ContentType TINYINT  NOT NULL,            -- 1=Project (2=Virtual, 3=Video: du phong tuong lai)
+        ContentID   INT      NOT NULL,            -- Projects.ID khi ContentType=1
+        CreatedByID INT      NULL,                -- admin thao tac
+        Createdate  DATETIME NOT NULL CONSTRAINT DF_AuthUserExcl_Createdate DEFAULT (GETDATE()),
+        CONSTRAINT PK_AuthUserExcl PRIMARY KEY CLUSTERED (ID),
+        CONSTRAINT UQ_AuthUserExcl UNIQUE (NhanVienID, ContentType, ContentID)
+    );
+    CREATE INDEX IX_AuthUserExcl_Content ON dbo.AuthorizationUSER_Exclude (ContentType, ContentID);
+    PRINT '[9.2b] Created table AuthorizationUSER_Exclude';
+END
+ELSE
+    PRINT '[9.2b] AuthorizationUSER_Exclude already exists - skipped';
+GO
+
 -- 9.3 Data migration legacy -> group-grant.
 -- Rule: user co file-grant tren project MOI NHAT (MAX ID) cua group
 --       -> tu dong cap group-grant cho user do.
@@ -884,6 +908,13 @@ BEGIN
             WHERE au.NhanVienID IN (SELECT ID FROM @Ids) AND au.ProjectID = p.ID
         )
         OR p.IDGroup IN (SELECT IDGroup FROM @AccessibleGroups)
+    )
+    -- Loai tru theo tung du an ("Nguoi duoc xem"): deny-list phu LEN TREN moi nguon quyen.
+    -- Check theo @Ids (moi ID cung MaNV) -> exclude 1 ban ghi trung la chan het.
+    AND NOT EXISTS (
+        SELECT 1 FROM dbo.AuthorizationUSER_Exclude ex
+        WHERE ex.NhanVienID IN (SELECT ID FROM @Ids)
+          AND ex.ContentType = 1 AND ex.ContentID = p.ID
     )
     AND (@search IS NULL OR @search = '' OR p.Title LIKE '%' + @search + '%');
 END;

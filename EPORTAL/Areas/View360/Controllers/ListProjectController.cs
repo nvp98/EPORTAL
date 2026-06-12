@@ -392,6 +392,33 @@ namespace EPORTAL.Areas.View360.Controllers
         // Tradeoff: data refresh sau 30 phut. Neu user can refresh ngay -> manual reload (Ctrl+F5 va recycle pool).
         public ActionResult Details(int id)
         {
+            // Guard "Nguoi duoc xem": user bi loai tru rieng du an nay (AuthorizationUSER_Exclude)
+            // -> chan ca truy cap bang URL truc tiep, khong chi an khoi danh sach.
+            // Check theo TAP ID cung MaNV (data co MaNV trung) - khop logic SP _select_USER.
+            try
+            {
+                var excludedCnt = db.Database.SqlQuery<int>(@"
+                    SELECT COUNT(*) FROM dbo.AuthorizationUSER_Exclude e
+                    WHERE e.ContentType = 1 AND e.ContentID = @pid
+                      AND e.NhanVienID IN (
+                          SELECT n2.ID FROM dbo.NhanVien n1
+                          JOIN dbo.NhanVien n2 ON n2.MaNV = n1.MaNV
+                          WHERE n1.ID = @uid AND n1.MaNV IS NOT NULL AND LTRIM(RTRIM(n1.MaNV)) <> ''
+                          UNION SELECT @uid)",
+                    new System.Data.SqlClient.SqlParameter("@pid", id),
+                    new System.Data.SqlClient.SqlParameter("@uid", MyAuthentication.ID)).First();
+                if (excludedCnt > 0)
+                {
+                    TempData["msgError"] = "<script>alert('Bạn không có quyền xem dự án này');</script>";
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception exGuard)
+            {
+                // Bang chua duoc tao (migration chua chay) -> bo qua guard, khong lam vo trang
+                System.Diagnostics.Debug.WriteLine("[Details] exclude guard skip: " + exGuard.Message);
+            }
+
             View360AccessTracker.Log(MyAuthentication.ID,
                 View360AccessTracker.ContentType.Project, id,
                 Session != null ? Session.SessionID : null);

@@ -875,6 +875,7 @@
     <div class="fx-ctxmenu__sep"></div>
     <a href="#" class="fx-ctxmenu__item" data-ctx-action="open"><i class="fa fa-folder-open"></i> Mở</a>
     <a href="#" class="fx-ctxmenu__item" data-ctx-action="edit"><i class="fa fa-edit"></i> Đổi tên / chỉnh sửa</a>
+    <a href="#" class="fx-ctxmenu__item" data-ctx-action="viewers"><i class="fa fa-eye"></i> Người được xem</a>
     <a href="#" class="fx-ctxmenu__item" data-ctx-action="move"><i class="fa fa-arrows-alt"></i> Di chuyển đến…</a>
     <div class="fx-ctxmenu__sep"></div>
     <a href="#" class="fx-ctxmenu__item is-danger" data-ctx-action="delete"><i class="fa fa-trash"></i> Xóa</a>
@@ -916,6 +917,33 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
                 <button type="button" id="fx-move-confirm" class="btn btn-primary" disabled>Di chuyển</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ===== Modal "Nguoi duoc xem" - loai tru quyen xem theo TUNG du an ===== *@
+<div class="modal" id="fx-viewers-modal" role="dialog" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5><i class="fa fa-eye"></i> Người được xem</h5>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:8px;color:#6b7c93;font-size:13px">
+                    Dự án: <strong id="fx-viewers-project">—</strong>
+                    <span id="fx-viewers-count" style="margin-left:8px;color:#94a3b8"></span>
+                </div>
+                <input type="text" id="fx-viewers-filter" class="form-control" placeholder="🔎 Tìm theo tên / mã nhân viên…" style="margin-bottom:10px" />
+                <div id="fx-viewers-list" style="max-height:380px;overflow:auto;border:1px solid #eef2f7;border-radius:8px;"></div>
+                <div style="margin-top:8px;color:#94a3b8;font-size:12px">
+                    "Bỏ xem" chỉ ẩn <b>duy nhất dự án này</b> với người đó — quyền nhóm / quyền lẻ khác
+                    trong Quản lý phân quyền giữ nguyên (vẫn xem được các dự án còn lại trong nhóm).
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
@@ -1144,6 +1172,9 @@
                 $del.removeClass('is-disabled').removeAttr('title');
             }
 
+            // "Nguoi duoc xem" chi ap dung cho DU AN (file), khong cho folder
+            jQuery('[data-ctx-action="viewers"]', $ctx).toggle(type === 'file');
+
             // Position - clamp vao viewport
             $ctx.addClass('is-open').css({ left: x + 'px', top: y + 'px' });
             var rect = $ctx[0].getBoundingClientRect();
@@ -1201,6 +1232,8 @@
                     jQuery("#ModalTitle").html(type === 'folder' ? "Đổi tên nhóm" : "Cập nhật dự án");
                     jQuery("#myModal").modal('show');
                 });
+            } else if (action === 'viewers') {
+                openViewersModal(id, name);
             } else if (action === 'move') {
                 openMoveModal(type, id, name, parent);
             } else if (action === 'delete') {
@@ -1275,6 +1308,102 @@
             }).fail(function (xhr) {
                 alert('Di chuyển thất bại: ' + (xhr.responseText || xhr.statusText));
             });
+        });
+
+        // ====================================================
+        // "Nguoi duoc xem" - danh sach nguoi xem duoc du an,
+        // admin tim theo ten/ma NV va bo (exclude) DUY NHAT du an nay.
+        // ====================================================
+        var viewersCtx = { projectId: null, projectName: '', rows: [] };
+
+        function vwEsc(s) {
+            return (s == null ? '' : String(s)).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function openViewersModal(projectId, name) {
+            viewersCtx = { projectId: projectId, projectName: name, rows: [] };
+            jQuery('#fx-viewers-project').text(name);
+            jQuery('#fx-viewers-count').text('');
+            jQuery('#fx-viewers-filter').val('');
+            jQuery('#fx-viewers-list').html('<div style="padding:14px;color:#94a3b8">Đang tải…</div>');
+            jQuery('#fx-viewers-modal').modal('show');
+            jQuery.getJSON('@Url.Action("ViewersList", "Projects")', { id: projectId }, function (d) {
+                if (!d || d.ok === false) {
+                    jQuery('#fx-viewers-list').html('<div style="padding:14px;color:#dc2626">'
+                        + vwEsc(d && d.error ? d.error : 'Lỗi tải danh sách') + '</div>');
+                    return;
+                }
+                viewersCtx.rows = d.rows || [];
+                renderViewers();
+            }).fail(function (xhr) {
+                jQuery('#fx-viewers-list').html('<div style="padding:14px;color:#dc2626">Lỗi tải danh sách (' + xhr.status + ')</div>');
+            });
+        }
+
+        function renderViewers() {
+            var q = (jQuery('#fx-viewers-filter').val() || '').trim().toLowerCase();
+            var rows = viewersCtx.rows.filter(function (r) {
+                return !q || (r.hoTen || '').toLowerCase().indexOf(q) >= 0
+                          || (r.maNV || '').toLowerCase().indexOf(q) >= 0;
+            });
+            var excl = viewersCtx.rows.filter(function (r) { return r.excluded; }).length;
+            jQuery('#fx-viewers-count').text(viewersCtx.rows.length + ' người'
+                + (excl ? ' · ' + excl + ' đang bị loại trừ' : ''));
+            if (!rows.length) {
+                jQuery('#fx-viewers-list').html('<div style="padding:14px;color:#94a3b8">'
+                    + (viewersCtx.rows.length ? 'Không ai khớp từ khóa' : 'Chưa có ai được cấp quyền xem dự án này') + '</div>');
+                return;
+            }
+            jQuery('#fx-viewers-list').html(rows.map(function (r) {
+                var src = '';
+                if (r.hasGroupGrant) src += '<span title="Xem được nhờ quyền NHÓM" style="background:#dcfce7;color:#166534;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;">📂 Nhóm</span> ';
+                if (r.hasFileGrant) src += '<span title="Xem được nhờ quyền LẺ trên dự án này" style="background:#fef3c7;color:#78350f;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;">📄 Lẻ</span> ';
+                var btn = r.excluded
+                    ? '<button type="button" class="btn btn-sm" data-vw-include="' + r.nhanVienId + '" style="border:1px solid #16a34a;color:#16a34a;background:#fff;font-size:12px;white-space:nowrap;">↩ Cho xem lại</button>'
+                    : '<button type="button" class="btn btn-sm" data-vw-exclude="' + r.nhanVienId + '" style="border:1px solid #dc2626;color:#dc2626;background:#fff;font-size:12px;white-space:nowrap;">✕ Bỏ xem</button>';
+                return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid #f1f5f9;'
+                    + (r.excluded ? 'opacity:.6;background:#fef2f2;' : '') + '">'
+                    + '<div style="flex:1;min-width:0;"><b>' + vwEsc(r.hoTen) + '</b> <small style="color:#6b7c93">· ' + vwEsc(r.maNV || '') + '</small>'
+                    + (r.active ? '' : ' <small style="color:#dc2626">(nghỉ việc)</small>')
+                    + '<div style="font-size:12px;color:#6b7c93;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + vwEsc(r.phongBan || '—') + '</div></div>'
+                    + src + btn + '</div>';
+            }).join(''));
+        }
+
+        jQuery('#fx-viewers-filter').on('input', renderViewers);
+
+        function vwPost(url, uid, btn, onOk) {
+            btn.disabled = true;
+            jQuery.post(url, {
+                id: viewersCtx.projectId,
+                userId: uid,
+                __RequestVerificationToken: jQuery('input[name="__RequestVerificationToken"]').val() || ''
+            }).done(function (d) {
+                if (d && d.ok) onOk();
+                else alert('Lỗi: ' + (d && d.error ? d.error : 'không rõ'));
+            }).fail(function (xhr) {
+                alert('Lỗi máy chủ (' + xhr.status + '): ' + (xhr.responseText || xhr.statusText));
+            }).always(function () {
+                btn.disabled = false;
+                renderViewers();
+            });
+        }
+
+        jQuery(document).on('click', '[data-vw-exclude]', function () {
+            var uid = parseInt(this.getAttribute('data-vw-exclude'), 10);
+            var row = viewersCtx.rows.filter(function (r) { return r.nhanVienId === uid; })[0];
+            if (!row) return;
+            if (!confirm('Bỏ quyền xem dự án "' + viewersCtx.projectName + '" của '
+                + row.hoTen + ' (' + (row.maNV || '') + ')?\n\nChỉ ẩn DUY NHẤT dự án này — quyền nhóm/quyền khác giữ nguyên.')) return;
+            vwPost('@Url.Action("ExcludeViewer", "Projects")', uid, this, function () { row.excluded = true; });
+        });
+
+        jQuery(document).on('click', '[data-vw-include]', function () {
+            var uid = parseInt(this.getAttribute('data-vw-include'), 10);
+            var row = viewersCtx.rows.filter(function (r) { return r.nhanVienId === uid; })[0];
+            if (!row) return;
+            vwPost('@Url.Action("IncludeViewer", "Projects")', uid, this, function () { row.excluded = false; });
         });
     })();
 </script>
