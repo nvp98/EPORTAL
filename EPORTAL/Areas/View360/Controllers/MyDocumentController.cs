@@ -174,12 +174,13 @@ namespace EPORTAL.Areas.View360.Controllers
                                     //}
                                 }
                             }
-                            string msg = "";
-                            if (dtc != 0)
-                            {
-                                msg = "Import được " + dtc + " dòng dữ liệu";
-                            }
-                            else { msg = "File import không có dữ liệu"; }
+                            // CHU Y: vong lap insert phia tren da bi comment tu truoc -> dtc luon = 0.
+                            // Tinh nang import tai lieu CHUA duoc trien khai va UI moi (MyDocument showcase)
+                            // KHONG con nut import. Bao trung thuc thay vi "khong co du lieu" gay hieu nham.
+                            // (Giu action + view de khong xoa code mo ho - cho quyet dinh: trien khai hay go han.)
+                            string msg = (dtc != 0)
+                                ? "Import được " + dtc + " dòng dữ liệu"
+                                : "Chức năng import tài liệu chưa được triển khai.";
 
                             TempData["msgSuccess"] = "<script>alert('" + msg + "');</script>";
 
@@ -207,6 +208,17 @@ namespace EPORTAL.Areas.View360.Controllers
             }
 
             return RedirectToAction("Index", "MyDocument");
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbE != null) dbE.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
