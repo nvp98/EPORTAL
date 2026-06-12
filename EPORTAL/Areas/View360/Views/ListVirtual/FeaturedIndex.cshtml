@@ -5,7 +5,7 @@
     var savedCounts = ViewBag.SavedCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
-<link href="~/Content/view360-modern.css?v=@(DateTime.UtcNow.Ticks)" rel="stylesheet" />
+<link href="~/Content/view360-modern.css?v=@EPORTAL.Common.AssetVersion.Token" rel="stylesheet" />
 
 <div class="app-main__outer">
     <div class="app-main__inner">
