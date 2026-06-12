@@ -12,6 +12,13 @@ namespace EPORTAL.Areas.View360.Controllers
     /// Admin dashboard cho View360 - do "user su dung thuc" qua bang View360_AccessLog.
     /// Permission: tai su dung key "Report" trong A_QuyenCT (zero DB work).
     /// Scope phase 1: Project + Virtual (Video chua co tracking).
+    ///
+    /// VI SAO RAW SQL (Database.SqlQuery) cho toan bo endpoint KPI o day:
+    ///  - Day la cac truy van AGGREGATE/ANALYTICS: GROUP BY theo ngay/gio/phong ban,
+    ///    COUNT(DISTINCT ...), recursive CTE (cay nhom), NOT EXISTS (noi dung chua dung).
+    ///    LINQ-to-Entities khong dien dat duoc CTE de quy va sinh SQL kem cho aggregate phuc tap.
+    ///  - View360_AccessLog la BANG MOI, chua map vao EDMX -> khong query qua db.* (EF) duoc.
+    ///  - Tat ca tham so hoa qua MakeParams (SqlParameter) -> khong co injection.
     /// </summary>
     public class DashboardController : Controller
     {
@@ -1054,6 +1061,17 @@ namespace EPORTAL.Areas.View360.Controllers
             public string Title { get; set; }
             public DateTime PublishedAt { get; set; }
             public int DaysOld { get; set; }
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

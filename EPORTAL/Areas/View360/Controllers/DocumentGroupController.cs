@@ -117,5 +117,15 @@ namespace EPORTAL.Areas.View360.Controllers
             }
             return RedirectToAction("Index", "DocumentGroup");
         }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }

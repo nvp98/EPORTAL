@@ -395,6 +395,8 @@ namespace EPORTAL.Areas.View360.Controllers
             // Guard "Nguoi duoc xem": user bi loai tru rieng du an nay (AuthorizationUSER_Exclude)
             // -> chan ca truy cap bang URL truc tiep, khong chi an khoi danh sach.
             // Check theo TAP ID cung MaNV (data co MaNV trung) - khop logic SP _select_USER.
+            // RAW SQL vi: (1) AuthorizationUSER_Exclude chua map vao EDMX; (2) can self-join NhanVien
+            // de gom moi ID cung MaNV. Tham so hoa @pid/@uid -> khong injection.
             try
             {
                 var excludedCnt = db.Database.SqlQuery<int>(@"
@@ -455,6 +457,16 @@ namespace EPORTAL.Areas.View360.Controllers
                 HttpNotFound();
             }
             return View(DO);
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

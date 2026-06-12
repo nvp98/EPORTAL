@@ -141,6 +141,11 @@ namespace EPORTAL.Areas.View360.Controllers
         /// Filter don le (phongBanId/type/rootGroupId): giu tuong thich cu.
         /// Filter da chon kieu Excel (csv): types "1,3" / grantTypes "0,1" /
         /// phongBanIds "2,5" / groups "type:groupId,..." vd "1:12,2:7".
+        ///
+        /// VI SAO RAW SQL: filter da-chon kieu Excel sinh menh de IN(...) co SO LUONG phan tu
+        /// DONG theo runtime (user tich bao nhieu gia tri) -> khong the tham so hoa co dinh hay
+        /// dat trong SP. AN TOAN: moi gia tri ghep vao IN deu da parse sang int (ParseIntCsv);
+        /// rieng `search` van tham so hoa (@search) vi la chuoi tu do.
         /// </summary>
         private string BuildGrantsWhere(string search, int? phongBanId, int? type,
             int? rootGroupId, bool exactGroup,
@@ -240,6 +245,13 @@ namespace EPORTAL.Areas.View360.Controllers
         ///   (1) Group-grants moi tu AuthorizationUSER_Group
         ///   (2) File-grants legacy aggregate (CHI khi user khong co group-grant tren cung (type, group))
         /// GrantType: 1 = group-grant (auto-inherit), 0 = file-grants only (no inherit)
+        ///
+        /// VI SAO RAW SQL (khong EF LINQ / SP-EDMX):
+        ///  - Cau la UNION 6 nhanh tu 4 bang (AuthorizationUSER_Group + AuthorizationUSER/Vitual/Video
+        ///    + ProjectsGroup/VirtualGroup/Album) voi NOT EXISTS de an file-grant trung group-grant.
+        ///    LINQ dien dat cuc kho doc va sinh SQL kem; tach thanh SP thi WHERE (filter) lai DONG
+        ///    (xem BuildGrantsWhere) nen khong the co dinh trong SP.
+        ///  - Bang AuthorizationUSER_Group la BANG MOI, chua duoc map vao EDMX -> khong goi qua db.* duoc.
         /// </summary>
         private static string GrantsFromJoin()
         {
@@ -1668,6 +1680,17 @@ namespace EPORTAL.Areas.View360.Controllers
             public string HoTen { get; set; }
             public string TenPhongBan { get; set; }
             public int GrantCount { get; set; }
+        }
+
+        // Dispose EF context (MVC khong tu dispose field context -> giai phong connection pool ngay).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null) db.Dispose();
+                if (dbP != null) dbP.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
