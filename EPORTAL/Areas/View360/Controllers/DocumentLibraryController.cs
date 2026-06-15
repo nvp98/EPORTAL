@@ -120,7 +120,9 @@ namespace EPORTAL.Areas.View360.Controllers
             }
             catch (Exception e)
             {
-                TempData["msgError"] = "<script>alert('Có lỗi khi thêm mới: " + e.Message + "');</script>";
+                // Lo INNER exception: loi EF "executing the command definition" nuot SqlException that
+                // -> can xem inner moi biet nguyen nhan (truncate cot, FK, ...).
+                TempData["msgError"] = "<script>alert('Có lỗi khi thêm mới: " + JsEscape(FlattenError(e)) + "');</script>";
             }
             //return View();
             return RedirectToAction("Index", "DocumentLibrary");
@@ -199,7 +201,7 @@ namespace EPORTAL.Areas.View360.Controllers
             }
             catch (Exception e)
             {
-                TempData["msgError"] = "<script>alert('Có lỗi khi chỉnh sửa: " + e.Message + "');</script>";
+                TempData["msgError"] = "<script>alert('Có lỗi khi chỉnh sửa: " + JsEscape(FlattenError(e)) + "');</script>";
             }
             //return View();
             return RedirectToAction("Index", "DocumentLibrary");
@@ -435,6 +437,26 @@ namespace EPORTAL.Areas.View360.Controllers
                 if (dbE != null) dbE.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        // Gom message cua exception + tat ca inner -> de lo nguyen nhan that (EF nuot SqlException).
+        private static string FlattenError(Exception e)
+        {
+            var sb = new System.Text.StringBuilder();
+            for (var cur = e; cur != null; cur = cur.InnerException)
+            {
+                if (sb.Length > 0) sb.Append(" | ");
+                sb.Append(cur.Message);
+            }
+            var s = sb.ToString();
+            return s.Length > 500 ? s.Substring(0, 500) : s;
+        }
+
+        // Escape cho chuoi nhung trong alert('...') (tranh vo JS khi message co dau nhay / xuong dong).
+        private static string JsEscape(string s)
+        {
+            return (s ?? "").Replace("\\", "\\\\").Replace("'", "\\'")
+                            .Replace("\r", " ").Replace("\n", " ");
         }
     }
 }
