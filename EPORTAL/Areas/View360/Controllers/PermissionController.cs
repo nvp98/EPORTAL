@@ -24,10 +24,24 @@ namespace EPORTAL.Areas.View360.Controllers
         int IDQuyenHT = MyAuthentication.IDQuyenHT;
         const string PermKey = "Projects";
 
-        // ContentType: 1=Project, 2=Virtual, 3=Video
-        const byte TYPE_PROJECT = 1;
-        const byte TYPE_VIRTUAL = 2;
-        const byte TYPE_VIDEO   = 3;
+        // ContentType: 1=Project, 2=Virtual, 3=Video, 4=Document (Thu vien tai lieu)
+        const byte TYPE_PROJECT  = 1;
+        const byte TYPE_VIRTUAL  = 2;
+        const byte TYPE_VIDEO    = 3;
+        const byte TYPE_DOCUMENT = 4;
+
+        // Ten loai dung chung cho moi cho hien thi (tranh lap ternary nhieu noi).
+        private static string TypeName(int t)
+        {
+            switch (t)
+            {
+                case 1: return "Project";
+                case 2: return "Virtual";
+                case 3: return "Video";
+                case 4: return "Document";
+                default: return "?";
+            }
+        }
 
         // GET: View360/Permission
         public ActionResult Index()
@@ -113,7 +127,7 @@ namespace EPORTAL.Areas.View360.Controllers
                         displayName = r.GroupName ?? "(không tên nhóm)";
                     return new {
                         type = r.Type,
-                        typeName = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video"),
+                        typeName = TypeName(r.Type),
                         groupId = r.GroupId,
                         groupName = displayName,
                         groupNameLeaf = r.GroupName ?? "(không tên nhóm)",
@@ -158,7 +172,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 where += " AND n.IDPhongBan = @phongBanId";
                 paramValues["@phongBanId"] = phongBanId.Value;
             }
-            if (type.HasValue && (type.Value == 1 || type.Value == 2 || type.Value == 3))
+            if (type.HasValue && type.Value >= 1 && type.Value <= 4)
             {
                 where += " AND g.Type = @type";
                 paramValues["@type"] = type.Value;
@@ -185,8 +199,8 @@ namespace EPORTAL.Areas.View360.Controllers
             }
             // === Multi-select kieu Excel (csv) - chi nhung gia tri parse duoc thanh int
             // moi vao SQL (literal IN list, khong co duong injection) ===
-            var typeList = ParseIntCsv(types).Where(t => t >= 1 && t <= 3).Distinct().ToList();
-            if (typeList.Count > 0 && typeList.Count < 3)
+            var typeList = ParseIntCsv(types).Where(t => t >= 1 && t <= 4).Distinct().ToList();
+            if (typeList.Count > 0 && typeList.Count < 4)
                 where += " AND g.Type IN (" + string.Join(",", typeList) + ")";
 
             var gtList = ParseIntCsv(grantTypes).Where(t => t == 0 || t == 1).Distinct().ToList();
@@ -208,7 +222,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     int t, gid;
                     if (!int.TryParse(pair.Substring(0, idx).Trim(), out t)) continue;
                     if (!int.TryParse(pair.Substring(idx + 1).Trim(), out gid)) continue;
-                    if (t < 1 || t > 3) continue;
+                    if (t < 1 || t > 4) continue;
                     if (!byType.ContainsKey(t)) byType[t] = new List<int>();
                     byType[t].Add(gid);
                 }
@@ -308,7 +322,16 @@ namespace EPORTAL.Areas.View360.Controllers
                        AND NOT EXISTS (
                            SELECT 1 FROM dbo.AuthorizationUSER_Group g
                            WHERE g.NhanVienID = avi.NhanVienID AND g.ContentType = 3 AND g.IDGroup = vd.AlbumID
-                       )";
+                       )
+                    UNION ALL
+                    -- (3) DOCUMENT (Thu vien tai lieu): CHI co file-grant (L_AuthorizationTV per tai lieu),
+                    -- khong co group-grant. Gom theo nhom tai lieu (L_NhomThuVienFile) de hien thi.
+                    SELECT 4 AS Type, atv.NhanVienID, tf.IDNhom AS GroupId,
+                           ng.TenNhomTV AS GroupName, atv.Createdate, 0 AS GrantType, 0 AS IsRecursive
+                      FROM dbo.L_AuthorizationTV atv
+                      JOIN dbo.L_ThuVienFile tf ON atv.IDThuVien = tf.ID
+                      LEFT JOIN dbo.L_NhomThuVienFile ng ON tf.IDNhom = ng.IDNhom
+                     WHERE atv.NhanVienID IS NOT NULL AND tf.IDNhom IS NOT NULL";
 
             return "FROM (" + unionSql + @") g
                     JOIN dbo.NhanVien n ON g.NhanVienID = n.ID
@@ -405,7 +428,7 @@ namespace EPORTAL.Areas.View360.Controllers
                             : "Lẻ";
 
                         ws.Cell(row, 1).Value = stt;
-                        ws.Cell(row, 2).Value = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video");
+                        ws.Cell(row, 2).Value = TypeName(r.Type);
                         ws.Cell(row, 3).Value = grantKind;
                         ws.Cell(row, 4).Value = r.MaNV ?? "";
                         ws.Cell(row, 5).Value = r.HoTen ?? "";
@@ -472,7 +495,7 @@ namespace EPORTAL.Areas.View360.Controllers
                 var result = rows.Select(r => new {
                         type = r.Type,
                         groupId = r.GroupId,
-                        typeName = r.Type == 1 ? "Project" : (r.Type == 2 ? "Virtual" : "Video"),
+                        typeName = TypeName(r.Type),
                         label = (r.Type == 1 && pathMap.ContainsKey(r.GroupId))
                             ? pathMap[r.GroupId]
                             : (r.GroupName ?? "(không tên nhóm)"),
@@ -532,6 +555,15 @@ namespace EPORTAL.Areas.View360.Controllers
                     var rows = db.Albums
                         .OrderBy(a => a.TenAlbum)
                         .Select(a => new { id = a.IDAlbum, name = a.TenAlbum, parentId = (int?)null, depth = 0 })
+                        .ToList();
+                    return Json(rows, JsonRequestBehavior.AllowGet);
+                }
+                // Document grouped by L_NhomThuVienFile (phang)
+                if (type == TYPE_DOCUMENT)
+                {
+                    var rows = dbP.L_NhomThuVienFile
+                        .OrderBy(g => g.TenNhomTV)
+                        .Select(g => new { id = g.IDNhom, name = g.TenNhomTV, parentId = (int?)null, depth = 0 })
                         .ToList();
                     return Json(rows, JsonRequestBehavior.AllowGet);
                 }
@@ -636,6 +668,20 @@ namespace EPORTAL.Areas.View360.Controllers
                         .ToList();
                     return Json(rows, JsonRequestBehavior.AllowGet);
                 }
+                if (type == TYPE_DOCUMENT)
+                {
+                    var q = dbP.L_ThuVienFile.AsQueryable();
+                    if (groupId.HasValue) q = q.Where(t => t.IDNhom == groupId.Value);
+                    if (!string.IsNullOrEmpty(s)) q = q.Where(t => t.TenTaiLieu.Contains(s));
+                    var rows = q.OrderByDescending(t => t.ID)
+                        .Take(limit)
+                        .Select(t => new {
+                            type = (int)TYPE_DOCUMENT, typeName = "Document",
+                            id = t.ID, title = t.TenTaiLieu, groupId = t.IDNhom
+                        })
+                        .ToList();
+                    return Json(rows, JsonRequestBehavior.AllowGet);
+                }
                 return Json(new object[0], JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex) { return Err(ex); }
@@ -674,8 +720,9 @@ namespace EPORTAL.Areas.View360.Controllers
                 // sẽ không bao giờ khớp (đây chính là bug đã xảy ra).
 
                 // ----- A. GROUP-GRANT units (AuthorizationUSER_Group) -----
+                // Tai lieu (type 4) KHONG phai group-grant -> loai ra, xu ly nhu file-grant ben duoi.
                 var groups = (req.Groups ?? new GroupRef[0])
-                    .Where(g => g.GroupId > 0)
+                    .Where(g => g.GroupId > 0 && g.Type != TYPE_DOCUMENT)
                     .GroupBy(g => g.Type + "-" + g.GroupId)
                     .Select(g => g.First())
                     .ToList();
@@ -708,6 +755,15 @@ namespace EPORTAL.Areas.View360.Controllers
                 var projIds = items.Where(i => i.Type == TYPE_PROJECT).Select(i => i.Id).ToList();
                 var virtIds = items.Where(i => i.Type == TYPE_VIRTUAL).Select(i => i.Id).ToList();
                 var vidIds  = items.Where(i => i.Type == TYPE_VIDEO ).Select(i => i.Id).ToList();
+                // Tai lieu (file-grant): item type 4 + expand doc-group type 4 -> tung tai lieu.
+                var pvDocGroupIds = (req.Groups ?? new GroupRef[0])
+                    .Where(g => g.Type == TYPE_DOCUMENT && g.GroupId > 0).Select(g => g.GroupId).Distinct().ToList();
+                var docIds = items.Where(i => i.Type == TYPE_DOCUMENT).Select(i => i.Id).ToList();
+                if (pvDocGroupIds.Count > 0)
+                    docIds.AddRange(dbP.L_ThuVienFile
+                        .Where(t => t.IDNhom.HasValue && pvDocGroupIds.Contains(t.IDNhom.Value))
+                        .Select(t => t.ID).ToList());
+                docIds = docIds.Distinct().ToList();
 
                 // DISTINCT count - tránh case AuthorizationUSER/Vitual/Video có row trùng (NhanVienID, ContentID).
                 int fileExisting = 0;
@@ -741,8 +797,18 @@ namespace EPORTAL.Areas.View360.Controllers
                         .Distinct()
                         .Count();
                 }
+                if (docIds.Count > 0)
+                {
+                    fileExisting += dbP.L_AuthorizationTV
+                        .Where(a => a.NhanVienID.HasValue && a.IDThuVien.HasValue
+                            && userIds.Contains(a.NhanVienID.Value)
+                            && docIds.Contains(a.IDThuVien.Value))
+                        .Select(a => new { a.NhanVienID, a.IDThuVien })
+                        .Distinct()
+                        .Count();
+                }
 
-                int itemCount = projIds.Count + virtIds.Count + vidIds.Count;
+                int itemCount = projIds.Count + virtIds.Count + vidIds.Count + docIds.Count;
                 int unitCount = groupCount + itemCount;
                 if (unitCount == 0)
                     return Json(new { existing = 0, notExisting = 0, total = 0, warnings = new object[0] });
@@ -1083,6 +1149,8 @@ namespace EPORTAL.Areas.View360.Controllers
                         foreach (var gref in req.Groups)
                         {
                             if (gref.GroupId <= 0) continue;
+                            // Tai lieu (type 4) KHONG co group-grant -> xu ly o phan file-grant ben duoi.
+                            if (gref.Type == TYPE_DOCUMENT) continue;
                             // Check existed (UNIQUE constraint)
                             var existCnt = db.Database.SqlQuery<int>(
                                 @"SELECT COUNT(*) FROM dbo.AuthorizationUSER_Group
@@ -1104,6 +1172,15 @@ namespace EPORTAL.Areas.View360.Controllers
                 var projIds = items.Where(i => i.Type == TYPE_PROJECT).Select(i => i.Id).Distinct().ToList();
                 var virtIds = items.Where(i => i.Type == TYPE_VIRTUAL).Select(i => i.Id).Distinct().ToList();
                 var vidIds  = items.Where(i => i.Type == TYPE_VIDEO ).Select(i => i.Id).Distinct().ToList();
+                // Tai lieu: gom item type 4 + expand cac doc-group (type 4) thanh tung tai lieu.
+                var docGroupIds = (req.Groups ?? new GroupRef[0])
+                    .Where(g => g.Type == TYPE_DOCUMENT && g.GroupId > 0).Select(g => g.GroupId).Distinct().ToList();
+                var docIds = items.Where(i => i.Type == TYPE_DOCUMENT).Select(i => i.Id).ToList();
+                if (docGroupIds.Count > 0)
+                    docIds.AddRange(dbP.L_ThuVienFile
+                        .Where(t => t.IDNhom.HasValue && docGroupIds.Contains(t.IDNhom.Value))
+                        .Select(t => t.ID).ToList());
+                docIds = docIds.Distinct().ToList();
 
                 // === Project grants ===
                 if (projIds.Count > 0)
@@ -1171,7 +1248,31 @@ namespace EPORTAL.Areas.View360.Controllers
                         }
                 }
 
-                if (created > 0) db.SaveChanges();
+                // === Document grants (L_AuthorizationTV - file-grant per tai lieu) ===
+                if (docIds.Count > 0)
+                {
+                    var existing = new HashSet<string>(
+                        dbP.L_AuthorizationTV
+                            .Where(a => a.NhanVienID.HasValue && a.IDThuVien.HasValue
+                                && userIds.Contains(a.NhanVienID.Value)
+                                && docIds.Contains(a.IDThuVien.Value))
+                            .Select(a => a.NhanVienID + "-" + a.IDThuVien)
+                            .ToList());
+                    foreach (var uid in userIds)
+                        foreach (var did in docIds)
+                        {
+                            var k = uid + "-" + did;
+                            if (existing.Contains(k)) { skipped++; continue; }
+                            dbP.L_AuthorizationTV.Add(new L_AuthorizationTV {
+                                NhanVienID = uid, IDThuVien = did, Createdate = now
+                            });
+                            created++;
+                        }
+                }
+
+                // Project/Virtual/Video o EPORTALEntities (db); Document o PhanQuyenHTEntities (dbP)
+                // -> phai luu CA HAI context (2 transaction rieng - chap nhan nhu pattern hien co).
+                if (created > 0) { db.SaveChanges(); dbP.SaveChanges(); }
                 return Json(new { created, skipped });
             }
             catch (Exception ex) { return Err(ex); }
@@ -1230,6 +1331,18 @@ namespace EPORTAL.Areas.View360.Controllers
                                 foreach (var r in rows) db.AuthorizationVideos.Remove(r);
                                 deletedTotal += rows.Count;
                             }
+                            else if (rg.Type == TYPE_DOCUMENT)
+                            {
+                                // Tai lieu chi co file-grant -> xoa L_AuthorizationTV cua cac tai lieu trong nhom.
+                                var dIds = dbP.L_ThuVienFile.Where(t => t.IDNhom == rg.GroupId)
+                                    .Select(t => t.ID).ToList();
+                                var rows = dbP.L_AuthorizationTV
+                                    .Where(a => a.NhanVienID == rg.UserId
+                                             && a.IDThuVien.HasValue
+                                             && dIds.Contains(a.IDThuVien.Value)).ToList();
+                                foreach (var r in rows) dbP.L_AuthorizationTV.Remove(r);
+                                deletedTotal += rows.Count;
+                            }
                         }
                         else
                         {
@@ -1241,7 +1354,8 @@ namespace EPORTAL.Areas.View360.Controllers
                             deletedTotal += rows;
                         }
                     }
-                    if (deletedTotal > 0) db.SaveChanges();
+                    // Luu ca 2 context: group/file-grant PVV o db, document o dbP.
+                    if (deletedTotal > 0) { db.SaveChanges(); dbP.SaveChanges(); }
                 }
 
                 // ===== B. Revoke file-grants legacy =====
@@ -1285,8 +1399,19 @@ namespace EPORTAL.Areas.View360.Controllers
                             deletedFile += rows.Count;
                         }
                     }
+                    else if (grp.Key == TYPE_DOCUMENT)
+                    {
+                        foreach (var item in grp)
+                        {
+                            var rows = dbP.L_AuthorizationTV
+                                .Where(a => a.NhanVienID == item.UserId && a.IDThuVien == item.ContentId)
+                                .ToList();
+                            foreach (var r in rows) dbP.L_AuthorizationTV.Remove(r);
+                            deletedFile += rows.Count;
+                        }
+                    }
                 }
-                if (deletedFile > 0) db.SaveChanges();
+                if (deletedFile > 0) { db.SaveChanges(); dbP.SaveChanges(); }
                 return Json(new { deleted = deletedTotal + deletedFile });
             }
             catch (Exception ex) { return Err(ex); }
@@ -1330,7 +1455,16 @@ namespace EPORTAL.Areas.View360.Controllers
                                   createdate = av.Createdate
                               }).ToList();
 
-                var all = projects.Concat(virtuals).Concat(videos)
+                var documents = (from a in dbP.L_AuthorizationTV
+                                 join t in dbP.L_ThuVienFile on a.IDThuVien equals t.ID
+                                 where a.NhanVienID == userId
+                                 select new {
+                                     type = (int)TYPE_DOCUMENT, typeName = "Document",
+                                     contentId = t.ID, title = t.TenTaiLieu,
+                                     createdate = a.Createdate
+                                 }).ToList();
+
+                var all = projects.Concat(virtuals).Concat(videos).Concat(documents)
                     .OrderByDescending(g => g.createdate)
                     .Select(g => new {
                         g.type, g.typeName, g.contentId, g.title,
@@ -1346,6 +1480,7 @@ namespace EPORTAL.Areas.View360.Controllers
                     grants = all,
                     counts = new {
                         project = projects.Count, @virtual = virtuals.Count, video = videos.Count,
+                        document = documents.Count,
                         total = all.Count
                     }
                 }, JsonRequestBehavior.AllowGet);
@@ -1534,6 +1669,18 @@ namespace EPORTAL.Areas.View360.Controllers
                     {
                         var k = "3-" + vid;
                         if (seen.Add(k)) result.Add(new ContentItem { Type = 3, Id = vid });
+                    }
+                }
+                else if (g.Type == TYPE_DOCUMENT)
+                {
+                    // Tai lieu: nhom phang, khong recursive. Expand -> tung tai lieu (file-grant).
+                    var ids = dbP.L_ThuVienFile
+                        .Where(t => t.IDNhom == g.GroupId)
+                        .Select(t => t.ID).ToList();
+                    foreach (var did in ids)
+                    {
+                        var k = "4-" + did;
+                        if (seen.Add(k)) result.Add(new ContentItem { Type = 4, Id = did });
                     }
                 }
             }
