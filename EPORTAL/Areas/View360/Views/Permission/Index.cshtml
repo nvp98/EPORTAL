@@ -75,6 +75,7 @@
 .pm-badge--p { background: #dbeafe; color: #1d4ed8; }
 .pm-badge--v { background: #ede9fe; color: #6d28d9; }
 .pm-badge--vd { background: #fee2e2; color: #b91c1c; }
+.pm-badge--d { background: #dcfce7; color: #15803d; }
 
 .pm-revoke-btn { padding: 5px 10px; background: #fff; border: 1px solid #fecaca; color: #dc2626;
                   border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; }
@@ -456,8 +457,8 @@ function renderRows(rows) {
         // Key = type-userId-groupId-grantType (group-grant vs file-grants có thể trùng group → 2 rows)
         var key = r.type + '-' + r.nhanVienId + '-' + r.groupId + '-' + (r.grantType || 0);
         state.rowData[key] = r;
-        var typeCls = r.type === 1 ? 'p' : (r.type === 2 ? 'v' : 'vd');
-        var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : 'video');
+        var typeCls = r.type === 1 ? 'p' : (r.type === 2 ? 'v' : (r.type === 4 ? 'd' : 'vd'));
+        var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : (r.type === 4 ? 'tài liệu' : 'video'));
 
         // Grant type badge: 📂 Group-grant (auto-inherit) vs 📄 File-grants legacy
         var grantBadge;
@@ -500,7 +501,7 @@ function renderRows(rows) {
             var key = b.dataset.revokeKey;
             var r = state.rowData[key];
             if (!r) return;
-            var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : 'video');
+            var unit = r.type === 1 ? 'dự án' : (r.type === 2 ? 'tour' : (r.type === 4 ? 'tài liệu' : 'video'));
             var msg = r.grantType === 1
                 ? 'Gỡ quyền NHÓM "' + r.groupName + '" của người dùng ' + r.hoTen +
                   '? (người dùng sẽ không còn tự kế thừa ' + unit + ' mới)'
@@ -657,6 +658,7 @@ function openFilterPanel(col, btn) {
             { k: 'types', v: '1', label: 'Project' },
             { k: 'types', v: '2', label: 'Virtual' },
             { k: 'types', v: '3', label: 'Video' },
+            { k: 'types', v: '4', label: 'Tài liệu' },
             { section: 'Hình thức cấp' },
             { k: 'grantTypes', v: '1', label: '📂 Nhóm (tự kế thừa nội dung mới)' },
             { k: 'grantTypes', v: '0', label: '📄 Lẻ (quyền từng nội dung)' }
@@ -764,7 +766,7 @@ $('#pm-fpanel-ok').addEventListener('click', function () {
         if (fSel[k]) fSel[k].add(v);
     });
     // Tich DU het gia tri = khong loc -> clear cho query gon
-    if (fSel.types.size === 3) fSel.types.clear();
+    if (fSel.types.size === 4) fSel.types.clear();
     if (fSel.grantTypes.size === 2) fSel.grantTypes.clear();
     closeFilterPanel();
     refreshAfterFilterChange();
@@ -808,6 +810,7 @@ function buildGroupPickerHtml() {
             '<button type="button" class="gp-type-btn active" data-type="1">📁 Project (theo nhóm)</button>' +
             '<button type="button" class="gp-type-btn" data-type="2">🌐 Virtual (theo nhóm)</button>' +
             '<button type="button" class="gp-type-btn" data-type="3">🎬 Video (theo album)</button>' +
+            '<button type="button" class="gp-type-btn" data-type="4">📄 Tài liệu (theo nhóm)</button>' +
         '</div></div>' +
         '<div class="pm-fld">' +
             '<input type="text" id="gp-q" placeholder="🔎 Tìm tên nhóm..." />' +
@@ -887,18 +890,20 @@ function wireGroupPicker(getSelected) {
             $sum.textContent = 'Chưa chọn gì.';
             return;
         }
-        // Folders breakdown by type
-        var folderByType = { 1: 0, 2: 0, 3: 0 };
-        var contentByType = { 1: 0, 2: 0, 3: 0 };
+        // Folders breakdown by type (type 4=Tài liệu: chọn nhóm = cấp LẺ tất cả tài liệu, KHÔNG kế thừa)
+        var folderByType = { 1: 0, 2: 0, 3: 0, 4: 0 };
+        var contentByType = { 1: 0, 2: 0, 3: 0, 4: 0 };
         getSelected._folders.forEach(function (f) {
             folderByType[f.type]++;
             contentByType[f.type] += (f.contentCount || 0);
         });
-        var fileByType = { 1: 0, 2: 0, 3: 0 };
+        var fileByType = { 1: 0, 2: 0, 3: 0, 4: 0 };
         getSelected._files.forEach(function (f) { fileByType[f.type]++; });
 
+        // Nhóm Project/Virtual/Video = group-grant (kế thừa). Nhóm Tài liệu KHÔNG kế thừa.
+        var groupFolderCount = folderByType[1] + folderByType[2] + folderByType[3];
         var html = '';
-        if (fSize > 0) {
+        if (groupFolderCount > 0) {
             var parts = [];
             if (folderByType[1] > 0) parts.push('📁 ' + folderByType[1] + ' nhóm Project (' + contentByType[1] + ' DA)');
             if (folderByType[2] > 0) parts.push('🌐 ' + folderByType[2] + ' nhóm Virtual (' + contentByType[2] + ' tour)');
@@ -906,11 +911,15 @@ function wireGroupPicker(getSelected) {
             html += '<div style="margin-bottom:4px;"><b style="color:#16a34a;">📂 Cấp NHÓM</b> (tự kế thừa):<br>' +
                 '<span style="color:#475569;">' + parts.join(' · ') + '</span></div>';
         }
-        if (sSize > 0) {
+        var hasLe = fileByType[1] || fileByType[2] || fileByType[3] || fileByType[4] || folderByType[4];
+        if (hasLe) {
             var fparts = [];
             if (fileByType[1] > 0) fparts.push('📄 ' + fileByType[1] + ' Project');
             if (fileByType[2] > 0) fparts.push('📄 ' + fileByType[2] + ' Virtual');
             if (fileByType[3] > 0) fparts.push('📄 ' + fileByType[3] + ' Video');
+            // Tài liệu: cả nhóm (expand ra từng file) lẫn file lẻ đều là cấp LẺ.
+            if (folderByType[4] > 0) fparts.push('📄 ' + folderByType[4] + ' nhóm Tài liệu (' + contentByType[4] + ' tài liệu)');
+            if (fileByType[4] > 0) fparts.push('📄 ' + fileByType[4] + ' Tài liệu');
             html += '<div><b style="color:#78350f;">📄 Cấp LẺ</b> (quyền lẻ, không kế thừa):<br>' +
                 '<span style="color:#475569;">' + fparts.join(' · ') + '</span></div>';
         }
@@ -969,7 +978,7 @@ function wireGroupPicker(getSelected) {
             fetchFolderCount(currentType, g.id, rec).then(function (cnt) {
                 var $c = $list.querySelector('[data-cnt="' + k + '"]');
                 if ($c) {
-                    var unit = currentType === 1 ? 'DA' : (currentType === 2 ? 'tour' : 'video');
+                    var unit = currentType === 1 ? 'DA' : (currentType === 2 ? 'tour' : (currentType === 4 ? 'tài liệu' : 'video'));
                     $c.textContent = cnt + ' ' + unit;
                 }
                 // Update folder.contentCount nếu selected

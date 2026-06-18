@@ -18,9 +18,13 @@ namespace EPORTAL.Common
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             { ".pdf" };
 
+        // DocumentLibrary (View360 - "Thu vien tai lieu") nhan: tai lieu office/pdf/txt
+        // + anh (jpg/png/...) + Google Earth (kml/kmz - vd map KKT, anh ve khu vuc).
         private static readonly HashSet<string> AllowedDocExt =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt" };
+            { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt",
+              ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp",
+              ".kml", ".kmz" };
 
         private static readonly HashSet<string> AllowedVideoExt =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -30,10 +34,10 @@ namespace EPORTAL.Common
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             { ".xls", ".xlsx" };
 
-        public const long MaxImageBytes = 10L * 1024 * 1024;     // 10 MB
-        public const long MaxPdfBytes   = 50L * 1024 * 1024;     // 50 MB
-        public const long MaxDocBytes   = 100L * 1024 * 1024;    // 100 MB
-        public const long MaxVideoBytes = 500L * 1024 * 1024;    // 500 MB
+        public const long MaxImageBytes = 10L * 1024 * 1024;       // 10 MB
+        public const long MaxPdfBytes   = 50L * 1024 * 1024;       // 50 MB
+        public const long MaxDocBytes   = 500L * 1024 * 1024;      // 500 MB (KMZ/anh ve KLH co the rat lon)
+        public const long MaxVideoBytes = 4000L * 1024 * 1024;     // ~3.9 GB (duoi tran cung IIS ~4GB)
         public const long MaxExcelBytes = 20L * 1024 * 1024;     // 20 MB
 
         // Tra ve null neu OK, neu khong tra ve message loi.
