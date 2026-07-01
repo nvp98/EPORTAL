@@ -84,6 +84,52 @@
         padding: 20px;
     }
 
+    .survey-media-banner {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        margin: 12px 0 20px;
+        min-height: 220px;
+        box-shadow: rgba(17, 24, 39, 0.22) 0px 12px 24px;
+    }
+
+    .survey-media-banner__img {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        object-fit: cover;
+        display: block;
+        filter: saturate(1.15) contrast(1.05);
+    }
+
+    .survey-media-banner__overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(100deg, rgba(4, 26, 56, 0.82) 0%, rgba(4, 26, 56, 0.35) 55%, rgba(4, 26, 56, 0.08) 100%);
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 20px 26px;
+        text-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px;
+    }
+
+    .survey-media-banner__title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .survey-media-banner__subtitle {
+        font-size: 1rem;
+        font-weight: 500;
+        max-width: 720px;
+    }
+
+
     .chosen-container-active .chosen-drop {
         z-index: 9999; /* Số lớn hơn để đảm bảo dropdown hiển thị phía trên */
     }
@@ -125,16 +171,16 @@
                             <div class="row col-10">
 
                                 <div class="col-3">
-                                    <a href="../../../../assets/pdf/chuongtrinhDuLich2026.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>CHƯƠNG TRÌNH</a>
-                                    @* <a href="../../../../assets/pdf/totrinhHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a> *@
+                                    @* <a href="../../../../assets/pdf/chuongtrinhDuLich2026.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>CHƯƠNG TRÌNH</a> *@
+                                    <a href="../../../../assets/pdf/totrinhHDay2026.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>
                                     @* <a href="../../../../assets/pdf/TaiLieuHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tài liệu H - Day</a>*@
                                 </div>
                                 <div class="col-3">
-                                    @* <a href="../../../../assets/pdf/theleHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>THỂ LỆ</a> *@
+                                    <a href="../../../../assets/pdf/theleHDay2026.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>THỂ LỆ</a>
                                     @*  <a href="../../../../assets/pdf/TotrinhHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Tờ trình</a>*@
                                 </div>
                                 <div class="col-3">
-                                    @* <a href="../../../../assets/pdf/giaithuongHDay2025.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>GIẢI THƯỞNG</a> *@
+                                    <a href="../../../../assets/pdf/giaithuongHDay2026.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Timeline</a>
                                     @*<a href="../../../../assets/pdf/ThongTinHDay2024.pdf" class="float-right" title="Xem" target="_blank" style="text-decoration: underline; font-style: italic; "><i class="fa fa-file-pdf-o"></i>Thông tin chương trình</a>*@
                                 </div>
                             </div>
@@ -232,6 +278,14 @@
                                             <h3 style="margin: revert;" class="font-weight-bold"> @ViewBag.TenDK</h3>
                                             <div class="font-weight-bold text-danger">
                                                 @*(CBNV có đăng ký tham gia các hoạt động thì vui lòng hoàn thành)*@
+                                            </div>
+
+                                            <div class="survey-media-banner" style="height: 10px;">
+                                                <img src="../../../../assets/images/bg_banner_servey.png" alt="Banner chương trình đăng ký" class="survey-media-banner__img" />
+                                                @* <div class="survey-media-banner__overlay">
+                                                    <div class="survey-media-banner__title">Hành trình gắn kết 2026</div>
+                                                    <div class="survey-media-banner__subtitle">Chọn hoạt động phù hợp và hoàn tất đăng ký để cùng đồng nghiệp tạo nên một mùa sự kiện đáng nhớ.</div>
+                                                </div> *@
                                             </div>
                                         </div>
 
