@@ -84,16 +84,16 @@
         padding: 20px;
     }
 
-    .survey-media-banner {
+    @* .survey-media-banner {
         position: relative;
         overflow: hidden;
         border-radius: 12px;
         margin: 12px 0 20px;
         min-height: 220px;
         box-shadow: rgba(17, 24, 39, 0.22) 0px 12px 24px;
-    }
+    } *@
 
-    .survey-media-banner__img {
+    @* .survey-media-banner__img {
         width: 100%;
         height: 100%;
         min-height: 220px;
@@ -127,7 +127,7 @@
         font-size: 1rem;
         font-weight: 500;
         max-width: 720px;
-    }
+    } *@
 
 
     .chosen-container-active .chosen-drop {
@@ -280,8 +280,8 @@
                                                 @*(CBNV có đăng ký tham gia các hoạt động thì vui lòng hoàn thành)*@
                                             </div>
 
-                                            <div class="survey-media-banner" style="height: 10px;">
-                                                <img src="../../../../assets/images/bg_banner_servey.png" alt="Banner chương trình đăng ký" class="survey-media-banner__img" />
+                                            <div class="survey-media-banner">
+                                                @* <img src="../../../../assets/images/bg_banner_servey.png" alt="Banner chương trình đăng ký" class="survey-media-banner__img" /> *@
                                                 @* <div class="survey-media-banner__overlay">
                                                     <div class="survey-media-banner__title">Hành trình gắn kết 2026</div>
                                                     <div class="survey-media-banner__subtitle">Chọn hoạt động phù hợp và hoàn tất đăng ký để cùng đồng nghiệp tạo nên một mùa sự kiện đáng nhớ.</div>
@@ -293,7 +293,7 @@
                                         @foreach (var gr in Model)
                                         {
                                             dem++;
-                                            <div class="font-weight-bold font-size-xlg LuaChon_@gr.ID" style=@(ViewBag.checkShowDK == "false" && gr.ID==13 ? "display:none" : "")>
+                                            <div class="font-weight-bold font-size-xlg LuaChon_@gr.ID" style=@(ViewBag.checkShowDK == "false" && (gr.ID==22 || gr.ID==23) ? "display:none" : "")>
                                                 @gr.TenNhom
                                             </div>
                                             //thêm lưu ý
@@ -319,7 +319,7 @@
                                                 var k = i + 1; n++;
                                                 var checkShow = @gr.OptionList.OptionLS[i].isShow == 0 ? "d-none" : "";
 
-                                                <div class="questions__question LuaChon_@gr.ID " style=@(ViewBag.checkShowDK == "false" && gr.ID==13 ? "display:none" : "")>
+                                                <div class="questions__question LuaChon_@gr.ID " style=@(ViewBag.checkShowDK == "false" && (gr.ID==22 || gr.ID==23) ? "display:none" : "")>
                                                     @*@Html.RadioButtonFor(m => gr.OptionList.Answer, gr.OptionList.OptionLS[i].IDOT, new { id = @n,  })*@
                                                     @if (gr.OptionList.Answer == @gr.OptionList.OptionLS[i].IDOT)
                                                     {
@@ -370,7 +370,7 @@
                         <!--</div>
                             </div>
                         </div>-->
-                        <div class="formLyDo" style=@(ViewBag.DKKhong == "false" ? "display:none" : "")>
+                        <div class="formLyDo" style=@(ViewBag.DKKhong == "false" ? "display:none" : "display:none")>
                             <h4 class="font-weight-bold">Lý do không tham gia:</h4>
                             <select class="form-control marginTB5 SelectLyDo" name="LyDo" id="LyDo">
                                 @foreach (var item in ViewBag.LyDo)
@@ -392,7 +392,8 @@
                             <div class="m-auto w-100">
 
                             </div>
-                            <h4 class="font-weight-bold">2. Mục dành cho vợ/chồng làm cùng Công ty đăng ký đi chung đoàn (Chỉ vợ đăng ký mục này) </h4>
+                            @* <h4 class="font-weight-bold">2. Mục dành cho vợ/chồng làm cùng Công ty đăng ký đi chung đoàn (Chỉ vợ đăng ký mục này) </h4> *@
+                            <h4 class="font-weight-bold">2. Mục dành cho vợ/chồng làm cùng Công ty đăng ký</h4>
 
                             <div class="card-body" style="padding:15px 10px;">
                                 <div class="table-responsive" style="">
@@ -409,7 +410,7 @@
                                                 {
                                                     <th class="text-center" style="min-width:150px">@hd</th>
                                                 }
-                                                <th class="text-center" style="min-width:150px">Đoàn đăng ký tham gia</th>
+                                                @* <th class="text-center" style="min-width:150px">Đoàn đăng ký tham gia</th> *@
                                                 <th class="text-center">Thao tác</th>
                                             </tr>
                                         </thead>
@@ -756,21 +757,21 @@ $(document).ready(function () {
 
     $("form .questions input:radio").change(function () {
         op = $(this).val();
-        if ( $(this).val() ==70) { // thay 25 bằng ID lựa chọn
+        if ( $(this).val() ==98) { // thay 25 bằng ID lựa chọn
             // Disable your roomnumber element here
             $('.formPart').show();
-            $('.formLyDo').hide();
-            $('.LuaChon_16').show(); // ẩn hiện theo IDOT
-            $('.LuaChon_17').show();
+            @* $('.formLyDo').hide(); *@
+            $('.LuaChon_22').show(); // ẩn hiện theo IDOT
+            $('.LuaChon_23').show();
             $('.LuaChon_18').show();
             $('.LuaChon_19').show();
 
-        } else if ($(this).val() == 71) {
+        } else if ($(this).val() == 99) {
             // Re-enable here I guess
             $('.formPart').hide();
-            $('.formLyDo').show();
-            $('.LuaChon_16').hide(); // ẩn hiện theo IDOT
-            $('.LuaChon_17').hide();
+            @* $('.formLyDo').show(); // lần đăng ký này chưa dùng*@   
+            $('.LuaChon_22').hide(); // ẩn hiện theo IDOT
+            $('.LuaChon_23').hide();
             $('.LuaChon_18').hide();
             $('.LuaChon_19').hide();
         }

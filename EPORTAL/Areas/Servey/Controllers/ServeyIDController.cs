@@ -40,8 +40,8 @@ namespace EPORTAL.Areas.Servey.Controllers
             var ctks = dbSV.CTKhaoSats.ToList();
             ViewBag.TenDK = dbSV.ListServeys.Where(x => x.IDSV == IDSV).FirstOrDefault().ContentSV;
             ViewBag.TinhTrangDK = employ != null ? employ.OTID : null;
-            ViewBag.checkShowDK = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 70).Count() != 0 ? "true" : "false";
-            ViewBag.DKKhong = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 71).Count() != 0 ? "true" : "false";
+            ViewBag.checkShowDK = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 98).Count() != 0 ? "true" : "false";
+            ViewBag.DKKhong = ctks.Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV && x.IDOT == 99).Count() != 0 ? "true" : "false";
             ViewBag.IDSV = IDSV;
             var group = (from a in dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV)
                          let CtKS = dbSV.CTKhaoSats.Where(x => x.IDSV == IDSV && x.IDNV == MyAuthentication.ID && x.IDGroup == a.ID).FirstOrDefault()
