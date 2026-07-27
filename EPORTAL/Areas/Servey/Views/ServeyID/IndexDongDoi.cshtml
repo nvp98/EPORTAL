@@ -1,0 +1,359 @@
+﻿@model List<EPORTAL.ModelsServey.PickleballGroupView>
+@{
+    ViewBag.Title = "Đăng ký Đồng đội";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int IDSV = ViewBag.IDSV;
+    int slotsRemaining = ViewBag.SlotsRemaining;
+}
+@using EPORTAL.ModelsServey
+
+@if (TempData["msgSuccess"] != null)
+{@Html.Raw(TempData["msgSuccess"])}
+@if (TempData["msgError"] != null)
+{@Html.Raw(TempData["msgError"])}
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+<style>
+    .pk-group-card {
+        border-left: 4px solid #007bff;
+        margin-bottom: 18px;
+    }
+
+        .pk-group-card.registered {
+            border-left-color: #28a745;
+        }
+
+    .pk-badge-doiNam {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .pk-badge-doiNu {
+        background: #e83e8c;
+        color: #fff;
+    }
+
+    .pk-badge-honHop {
+        background: #fd7e14;
+        color: #fff;
+    }
+
+    .partner-block {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 10px;
+    }
+
+    .slot-bar {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h4 class="font-weight-bold mb-0">@ViewBag.TenDK</h4>
+                    <small class="text-muted">Đăng ký Đồng đội</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    @if (slotsRemaining < 2)
+                    {
+                        <a href="@Url.Action("DeleteDongDoiDK", "ServeyID", new { IDSV })"
+                           class="btn btn-danger btn-sm mr-3"
+                           onclick="return confirm('Xóa toàn bộ đăng ký? Bạn sẽ có thể đăng ký lại.')">
+                            <i class="fa fa-trash"></i>&nbsp;Xóa đăng ký
+                        </a>
+                    }
+                    <div class="slot-bar">
+                        Slot còn lại:
+                        <span class="badge badge-@(slotsRemaining > 0 ? "info" : "danger") font-size-lg">
+                            @slotsRemaining / 2
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @* ─── I. Danh sách đã đăng ký ─── *@
+            @{
+                var myPairs = ViewBag.MyPairs as List<PartTogetherValidation>;
+            }
+            @if (myPairs != null && myPairs.Count > 0)
+            {
+                <div class="card-body pb-0">
+                    <h5 class="font-weight-bold"><i class="fa fa-check-circle text-success"></i> I. Đăng ký của bạn</h5>
+                    <table class="table table-bordered table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Nội dung</th>
+                                <th>Mã NV đồng đội</th>
+                                <th>Họ tên đồng đội</th>
+                                <th>Bộ phận</th>
+                                <th class="text-center" style="width:100px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pair in myPairs)
+                            {
+                                <tr>
+                                    <td><strong>@pair.Note</strong></td>
+                                    <td>@pair.MaNV</td>
+                                    <td>@pair.HoTen</td>
+                                    <td>@pair.PhongBan</td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("DeleteDongDoiPair", "ServeyID", new { id = pair.ID, IDSV })"
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Xóa đăng ký nội dung @pair.Note?')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @* ─── II. Được người khác đăng ký làm đồng đội ─── *@
+            @{
+                var byOthers = ViewBag.RegisteredByOthers as List<PartTogetherValidation>;
+            }
+            @if (byOthers != null && byOthers.Count > 0)
+            {
+                <div class="card-body pb-0">
+                    <h5 class="font-weight-bold">
+                        <i class="fa fa-user-friends text-warning"></i> II. Bạn được đăng ký làm đồng đội
+                    </h5>
+                    <p class="text-muted mb-2" style="font-size:0.9rem">
+                        Những người dưới đây đã chọn bạn làm đồng đội trong giải này.
+                    </p>
+                    <table class="table table-bordered table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Nội dung</th>
+                                <th>Mã NV</th>
+                                <th>Người đăng ký bạn</th>
+                                <th>Bộ phận</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var reg in byOthers)
+                            {
+                                <tr>
+                                    <td><strong>@reg.Note</strong></td>
+                                    <td>@reg.MaNV</td>
+                                    <td>@reg.HoTen</td>
+                                    <td>@reg.PhongBan</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @* ─── III. Form đăng ký mới ─── *@
+            @{
+                var unregistered = Model.Where(g => !g.IsRegistered).ToList();
+            }
+
+            @if (slotsRemaining > 0 && unregistered.Any())
+            {
+                using (Html.BeginForm("ConfirmDongDoi", "ServeyID", FormMethod.Post, new { id = "form-dongdoi" }))
+                {
+                    <input type="hidden" name="IDSV" value="@IDSV" />
+                    <div class="card-body">
+                        <h5 class="font-weight-bold mt-2">
+                            <i class="fa fa-edit text-primary"></i> III. Đăng ký mới
+                        </h5>
+                        <p class="text-muted mb-3">
+                            Chọn tối đa <strong>@slotsRemaining</strong> nội dung.
+                            Mỗi nội dung bắt buộc chọn <strong>1 đồng đội</strong>.
+                        </p>
+
+                        @{ int radioIdx = 0; }
+                        @foreach (var group in unregistered)
+                        {
+                            
+                            string badgeClass = group.LoaiDoi == "DoiNam" ? "pk-badge-doiNam"
+                                             : group.LoaiDoi == "DoiNu" ? "pk-badge-doiNu"
+                                             : "pk-badge-honHop";
+                            string genderHint = group.LoaiDoi == "DoiNam" ? "Nam + Nam"
+                                             : group.LoaiDoi == "DoiNu" ? "Nữ + Nữ"
+                                             : "Nam + Nữ";
+
+                            <div class="card pk-group-card" id="groupCard_@group.IDGroup">
+                                <div class="card-header bg-light d-flex align-items-center">
+                                    <strong class="mr-2">@group.TenNhom</strong>
+                                    <span class="badge @badgeClass">@genderHint</span>
+                                </div>
+                                <div class="card-body py-2">
+                                    <div class="mb-1">
+                                        @foreach (var opt in group.Options)
+                                        {
+                                            radioIdx++;
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input pk-radio"
+                                                       type="radio"
+                                                       name="answer_@group.IDGroup"
+                                                       id="opt_@radioIdx"
+                                                       value="@opt.IDOT"
+                                                       data-groupid="@group.IDGroup"
+                                                       data-isshow="@opt.isShow"
+                                                       data-idsv="@IDSV"
+                                                       @(opt.isShow == 0 ? "checked" : "") />
+                                                <label class="form-check-label" for="opt_@radioIdx">
+                                                    @opt.ContentOT
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    @* Khối chọn đồng đội — ẩn mặc định *@
+                                    <div class="partner-block" id="partnerBlock_@group.IDGroup" style="display:none">
+                                        <label class="font-weight-bold mb-1">
+                                            <i class="fa fa-user-plus"></i> Chọn đồng đội:
+                                        </label>
+                                        <select name="partner_@group.IDGroup"
+                                                id="partnerSelect_@group.IDGroup"
+                                                class="form-control chosen-select partnerSelect"
+                                                data-placeholder="-- Tìm và chọn đồng đội --">
+                                            <option value=""></option>
+                                        </select>
+                                        <small class="text-muted mt-1 d-block partnerHint" id="partnerHint_@group.IDGroup"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex align-items-center justify-content-end mt-2">
+                            <span class="text-danger font-weight-bold mr-3" id="maxWarning" style="display:none">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                Chỉ được chọn tối đa @slotsRemaining nội dung
+                            </span>
+                            <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                <i class="fa fa-check"></i> Đăng ký
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+            else if (slotsRemaining == 0)
+            {
+                <div class="card-body">
+                    <div class="alert alert-success mb-0">
+                        <i class="fa fa-trophy"></i> Bạn đã đăng ký đủ 2 nội dung. Chúc bạn thi đấu tốt!
+                    </div>
+                </div>
+            }
+            else if (!unregistered.Any() && slotsRemaining > 0)
+            {
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">
+                        <i class="fa fa-info-circle"></i> Tất cả nội dung phù hợp đã được đăng ký.
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var slotsRemaining = @slotsRemaining;
+
+    function countSelected() {
+        return $('.pk-radio:checked').filter(function () {
+            return parseInt($(this).data('isshow')) !== 0;
+        }).length;
+    }
+
+    function loadPartners(IDSV, IDGroup, selectEl) {
+        $(selectEl).empty().append('<option value="">-- Đang tải... --</option>');
+        $(selectEl).trigger('chosen:updated');
+
+        $.getJSON('@Url.Action("GetDongDoiPartners", "ServeyID")',
+            { IDSV: IDSV, IDGroup: IDGroup },
+            function (data) {
+                $(selectEl).empty().append('<option value=""></option>');
+                var hint = $('#partnerHint_' + IDGroup);
+
+                if (data.length === 0) {
+                    hint.text('Không có nhân viên hợp lệ hoặc tất cả đã được đăng ký.')
+                        .removeClass('text-muted').addClass('text-danger');
+                } else {
+                    hint.text(data.length + ' đồng đội khả dụng')
+                        .removeClass('text-danger').addClass('text-muted');
+                    $.each(data, function (i, nv) {
+                        $(selectEl).append($('<option>').val(nv.ID).text(nv.HoTen));
+                    });
+                }
+                $(selectEl).trigger('chosen:updated');
+            }
+        );
+    }
+
+    function clearPartner(groupId) {
+        var partnerSelect = $('#partnerSelect_' + groupId);
+        partnerSelect.empty().append('<option value=""></option>');
+        partnerSelect.prop('disabled', true);
+        partnerSelect.trigger('chosen:updated');
+        $('#partnerHint_' + groupId).text('');
+        $('#partnerBlock_' + groupId).hide();
+    }
+
+    $(document).ready(function () {
+
+        // Khởi tạo chosen — ban đầu tất cả select bị disable vì block đang ẩn
+        $('.partnerSelect').prop('disabled', true).chosen({ width: '100%', search_contains: true });
+
+        // Xử lý khi chọn radio
+        $(document).on('change', '.pk-radio', function () {
+            var groupId = $(this).data('groupid');
+            var isShow  = parseInt($(this).data('isshow'));
+            var IDSV    = $(this).data('idsv');
+            var partnerBlock  = $('#partnerBlock_' + groupId);
+            var partnerSelect = $('#partnerSelect_' + groupId);
+
+            if (isShow !== 0) {
+                // Kiểm tra giới hạn slot
+                if (countSelected() > slotsRemaining) {
+                    $(this).prop('checked', false);
+                    $('input[name="answer_' + groupId + '"][data-isshow="0"]').prop('checked', true);
+                    $('#maxWarning').show();
+                    return;
+                }
+                partnerSelect.prop('disabled', false);
+                partnerBlock.show();
+                loadPartners(IDSV, groupId, partnerSelect);
+            } else {
+                clearPartner(groupId);
+            }
+
+            $('#maxWarning').toggle(countSelected() >= slotsRemaining && slotsRemaining > 0);
+        });
+
+        // Validate trước khi submit
+        $('#form-dongdoi').on('submit', function (e) {
+            var hasError = false;
+            $('.pk-radio:checked').filter(function () {
+                return parseInt($(this).data('isshow')) !== 0;
+            }).each(function () {
+                var groupId = $(this).data('groupid');
+                var partner = $('#partnerSelect_' + groupId).val();
+                if (!partner) {
+                    alert('Vui lòng chọn đồng đội cho nội dung: ' +
+                          $('#groupCard_' + groupId + ' .card-header strong').text());
+                    hasError = true;
+                    return false;
+                }
+            });
+            if (hasError) e.preventDefault();
+        });
+    });
+</script>

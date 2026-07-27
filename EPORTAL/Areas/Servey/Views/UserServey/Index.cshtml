@@ -77,9 +77,18 @@
                                                 {@khd}
                                                 </span>
                                                 <div class="p-2">
-                                                    <a id="4" href="@Url.Action("Index", "ServeyID", new { IDSV = item.IDSV })" class="aTag">
-                                                        <span class="btn-transition btn btn-outline-success" style="left:65%">Tham gia đăng ký</span>
-                                                    </a>
+                                                    @if (item.IDSV == 14 || item.IDSV == 15)
+                                                    {
+                                                        <a id="4" href="@Url.Action("IndexDongDoi", "ServeyID", new { IDSV = item.IDSV })" class="aTag">
+                                                            <span class="btn-transition btn btn-outline-success" style="left:65%">Tham gia đăng ký</span>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a id="4" href="@Url.Action("Index", "ServeyID", new { IDSV = item.IDSV })" class="aTag">
+                                                            <span class="btn-transition btn btn-outline-success" style="left:65%">Tham gia đăng ký</span>
+                                                        </a>
+                                                    }
                                                 </div>
 
                                                 <div class="d-flex justify-content-between stats">

@@ -898,6 +898,7 @@
     <Compile Include="ModelsServey\PartTogether_selectCom_Result.cs">
       <DependentUpon>EPORTAL_SERVEY.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelsServey\PickleballGroupView.cs" />
     <Compile Include="ModelsServey\ResultServey.cs">
       <DependentUpon>EPORTAL_SERVEY.tt</DependentUpon>
     </Compile>
@@ -4780,6 +4781,7 @@
     <Content Include="Areas\TagSign\Views\DangKyKhoaThe_NT\HPDQ_GetAll.cshtml" />
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\QuyenHoanThanhDon_Index.cshtml" />
     <Content Include="Content\view360-imagery\manifest.json" />
+    <Content Include="Areas\Servey\Views\ServeyID\IndexDongDoi.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

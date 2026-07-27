@@ -23,6 +23,7 @@ namespace EPORTAL.Models
             public string ngaynghiviec { get; set; }
             public string phongban { get; set; }
             public string vitri { get; set; }
+            public string gioitinh { get; set; }
         }
     }
 }

@@ -156,7 +156,16 @@ namespace EPORTAL.Controllers
                                         _db.Vitri_insert(IDViTriout, item.vitri);
                                         IDViTri = Convert.ToInt32(IDViTriout.Value);
                                     }
-                                    _db.Nhanvien_insert_API(MaNV, item.hoten, convertToUnSign(item.hoten), item.diachi, item.sodienthoai, DateTime.ParseExact(item.ngayvaolam, "dd/MM/yyyy", CultureInfo.InvariantCulture), IDPhongBan, item.tinhtranglamviec, IDViTri);
+                                    int? GioiTinh = null;
+                                    if (item.gioitinh == "Nam" && item.gioitinh != null)
+                                    {
+                                        GioiTinh = 0;
+                                    }
+                                    else if(item.gioitinh != null)
+                                    {
+                                        GioiTinh = 1;
+                                    }
+                                    _db.Nhanvien_insert_API(MaNV, item.hoten, convertToUnSign(item.hoten), item.diachi, item.sodienthoai, DateTime.ParseExact(item.ngayvaolam, "dd/MM/yyyy", CultureInfo.InvariantCulture), IDPhongBan, item.tinhtranglamviec, IDViTri, GioiTinh);
                                     _db.NhanVienCCCD_Update(MaNV, item.cmnd);
                                 }
                             }
@@ -178,9 +187,18 @@ namespace EPORTAL.Controllers
                                         _db.Vitri_insert(IDViTriout, item.vitri);
                                         IDViTri = Convert.ToInt32(IDViTriout.Value);
                                     }
-                                    if (rsnv.IDPhongBan != IDPhongBan || rsnv.IDViTri != IDViTri || rsnv.IDTinhTrangLV != item.tinhtranglamviec)
+                                    int? isGioiTinh = null;
+                                    if (item.gioitinh == "Nam" && item.gioitinh != null)
                                     {
-                                        _db.Nhanvien_update_API(MaNV, item.diachi, item.sodienthoai, IDPhongBan, item.tinhtranglamviec, IDViTri);
+                                        isGioiTinh = 0;
+                                    }
+                                    else if (item.gioitinh != null)
+                                    {
+                                        isGioiTinh = 1;
+                                    }
+                                    if (rsnv.IDPhongBan != IDPhongBan || rsnv.IDViTri != IDViTri || rsnv.IDTinhTrangLV != item.tinhtranglamviec || rsnv.IsGioiTinh != isGioiTinh)
+                                    {
+                                        _db.Nhanvien_update_API(MaNV, item.diachi, item.sodienthoai, IDPhongBan, item.tinhtranglamviec, IDViTri, isGioiTinh);
                                         dtc++;
                                     }
                                     if (item.tinhtranglamviec == 1)

@@ -30,6 +30,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                           StatusSV = (Boolean)a.StatusSV,
                           Exp = (TimeSpan)((DateTime)a.EndTime - DateTime.Now.AddDays(-2)),
                           CountSV = dbSV.EmployeeServeys.Where(x=>x.IDSV ==a.IDSV && x.OTID != null ).Count(),
+                          MenuOT = b.MenuOT,
                       }).ToList();
 
             return View(res.OrderByDescending(x => x.StartTime).ToList());

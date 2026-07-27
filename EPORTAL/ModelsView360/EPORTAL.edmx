@@ -206,6 +206,7 @@
           <Property Name="GroupQuyen" Type="nvarchar" MaxLength="50" />
           <Property Name="Email" Type="varchar" MaxLength="50" />
           <Property Name="CCCD" Type="varchar" MaxLength="15" />
+          <Property Name="IsGioiTinh" Type="int" />
         </EntityType>
         <EntityType Name="NT_Authority">
           <Key>
@@ -1673,6 +1674,7 @@
           <NavigationProperty Name="ThongTinCaNhans" Relationship="Self.FK_ThongTinCaNhan_NhanVien" FromRole="NhanVien" ToRole="ThongTinCaNhan" />
           <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="CCCD" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="IsGioiTinh" Type="Int32" />
         </EntityType>
         <EntityType Name="NT_Authority">
           <Key>
@@ -3611,6 +3613,7 @@
               <MappingFragment StoreEntitySet="NhanVien">
                 <ScalarProperty Name="CCCD" ColumnName="CCCD" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="IsGioiTinh" ColumnName="IsGioiTinh" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="MaNV" ColumnName="MaNV" />
                 <ScalarProperty Name="MatKhau" ColumnName="MatKhau" />

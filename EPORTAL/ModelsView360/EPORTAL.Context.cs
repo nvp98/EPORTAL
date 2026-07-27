@@ -1069,7 +1069,7 @@ public partial class EPORTALEntities : DbContext
     }
 
 
-    public virtual int Nhanvien_insert_API(string maNV, string hoTen, string hoTenKhongdau, string diaChi, string dienThoai, Nullable<System.DateTime> ngayVaolam, Nullable<int> iDPhongBan, Nullable<int> iDTinhTrangLV, Nullable<int> iDViTri)
+    public virtual int Nhanvien_insert_API(string maNV, string hoTen, string hoTenKhongdau, string diaChi, string dienThoai, Nullable<System.DateTime> ngayVaolam, Nullable<int> iDPhongBan, Nullable<int> iDTinhTrangLV, Nullable<int> iDViTri, Nullable<int> isGioiTinh)
     {
 
         var maNVParameter = maNV != null ?
@@ -1117,7 +1117,12 @@ public partial class EPORTALEntities : DbContext
             new ObjectParameter("IDViTri", typeof(int));
 
 
-        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Nhanvien_insert_API", maNVParameter, hoTenParameter, hoTenKhongdauParameter, diaChiParameter, dienThoaiParameter, ngayVaolamParameter, iDPhongBanParameter, iDTinhTrangLVParameter, iDViTriParameter);
+        var isGioiTinhParameter = isGioiTinh.HasValue ?
+            new ObjectParameter("IsGioiTinh", isGioiTinh) :
+            new ObjectParameter("IsGioiTinh", typeof(int));
+
+
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Nhanvien_insert_API", maNVParameter, hoTenParameter, hoTenKhongdauParameter, diaChiParameter, dienThoaiParameter, ngayVaolamParameter, iDPhongBanParameter, iDTinhTrangLVParameter, iDViTriParameter, isGioiTinhParameter);
     }
 
 
@@ -1140,7 +1145,7 @@ public partial class EPORTALEntities : DbContext
     }
 
 
-    public virtual int Nhanvien_update_API(string maNV, string diaChi, string dienThoai, Nullable<int> iDPhongBan, Nullable<int> iDTinhTrangLV, Nullable<int> iDViTri)
+    public virtual int Nhanvien_update_API(string maNV, string diaChi, string dienThoai, Nullable<int> iDPhongBan, Nullable<int> iDTinhTrangLV, Nullable<int> iDViTri, Nullable<int> isGioiTinh)
     {
 
         var maNVParameter = maNV != null ?
@@ -1173,7 +1178,12 @@ public partial class EPORTALEntities : DbContext
             new ObjectParameter("IDViTri", typeof(int));
 
 
-        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Nhanvien_update_API", maNVParameter, diaChiParameter, dienThoaiParameter, iDPhongBanParameter, iDTinhTrangLVParameter, iDViTriParameter);
+        var isGioiTinhParameter = isGioiTinh.HasValue ?
+            new ObjectParameter("IsGioiTinh", isGioiTinh) :
+            new ObjectParameter("IsGioiTinh", typeof(int));
+
+
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("Nhanvien_update_API", maNVParameter, diaChiParameter, dienThoaiParameter, iDPhongBanParameter, iDTinhTrangLVParameter, iDViTriParameter, isGioiTinhParameter);
     }
 
 

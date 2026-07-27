@@ -33,7 +33,8 @@ namespace EPORTAL.ModelsOrganizational
         public Nullable<int> IDLoai { get; set; }
         public Nullable<int> TT_BGD { get; set; }
         public string ImagePath { get; set; }
-    
+        public Nullable<int> IsGioiTinh { get; set; }
+
         public virtual PhanXuong PhanXuong { get; set; }
         public virtual PhongBan PhongBan { get; set; }
         public virtual ToLV ToLV { get; set; }

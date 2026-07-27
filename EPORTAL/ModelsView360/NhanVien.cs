@@ -12,97 +12,99 @@
 namespace EPORTAL.ModelsView360
 {
 
-using System;
+    using System;
     using System.Collections.Generic;
-    
-public partial class NhanVien
-{
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-    public NhanVien()
+    public partial class NhanVien
     {
 
-        this.AuthorizationContractors = new HashSet<AuthorizationContractor>();
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public NhanVien()
+        {
 
-        this.AuthorizationUSERs = new HashSet<AuthorizationUSER>();
+            this.AuthorizationContractors = new HashSet<AuthorizationContractor>();
 
-        this.AuthorizationVideos = new HashSet<AuthorizationVideo>();
+            this.AuthorizationUSERs = new HashSet<AuthorizationUSER>();
 
-        this.KD_KyDuyet = new HashSet<KD_KyDuyet>();
+            this.AuthorizationVideos = new HashSet<AuthorizationVideo>();
 
-        this.ThongTinCaNhans = new HashSet<ThongTinCaNhan>();
+            this.KD_KyDuyet = new HashSet<KD_KyDuyet>();
+
+            this.ThongTinCaNhans = new HashSet<ThongTinCaNhan>();
+
+        }
+
+
+        public int ID { get; set; }
+
+        public string MaNV { get; set; }
+
+        public string MatKhau { get; set; }
+
+        public string HoTen { get; set; }
+
+        public string HoTenKhongDau { get; set; }
+
+        public Nullable<System.DateTime> NgaySinh { get; set; }
+
+        public string DiaChi { get; set; }
+
+        public string DienThoai { get; set; }
+
+        public Nullable<System.DateTime> NgayVaoLam { get; set; }
+
+        public Nullable<int> IDPhongBan { get; set; }
+
+        public Nullable<int> IDTinhTrangLV { get; set; }
+
+        public Nullable<int> IDViTri { get; set; }
+
+        public Nullable<bool> IsGV { get; set; }
+
+        public Nullable<int> IDQuyen { get; set; }
+
+        public string Chukynhay { get; set; }
+
+        public string Chukychinh { get; set; }
+
+        public Nullable<int> IDQuyenHT { get; set; }
+
+        public string GroupQuyen { get; set; }
+
+        public string Email { get; set; }
+
+        public string CCCD { get; set; }
+
+        public Nullable<int> IsGioiTinh { get; set; }
+
+
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+        public virtual ICollection<AuthorizationContractor> AuthorizationContractors { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+        public virtual ICollection<AuthorizationUSER> AuthorizationUSERs { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+        public virtual ICollection<AuthorizationVideo> AuthorizationVideos { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+        public virtual ICollection<KD_KyDuyet> KD_KyDuyet { get; set; }
+
+        public virtual PhongBan PhongBan { get; set; }
+
+        public virtual TinhTrangLV TinhTrangLV { get; set; }
+
+        public virtual Vitri Vitri { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+        public virtual ICollection<ThongTinCaNhan> ThongTinCaNhans { get; set; }
 
     }
-
-
-    public int ID { get; set; }
-
-    public string MaNV { get; set; }
-
-    public string MatKhau { get; set; }
-
-    public string HoTen { get; set; }
-
-    public string HoTenKhongDau { get; set; }
-
-    public Nullable<System.DateTime> NgaySinh { get; set; }
-
-    public string DiaChi { get; set; }
-
-    public string DienThoai { get; set; }
-
-    public Nullable<System.DateTime> NgayVaoLam { get; set; }
-
-    public Nullable<int> IDPhongBan { get; set; }
-
-    public Nullable<int> IDTinhTrangLV { get; set; }
-
-    public Nullable<int> IDViTri { get; set; }
-
-    public Nullable<bool> IsGV { get; set; }
-
-    public Nullable<int> IDQuyen { get; set; }
-
-    public string Chukynhay { get; set; }
-
-    public string Chukychinh { get; set; }
-
-    public Nullable<int> IDQuyenHT { get; set; }
-
-    public string GroupQuyen { get; set; }
-
-    public string Email { get; set; }
-
-    public string CCCD { get; set; }
-
-
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<AuthorizationContractor> AuthorizationContractors { get; set; }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<AuthorizationUSER> AuthorizationUSERs { get; set; }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<AuthorizationVideo> AuthorizationVideos { get; set; }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<KD_KyDuyet> KD_KyDuyet { get; set; }
-
-    public virtual PhongBan PhongBan { get; set; }
-
-    public virtual TinhTrangLV TinhTrangLV { get; set; }
-
-    public virtual Vitri Vitri { get; set; }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<ThongTinCaNhan> ThongTinCaNhans { get; set; }
-
-}
 
 }

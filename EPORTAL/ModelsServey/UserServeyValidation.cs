@@ -15,6 +15,6 @@ namespace EPORTAL.ModelsServey
         public TimeSpan Exp { get; set; }
         public int? CountSV { get; set; }
         public int? CountDKS { get; set; }
-     
+        public int? MenuOT { get; set; }
     }
 }
