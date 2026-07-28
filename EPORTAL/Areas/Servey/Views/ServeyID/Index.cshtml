@@ -2,6 +2,13 @@
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int? nextIDSV    = ViewBag.NextIDSV as int?;
+    int[] dongDoiIDs = new[] { 14, 15 }; // ID server
+    string nextUrl   = nextIDSV.HasValue
+        ? (dongDoiIDs.Contains(nextIDSV.Value)
+            ? Url.Action("IndexDongDoi", "ServeyID", new { IDSV = nextIDSV })
+            : Url.Action("Index",        "ServeyID", new { IDSV = nextIDSV }))
+        : null;
 }
 @using EPORTAL.ModelsServey
 @model List<GroupKhaoSatView>
@@ -137,6 +144,26 @@
 
 <div class="app-main__outer">
     <div class="app-main__inner">
+
+        @* ─── Thanh điều hướng ─── *@
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <a href="@Url.Action("Index", "UserServey", new { area = "Servey" })"
+               class="btn btn-outline-secondary btn-sm">
+                <i class="fa fa-arrow-left mr-1"></i> Trở lại
+            </a>
+            @if (nextUrl != null)
+            {
+                <a href="@nextUrl" class="btn btn-outline-primary btn-sm">
+                    Hoạt động đăng ký tiếp theo <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            }
+            else
+            {
+                <span class="text-muted" style="font-size:0.85rem">
+                    <i class="fa fa-check-circle text-success"></i> Đây là hoạt động cuối cùng
+                </span>
+            }
+        </div>
 
         <!--<div class="app-page-title">
         <div class="page-title-wrapper">

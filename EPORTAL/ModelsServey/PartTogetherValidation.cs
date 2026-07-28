@@ -38,5 +38,6 @@ namespace EPORTAL.ModelsServey
         public int? IDSize { get; set; }
         public int? CungCTy { get; set; }
         public List<String> ListSelect { get; set; }
+        public string ContentOT { get; set; }
     }
 }

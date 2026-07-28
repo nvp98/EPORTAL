@@ -298,6 +298,26 @@ namespace EPORTAL.Areas.Servey.Controllers
 
 
             ViewBag.IDNV = new SelectList(ListNV, "ID", "HoTen");
+
+            // Tìm survey tiếp theo trong danh sách đang hoạt động của user
+            var allActiveSV2 = dbSV.EmployeeServeys
+                .Where(x => x.IDNV == IDNV)
+                .Select(x => x.IDSV)
+                .ToList();
+            var activeSorted2 = dbSV.ListServeys
+                .Where(x => allActiveSV2.Contains(x.IDSV)
+                         && x.StartTime <= DateTime.Now
+                         && x.EndTime   >= DateTime.Now
+                         && x.StatusSV  == true)
+                .OrderBy(x => x.StartTime).ThenBy(x => x.IDSV)
+                .Select(x => x.IDSV)
+                .ToList();
+            int currentIdx2 = activeSorted2.IndexOf((int)IDSV);
+            int? nextIDSV2  = (currentIdx2 >= 0 && currentIdx2 < activeSorted2.Count - 1)
+                              ? activeSorted2[currentIdx2 + 1]
+                              : (int?)null;
+            ViewBag.NextIDSV = nextIDSV2;
+
             return View(group.ToList());
         }
         [HttpPost]
@@ -803,7 +823,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                 return "HonHop";
             if (t.Contains("nữ"))
                 return "DoiNu";
-            return "DoiNam";
+            if (t.Contains("nam"))
+                return "DoiNam";
+            return "All";
         }
 
         public ActionResult IndexDongDoi(int? IDSV)
@@ -814,6 +836,7 @@ namespace EPORTAL.Areas.Servey.Controllers
             var options  = dbSV.OptionServeys.Where(x => x.IDSV == IDSV).ToList();
             var LSNV     = db.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
             var pb       = db.PhongBans.ToList();
+            var servey = dbSV.ListServeys.FirstOrDefault(x => x.IDSV == IDSV);
 
             var myPairs = dbSV.CTDKNguoiThans
                 .Where(x => x.IDNV == IDNV  && x.IDSV == IDSV && x.isCom == 1)
@@ -836,6 +859,29 @@ namespace EPORTAL.Areas.Servey.Controllers
 
             var registeredLoaiDoi = myPairs.Select(x => x.QuanHe).ToList();
 
+            // Solo registrations: isShow=0, saved only to CTKhaoSats (no partner)
+            var soloCtKS = dbSV.CTKhaoSats
+                .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup != null)
+                .ToList();
+            var soloView = (from a in soloCtKS
+                            join g in groups on a.IDGroup equals g.ID into gg
+                            from g in gg.DefaultIfEmpty()
+                            let loaiDoiS = GetLoaiDoi(g != null ? g.TenNhom ?? "" : "")
+                            where g != null && !registeredLoaiDoi.Contains(loaiDoiS)
+                            select new PartTogetherValidation
+                            {
+                                ID          = a.ID,
+                                Note        = g.TenNhom ?? "",
+                                QuanHe      = loaiDoiS,
+                                IDSV        = IDSV,
+                                IDNguoiThan = null,
+                            }).ToList();
+            myPairsView.AddRange(soloView);
+
+            var allRegisteredLoaiDoi = registeredLoaiDoi
+                .Union(soloView.Select(x => x.QuanHe))
+                .ToList();
+
             var groupViews = groups.Select(g =>
             {
                 string loaiDoi = GetLoaiDoi(g.TenNhom ?? "");
@@ -845,7 +891,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                     IDSV         = g.IDSV ?? 0,
                     TenNhom      = g.TenNhom,
                     LoaiDoi      = loaiDoi,
-                    IsRegistered = registeredLoaiDoi.Contains(loaiDoi),
+                    IsRegistered = allRegisteredLoaiDoi.Contains(loaiDoi),
                     ExistingPair = myPairsView.FirstOrDefault(p => p.QuanHe == loaiDoi),
                     Options      = options.Where(o => o.MaOT == g.MaNhom)
                                          .OrderBy(o => o.OrderBy)
@@ -860,7 +906,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
             // Ẩn nhóm không phù hợp giới tính: Nam chỉ thấy DoiNam + HonHop, Nữ chỉ thấy DoiNu + HonHop
             int? userGioiTinh = currentUser?.IsGioiTinh;
-            if (userGioiTinh.HasValue)
+            if (userGioiTinh.HasValue && servey.ContentSV.Contains("Pickleball"))
             {
                 groupViews = groupViews.Where(g =>
                     g.LoaiDoi == "HonHop" ||
@@ -888,12 +934,31 @@ namespace EPORTAL.Areas.Servey.Controllers
                                               Note     = a.GhiChu
                                           }).ToList();
 
+            // Tìm survey tiếp theo trong danh sách đang hoạt động của user
+            var allActiveSV = dbSV.EmployeeServeys
+                .Where(x => x.IDNV == IDNV)
+                .Select(x => x.IDSV)
+                .ToList();
+            var activeSorted = dbSV.ListServeys
+                .Where(x => allActiveSV.Contains(x.IDSV)
+                         && x.StartTime <= DateTime.Now
+                         && x.EndTime   >= DateTime.Now
+                         && x.StatusSV  == true)
+                .OrderBy(x => x.StartTime).ThenBy(x => x.IDSV)
+                .Select(x => x.IDSV)
+                .ToList();
+            int currentIdx = activeSorted.IndexOf((int)IDSV);
+            int? nextIDSV  = (currentIdx >= 0 && currentIdx < activeSorted.Count - 1)
+                             ? activeSorted[currentIdx + 1]
+                             : (int?)null;
+
             ViewBag.IDSV                = IDSV;
             ViewBag.TenDK               = dbSV.ListServeys.FirstOrDefault(x => x.IDSV == IDSV)?.ContentSV;
-            ViewBag.SlotsRemaining      = 2 - myPairs.Count;
+            ViewBag.SlotsRemaining      = 2 - myPairsView.Count;
             ViewBag.MyPairs             = myPairsView;
             ViewBag.CurrentUserGioiTinh = userGioiTinh;
             ViewBag.RegisteredByOthers  = registeredByOthersView;
+            ViewBag.NextIDSV            = nextIDSV;
 
             return View(groupViews);
         }
@@ -929,7 +994,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                 candidates = candidates.Where(x => x.IsGioiTinh == 0);
             else if (loaiDoi == "DoiNu")
                 candidates = candidates.Where(x => x.IsGioiTinh == 1);
-            else // HonHop: chọn giới tính ngược với người đăng ký
+            else if(loaiDoi == "HonHop") // HonHop: chọn giới tính ngược với người đăng ký
             {
                 int? oppositeGender = currentUser?.IsGioiTinh == 0 ? (int?)1 : 0;
                 candidates = candidates.Where(x => x.IsGioiTinh == oppositeGender);
@@ -959,7 +1024,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                 var registeredLoaiDoi = existingPairs.Select(x => x.QuanHe).ToList();
 
                 // Thu thập lựa chọn mới từ form
-                var newItems = new List<Tuple<GroupKhaoSat, int, int>>();
+                var newItems = new List<Tuple<GroupKhaoSat, int, int?>>();
 
                 foreach (var group in groups)
                 {
@@ -971,16 +1036,19 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                     int idot   = int.Parse(selectedOT);
                     var option = dbSV.OptionServeys.FirstOrDefault(x => x.IDOT == idot);
-                    if (option == null || option.isShow == 0) continue; // Không tham gia
+                    if (option == null) continue;
 
-                    string selectedPartner = collection["partner_" + group.ID];
-                    if (string.IsNullOrEmpty(selectedPartner))
+                    int? idPartner = null;
+                    if (option.isShow == 1)
                     {
-                        TempData["msgError"] = "<script>alert('Vui lòng chọn đồng đội cho nội dung: " + group.TenNhom + "');</script>";
-                        return RedirectToAction("IndexDongDoi", new { IDSV });
+                        string selectedPartner = collection["partner_" + group.ID];
+                        if (string.IsNullOrEmpty(selectedPartner))
+                        {
+                            TempData["msgError"] = "<script>alert('Vui lòng chọn đồng đội cho nội dung: " + group.TenNhom + "');</script>";
+                            return RedirectToAction("IndexDongDoi", new { IDSV });
+                        }
+                        idPartner = int.Parse(selectedPartner);
                     }
-
-                    int idPartner = int.Parse(selectedPartner);
                     newItems.Add(Tuple.Create(group, idot, idPartner));
                 }
 
@@ -1010,25 +1078,27 @@ namespace EPORTAL.Areas.Servey.Controllers
                 foreach (var item in newItems)
                 {
                     var group      = item.Item1;
-                    int idPartner  = item.Item3;
+                    int? idPartner = item.Item3;
                     string loaiDoi = GetLoaiDoi(group.TenNhom ?? "");
 
-                    if (takenIDs.Contains(idPartner) || registrantIDs.Contains(idPartner))
+                    if (!idPartner.HasValue) continue; // không cần đồng đội
+
+                    if (takenIDs.Contains(idPartner.Value) || registrantIDs.Contains(idPartner.Value))
                     {
-                        var partnerName = db.NhanViens.FirstOrDefault(x => x.ID == idPartner)?.HoTen;
+                        var partnerName = db.NhanViens.FirstOrDefault(x => x.ID == idPartner.Value)?.HoTen;
                         TempData["msgError"] = "<script>alert('" + partnerName + " đã được đăng ký trong giải này, vui lòng chọn người khác');</script>";
                         return RedirectToAction("IndexDongDoi", new { IDSV });
                     }
 
-                    if (selectedPartnerIDs.Contains(idPartner))
+                    if (selectedPartnerIDs.Contains(idPartner.Value))
                     {
                         TempData["msgError"] = "<script>alert('Không thể chọn cùng một người cho nhiều nội dung');</script>";
                         return RedirectToAction("IndexDongDoi", new { IDSV });
                     }
-                    selectedPartnerIDs.Add(idPartner);
+                    selectedPartnerIDs.Add(idPartner.Value);
 
                     // Validate giới tính
-                    var partner = db.NhanViens.FirstOrDefault(x => x.ID == idPartner);
+                    var partner = db.NhanViens.FirstOrDefault(x => x.ID == idPartner.Value);
                     bool valid  = true;
 
                     if (loaiDoi == "DoiNam" && (partner?.IsGioiTinh != 0 || currentUser?.IsGioiTinh != 0))
@@ -1051,12 +1121,15 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     var group      = item.Item1;
                     int idot       = item.Item2;
-                    int idPartner  = item.Item3;
+                    int? idPartner = item.Item3;
                     string loaiDoi = GetLoaiDoi(group.TenNhom ?? "");
 
-                    ObjectParameter IDNTOut = new ObjectParameter("ID", typeof(int));
                     dbSV.CTKhaoSat_insert(IDSV, idot, IDNV, group.ID);
-                    dbSV.CTDKNguoiThan_insert(IDNV, idPartner, null, null, IDSV, 1, null, null, null, loaiDoi, group.TenNhom, IDNTOut);
+                    if (idPartner.HasValue)
+                    {
+                        ObjectParameter IDNTOut = new ObjectParameter("ID", typeof(int));
+                        dbSV.CTDKNguoiThan_insert(IDNV, idPartner.Value, null, null, IDSV, 1, null, null, null, loaiDoi, group.TenNhom, IDNTOut);
+                    }
                 }
 
                 TempData["msgSuccess"] = "<script>alert('Đăng ký thành công');</script>";
@@ -1084,6 +1157,30 @@ namespace EPORTAL.Areas.Servey.Controllers
                 dbSV.CTKhaoSat_delete(IDSV, MyAuthentication.ID);
                 dbSV.EmployeeServey_updateOT(MyAuthentication.ID, IDSV, null);
                 TempData["msgSuccess"] = "<script>alert('Đã xóa đăng ký. Bạn có thể đăng ký lại.');</script>";
+            }
+            catch (Exception e)
+            {
+                TempData["msgError"] = "<script>alert('Lỗi: " + e.Message + "');</script>";
+            }
+            return RedirectToAction("IndexDongDoi", new { IDSV });
+        }
+
+        public ActionResult DeleteDongDoiSolo(int id, int IDSV)
+        {
+            try
+            {
+                var item = dbSV.CTKhaoSats.FirstOrDefault(x => x.ID == id && x.IDNV == MyAuthentication.ID);
+                if (item != null)
+                {
+                    dbSV.CTKhaoSats.Remove(item);
+                    dbSV.SaveChanges();
+                    var remaining = dbSV.CTKhaoSats
+                        .Where(x => x.IDNV == MyAuthentication.ID && x.IDSV == IDSV)
+                        .ToList();
+                    if (!remaining.Any())
+                        dbSV.EmployeeServey_updateOT(MyAuthentication.ID, IDSV, null);
+                }
+                TempData["msgSuccess"] = "<script>alert('Đã xóa đăng ký');</script>";
             }
             catch (Exception e)
             {

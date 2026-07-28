@@ -4534,7 +4534,6 @@
     <Content Include="Areas\Servey\Views\ListSevey\EditOption.cshtml" />
     <Content Include="Areas\Servey\Views\ListSevey\UserServey.cshtml" />
     <Content Include="Areas\Servey\Views\ListSevey\CreateUser.cshtml" />
-    <Content Include="Areas\Servey\Views\UserServey\Index.cshtml" />
     <Content Include="App_Data\BM_DSNV.xlsx" />
     <Content Include="Areas\Servey\Views\ListSevey\ImportExcel.cshtml" />
     <Content Include="App_Data\BM_DSSERVEY.xlsx" />
@@ -4782,6 +4781,7 @@
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\QuyenHoanThanhDon_Index.cshtml" />
     <Content Include="Content\view360-imagery\manifest.json" />
     <Content Include="Areas\Servey\Views\ServeyID\IndexDongDoi.cshtml" />
+    <Content Include="Areas\Servey\Views\UserServey\Index.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

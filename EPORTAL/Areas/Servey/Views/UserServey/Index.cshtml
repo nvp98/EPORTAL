@@ -1,185 +1,304 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Danh sách đăng ký";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @using EPORTAL.ModelsServey
 @model List<UserServeyValidation>
-@using PagedList.Mvc
 
 @if (TempData["msgSuccess"] != null)
-{
-    @Html.Raw(TempData["msgSuccess"])
-}
+{@Html.Raw(TempData["msgSuccess"])}
 @if (TempData["msgError"] != null)
-{
-    @Html.Raw(TempData["msgError"])
-}
-<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
-<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
-<link href="~/Content/PagedList.css" rel="stylesheet" />
+{@Html.Raw(TempData["msgError"])}
 
 <style>
-    .boxx {
-        box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-        background: rgb(2,0,36);
-        background: linear-gradient(173deg, rgba(2,0,36,1) 0%, rgba(245,245,245,0.7483368347338936) 0%, rgba(2,62,255,0.025647759103641476) 100%);
+    .sv-page-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
     }
 
-    .aTag {
-        /*position: relative;*/
-        /* right: 0; */
-        /*left: 70%;*/
+        .sv-page-header h4 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3a4a;
+            margin: 0;
+        }
+
+    .sv-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 22px;
+    }
+
+    .sv-card {
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #eef0f4;
+    }
+
+        .sv-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 32px rgba(0,0,0,0.13);
+        }
+
+    /* ── Header strip ── */
+    .sv-card-top {
+        padding: 14px 18px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .sv-card-top.done {
+            background: linear-gradient(135deg, #1d8348, #27ae60);
+        }
+
+        .sv-card-top.todo {
+            background: linear-gradient(135deg, #154360, #1a6fa8);
+        }
+
+        .sv-card-top.locked {
+            background: linear-gradient(135deg, #616a6b, #909497);
+        }
+
+        .sv-card-top .sv-index {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 0.5px;
+        }
+
+    .sv-reg-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+        .sv-reg-pill.done {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+        }
+
+        .sv-reg-pill.todo {
+            background: rgba(255,255,255,0.18);
+            color: rgba(255,255,255,0.9);
+        }
+
+    /* ── Body ── */
+    .sv-card-body {
+        padding: 16px 18px 10px;
+        flex: 1;
+    }
+
+        .sv-card-body .sv-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a2535;
+            margin: 0 0 10px;
+            line-height: 1.4;
+        }
+
+    .sv-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 0.84rem;
+        color: #5d6778;
+    }
+
+        .sv-meta i {
+            width: 16px;
+            text-align: center;
+            color: #8a95a3;
+            margin-right: 4px;
+        }
+
+    .sv-status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+        padding: 3px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+        .sv-status-chip.active {
+            background: #d5f5e3;
+            color: #1e8449;
+        }
+
+        .sv-status-chip.locked {
+            background: #f2f3f4;
+            color: #717d7e;
+        }
+
+    /* ── Footer ── */
+    .sv-card-footer {
+        padding: 12px 18px 16px;
+        border-top: 1px solid #f0f2f5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .sv-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 0.8rem;
+        color: #7f8c9a;
+    }
+
+        .sv-stats i {
+            width: 14px;
+            text-align: center;
+            margin-right: 4px;
+        }
+
+    .sv-days {
+        font-weight: 700;
+        color: #c0392b;
+    }
+
+    .sv-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.18s;
+        white-space: nowrap;
+    }
+
+        .sv-btn:hover {
+            text-decoration: none;
+            opacity: 0.88;
+            transform: scale(1.03);
+        }
+
+        .sv-btn.register {
+            background: #1a6fa8;
+            color: #fff;
+        }
+
+        .sv-btn.registered {
+            background: #eafaf1;
+            color: #1e8449;
+            border: 1.5px solid #82e0aa;
+        }
+
+        .sv-btn.locked-btn {
+            background: #f2f3f4;
+            color: #909497;
+            pointer-events: none;
+            cursor: default;
+        }
+
+    .sv-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        color: #a0aab4;
+        font-size: 1rem;
     }
 </style>
+
 <div class="app-main__outer">
     <div class="app-main__inner">
 
-        @*<div class="app-page-title">
-                <div class="page-title-wrapper">
-                    <div class="page-title-heading">
-                        <div class="page-title-icon">
-                            <i class="pe-7s-portfolio icon-gradient bg-grow-early">
-                            </i>
-                        </div>
-                        <div>
-                            Danh sách khảo sát
-                            <div class="page-title-subheading">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>*@
-
-        <div class="tab-content">
-            <div class="row">
-                <div class="card">
-
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <div class="table-responsive">
-
-                                <div class="row mt-1">
-
-                                    @{ var RowNo = 1; var hd = "Đang hoạt động"; var khd = "Khóa đăng ký";}
-                                    @foreach (var item in Model)
-                                    {
-                                        <div class="col-md-4 mb-3">
-                                            <div class="p-card boxx p-2 rounded px-3">
-                                                @*<div class="d-flex align-items-center credits"><i class="fa-brands fa-slack"></i><span class="text-black-50 ml-2">@RowNo@{RowNo++;}</span></div>*@
-                                                <h5 class="mt-2"><span class="font-weight-bold">@RowNo@{RowNo++;}.&nbsp;Nội dung:&nbsp;</span> @item.ContentSV</h5><span class="badge badge-danger "><span class="font-weight-bold">Thời gian:&nbsp;</span> @item.StartTime.ToString("dd-MM-yyyy") &nbsp;-&nbsp; @item.EndTime.AddDays(-1).ToString("dd-MM-yyyy") </span>
-                                                <span class="d-block mb-1">
-                                                    <span class="font-weight-bold">Tình trạng:&nbsp;</span>
-                                                    @if (item.StatusSV)
-                                                    {@hd}
-                                                else
-                                                {@khd}
-                                                </span>
-                                                <div class="p-2">
-                                                    @if (item.IDSV == 14 || item.IDSV == 15)
-                                                    {
-                                                        <a id="4" href="@Url.Action("IndexDongDoi", "ServeyID", new { IDSV = item.IDSV })" class="aTag">
-                                                            <span class="btn-transition btn btn-outline-success" style="left:65%">Tham gia đăng ký</span>
-                                                        </a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a id="4" href="@Url.Action("Index", "ServeyID", new { IDSV = item.IDSV })" class="aTag">
-                                                            <span class="btn-transition btn btn-outline-success" style="left:65%">Tham gia đăng ký</span>
-                                                        </a>
-                                                    }
-                                                </div>
-
-                                                <div class="d-flex justify-content-between stats">
-                                                    <div><i class="fa fa-calendar-o"></i><span><span class="font-weight-bold">Thời hạn còn lại:&nbsp;</span> @item.Exp.Add(-TimeSpan.FromDays(1)).Days &nbsp;ngày </span></div>
-                                                    <div class="d-flex flex-row align-items-center mr-1">
-                                                        <div class="profiles"><i class="fa-solid fa-user-check"></i></div><span class="ml-3">@item.CountSV</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-
-
-                                    @*<div class="col-md-4 mb-3">
-                                            <div class="p-card boxx p-2 rounded px-3">
-                                                <div class="d-flex align-items-center credits"><img src="https://i.imgur.com/hlz6G90.png" width="16px"><span class="text-black-50 ml-2">2 credits</span></div>
-                                                <h5 class="mt-2">Increase confidence with trustpilot reviews</h5><span class="badge badge-primary py-1 mb-2">integrations</span><span class="d-block mb-5">Some kind of short descriptions can go here to better recommend tasks.</span>
-                                                <div class="d-flex justify-content-between stats">
-                                                    <div><i class="fa fa-calendar-o"></i><span class="ml-2">2 days ago</span></div>
-                                                    <div class="d-flex flex-row align-items-center">
-                                                        <div class="profiles"><img class="rounded-circle" src="https://i.imgur.com/KcxKRBm.jpg" width="30"><img class="rounded-circle" src="https://i.imgur.com/DukIAef.jpg" width="30"><img class="rounded-circle" src="https://i.imgur.com/UL0GS75.jpg" width="30"></div><span class="ml-3">16</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>*@
-
-                                    @*<div class="pager">
-                                            @Html.PagedListPager(Model, page => Url.Action("Index", "ListSevey", new { area = "Servey", page }))
-                                            <span class="pageoff">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
-                                        </div>*@
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="sv-page-header">
+            <i class="fa fa-list-alt fa-lg text-primary"></i>
+            <h4>Danh sách chương trình đăng ký</h4>
         </div>
 
+        <div class="sv-grid">
+            @{ int RowNo = 1; }
+            @if (!Model.Any())
+            {
+                <div class="sv-empty">
+                    <i class="fa fa-inbox fa-3x mb-3 d-block"></i>
+                    Hiện chưa có chương trình nào đang hoạt động.
+                </div>
+            }
+            @foreach (var item in Model)
+            {
+                bool locked = !item.StatusSV;
+                bool done = item.IsRegistered;
+                int daysLeft = item.Exp.Add(-TimeSpan.FromDays(1)).Days;
 
-        @*<div class="app-wrapper-footer">
-                <div class="app-footer">
-                    <div class="app-footer__inner">
+                string topClass = locked ? "locked" : (done ? "done" : "todo");
+                string regText = done ? "Đã đăng ký" : "Chưa đăng ký";
+                string regIcon = done ? "fa-check-circle" : "fa-circle-o";
 
+                string actionUrl = (item.ContentSV.Contains("Pickleball") || item.ContentSV.Contains("hát"))
+                    ? Url.Action("IndexDongDoi", "ServeyID", new { IDSV = item.IDSV })
+                    : Url.Action("Index", "ServeyID", new { IDSV = item.IDSV });
+
+                string btnClass = locked ? "locked-btn" : (done ? "registered" : "register");
+                string btnText = locked ? "Đã khóa" : (done ? "Xem / Chỉnh sửa" : "Đăng ký ngay");
+                string btnIcon = locked ? "fa-lock" : (done ? "fa-eye" : "fa-arrow-right");
+                string chipClass = item.StatusSV ? "active" : "locked";
+                string chipIcon = item.StatusSV ? "fa-unlock-alt" : "fa-lock";
+                string chipText = item.StatusSV ? "Đang hoạt động" : "Khóa đăng ký";
+
+                <div class="sv-card">
+                    <div class="sv-card-top @topClass">
+                        <span class="sv-index">
+                            <i class="fa fa-hashtag"></i> @RowNo@{ RowNo++; }
+                        </span>
+                        <span class="sv-reg-pill @(done ? "done" : "todo")">
+                            <i class="fa @regIcon"></i> @regText
+                        </span>
+                    </div>
+
+                    <div class="sv-card-body">
+                        <p class="sv-title">@item.ContentSV</p>
+                        <div class="sv-meta">
+                            <span>
+                                <i class="fa fa-calendar"></i>
+                                @item.StartTime.ToString("dd/MM/yyyy") &nbsp;–&nbsp; @item.EndTime.AddDays(-1).ToString("dd/MM/yyyy")
+                            </span>
+                        </div>
+                        <span class="sv-status-chip @chipClass">
+                            <i class="fa @chipIcon"></i>
+                            @chipText
+                        </span>
+                    </div>
+
+                    <div class="sv-card-footer">
+                        <div class="sv-stats">
+                            <span>
+                                <i class="fa fa-clock-o"></i>
+                                Còn&nbsp;<span class="sv-days">@daysLeft</span>&nbsp;ngày
+                            </span>
+                            <span>
+                                <i class="fa fa-users"></i>
+                                @item.CountSV người đã đăng ký
+                            </span>
+                        </div>
+                        <a href="@actionUrl" class="sv-btn @btnClass">
+                            <i class="fa @btnIcon"></i> @btnText
+                        </a>
                     </div>
                 </div>
-            </div>*@
-
+            }
+        </div>
 
     </div>
-
-    <script type="text/javascript">
-    $('#btn-add').click(function () {
-        var url = $('#myModal').data('url');
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#ModalTitle").html("Thêm Khảo sát");
-            $("#myModal").modal('show');
-        });
-    });
-    $('#btn-Import').click(function () {
-        var url = $('#myModalImport').data('url');
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#ModalTitle").html("Add Permission");
-            $("#myModal").modal('show');
-        });
-    });
-    $("#btn-search").on('click', function () {
-        var IDGroup = $('#IDGroup').val();
-        var search = $('#txtsearch').val();
-        if (IDGroup == "") {
-            window.location.href = '@Url.Action("Index", "Projects")?search=' + search;
-        } else window.location.href = '@Url.Action("Index", "Projects")?search=' + search + "&IDGroup=" + IDGroup;
-
-     });
-    $('#btn-Export').click(function () {
-        var IDGroup = $('#IDGroup').val();
-        var search = $('#txtsearch').val();
-        ////window.location.href = '@Url.Action("ExportToExcel", "Projects")?search=' + search;
-        if (IDGroup == "") {
-            window.location.href = '@Url.Action("ExportToExcel", "Projects")?search=' + search;
-        } else window.location.href = '@Url.Action("ExportToExcel", "Projects")?search=' + search + "&IDGroup=" + IDGroup;
-    });
-    $('#btn-List').click(function () {
-
-        window.location.href = '@Url.Action("index", "ProjectsGroup")';
-    });
-    </script>
-
-
-
-
-
+</div>

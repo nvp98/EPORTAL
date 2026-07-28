@@ -16,5 +16,6 @@ namespace EPORTAL.ModelsServey
         public int? CountSV { get; set; }
         public int? CountDKS { get; set; }
         public int? MenuOT { get; set; }
+        public bool IsRegistered { get; set; }
     }
 }

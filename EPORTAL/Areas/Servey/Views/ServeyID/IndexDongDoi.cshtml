@@ -4,57 +4,143 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     int IDSV = ViewBag.IDSV;
     int slotsRemaining = ViewBag.SlotsRemaining;
+    int? nextIDSV = ViewBag.NextIDSV as int?;
+    // Xác định route cho survey tiếp theo (DongDoi hay survey thường)
+    int[] dongDoiIDs = new[] { 12,13,14, 15 };
+    string nextUrl = nextIDSV.HasValue
+        ? (dongDoiIDs.Contains(nextIDSV.Value)
+            ? Url.Action("IndexDongDoi", "ServeyID", new { IDSV = nextIDSV })
+            : Url.Action("Index", "ServeyID", new { IDSV = nextIDSV }))
+        : null;
 }
 @using EPORTAL.ModelsServey
 
 @if (TempData["msgSuccess"] != null)
-{@Html.Raw(TempData["msgSuccess"])}
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
 @if (TempData["msgError"] != null)
-{@Html.Raw(TempData["msgError"])}
+{
+    @Html.Raw(TempData["msgError"])
+}
 
 <script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
 <link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
 
 <style>
     .pk-group-card {
-        border-left: 4px solid #007bff;
-        margin-bottom: 18px;
+    border-left: 4px solid #007bff;
+    margin-bottom: 18px;
     }
 
-        .pk-group-card.registered {
-            border-left-color: #28a745;
-        }
+    .pk-group-card.registered {
+    border-left-color: #28a745;
+    }
 
     .pk-badge-doiNam {
-        background: #007bff;
-        color: #fff;
+    background: #007bff;
+    color: #fff;
     }
 
     .pk-badge-doiNu {
-        background: #e83e8c;
-        color: #fff;
+    background: #e83e8c;
+    color: #fff;
     }
 
     .pk-badge-honHop {
-        background: #fd7e14;
-        color: #fff;
+    background: #fd7e14;
+    color: #fff;
     }
 
     .partner-block {
-        background: #f8f9fa;
-        border-radius: 6px;
-        padding: 12px;
-        margin-top: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 10px;
     }
 
     .slot-bar {
-        font-size: 1rem;
-        font-weight: 600;
+    font-size: 1rem;
+    font-weight: 600;
+    }
+
+    /* ── Custom radio pill ── */
+    .dk-option-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 4px;
+    }
+
+    .dk-radio-hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+    }
+
+    .dk-option-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    border-radius: 50px;
+    border: 2px solid #dee2e6;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    background: #fff;
+    color: #495057;
+    transition: all 0.18s ease;
+    user-select: none;
+    margin: 0;
+    white-space: nowrap;
+    }
+
+    .dk-option-label:hover {
+    border-color: #adb5bd;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+    }
+
+    .dk-radio-hidden:checked+.dk-option-label.dk-no {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(108, 117, 125, 0.35);
+    }
+
+    .dk-radio-hidden:checked+.dk-option-label.dk-yes {
+    background: #28a745;
+    border-color: #28a745;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.35);
     }
 </style>
 
 <div class="app-main__outer">
     <div class="app-main__inner">
+
+        @* ─── Thanh điều hướng ─── *@
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <a href="@Url.Action("Index", "UserServey", new { area = "Servey" })"
+               class="btn btn-outline-secondary btn-sm">
+                <i class="fa fa-arrow-left mr-1"></i> Trở lại
+            </a>
+            @if (nextUrl != null)
+            {
+                <a href="@nextUrl" class="btn btn-outline-primary btn-sm">
+                    Hoạt động đăng ký tiếp theo <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            }
+            else
+            {
+                <span class="text-muted" style="font-size:0.85rem">
+                    <i class="fa fa-check-circle text-success"></i> Đây là hoạt động cuối cùng
+                </span>
+            }
+        </div>
 
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
@@ -101,13 +187,17 @@
                         <tbody>
                             @foreach (var pair in myPairs)
                             {
+                                bool hasParter = pair.IDNguoiThan.HasValue;
+                                string deleteUrl = hasParter
+                                    ? Url.Action("DeleteDongDoiPair", "ServeyID", new { id = pair.ID, IDSV })
+                                    : Url.Action("DeleteDongDoiSolo", "ServeyID", new { id = pair.ID, IDSV });
                                 <tr>
                                     <td><strong>@pair.Note</strong></td>
-                                    <td>@pair.MaNV</td>
-                                    <td>@pair.HoTen</td>
-                                    <td>@pair.PhongBan</td>
+                                    <td>@(hasParter ? pair.MaNV : "--")</td>
+                                    <td>@(hasParter ? pair.HoTen : "Đăng ký một mình")</td>
+                                    <td>@(hasParter ? pair.PhongBan : "--")</td>
                                     <td class="text-center">
-                                        <a href="@Url.Action("DeleteDongDoiPair", "ServeyID", new { id = pair.ID, IDSV })"
+                                        <a href="@deleteUrl"
                                            class="btn btn-sm btn-danger"
                                            onclick="return confirm('Xóa đăng ký nội dung @pair.Note?')">
                                             <i class="fa fa-trash"></i>
@@ -176,13 +266,15 @@
                             Mỗi nội dung bắt buộc chọn <strong>1 đồng đội</strong>.
                         </p>
 
-                        @{ int radioIdx = 0; }
+                        @{
+                            int radioIdx = 0;
+                        }
                         @foreach (var group in unregistered)
                         {
-                            
+
                             string badgeClass = group.LoaiDoi == "DoiNam" ? "pk-badge-doiNam"
-                                             : group.LoaiDoi == "DoiNu" ? "pk-badge-doiNu"
-                                             : "pk-badge-honHop";
+                                                                         : group.LoaiDoi == "DoiNu" ? "pk-badge-doiNu"
+                                                                         : "pk-badge-honHop";
                             string genderHint = group.LoaiDoi == "DoiNam" ? "Nam + Nam"
                                              : group.LoaiDoi == "DoiNu" ? "Nữ + Nữ"
                                              : "Nam + Nữ";
@@ -193,21 +285,17 @@
                                     <span class="badge @badgeClass">@genderHint</span>
                                 </div>
                                 <div class="card-body py-2">
-                                    <div class="mb-1">
+                                    <div class="dk-option-group">
                                         @foreach (var opt in group.Options)
                                         {
                                             radioIdx++;
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input pk-radio"
-                                                       type="radio"
-                                                       name="answer_@group.IDGroup"
-                                                       id="opt_@radioIdx"
-                                                       value="@opt.IDOT"
-                                                       data-groupid="@group.IDGroup"
-                                                       data-isshow="@opt.isShow"
-                                                       data-idsv="@IDSV"
-                                                       @(opt.isShow == 0 ? "checked" : "") />
-                                                <label class="form-check-label" for="opt_@radioIdx">
+                                            bool isNoOpt = (opt.isShow == 0);
+                                            <div class="dk-option-item">
+                                                <input class="pk-radio dk-radio-hidden" type="radio" data-ispartner="@(opt.ContentOT == "Có" || opt.ContentOT == "Song ca"  ? 1 : 0)" name="answer_@group.IDGroup"
+                                                       id="opt_@radioIdx" value="@opt.IDOT" data-groupid="@group.IDGroup"
+                                                       data-isshow="@opt.isShow" data-idsv="@IDSV" @(isNoOpt ? "checked" : "") />
+                                                <label class="dk-option-label @(isNoOpt ? "dk-no" : "dk-yes")" for="opt_@radioIdx">
+                                                    <i class="fa @(isNoOpt ? "fa-times-circle" : "fa-check-circle")"></i>
                                                     @opt.ContentOT
                                                 </label>
                                             </div>
@@ -219,8 +307,7 @@
                                         <label class="font-weight-bold mb-1">
                                             <i class="fa fa-user-plus"></i> Chọn đồng đội:
                                         </label>
-                                        <select name="partner_@group.IDGroup"
-                                                id="partnerSelect_@group.IDGroup"
+                                        <select name="partner_@group.IDGroup" id="partnerSelect_@group.IDGroup"
                                                 class="form-control chosen-select partnerSelect"
                                                 data-placeholder="-- Tìm và chọn đồng đội --">
                                             <option value=""></option>
@@ -268,92 +355,117 @@
     var slotsRemaining = @slotsRemaining;
 
     function countSelected() {
-        return $('.pk-radio:checked').filter(function () {
-            return parseInt($(this).data('isshow')) !== 0;
-        }).length;
+    return $('.pk-radio:checked').filter(function () {
+    return parseInt($(this).data('isshow')) !== 0;
+    }).length;
     }
 
     function loadPartners(IDSV, IDGroup, selectEl) {
-        $(selectEl).empty().append('<option value="">-- Đang tải... --</option>');
-        $(selectEl).trigger('chosen:updated');
+    $(selectEl).empty().append('<option value="">-- Đang tải... --</option>');
+    $(selectEl).trigger('chosen:updated');
 
-        $.getJSON('@Url.Action("GetDongDoiPartners", "ServeyID")',
-            { IDSV: IDSV, IDGroup: IDGroup },
-            function (data) {
-                $(selectEl).empty().append('<option value=""></option>');
-                var hint = $('#partnerHint_' + IDGroup);
+    $.getJSON('@Url.Action("GetDongDoiPartners", "ServeyID")',
+    { IDSV: IDSV, IDGroup: IDGroup },
+    function (data) {
+    // Nếu user đã chọn "Không" trong lúc AJAX chạy → bỏ qua kết quả
+    if (!$('#partnerBlock_' + IDGroup).is(':visible')) return;
 
-                if (data.length === 0) {
-                    hint.text('Không có nhân viên hợp lệ hoặc tất cả đã được đăng ký.')
-                        .removeClass('text-muted').addClass('text-danger');
-                } else {
-                    hint.text(data.length + ' đồng đội khả dụng')
-                        .removeClass('text-danger').addClass('text-muted');
-                    $.each(data, function (i, nv) {
-                        $(selectEl).append($('<option>').val(nv.ID).text(nv.HoTen));
-                    });
-                }
-                $(selectEl).trigger('chosen:updated');
-            }
-        );
+    $(selectEl).empty().append('<option value=""></option>');
+    var hint = $('#partnerHint_' + IDGroup);
+
+    if (data.length === 0) {
+    hint.text('Không có nhân viên hợp lệ hoặc tất cả đã được đăng ký.')
+    .removeClass('text-muted').addClass('text-danger');
+    } else {
+    hint.text(data.length + ' đồng đội khả dụng')
+    .removeClass('text-danger').addClass('text-muted');
+    $.each(data, function (i, nv) {
+    $(selectEl).append($('<option>').val(nv.ID).text(nv.HoTen));
+    });
+    }
+    $(selectEl).trigger('chosen:updated');
+    }
+    );
     }
 
     function clearPartner(groupId) {
-        var partnerSelect = $('#partnerSelect_' + groupId);
-        partnerSelect.empty().append('<option value=""></option>');
-        partnerSelect.prop('disabled', true);
-        partnerSelect.trigger('chosen:updated');
-        $('#partnerHint_' + groupId).text('');
-        $('#partnerBlock_' + groupId).hide();
+    var partnerSelect = $('#partnerSelect_' + groupId);
+    partnerSelect.empty().append('<option value=""></option>');
+    partnerSelect.prop('disabled', true);
+    partnerSelect.trigger('chosen:updated');
+    $('#partnerHint_' + groupId).text('');
+    $('#partnerBlock_' + groupId).hide();
     }
 
     $(document).ready(function () {
 
-        // Khởi tạo chosen — ban đầu tất cả select bị disable vì block đang ẩn
-        $('.partnerSelect').prop('disabled', true).chosen({ width: '100%', search_contains: true });
+    // Khởi tạo chosen — ban đầu tất cả select bị disable vì block đang ẩn
+    $('.partnerSelect').prop('disabled', true).chosen({ width: '100%', search_contains: true });
 
-        // Xử lý khi chọn radio
-        $(document).on('change', '.pk-radio', function () {
-            var groupId = $(this).data('groupid');
-            var isShow  = parseInt($(this).data('isshow'));
-            var IDSV    = $(this).data('idsv');
-            var partnerBlock  = $('#partnerBlock_' + groupId);
-            var partnerSelect = $('#partnerSelect_' + groupId);
+    // Khởi tạo trạng thái ban đầu: ẩn partner block nếu "Không" đang chọn
+    // (xử lý cả trường hợp browser restore state)
+    $('.pk-radio').each(function () {
+    var groupId = $(this).data('groupid');
+    // Chỉ xử lý radio đang được check
+    if (!$(this).prop('checked')) return;
+    var isShow = parseInt($(this).data('isshow'));
+    if (isShow === 1) {
+    // Hiện partner block và load danh sách
+    var partnerSelect = $('#partnerSelect_' + groupId);
+    partnerSelect.prop('disabled', false);
+    $('#partnerBlock_' + groupId).show();
+    loadPartners($(this).data('idsv'), groupId, partnerSelect);
+    } else {
+    // Ẩn partner block (isShow = 0 hoặc null)
+    $('#partnerBlock_' + groupId).hide();
+    $('#partnerSelect_' + groupId).prop('disabled', true).trigger('chosen:updated');
+    }
+    });
 
-            if (isShow !== 0) {
-                // Kiểm tra giới hạn slot
-                if (countSelected() > slotsRemaining) {
-                    $(this).prop('checked', false);
-                    $('input[name="answer_' + groupId + '"][data-isshow="0"]').prop('checked', true);
-                    $('#maxWarning').show();
-                    return;
-                }
-                partnerSelect.prop('disabled', false);
-                partnerBlock.show();
-                loadPartners(IDSV, groupId, partnerSelect);
-            } else {
-                clearPartner(groupId);
-            }
+    // Xử lý khi chọn radio
+    $(document).on('change', '.pk-radio', function () {
+    var groupId = $(this).data('groupid');
+    var isShow = $(this).data("ispartner");
+    var IDSV = $(this).data('idsv');
+    var partnerBlock = $('#partnerBlock_' + groupId);
+    var partnerSelect = $('#partnerSelect_' + groupId);
+    var isparner = $(this).data("ispartner");
 
-            $('#maxWarning').toggle(countSelected() >= slotsRemaining && slotsRemaining > 0);
-        });
+    if (isShow === 1) {
+    // Kiểm tra giới hạn slot
+    if (countSelected() > slotsRemaining) {
+    $(this).prop('checked', false);
+    $('input[name="answer_' + groupId + '"][data-isshow="0"]').prop('checked', true);
+    $('#maxWarning').show();
+    return;
+    }
+    partnerSelect.prop('disabled', false);
+    partnerBlock.show();
+    loadPartners(IDSV, groupId, partnerSelect);
+    } else {
+    clearPartner(groupId);
+    }
 
-        // Validate trước khi submit
-        $('#form-dongdoi').on('submit', function (e) {
-            var hasError = false;
-            $('.pk-radio:checked').filter(function () {
-                return parseInt($(this).data('isshow')) !== 0;
-            }).each(function () {
-                var groupId = $(this).data('groupid');
-                var partner = $('#partnerSelect_' + groupId).val();
-                if (!partner) {
-                    alert('Vui lòng chọn đồng đội cho nội dung: ' +
-                          $('#groupCard_' + groupId + ' .card-header strong').text());
-                    hasError = true;
-                    return false;
-                }
-            });
-            if (hasError) e.preventDefault();
-        });
+    $('#maxWarning').toggle(countSelected() >= slotsRemaining && slotsRemaining > 0);
+    });
+
+    // Validate trước khi submit
+    $('#form-dongdoi').on('submit', function (e) {
+    var hasError = false;
+    $('.pk-radio:checked').filter(function () {
+    return parseInt($(this).data('isshow')) === 1;
+    }).each(function () {
+    var groupId = $(this).data('groupid');
+        var partner = $('#partnerSelect_' + groupId).val();
+
+        if (!partner) {
+    alert('Vui lòng chọn đồng đội cho nội dung: ' +
+    $('#groupCard_' + groupId + ' .card-header strong').text());
+    hasError = true;
+    return false;
+    }
+    });
+    if (hasError) e.preventDefault();
+    });
     });
 </script>

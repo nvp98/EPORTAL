@@ -31,6 +31,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                           Exp = (TimeSpan)((DateTime)a.EndTime - DateTime.Now.AddDays(-2)),
                           CountSV = dbSV.EmployeeServeys.Where(x=>x.IDSV ==a.IDSV && x.OTID != null ).Count(),
                           MenuOT = b.MenuOT,
+                          IsRegistered = b.OTID != null,
                       }).ToList();
 
             return View(res.OrderByDescending(x => x.StartTime).ToList());
