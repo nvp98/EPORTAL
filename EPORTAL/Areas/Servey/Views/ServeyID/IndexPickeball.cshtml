@@ -1,0 +1,334 @@
+﻿@model List<EPORTAL.ModelsServey.PickleballGroupView>
+@using EPORTAL.ModelsServey
+@using System.Linq
+@{
+    ViewBag.Title = "Đăng ký Pickleball";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int IDSV = ViewBag.IDSV;
+    int maxSlots = ViewBag.MaxSlots;
+    int slotsRemaining = ViewBag.SlotsRemaining;
+    int? nextIDSV = ViewBag.NextIDSV as int?;
+    int[] legacyTeamSurveyIds = new[] { 14, 15 };
+    string nextUrl = nextIDSV.HasValue
+        ? (legacyTeamSurveyIds.Contains(nextIDSV.Value)
+            ? Url.Action("IndexDongDoi", "ServeyID", new { IDSV = nextIDSV.Value })
+            : Url.Action("Index", "ServeyID", new { IDSV = nextIDSV.Value }))
+        : null;
+    var myPairs = ViewBag.MyPairs as List<PartTogetherValidation> ?? new List<PartTogetherValidation>();
+    string registrantCode = ViewBag.RegistrantCode as string ?? "--";
+    string registrantName = ViewBag.RegistrantName as string ?? "--";
+    string registrantPhone = ViewBag.RegistrantPhone as string ?? "--";
+    string registrantDepartment = ViewBag.RegistrantDepartment as string ?? "--";
+    var availableGroups = Model.Where(x => !x.IsRegistered && x.Options.Any(o => o.isShow == 1)).ToList();
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<style>
+    .pknew-page { color: #14264d; }
+    .pknew-page * { box-sizing: border-box; }
+    .pknew-back {
+        display: inline-flex; align-items: center; gap: 8px; min-height: 42px;
+        margin-bottom: 14px; padding: 9px 18px; border: 1px solid #d5dff2;
+        border-radius: 8px; background: #fff; color: #0754c6; font-weight: 600;
+    }
+    .pknew-back:hover { color: #003f9e; text-decoration: none; border-color: #8eb3f3; }
+    .pknew-navigation { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+    .pknew-navigation .pknew-back { margin-bottom: 0; }
+    .pknew-next-link, .pknew-last-activity { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 42px; padding: 9px 16px; border-radius: 8px; font-size: .92rem; font-weight: 700; }
+    .pknew-next-link { border: 1px solid #0754c6; background: linear-gradient(135deg, #0866e8, #0648b2); color: #fff; box-shadow: 0 4px 10px rgba(7,84,198,.2); transition: transform .18s ease, box-shadow .18s ease; }
+    .pknew-next-link:hover, .pknew-next-link:focus { color: #fff; text-decoration: none; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(7,84,198,.27); }
+    .pknew-last-activity { border: 1px solid #bde9cf; background: #effaf4; color: #187643; }
+    .pknew-last-activity i { color: #0baa5b; font-size: 1.05rem; }
+    .pknew-shell {
+        padding: 22px 30px 30px; border: 1px solid #d7e2f4; border-radius: 10px;
+        background: #fff; box-shadow: 0 3px 14px rgba(16,57,126,.05);
+    }
+    .pknew-header {
+        display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+        padding: 0 4px 20px; border-bottom: 1px solid #dce5f4;
+    }
+    .pknew-title {
+        margin: 0 0 12px; color: #073d98; font-size: 1.7rem; font-weight: 800;
+        line-height: 1.3; text-transform: uppercase;
+    }
+    .pknew-header-actions { display: flex; align-items: center; gap: 20px; padding-top: 7px; }
+    .pknew-delete-all {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-height: 42px; padding: 9px 17px; border: 0; border-radius: 7px;
+        background: #e81027; color: #fff; font-weight: 700; text-transform: uppercase;
+    }
+    .pknew-trash-icon { width: 17px; height: 17px; display: inline-block; vertical-align: -3px; color: #fff; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .pknew-section { margin-top: 20px; }
+    .pknew-section-title {
+        display: flex; align-items: center; gap: 12px; margin: 0 0 13px;
+        color: #073d98; font-size: 1.25rem; font-weight: 800;
+    }
+    .pknew-section-title i { color: #0baa5b; font-size: 1.4rem; }
+    .pknew-section-title i.edit { color: #075ee0; }
+    .pknew-help { margin: -4px 0 14px; color: #596982; }
+    .pknew-notice {
+        display: flex; align-items: flex-start; gap: 11px; margin: 0 0 16px; padding: 13px 16px;
+        border-left: 4px solid #075ee0; border-radius: 7px; background: #f2f7ff;
+        color: #354766; line-height: 1.55;
+    }
+    .pknew-notice i { flex: 0 0 auto; margin-top: 3px; color: #075ee0; font-size: 1.05rem; }
+    .pknew-notice strong { color: #123b7a; }
+    .pknew-table-wrap { overflow-x: auto; border: 1px solid #d9e3f3; border-radius: 9px; }
+    .pknew-table { width: 100%; min-width: 850px; margin: 0; border-collapse: collapse; }
+    .pknew-table th, .pknew-table td { padding: 14px 16px; border-bottom: 1px solid #e0e7f3; vertical-align: middle; }
+    .pknew-table th { background: #f8faff; text-align: left; color: #17284e; }
+    .pknew-table tbody tr:last-child td { border-bottom: 0; }
+    .pknew-content { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .pknew-row-icon {
+        display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px;
+        border-radius: 50%; background: linear-gradient(145deg, #1684ff, #0754d7); color: #fff;
+        box-shadow: 0 4px 10px rgba(7,84,198,.18), inset 0 1px 0 rgba(255,255,255,.28);
+    }
+    .pknew-row-icon.doi-nu { background: linear-gradient(145deg, #b43bd2, #7621a8); }
+    .pknew-row-icon.hon-hop { background: linear-gradient(145deg, #18c69a, #058f6d); }
+    .pknew-row-icon.hon-hop-trinh-cao, .pknew-row-icon.hon-hop-nam, .pknew-row-icon.khac { background: linear-gradient(145deg, #ffae22, #f07800); }
+    .pknew-row-delete { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 0; border-radius: 7px; background: #ec0c27; color: #fff; }
+    .pknew-actions { display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
+    .pknew-empty { padding: 18px; border: 1px dashed #cbd8ed; border-radius: 8px; background: #f9fbff; text-align: center; color: #687791; }
+    .pknew-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .pknew-card {
+        position: relative; display: flex; align-items: center; min-height: 132px; margin: 0;
+        padding: 18px 46px 18px 20px; border: 1.5px solid #d3dff1; border-radius: 9px;
+        background: #fff; cursor: pointer; transition: .18s ease;
+    }
+    .pknew-card:hover { transform: translateY(-1px); border-color: #82aef4; box-shadow: 0 5px 16px rgba(7,84,198,.08); }
+    .pknew-card.selected { border-color: var(--pk-color); box-shadow: 0 0 0 1px color-mix(in srgb, var(--pk-color) 15%, transparent); }
+    .pknew-card input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .pknew-check {
+        position: absolute; top: 14px; right: 14px; display: flex; align-items: center; justify-content: center;
+        width: 25px; height: 25px; border: 2px solid #64748e; border-radius: 5px; color: transparent;
+    }
+    .pknew-card.selected .pknew-check { border-color: var(--pk-color); background: var(--pk-color); color: #fff; }
+    .pknew-card-icon {
+        display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+        width: 78px; height: 78px; margin-right: 22px; border-radius: 50%;
+        background: linear-gradient(145deg, var(--pk-color-light), var(--pk-color)); color: #fff;
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--pk-color) 24%, transparent), inset 0 1px 0 rgba(255,255,255,.3);
+    }
+    .pknew-card.doi-nam { --pk-color: #0754d7; --pk-color-light: #1684ff; }
+    .pknew-card.doi-nu { --pk-color: #7621a8; --pk-color-light: #b43bd2; }
+    .pknew-card.hon-hop { --pk-color: #058f6d; --pk-color-light: #18c69a; }
+    .pknew-card.hon-hop-trinh-cao, .pknew-card.hon-hop-nam { --pk-color: #f07800; --pk-color-light: #ffae22; }
+    .pknew-card.khac { --pk-color: #f07800; --pk-color-light: #ffae22; }
+    .pknew-pictogram { display: inline-flex; align-items: center; justify-content: center; gap: 3px; color: #fff; line-height: 1; }
+    .pknew-pictogram .fa { font-size: 2.15rem; }
+    .pknew-pictogram .fa-star { margin-left: -1px; font-size: 1.55rem; }
+    .pknew-pictogram.pknew-high-mixed { gap: 1px; }
+    .pknew-pictogram.pknew-high-mixed .fa { font-size: 1.85rem; }
+    .pknew-pictogram.pknew-high-mixed .fa-star { font-size: 1.25rem; }
+    .pknew-row-icon .pknew-pictogram { gap: 1px; }
+    .pknew-row-icon .pknew-pictogram .fa { font-size: 1.25rem; }
+    .pknew-row-icon .pknew-pictogram .fa-star { font-size: .92rem; }
+    .pknew-row-icon .pknew-pictogram.pknew-high-mixed .fa { font-size: 1.05rem; }
+    .pknew-row-icon .pknew-pictogram.pknew-high-mixed .fa-star { font-size: .72rem; }
+    .pknew-card-name { display: block; margin-bottom: 8px; color: #14264d; font-size: 1.1rem; font-weight: 800; }
+    .pknew-card-desc { display: block; color: #596982; font-weight: 400; }
+    .pknew-submit-row { display: flex; justify-content: flex-end; margin-top: 22px; }
+    .pknew-submit {
+        min-width: 170px; min-height: 52px; border: 0; border-radius: 8px;
+        background: #0754c6; color: #fff; font-size: 1.03rem; font-weight: 700;
+    }
+    @@media (max-width: 1100px) {
+        .pknew-header { flex-direction: column; }
+        .pknew-header-actions { width: 100%; justify-content: space-between; }
+    }
+    @@media (max-width: 767px) {
+        .pknew-navigation { align-items: flex-start; flex-direction: column; }
+        .pknew-navigation .pknew-back, .pknew-next-link, .pknew-last-activity { width: 100%; }
+        .pknew-shell { padding: 17px 14px 22px; }
+        .pknew-title { font-size: 1.3rem; }
+        .pknew-header-actions { align-items: stretch; flex-direction: column; }
+        .pknew-options { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="app-main__outer pknew-page">
+    <div class="app-main__inner">
+        <div class="pknew-navigation">
+            <a class="pknew-back" href="@Url.Action("Index", "UserServey", new { area = "Servey" })">
+                <i class="fa fa-arrow-left"></i> Trở lại
+            </a>
+            @if (nextUrl != null)
+            {
+                <a href="@nextUrl" class="pknew-next-link">
+                    Hoạt động đăng ký tiếp theo <i class="fa fa-arrow-right"></i>
+                </a>
+            }
+            else
+            {
+                <span class="pknew-last-activity">
+                    <i class="fa fa-check-circle"></i> Đây là hoạt động cuối cùng
+                </span>
+            }
+        </div>
+        <div class="pknew-shell">
+            <header class="pknew-header">
+                <div>
+                    <h2 class="pknew-title">@((ViewBag.TenDK as string ?? "Pickleball").ToUpperInvariant())</h2>
+                </div>
+                <div class="pknew-header-actions">
+                    @if (myPairs.Any())
+                    {
+                    using (Html.BeginForm("DeleteAllPickleball", "ServeyID", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="IDSV" value="@IDSV" />
+                            <button type="submit" class="pknew-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký Pickleball?');">
+                                <svg class="pknew-trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path></svg>&nbsp; Xóa đăng ký
+                            </button>
+                        }
+                    }
+                </div>
+            </header>
+
+            <section class="pknew-section">
+                <h3 class="pknew-section-title"><i class="fa fa-check-circle"></i> I. Đăng ký của bạn</h3>
+                @if (myPairs.Any())
+                {
+                    <div class="pknew-table-wrap">
+                        <table class="pknew-table">
+                            <thead><tr><th>Nội dung</th><th>Mã nhân viên</th><th>Họ tên</th><th>Số điện thoại</th><th>Bộ phận</th><th>Thao tác</th></tr></thead>
+                            <tbody>
+                                @foreach (var item in myPairs)
+                                {
+                                    bool hasPartner = item.IDNguoiThan.HasValue;
+                                    string rowType = item.QuanHe ?? "All";
+                                    string rowClass = rowType == "DoiNam" ? "doi-nam" : rowType == "DoiNu" ? "doi-nu" : rowType == "HonHop" ? "hon-hop" : rowType == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : rowType == "HonHopNam" ? "hon-hop-nam" : "khac";
+                                    <tr>
+                                        <td>
+                                            <div class="pknew-content">
+                                                <span class="pknew-row-icon @rowClass">
+                                                    <span class="pknew-pictogram @(rowType == "HonHopTrinhCao" ? "pknew-high-mixed" : "")" aria-hidden="true">
+                                                        @if (rowType == "DoiNu")
+                                                        { <i class="fa fa-female"></i><i class="fa fa-female"></i> }
+                                                        else if (rowType == "HonHop")
+                                                        { <i class="fa fa-male"></i><i class="fa fa-female"></i> }
+                                                        else if (rowType == "HonHopTrinhCao")
+                                                        { <i class="fa fa-male"></i><i class="fa fa-female"></i><i class="fa fa-star"></i> }
+                                                        else if (rowType == "HonHopNam")
+                                                        { <i class="fa fa-male"></i><i class="fa fa-star"></i> }
+                                                        else
+                                                        { <i class="fa fa-male"></i><i class="fa fa-male"></i> }
+                                                    </span>
+                                                </span>
+                                                @item.Note
+                                            </div>
+                                        </td>
+                                        <td>@registrantCode</td>
+                                        <td>@registrantName</td>
+                                        <td>@registrantPhone</td>
+                                        <td>@registrantDepartment</td>
+                                        <td>
+                                            <div class="pknew-actions">
+                                                @using (Html.BeginForm("DeletePickleballItem", "ServeyID", FormMethod.Post))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="IDSV" value="@IDSV" />
+                                                    <input type="hidden" name="id" value="@item.ID" />
+                                                    <input type="hidden" name="hasPartner" value="@hasPartner.ToString().ToLowerInvariant()" />
+                                                    <button type="submit" class="pknew-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');"><svg class="pknew-trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path></svg></button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="pknew-empty">Bạn chưa đăng ký nội dung nào.</div>
+                }
+            </section>
+
+            <section class="pknew-section">
+                <h3 class="pknew-section-title"><i class="fa fa-edit edit"></i> II. Đăng ký mới</h3>
+                <div class="pknew-notice">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <div><strong>Lưu ý:</strong> Đây là thông tin <strong>đăng ký hạng mục thi đấu</strong> của các vận động viên. Việc <strong>chia đội và bốc thăm thi đấu</strong> sẽ được Ban Tổ chức thực hiện trực tiếp theo thể lệ chương trình.</div>
+                </div>
+                @if (slotsRemaining <= 0)
+                {
+                    <div class="alert alert-success">Bạn đã đăng ký đủ @maxSlots nội dung.</div>
+                }
+                else if (!availableGroups.Any())
+                {
+                    <div class="alert alert-info">Không còn nội dung phù hợp để đăng ký.</div>
+                }
+                else
+                {
+                    <p class="pknew-help">Mỗi CBNV chỉ được đăng ký tối đa @maxSlots nội dung thi đấu.</p>
+                    using (Html.BeginForm("ConfirmPickleball", "ServeyID", FormMethod.Post, new { id = "pknewForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="IDSV" value="@IDSV" />
+                        <div class="pknew-options">
+                            @foreach (var group in availableGroups)
+                            {
+                                var positiveOption = group.Options.First(x => x.isShow == 1);
+                                string cardClass = group.LoaiDoi == "DoiNam" ? "doi-nam" : group.LoaiDoi == "DoiNu" ? "doi-nu" : group.LoaiDoi == "HonHop" ? "hon-hop" : group.LoaiDoi == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : group.LoaiDoi == "HonHopNam" ? "hon-hop-nam" : "khac";
+                                string description = group.LoaiDoi == "DoiNam" ? "Nội dung dành cho vận động viên nam" : group.LoaiDoi == "DoiNu" ? "Nội dung dành cho vận động viên nữ" : group.LoaiDoi == "HonHop" ? "Nội dung thi đấu đôi nam - nữ" : group.LoaiDoi == "HonHopTrinhCao" ? "Nội dung hỗn hợp trình độ cao" : group.LoaiDoi == "HonHopNam" ? "VĐV nam trình độ cao" : "Nội dung thi đấu Pickleball";
+                                <label class="pknew-card @cardClass" data-group-id="@group.IDGroup">
+                                    <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT" data-group-id="@group.IDGroup" />
+                                    <span class="pknew-check"><i class="fa fa-check"></i></span>
+                                    <span class="pknew-card-icon">
+                                        <span class="pknew-pictogram @(group.LoaiDoi == "HonHopTrinhCao" ? "pknew-high-mixed" : "")" aria-hidden="true">
+                                            @if (group.LoaiDoi == "DoiNu")
+                                            { <i class="fa fa-female"></i><i class="fa fa-female"></i> }
+                                            else if (group.LoaiDoi == "HonHop")
+                                            { <i class="fa fa-male"></i><i class="fa fa-female"></i> }
+                                            else if (group.LoaiDoi == "HonHopTrinhCao")
+                                            { <i class="fa fa-male"></i><i class="fa fa-female"></i><i class="fa fa-star"></i> }
+                                            else if (group.LoaiDoi == "HonHopNam")
+                                            { <i class="fa fa-male"></i><i class="fa fa-star"></i> }
+                                            else
+                                            { <i class="fa fa-male"></i><i class="fa fa-male"></i> }
+                                        </span>
+                                    </span>
+                                    <span><span class="pknew-card-name">@group.TenNhom</span><span class="pknew-card-desc">@description</span></span>
+                                </label>
+                            }
+                        </div>
+
+                        <div class="pknew-submit-row"><button type="submit" class="pknew-submit" id="pknewSubmit"><i class="fa fa-paper-plane"></i>&nbsp; Đăng ký</button></div>
+                    }
+                }
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var slotsRemaining = @slotsRemaining;
+        $(document).on('change', '.pknew-card input', function () {
+            if ($('.pknew-card input:checked').length > slotsRemaining) {
+                $(this).prop('checked', false);
+                alert('Bạn chỉ được chọn tối đa ' + slotsRemaining + ' nội dung.');
+            }
+            var checked = $(this).prop('checked');
+            $(this).closest('.pknew-card').toggleClass('selected', checked);
+        });
+
+        $('#pknewForm').on('submit', function (event) {
+            var $checked = $('.pknew-card input:checked');
+            if (!$checked.length) { event.preventDefault(); alert('Vui lòng chọn ít nhất một nội dung.'); return; }
+            $('#pknewSubmit').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp; Đang đăng ký');
+        });
+    });
+</script>

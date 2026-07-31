@@ -895,6 +895,7 @@
       <DependentUpon>EPORTAL_SERVEY.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelsServey\PartTogetherValidation.cs" />
+    <Compile Include="ModelsServey\SingingRegistrationViewModel.cs" />
     <Compile Include="ModelsServey\PartTogether_selectCom_Result.cs">
       <DependentUpon>EPORTAL_SERVEY.tt</DependentUpon>
     </Compile>
@@ -4781,6 +4782,8 @@
     <Content Include="Areas\TagSign\Views\TheXeCoDong_NT\QuyenHoanThanhDon_Index.cshtml" />
     <Content Include="Content\view360-imagery\manifest.json" />
     <Content Include="Areas\Servey\Views\ServeyID\IndexDongDoi.cshtml" />
+    <Content Include="Areas\Servey\Views\ServeyID\IndexTiengHat.cshtml" />
+    <Content Include="Areas\Servey\Views\ServeyID\IndexPickeball.cshtml" />
     <Content Include="Areas\Servey\Views\UserServey\Index.cshtml" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
