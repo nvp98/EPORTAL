@@ -184,7 +184,6 @@
                     {
                     using (Html.BeginForm("DeleteAllPickleball", "ServeyID", FormMethod.Post))
                         {
-                            @Html.AntiForgeryToken()
                             <input type="hidden" name="IDSV" value="@IDSV" />
                             <button type="submit" class="pknew-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký Pickleball?');">
                                 <svg class="pknew-trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path></svg>&nbsp; Xóa đăng ký
@@ -204,7 +203,6 @@
                             <tbody>
                                 @foreach (var item in myPairs)
                                 {
-                                    bool hasPartner = item.IDNguoiThan.HasValue;
                                     string rowType = item.QuanHe ?? "All";
                                     string rowClass = rowType == "DoiNam" ? "doi-nam" : rowType == "DoiNu" ? "doi-nu" : rowType == "HonHop" ? "hon-hop" : rowType == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : rowType == "HonHopNam" ? "hon-hop-nam" : "khac";
                                     <tr>
@@ -235,10 +233,8 @@
                                             <div class="pknew-actions">
                                                 @using (Html.BeginForm("DeletePickleballItem", "ServeyID", FormMethod.Post))
                                                 {
-                                                    @Html.AntiForgeryToken()
                                                     <input type="hidden" name="IDSV" value="@IDSV" />
                                                     <input type="hidden" name="id" value="@item.ID" />
-                                                    <input type="hidden" name="hasPartner" value="@hasPartner.ToString().ToLowerInvariant()" />
                                                     <button type="submit" class="pknew-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');"><svg class="pknew-trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path></svg></button>
                                                 }
                                             </div>
@@ -274,7 +270,6 @@
                     <p class="pknew-help">Mỗi CBNV chỉ được đăng ký tối đa @maxSlots nội dung thi đấu.</p>
                     using (Html.BeginForm("ConfirmPickleball", "ServeyID", FormMethod.Post, new { id = "pknewForm" }))
                     {
-                        @Html.AntiForgeryToken()
                         <input type="hidden" name="IDSV" value="@IDSV" />
                         <div class="pknew-options">
                             @foreach (var group in availableGroups)

@@ -632,7 +632,6 @@
                     {
                         using (Html.BeginForm("DeleteAllSinging", "ServeyID", FormMethod.Post, new { @class = "singing-delete-all-form" }))
                         {
-                            @Html.AntiForgeryToken()
                             <input type="hidden" name="IDSV" value="@Model.IDSV" />
                             <button type="submit" class="singing-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký tiếng hát?');">
                                 <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -682,7 +681,6 @@
                                                 <td>
                                                     @using (Html.BeginForm("DeleteSingingItem", "ServeyID", FormMethod.Post, new { @class = "singing-delete-item-form" }))
                                                     {
-                                                        @Html.AntiForgeryToken()
                                                         <input type="hidden" name="IDSV" value="@Model.IDSV" />
                                                         <input type="hidden" name="CTKhaoSatID" value="@item.CTKhaoSatID" />
                                                         <button type="submit" class="singing-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');">
@@ -752,7 +750,6 @@
                                                         {
                                                             using (Html.BeginForm("DeleteSingingItem", "ServeyID", FormMethod.Post, new { @class = "singing-delete-item-form" }))
                                                             {
-                                                                @Html.AntiForgeryToken()
                                                                 <input type="hidden" name="IDSV" value="@Model.IDSV" />
                                                                 <input type="hidden" name="CTKhaoSatID" value="@item.CTKhaoSatID" />
                                                                 <button type="submit" class="singing-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');">
@@ -804,7 +801,6 @@
                     <p class="singing-help">Chọn tối đa @Model.MaxSlots nội dung. Nội dung có hình thức biểu diễn cùng người khác bắt buộc chọn một người hát cùng.</p>
                     using (Html.BeginForm("ConfirmSinging", "ServeyID", FormMethod.Post, new { id = "singingRegistrationForm" }))
                     {
-                        @Html.AntiForgeryToken()
                         <input type="hidden" name="IDSV" value="@Model.IDSV" />
 
                         <div class="singing-options">
@@ -872,7 +868,6 @@
                     <div class="modal-content">
                         @using (Html.BeginForm("UpdateSingingPartner", "ServeyID", FormMethod.Post, new { id = "singingEditPartnerForm" }))
                         {
-                            @Html.AntiForgeryToken()
                             <input type="hidden" name="IDSV" value="@Model.IDSV" />
                             <input type="hidden" name="CTKhaoSatID" id="singingEditRegistrationId" />
                             <input type="hidden" name="PairID" id="singingEditPairId" />
