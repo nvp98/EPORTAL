@@ -246,7 +246,9 @@
                 string regText = done ? "Đã đăng ký" : "Chưa đăng ký";
                 string regIcon = done ? "fa-check-circle" : "fa-circle-o";
 
-                string actionUrl = (item.ContentSV.Contains("Pickleball") || item.ContentSV.Contains("hát"))
+                bool isPickleball = item.IDSV != 12 && item.IDSV != 13
+                    && (item.ContentSV ?? "").IndexOf("Pickleball", StringComparison.OrdinalIgnoreCase) >= 0;
+                string actionUrl = isPickleball
                     ? Url.Action("IndexDongDoi", "ServeyID", new { IDSV = item.IDSV })
                     : Url.Action("Index", "ServeyID", new { IDSV = item.IDSV });
 

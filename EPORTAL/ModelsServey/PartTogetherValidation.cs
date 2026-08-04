@@ -31,6 +31,7 @@ namespace EPORTAL.ModelsServey
 
         public int? IDNguoiThan { get; set; }
         public int? IDSV { get; set; }
+        public int? IDGroup { get; set; }
 
         public int? IDCuLy { get; set; }
         public int? IDMau { get; set; }

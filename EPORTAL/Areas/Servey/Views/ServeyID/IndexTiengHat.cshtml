@@ -1,0 +1,1062 @@
+﻿@model EPORTAL.ModelsServey.SingingRegistrationViewModel
+@using System.Linq
+@{
+    ViewBag.Title = "Đăng ký tiếng hát";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var availableOptions = Model.Options.Where(x => !x.IsRegistered).ToList();
+    var soloRegistrations = Model.Registrations.Where(x => !x.RequiresPartner).ToList();
+    var partnerRegistrations = Model.Registrations.Where(x => x.RequiresPartner).ToList();
+    int? nextIDSV = ViewBag.NextIDSV as int?;
+    int[] legacyTeamSurveyIds = new[] { 14, 15 };
+    string nextUrl = nextIDSV.HasValue
+        ? (legacyTeamSurveyIds.Contains(nextIDSV.Value)
+            ? Url.Action("IndexDongDoi", "ServeyID", new { IDSV = nextIDSV.Value })
+            : Url.Action("Index", "ServeyID", new { IDSV = nextIDSV.Value }))
+        : null;
+}
+
+@if (TempData["msgSuccess"] != null)
+{
+    @Html.Raw(TempData["msgSuccess"])
+}
+@if (TempData["msgError"] != null)
+{
+    @Html.Raw(TempData["msgError"])
+}
+
+<script src="~/Content/assets/Chonse/chosen.jquery.js"></script>
+<link href="~/Content/assets/Chonse/chosen.css" rel="stylesheet" />
+
+<style>
+    .singing-page {
+        color: #14264d;
+    }
+
+    .singing-page * {
+        box-sizing: border-box;
+    }
+
+    .singing-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 42px;
+        margin-bottom: 14px;
+        padding: 9px 18px;
+        border: 1px solid #d5dff2;
+        border-radius: 8px;
+        background: #fff;
+        color: #0754c6;
+        font-weight: 600;
+    }
+
+    .singing-back:hover {
+        color: #003f9e;
+        text-decoration: none;
+        border-color: #8eb3f3;
+    }
+
+    .singing-navigation {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .singing-navigation .singing-back {
+        margin-bottom: 0;
+    }
+
+    .singing-next-link,
+    .singing-last-activity {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 42px;
+        padding: 9px 16px;
+        border-radius: 8px;
+        font-size: 0.92rem;
+        font-weight: 700;
+    }
+
+    .singing-next-link {
+        border: 1px solid #0754c6;
+        background: linear-gradient(135deg, #0866e8, #0648b2);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(7, 84, 198, 0.2);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .singing-next-link:hover,
+    .singing-next-link:focus {
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(7, 84, 198, 0.27);
+    }
+
+    .singing-last-activity {
+        border: 1px solid #bde9cf;
+        background: #effaf4;
+        color: #187643;
+    }
+
+    .singing-last-activity i {
+        color: #0baa5b;
+        font-size: 1.05rem;
+    }
+
+    .singing-shell {
+        padding: 22px 30px 30px;
+        border: 1px solid #d7e2f4;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 3px 14px rgba(16, 57, 126, 0.05);
+    }
+
+    .singing-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 0 4px 20px;
+        border-bottom: 1px solid #dce5f4;
+    }
+
+    .singing-title {
+        margin: 0 0 12px;
+        color: #073d98;
+        font-size: 1.7rem;
+        font-weight: 800;
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+
+    .singing-header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 20px;
+        flex: 0 0 auto;
+        padding-top: 7px;
+    }
+
+    .singing-delete-all {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 9px 17px;
+        border: 0;
+        border-radius: 7px;
+        background: #e81027;
+        color: #fff;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 0 4px 10px rgba(232, 16, 39, 0.18);
+    }
+
+    .singing-trash-icon {
+        width: 17px;
+        height: 17px;
+        display: inline-block;
+        vertical-align: -3px;
+        color: #fff;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .singing-section {
+        margin-top: 20px;
+    }
+
+    .singing-section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 13px;
+        color: #073d98;
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .singing-section-title .section-icon {
+        color: #0baa5b;
+        font-size: 1.45rem;
+    }
+
+    .singing-section-title .section-icon.edit {
+        color: #075ee0;
+    }
+
+    .singing-table-wrap {
+        overflow-x: auto;
+        border: 1px solid #d9e3f3;
+        border-radius: 9px;
+        box-shadow: 0 2px 8px rgba(24, 58, 112, 0.05);
+    }
+
+    .singing-registration-block + .singing-registration-block {
+        margin-top: 18px;
+    }
+
+    .singing-table {
+        width: 100%;
+        min-width: 720px;
+        margin: 0;
+        border-collapse: collapse;
+    }
+
+    .singing-duet-table { min-width: 1050px; }
+
+    .singing-table th,
+    .singing-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e0e7f3;
+        vertical-align: middle;
+    }
+
+    .singing-table th {
+        background: #f8faff;
+        color: #17284e;
+        font-size: 0.9rem;
+        text-align: left;
+    }
+
+    .singing-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .singing-content-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+    }
+
+    .singing-content-icon,
+    .singing-option-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        border-radius: 50%;
+    }
+
+    .singing-content-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(145deg, #075fe2, #003da8);
+        color: #fff;
+        font-size: 1.15rem;
+    }
+
+    .singing-content-icon.partner {
+        background: #d9f7df;
+        color: #0da658;
+    }
+
+    .singing-row-delete {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 7px;
+        background: #ec0c27;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .singing-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .singing-row-edit {
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 7px;
+        background: #0754c6;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .singing-edit-modal .modal-content {
+        overflow: visible;
+        border: 0;
+        border-radius: 10px;
+    }
+
+    .singing-edit-modal .modal-header {
+        border-bottom: 1px solid #dce5f4;
+    }
+
+    .singing-edit-modal .modal-title {
+        color: #073d98;
+        font-weight: 800;
+    }
+
+    .singing-edit-current {
+        margin-bottom: 14px;
+        padding: 10px 12px;
+        border-radius: 7px;
+        background: #f2f7ff;
+        color: #53627d;
+    }
+
+    .singing-edit-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 14px;
+    }
+
+    .singing-empty {
+        padding: 18px;
+        border: 1px dashed #cbd8ed;
+        border-radius: 8px;
+        background: #f9fbff;
+        color: #687791;
+        text-align: center;
+    }
+
+    .singing-help {
+        margin: -4px 0 14px;
+        color: #596982;
+    }
+
+    .singing-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(240px, 1fr));
+        gap: 20px;
+        max-width: 900px;
+    }
+
+    .singing-option-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: 120px;
+        margin: 0;
+        padding: 18px 48px 18px 24px;
+        border: 1.5px solid #d3dff1;
+        border-radius: 9px;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    }
+
+    .singing-option-card:hover {
+        border-color: #82aef4;
+        box-shadow: 0 5px 16px rgba(7, 84, 198, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .singing-option-card.selected {
+        border-color: #1769eb;
+        box-shadow: 0 0 0 1px rgba(23, 105, 235, 0.08);
+    }
+
+    .singing-option-card input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .singing-option-check {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        height: 25px;
+        border: 2px solid #64748e;
+        border-radius: 5px;
+        color: transparent;
+        font-size: 0.8rem;
+    }
+
+    .singing-option-card.selected .singing-option-check {
+        border-color: #0a64e8;
+        background: #0a64e8;
+        color: #fff;
+    }
+
+    .singing-option-icon {
+        width: 78px;
+        height: 78px;
+        margin-right: 28px;
+        background: linear-gradient(145deg, #075fe2, #003da8);
+        color: #fff;
+        font-size: 2.2rem;
+    }
+
+    .singing-option-card[data-requires-partner="1"] .singing-option-icon {
+        background: #d8f7df;
+        color: #0aa457;
+    }
+
+    .singing-duet-mics {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 44px;
+    }
+
+    .singing-duet-mics i {
+        position: absolute;
+        top: 3px;
+        font-size: 2rem;
+        transform-origin: center bottom;
+    }
+
+    .singing-duet-mics i:first-child {
+        left: 3px;
+        transform: rotate(-25deg);
+    }
+
+    .singing-duet-mics i:last-child {
+        right: 3px;
+        transform: rotate(25deg);
+    }
+
+    .singing-content-icon .singing-duet-mics {
+        width: 32px;
+        height: 30px;
+    }
+
+    .singing-content-icon .singing-duet-mics i {
+        top: 4px;
+        font-size: 1.25rem;
+    }
+
+    .singing-option-name {
+        display: block;
+        margin-bottom: 7px;
+        color: #063d9c;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .singing-option-description {
+        display: block;
+        color: #53637e;
+        font-size: 0.92rem;
+        font-weight: 400;
+    }
+
+    .singing-partner-panel {
+        margin-top: 24px;
+        padding: 18px 16px 16px;
+        border: 1px solid #bad1f6;
+        border-radius: 9px;
+        background: #fbfdff;
+    }
+
+    .singing-partner-title {
+        margin: 0 0 6px;
+        color: #073d98;
+        font-size: 1.05rem;
+        font-weight: 800;
+    }
+
+    .singing-partner-note {
+        margin-bottom: 14px;
+        color: #60708a;
+    }
+
+    .singing-partner-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.1fr;
+        gap: 20px;
+    }
+
+    .singing-field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #17284e;
+        font-weight: 700;
+    }
+
+    .singing-field label em {
+        color: #e10e25;
+        font-style: normal;
+    }
+
+    .singing-field .form-control,
+    .singing-field .chosen-container-single .chosen-single {
+        min-height: 48px;
+        border: 1px solid #cedaee;
+        border-radius: 7px;
+        background: #fff;
+        color: #253858;
+        box-shadow: none;
+    }
+
+    .singing-field .form-control {
+        padding: 12px 14px;
+    }
+
+    .singing-field .chosen-container-single .chosen-single {
+        height: 48px;
+        padding: 11px 14px;
+        line-height: 24px;
+    }
+
+    .singing-field .chosen-container-single .chosen-single div b {
+        margin-top: 12px;
+    }
+
+    .singing-submit-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 22px;
+    }
+
+    .singing-submit {
+        min-width: 170px;
+        min-height: 52px;
+        border: 0;
+        border-radius: 8px;
+        background: #0754c6;
+        color: #fff;
+        font-size: 1.03rem;
+        font-weight: 700;
+        box-shadow: 0 5px 14px rgba(7, 84, 198, 0.2);
+    }
+
+    .singing-submit:disabled {
+        opacity: 0.65;
+    }
+
+    @@media (max-width: 1100px) {
+        .singing-header {
+            flex-direction: column;
+        }
+
+        .singing-header-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .singing-partner-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .singing-edit-details {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 767px) {
+        .singing-shell {
+            padding: 17px 14px 22px;
+        }
+
+        .singing-title {
+            font-size: 1.3rem;
+        }
+
+        .singing-header-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .singing-navigation {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .singing-navigation .singing-back,
+        .singing-next-link,
+        .singing-last-activity {
+            width: 100%;
+        }
+
+        .singing-options {
+            grid-template-columns: 1fr;
+        }
+
+        .singing-option-card {
+            min-height: 105px;
+        }
+
+        .singing-option-icon {
+            width: 64px;
+            height: 64px;
+            margin-right: 18px;
+        }
+    }
+</style>
+
+<div class="app-main__outer singing-page">
+    <div class="app-main__inner">
+        <div class="singing-navigation">
+            <a class="singing-back" href="@Url.Action("Index", "UserServey", new { area = "Servey" })">
+                <i class="fa fa-arrow-left"></i> Trở lại
+            </a>
+            @if (nextUrl != null)
+            {
+                <a href="@nextUrl" class="singing-next-link">
+                    Hoạt động đăng ký tiếp theo <i class="fa fa-arrow-right"></i>
+                </a>
+            }
+            else
+            {
+                <span class="singing-last-activity">
+                    <i class="fa fa-check-circle"></i> Đây là hoạt động cuối cùng
+                </span>
+            }
+        </div>
+
+        <div class="singing-shell">
+            <div class="singing-header">
+                <div>
+                    <h2 class="singing-title">@((Model.Title ?? "Tiếng hát").ToUpperInvariant())</h2>
+                </div>
+                <div class="singing-header-actions">
+                    @if (Model.Registrations.Any(x => x.CanManage))
+                    {
+                        using (Html.BeginForm("DeleteAllSinging", "ServeyID", FormMethod.Post, new { @class = "singing-delete-all-form" }))
+                        {
+                            <input type="hidden" name="IDSV" value="@Model.IDSV" />
+                            <button type="submit" class="singing-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký tiếng hát?');">
+                                <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
+                                </svg>&nbsp; Xóa đăng ký
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+
+            <section class="singing-section">
+                <h3 class="singing-section-title">
+                    <i class="fa fa-check-circle section-icon"></i> I. Đăng ký của bạn
+                </h3>
+                @if (Model.Registrations.Any())
+                {
+                    if (soloRegistrations.Any())
+                    {
+                        <div class="singing-registration-block">
+                            <div class="singing-table-wrap">
+                                <table class="singing-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nội dung</th>
+                                            <th>Mã nhân viên</th>
+                                            <th>Họ tên</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Bộ phận</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in soloRegistrations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="singing-content-cell">
+                                                        <span class="singing-content-icon solo"><i class="fa fa-microphone"></i></span>
+                                                        @item.Content
+                                                    </div>
+                                                </td>
+                                                <td>@item.PartnerCode</td>
+                                                <td>@item.PartnerName</td>
+                                                <td>@(string.IsNullOrWhiteSpace(item.RegistrationOwnerPhone) ? "--" : item.RegistrationOwnerPhone)</td>
+                                                <td>@item.PartnerDepartment</td>
+                                                <td>
+                                                    @using (Html.BeginForm("DeleteSingingItem", "ServeyID", FormMethod.Post, new { @class = "singing-delete-item-form" }))
+                                                    {
+                                                        <input type="hidden" name="IDSV" value="@Model.IDSV" />
+                                                        <input type="hidden" name="CTKhaoSatID" value="@item.CTKhaoSatID" />
+                                                        <button type="submit" class="singing-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');">
+                                                            <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                                <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
+                                                            </svg>
+                                                        </button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+
+                    if (partnerRegistrations.Any())
+                    {
+                        <div class="singing-registration-block">
+                            <div class="singing-table-wrap">
+                                <table class="singing-table singing-duet-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nội dung</th>
+                                            <th>Mã NV người hát cùng</th>
+                                            <th>Họ tên người hát cùng</th>
+                                            <th>SĐT của bạn</th>
+                                            <th>SĐT người hát cùng</th>
+                                            <th>Bộ phận người hát cùng</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in partnerRegistrations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="singing-content-cell">
+                                                        <span class="singing-content-icon partner">
+                                                            <span class="singing-duet-mics" aria-label="Hai micro">
+                                                                <i class="fa fa-microphone"></i><i class="fa fa-microphone"></i>
+                                                            </span>
+                                                        </span>
+                                                        @item.Content
+                                                    </div>
+                                                </td>
+                                                <td>@item.PartnerCode</td>
+                                                <td>@item.PartnerName</td>
+                                                <td>@(string.IsNullOrWhiteSpace(Model.RegistrantPhone) ? "--" : Model.RegistrantPhone)</td>
+                                                <td>@(string.IsNullOrWhiteSpace(item.PartnerPhone) ? "--" : item.PartnerPhone)</td>
+                                                <td>@item.PartnerDepartment</td>
+                                                <td>
+                                                    <div class="singing-actions">
+                                                        @if (item.CanManage && item.PairID.HasValue)
+                                                        {
+                                                            <button type="button" class="singing-row-edit" title="Chỉnh sửa người hát cùng"
+                                                                    data-toggle="modal" data-target="#singingEditPartnerModal"
+                                                                    data-registration-id="@item.CTKhaoSatID" data-option-id="@item.IDOT"
+                                                                    data-pair-id="@item.PairID.Value"
+                                                                    data-content="@item.Content" data-current-code="@item.PartnerCode"
+                                                                    data-current-name="@item.PartnerName">
+                                                                <i class="fa fa-pencil"></i>
+                                                            </button>
+                                                        }
+                                                        @if (item.CanManage)
+                                                        {
+                                                            using (Html.BeginForm("DeleteSingingItem", "ServeyID", FormMethod.Post, new { @class = "singing-delete-item-form" }))
+                                                            {
+                                                                <input type="hidden" name="IDSV" value="@Model.IDSV" />
+                                                                <input type="hidden" name="CTKhaoSatID" value="@item.CTKhaoSatID" />
+                                                                <button type="submit" class="singing-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');">
+                                                                    <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                                        <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
+                                                                    </svg>
+                                                                </button>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">Đã được đăng ký cùng</span>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="singing-empty">Bạn chưa đăng ký nội dung nào.</div>
+                }
+            </section>
+
+            <section class="singing-section">
+                <h3 class="singing-section-title">
+                    <i class="fa fa-edit section-icon edit"></i> II. Đăng ký mới
+                </h3>
+
+                @if (!Model.IsActive)
+                {
+                    <div class="alert alert-warning">Chương trình hiện không nhận đăng ký.</div>
+                }
+                else if (Model.SlotsRemaining == 0)
+                {
+                    <div class="alert alert-success">Bạn đã đăng ký đủ @Model.MaxSlots nội dung.</div>
+                }
+                else if (!availableOptions.Any())
+                {
+                    <div class="alert alert-info">Không còn nội dung mới để đăng ký.</div>
+                }
+                else
+                {
+                    <p class="singing-help">Chọn tối đa @Model.MaxSlots nội dung. Nội dung có hình thức biểu diễn cùng người khác bắt buộc chọn một người hát cùng.</p>
+                    using (Html.BeginForm("ConfirmSinging", "ServeyID", FormMethod.Post, new { id = "singingRegistrationForm" }))
+                    {
+                        <input type="hidden" name="IDSV" value="@Model.IDSV" />
+
+                        <div class="singing-options">
+                            @foreach (var option in availableOptions)
+                            {
+                                <label class="singing-option-card" data-requires-partner="@(option.RequiresPartner ? 1 : 0)">
+                                    <input type="checkbox" name="SelectedOptionIds" value="@option.IDOT"
+                                           data-option-id="@option.IDOT" data-option-content="@option.Content"
+                                           data-requires-partner="@(option.RequiresPartner ? 1 : 0)" />
+                                    <span class="singing-option-check"><i class="fa fa-check"></i></span>
+                                    <span class="singing-option-icon">
+                                        @if (option.RequiresPartner)
+                                        {
+                                            <span class="singing-duet-mics" aria-label="Hai micro">
+                                                <i class="fa fa-microphone"></i><i class="fa fa-microphone"></i>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa fa-microphone"></i>
+                                        }
+                                    </span>
+                                    <span>
+                                        <span class="singing-option-name">@option.Content</span>
+                                        <span class="singing-option-description">
+                                            @(option.RequiresPartner ? "Nội dung biểu diễn cùng người hát khác" : "Nội dung biểu diễn cá nhân")
+                                        </span>
+                                    </span>
+                                </label>
+                            }
+                        </div>
+
+                        <div class="singing-partner-panel" id="singingPartnerPanel" style="display:none">
+                            <h4 class="singing-partner-title">Thông tin người hát cùng</h4>
+                            <div class="singing-partner-note">Chọn nhân viên theo mã hoặc họ tên; thông tin còn lại được lấy tự động từ hệ thống.</div>
+                            <div class="singing-partner-grid">
+                                <div class="singing-field">
+                                    <label>Mã NV người hát cùng <em>*</em></label>
+                                    <select class="form-control" name="PartnerID" id="singingPartnerSelect" data-placeholder="Nhập mã hoặc họ tên">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="singing-field">
+                                    <label>Họ tên người hát cùng <em>*</em></label>
+                                    <input type="text" class="form-control" id="singingPartnerName" placeholder="Họ và tên" readonly />
+                                </div>
+                                <div class="singing-field">
+                                    <label>Bộ phận <em>*</em></label>
+                                    <input type="text" class="form-control" id="singingPartnerDepartment" placeholder="Bộ phận" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="singing-submit-row">
+                            <button type="submit" class="singing-submit" id="singingSubmitButton">
+                                <i class="fa fa-paper-plane"></i>&nbsp; Đăng ký
+                            </button>
+                        </div>
+                    }
+                }
+            </section>
+
+            <div class="modal fade singing-edit-modal" id="singingEditPartnerModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        @using (Html.BeginForm("UpdateSingingPartner", "ServeyID", FormMethod.Post, new { id = "singingEditPartnerForm" }))
+                        {
+                            <input type="hidden" name="IDSV" value="@Model.IDSV" />
+                            <input type="hidden" name="CTKhaoSatID" id="singingEditRegistrationId" />
+                            <input type="hidden" name="PairID" id="singingEditPairId" />
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="singingEditTitle">Chỉnh sửa người hát cùng</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Đóng"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="singing-edit-current" id="singingEditCurrent"></div>
+                                <div class="singing-field">
+                                    <label>Chọn người hát cùng mới <em>*</em></label>
+                                    <select name="PartnerID" id="singingEditPartnerSelect" class="form-control" data-placeholder="Nhập mã hoặc họ tên">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="singing-edit-details">
+                                    <div class="singing-field">
+                                        <label>Họ tên người hát cùng</label>
+                                        <input type="text" class="form-control" id="singingEditPartnerName" readonly />
+                                    </div>
+                                    <div class="singing-field">
+                                        <label>Bộ phận</label>
+                                        <input type="text" class="form-control" id="singingEditPartnerDepartment" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary" id="singingEditSubmit"><i class="fa fa-save"></i> Lưu thay đổi</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var slotsRemaining = @Model.SlotsRemaining;
+        var partnerUrl = '@Url.Action("GetSingingPartners", "ServeyID")';
+        var surveyId = @Model.IDSV;
+        var loadedPartnerOptionId = null;
+        var $partnerSelect = $('#singingPartnerSelect');
+        var $editPartnerSelect = $('#singingEditPartnerSelect');
+
+        if ($partnerSelect.length) {
+            $partnerSelect.chosen({ width: '100%', search_contains: true, no_results_text: 'Không tìm thấy nhân viên' });
+        }
+        if ($editPartnerSelect.length) {
+            $editPartnerSelect.chosen({ width: '100%', search_contains: true, no_results_text: 'Không tìm thấy nhân viên' });
+        }
+
+        function clearPartner() {
+            $partnerSelect.empty().append('<option value=""></option>').val('').trigger('chosen:updated');
+            $('#singingPartnerName').val('');
+            $('#singingPartnerDepartment').val('');
+            loadedPartnerOptionId = null;
+        }
+
+        function loadPartners(optionId) {
+            if (loadedPartnerOptionId === optionId) return;
+            loadedPartnerOptionId = optionId;
+            $partnerSelect.empty().append('<option value="">-- Đang tải danh sách --</option>').trigger('chosen:updated');
+
+            $.getJSON(partnerUrl, { IDSV: surveyId, IDOT: optionId })
+                .done(function (data) {
+                    $partnerSelect.empty().append('<option value=""></option>');
+                    $.each(data, function (_, employee) {
+                        $('<option>')
+                            .val(employee.ID)
+                            .text(employee.MaNV + ' - ' + employee.HoTen)
+                            .attr('data-name', employee.HoTen)
+                            .attr('data-department', employee.PhongBan)
+                            .appendTo($partnerSelect);
+                    });
+                    $partnerSelect.trigger('chosen:updated');
+                })
+                .fail(function () {
+                    clearPartner();
+                    alert('Không tải được danh sách người hát cùng.');
+                });
+        }
+
+        function refreshSelection(changedCheckbox) {
+            var $checked = $('.singing-option-card input:checked');
+            if ($checked.length > slotsRemaining) {
+                $(changedCheckbox).prop('checked', false);
+                alert('Bạn chỉ được chọn tối đa ' + slotsRemaining + ' nội dung.');
+                $checked = $('.singing-option-card input:checked');
+            }
+
+            $('.singing-option-card').each(function () {
+                $(this).toggleClass('selected', $(this).find('input').prop('checked'));
+            });
+
+            var $partnerOption = $checked.filter('[data-requires-partner="1"]').first();
+            var $soloOption = $checked.filter('[data-requires-partner="0"]').first();
+            if ($partnerOption.length) {
+                $('#singingPartnerPanel').show();
+                loadPartners(parseInt($partnerOption.data('option-id')));
+            } else {
+                $('#singingPartnerPanel').hide();
+                clearPartner();
+            }
+        }
+
+        $(document).on('change', '.singing-option-card input', function () {
+            refreshSelection(this);
+        });
+
+        $partnerSelect.on('change', function () {
+            var $selected = $(this).find('option:selected');
+            $('#singingPartnerName').val($selected.attr('data-name') || '');
+            $('#singingPartnerDepartment').val($selected.attr('data-department') || '');
+        });
+
+        $('#singingEditPartnerModal').on('show.bs.modal', function (event) {
+            var $button = $(event.relatedTarget);
+            var registrationId = $button.data('registration-id');
+            var optionId = $button.data('option-id');
+            var pairId = $button.data('pair-id');
+            var content = $button.data('content') || '';
+            var currentCode = $button.data('current-code') || '';
+            var currentName = $button.data('current-name') || '';
+
+            if (!registrationId || !optionId || !pairId) {
+                event.preventDefault();
+                alert('Không tìm thấy thông tin đăng ký Song ca cần chỉnh sửa.');
+                return;
+            }
+
+            $('#singingEditRegistrationId').val(registrationId);
+            $('#singingEditPairId').val(pairId);
+            $('#singingEditTitle').text('Chỉnh sửa người hát cùng: ' + content);
+            $('#singingEditCurrent').text('Hiện tại: ' + currentCode + (currentName ? ' - ' + currentName : ''));
+            $('#singingEditPartnerName, #singingEditPartnerDepartment').val('');
+            $editPartnerSelect.empty().append('<option value="">-- Đang tải danh sách --</option>').trigger('chosen:updated');
+
+            $.getJSON(partnerUrl, { IDSV: surveyId, IDOT: optionId }).done(function (data) {
+                $editPartnerSelect.empty().append('<option value=""></option>');
+                $.each(data, function (_, employee) {
+                    $('<option>')
+                        .val(employee.ID)
+                        .text(employee.MaNV + ' - ' + employee.HoTen)
+                        .attr('data-name', employee.HoTen)
+                        .attr('data-department', employee.PhongBan)
+                        .appendTo($editPartnerSelect);
+                });
+                $editPartnerSelect.trigger('chosen:updated');
+            }).fail(function () {
+                $editPartnerSelect.empty().append('<option value=""></option>').trigger('chosen:updated');
+                alert('Không tải được danh sách người hát cùng.');
+            });
+        });
+
+        $('#singingEditPartnerModal').on('shown.bs.modal', function () {
+            $editPartnerSelect.trigger('chosen:updated');
+        });
+
+        $editPartnerSelect.on('change', function () {
+            var $selected = $(this).find('option:selected');
+            $('#singingEditPartnerName').val($selected.attr('data-name') || '');
+            $('#singingEditPartnerDepartment').val($selected.attr('data-department') || '');
+        });
+
+        $('#singingEditPartnerForm').on('submit', function (event) {
+            if (!$editPartnerSelect.val()) {
+                event.preventDefault();
+                alert('Vui lòng chọn người hát cùng mới.');
+                return;
+            }
+            $('#singingEditSubmit').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang lưu');
+        });
+
+        $('#singingRegistrationForm').on('submit', function (event) {
+            var $checked = $('.singing-option-card input:checked');
+            if (!$checked.length) {
+                event.preventDefault();
+                alert('Vui lòng chọn ít nhất một nội dung.');
+                return;
+            }
+            if ($checked.filter('[data-requires-partner="1"]').length && !$partnerSelect.val()) {
+                event.preventDefault();
+                alert('Vui lòng chọn người hát cùng cho nội dung đã chọn.');
+                return;
+            }
+            $('#singingSubmitButton').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp; Đang đăng ký');
+        });
+    });
+</script>
