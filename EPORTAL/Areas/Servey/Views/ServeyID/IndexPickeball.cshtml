@@ -94,6 +94,7 @@
     }
     .pknew-row-icon.doi-nu { background: linear-gradient(145deg, #b43bd2, #7621a8); }
     .pknew-row-icon.hon-hop { background: linear-gradient(145deg, #18c69a, #058f6d); }
+    .pknew-row-icon.team-dong-doi { background: linear-gradient(145deg, #25a9d8, #087aa8); }
     .pknew-row-icon.hon-hop-trinh-cao, .pknew-row-icon.hon-hop-nam, .pknew-row-icon.khac { background: linear-gradient(145deg, #ffae22, #f07800); }
     .pknew-row-delete { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 0; border-radius: 7px; background: #ec0c27; color: #fff; }
     .pknew-actions { display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
@@ -121,6 +122,7 @@
     .pknew-card.doi-nam { --pk-color: #0754d7; --pk-color-light: #1684ff; }
     .pknew-card.doi-nu { --pk-color: #7621a8; --pk-color-light: #b43bd2; }
     .pknew-card.hon-hop { --pk-color: #058f6d; --pk-color-light: #18c69a; }
+    .pknew-card.team-dong-doi { --pk-color: #087aa8; --pk-color-light: #25a9d8; }
     .pknew-card.hon-hop-trinh-cao, .pknew-card.hon-hop-nam { --pk-color: #f07800; --pk-color-light: #ffae22; }
     .pknew-card.khac { --pk-color: #f07800; --pk-color-light: #ffae22; }
     .pknew-pictogram { display: inline-flex; align-items: center; justify-content: center; gap: 3px; color: #fff; line-height: 1; }
@@ -204,7 +206,7 @@
                                 @foreach (var item in myPairs)
                                 {
                                     string rowType = item.QuanHe ?? "All";
-                                    string rowClass = rowType == "DoiNam" ? "doi-nam" : rowType == "DoiNu" ? "doi-nu" : rowType == "HonHop" ? "hon-hop" : rowType == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : rowType == "HonHopNam" ? "hon-hop-nam" : "khac";
+                                    string rowClass = rowType == "DoiNam" ? "doi-nam" : rowType == "DoiNu" ? "doi-nu" : rowType == "HonHop" ? "hon-hop" : rowType == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : rowType == "TeamDongDoi" ? "team-dong-doi" : rowType == "HonHopNam" ? "hon-hop-nam" : "khac";
                                     <tr>
                                         <td>
                                             <div class="pknew-content">
@@ -216,6 +218,8 @@
                                                         { <i class="fa fa-male"></i><i class="fa fa-female"></i> }
                                                         else if (rowType == "HonHopTrinhCao")
                                                         { <i class="fa fa-male"></i><i class="fa fa-female"></i><i class="fa fa-star"></i> }
+                                                        else if (rowType == "TeamDongDoi")
+                                                        { <i class="fa fa-users"></i> }
                                                         else if (rowType == "HonHopNam")
                                                         { <i class="fa fa-male"></i><i class="fa fa-star"></i> }
                                                         else
@@ -275,8 +279,8 @@
                             @foreach (var group in availableGroups)
                             {
                                 var positiveOption = group.Options.First(x => x.isShow == 1);
-                                string cardClass = group.LoaiDoi == "DoiNam" ? "doi-nam" : group.LoaiDoi == "DoiNu" ? "doi-nu" : group.LoaiDoi == "HonHop" ? "hon-hop" : group.LoaiDoi == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : group.LoaiDoi == "HonHopNam" ? "hon-hop-nam" : "khac";
-                                string description = group.LoaiDoi == "DoiNam" ? "Nội dung dành cho vận động viên nam" : group.LoaiDoi == "DoiNu" ? "Nội dung dành cho vận động viên nữ" : group.LoaiDoi == "HonHop" ? "Nội dung thi đấu đôi nam - nữ" : group.LoaiDoi == "HonHopTrinhCao" ? "Nội dung hỗn hợp trình độ cao" : group.LoaiDoi == "HonHopNam" ? "VĐV nam trình độ cao" : "Nội dung thi đấu Pickleball";
+                                string cardClass = group.LoaiDoi == "DoiNam" ? "doi-nam" : group.LoaiDoi == "DoiNu" ? "doi-nu" : group.LoaiDoi == "HonHop" ? "hon-hop" : group.LoaiDoi == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : group.LoaiDoi == "TeamDongDoi" ? "team-dong-doi" : group.LoaiDoi == "HonHopNam" ? "hon-hop-nam" : "khac";
+                                string description = group.LoaiDoi == "DoiNam" ? "Nội dung dành cho vận động viên nam" : group.LoaiDoi == "DoiNu" ? "Nội dung dành cho vận động viên nữ" : group.LoaiDoi == "HonHop" ? "Nội dung thi đấu đôi nam - nữ" : group.LoaiDoi == "HonHopTrinhCao" ? "Nội dung hỗn hợp trình độ cao" : group.LoaiDoi == "TeamDongDoi" ? "Nội dung thi đấu đồng đội" : group.LoaiDoi == "HonHopNam" ? "VĐV nam trình độ cao" : "Nội dung thi đấu Pickleball";
                                 <label class="pknew-card @cardClass" data-group-id="@group.IDGroup">
                                     <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT" data-group-id="@group.IDGroup" />
                                     <span class="pknew-check"><i class="fa fa-check"></i></span>
@@ -288,6 +292,8 @@
                                             { <i class="fa fa-male"></i><i class="fa fa-female"></i> }
                                             else if (group.LoaiDoi == "HonHopTrinhCao")
                                             { <i class="fa fa-male"></i><i class="fa fa-female"></i><i class="fa fa-star"></i> }
+                                            else if (group.LoaiDoi == "TeamDongDoi")
+                                            { <i class="fa fa-users"></i> }
                                             else if (group.LoaiDoi == "HonHopNam")
                                             { <i class="fa fa-male"></i><i class="fa fa-star"></i> }
                                             else

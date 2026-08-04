@@ -1649,6 +1649,8 @@ namespace EPORTAL.Areas.Servey.Controllers
         {
             var t = (tenNhom ?? "").ToLower();
             var compact = t.Replace(" ", "").Replace("-", "");
+            if (t.Contains("team") || t.Contains("đồng đội") || compact.Contains("dongdoi"))
+                return "TeamDongDoi";
             if (t.Contains("trình cao") || t.Contains("trinh cao"))
             {
                 // Tên cũ có chữ "Nam" chỉ dành cho nam; tên mới là nội dung hỗn hợp cho cả hai giới.
@@ -1670,7 +1672,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                 return true;
             }
 
-            return loaiDoi == "HonHop" || loaiDoi == "HonHopTrinhCao"
+            return loaiDoi == "TeamDongDoi"
+                || loaiDoi == "HonHop" || loaiDoi == "HonHopTrinhCao"
                 || (gender.Value == 0 && loaiDoi == "HonHopNam")
                 || (gender.Value == 0 && loaiDoi == "DoiNam")
                 || (gender.Value == 1 && loaiDoi == "DoiNu");
