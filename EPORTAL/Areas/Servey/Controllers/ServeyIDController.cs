@@ -848,15 +848,49 @@ namespace EPORTAL.Areas.Servey.Controllers
                 .ToList();
             var options = dbSV.OptionServeys.Where(x => x.IDSV == IDSV).ToList();
             var departments = db.PhongBans.ToList();
+            var experienceGroup = groups.FirstOrDefault(IsPickleballExperienceGroup);
+            var tournamentGroup = groups.FirstOrDefault(IsPickleballTournamentGroup);
+            var phoneGroup = groups.FirstOrDefault(IsPickleballPhoneGroup);
+            var competitionGroups = groups.Where(x => !IsPickleballSurveyGroup(x)).ToList();
+            var competitionGroupIds = competitionGroups.Select(x => x.ID).ToList();
+            var slotLimitedGroupIds = competitionGroups
+                .Where(x => GetLoaiDoi(x.TenNhom ?? "") != "TeamDongDoi")
+                .Select(x => x.ID)
+                .ToList();
             var registrationRows = dbSV.CTKhaoSats
-                .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup.HasValue)
+                .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup.HasValue
+                    && competitionGroupIds.Contains(x.IDGroup.Value))
                 .ToList()
                 .GroupBy(x => x.IDGroup.Value)
                 .Select(x => x.OrderBy(y => y.ID).First())
                 .ToList();
+            var selectedExperienceOptionId = experienceGroup == null
+                ? (int?)null
+                : dbSV.CTKhaoSats
+                    .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == experienceGroup.ID)
+                    .OrderBy(x => x.ID)
+                    .Select(x => x.IDOT)
+                    .FirstOrDefault();
+            var selectedTournamentOptionId = tournamentGroup == null
+                ? (int?)null
+                : dbSV.CTKhaoSats
+                    .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == tournamentGroup.ID)
+                    .OrderBy(x => x.ID)
+                    .Select(x => x.IDOT)
+                    .FirstOrDefault();
+            var savedPhoneAnswer = phoneGroup == null
+                ? null
+                : dbSV.CTKhaoSats
+                    .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == phoneGroup.ID)
+                    .OrderBy(x => x.ID)
+                    .Select(x => x.GhiChu)
+                    .FirstOrDefault();
+            var phoneAnswer = !string.IsNullOrWhiteSpace(savedPhoneAnswer)
+                ? savedPhoneAnswer
+                : currentUser != null ? currentUser.DienThoai : null;
             var registeredGroupIds = new HashSet<int>(registrationRows.Select(x => x.IDGroup.Value));
             var registrations = (from registration in registrationRows
-                                 join surveyGroup in groups on registration.IDGroup equals surveyGroup.ID
+                                 join surveyGroup in competitionGroups on registration.IDGroup equals surveyGroup.ID
                                  select new PartTogetherValidation
                                  {
                                      ID = registration.ID,
@@ -872,6 +906,15 @@ namespace EPORTAL.Areas.Servey.Controllers
                 IDSV = group.IDSV ?? 0,
                 TenNhom = group.TenNhom,
                 LoaiDoi = GetLoaiDoi(group.TenNhom ?? ""),
+                IsExperienceQuestion = IsPickleballExperienceGroup(group),
+                IsTournamentQuestion = IsPickleballTournamentGroup(group),
+                IsPhoneQuestion = IsPickleballPhoneGroup(group),
+                SelectedOptionId = experienceGroup != null && group.ID == experienceGroup.ID
+                    ? selectedExperienceOptionId
+                    : tournamentGroup != null && group.ID == tournamentGroup.ID
+                        ? selectedTournamentOptionId
+                        : null,
+                TextAnswer = phoneGroup != null && group.ID == phoneGroup.ID ? phoneAnswer : null,
                 IsRegistered = registeredGroupIds.Contains(group.ID),
                 Options = options.Where(option => option.MaOT == group.MaNhom)
                     .OrderBy(option => option.OrderBy)
@@ -886,7 +929,8 @@ namespace EPORTAL.Areas.Servey.Controllers
             if (currentUser != null && currentUser.IsGioiTinh.HasValue)
             {
                 groupViews = groupViews
-                    .Where(group => IsPickleballGroupAllowedForGender(group.LoaiDoi, currentUser.IsGioiTinh))
+                    .Where(group => group.IsExperienceQuestion || group.IsTournamentQuestion || group.IsPhoneQuestion
+                        || IsPickleballGroupAllowedForGender(group.LoaiDoi, currentUser.IsGioiTinh))
                     .ToList();
             }
 
@@ -909,7 +953,8 @@ namespace EPORTAL.Areas.Servey.Controllers
             ViewBag.TenDK = dbSV.ListServeys.Where(x => x.IDSV == IDSV)
                 .Select(x => x.ContentSV).FirstOrDefault();
             ViewBag.MaxSlots = PickleballMaxSlots;
-            ViewBag.SlotsRemaining = Math.Max(0, PickleballMaxSlots - registrations.Count);
+            ViewBag.SlotsRemaining = Math.Max(0, PickleballMaxSlots
+                - registrationRows.Count(x => slotLimitedGroupIds.Contains(x.IDGroup.Value)));
             ViewBag.MyPairs = registrations;
             ViewBag.RegistrantCode = currentUser != null ? currentUser.MaNV : null;
             ViewBag.RegistrantName = currentUser != null ? currentUser.HoTen : null;
@@ -950,9 +995,57 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                     var groups = dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV).ToList();
                     var options = dbSV.OptionServeys.Where(x => x.IDSV == IDSV).ToList();
+                    var experienceGroup = groups.FirstOrDefault(IsPickleballExperienceGroup);
+                    var tournamentGroup = groups.FirstOrDefault(IsPickleballTournamentGroup);
+                    var phoneGroup = groups.FirstOrDefault(IsPickleballPhoneGroup);
+                    if (experienceGroup == null || tournamentGroup == null || phoneGroup == null)
+                    {
+                        transaction.Rollback();
+                        TempData["msgError"] = "<script>alert('Các câu hỏi khảo sát Pickleball chưa được cấu hình đầy đủ.');</script>";
+                        return RedirectToAction("Index", new { IDSV });
+                    }
+
+                    int selectedExperienceOptionId;
+                    var selectedExperienceValue = collection["answer_" + experienceGroup.ID];
+                    var experienceOptionIsValid = int.TryParse(selectedExperienceValue, out selectedExperienceOptionId)
+                        && options.Any(x => x.IDOT == selectedExperienceOptionId
+                            && x.MaOT == experienceGroup.MaNhom);
+                    if (!experienceOptionIsValid)
+                    {
+                        transaction.Rollback();
+                        TempData["msgError"] = "<script>alert('Vui lòng chọn thời gian bạn đã tập luyện môn Pickleball.');</script>";
+                        return RedirectToAction("Index", new { IDSV });
+                    }
+
+                    int selectedTournamentOptionId;
+                    var selectedTournamentValue = collection["answer_" + tournamentGroup.ID];
+                    var tournamentOptionIsValid = int.TryParse(selectedTournamentValue, out selectedTournamentOptionId)
+                        && options.Any(x => x.IDOT == selectedTournamentOptionId
+                            && x.MaOT == tournamentGroup.MaNhom);
+                    if (!tournamentOptionIsValid)
+                    {
+                        transaction.Rollback();
+                        TempData["msgError"] = "<script>alert('Vui lòng chọn kinh nghiệm tham gia thi đấu Pickleball.');</script>";
+                        return RedirectToAction("Index", new { IDSV });
+                    }
+
+                    var phoneAnswer = NormalizePickleballPhone(collection["phone_" + phoneGroup.ID]);
+                    if (!IsValidPickleballPhone(phoneAnswer))
+                    {
+                        transaction.Rollback();
+                        TempData["msgError"] = "<script>alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.');</script>";
+                        return RedirectToAction("Index", new { IDSV });
+                    }
+
+                    var competitionGroups = groups.Where(x => !IsPickleballSurveyGroup(x)).ToList();
+                    var competitionGroupIds = competitionGroups.Select(x => x.ID).ToList();
+                    var slotLimitedGroupIds = competitionGroups
+                        .Where(x => GetLoaiDoi(x.TenNhom ?? "") != "TeamDongDoi")
+                        .Select(x => x.ID)
+                        .ToList();
                     var newItems = new List<Tuple<GroupKhaoSat, OptionServey>>();
 
-                    foreach (var group in groups)
+                    foreach (var group in competitionGroups)
                     {
                         var selectedValue = collection["answer_" + group.ID];
                         int selectedOptionId;
@@ -976,34 +1069,109 @@ namespace EPORTAL.Areas.Servey.Controllers
                         newItems.Add(Tuple.Create(group, selectedOption));
                     }
 
-                    if (!newItems.Any())
-                    {
-                        transaction.Rollback();
-                        TempData["msgError"] = "<script>alert('Vui lòng chọn ít nhất một nội dung.');</script>";
-                        return RedirectToAction("Index", new { IDSV });
-                    }
-
                     var existingGroupIds = dbSV.CTKhaoSats
-                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup.HasValue)
+                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup.HasValue
+                            && competitionGroupIds.Contains(x.IDGroup.Value))
                         .Select(x => x.IDGroup.Value)
                         .Distinct()
                         .ToList();
-                    if (newItems.Any(x => existingGroupIds.Contains(x.Item1.ID)))
+                    if (!newItems.Any())
                     {
                         transaction.Rollback();
-                        TempData["msgError"] = "<script>alert('Nội dung đã được đăng ký trước đó.');</script>";
+                        TempData["msgError"] = "<script>alert('Vui lòng chọn ít nhất một nội dung thi đấu.');</script>";
                         return RedirectToAction("Index", new { IDSV });
                     }
 
-                    if (existingGroupIds.Count + newItems.Count > PickleballMaxSlots)
+                    var selectedSlotCount = newItems.Count(x => slotLimitedGroupIds.Contains(x.Item1.ID));
+                    if (selectedSlotCount > PickleballMaxSlots)
                     {
                         transaction.Rollback();
                         TempData["msgError"] = "<script>alert('Bạn chỉ được đăng ký tối đa " + PickleballMaxSlots + " nội dung.');</script>";
                         return RedirectToAction("Index", new { IDSV });
                     }
 
+                    var existingExperienceRows = dbSV.CTKhaoSats
+                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == experienceGroup.ID)
+                        .OrderBy(x => x.ID)
+                        .ToList();
+                    if (existingExperienceRows.Any())
+                    {
+                        existingExperienceRows[0].IDOT = selectedExperienceOptionId;
+                        if (existingExperienceRows.Count > 1)
+                        {
+                            dbSV.CTKhaoSats.RemoveRange(existingExperienceRows.Skip(1));
+                        }
+                        dbSV.SaveChanges();
+                    }
+                    else
+                    {
+                        dbSV.CTKhaoSat_insert(IDSV, selectedExperienceOptionId, IDNV, experienceGroup.ID);
+                    }
+
+                    var existingTournamentRows = dbSV.CTKhaoSats
+                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == tournamentGroup.ID)
+                        .OrderBy(x => x.ID)
+                        .ToList();
+                    if (existingTournamentRows.Any())
+                    {
+                        existingTournamentRows[0].IDOT = selectedTournamentOptionId;
+                        if (existingTournamentRows.Count > 1)
+                        {
+                            dbSV.CTKhaoSats.RemoveRange(existingTournamentRows.Skip(1));
+                        }
+                        dbSV.SaveChanges();
+                    }
+                    else
+                    {
+                        dbSV.CTKhaoSat_insert(IDSV, selectedTournamentOptionId, IDNV, tournamentGroup.ID);
+                    }
+
+                    var phoneOptionId = options
+                        .Where(x => x.MaOT == phoneGroup.MaNhom)
+                        .OrderBy(x => x.OrderBy)
+                        .Select(x => (int?)x.IDOT)
+                        .FirstOrDefault();
+                    var existingPhoneRows = dbSV.CTKhaoSats
+                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup == phoneGroup.ID)
+                        .OrderBy(x => x.ID)
+                        .ToList();
+                    if (existingPhoneRows.Any())
+                    {
+                        existingPhoneRows[0].IDOT = phoneOptionId;
+                        existingPhoneRows[0].GhiChu = phoneAnswer;
+                        if (existingPhoneRows.Count > 1)
+                        {
+                            dbSV.CTKhaoSats.RemoveRange(existingPhoneRows.Skip(1));
+                        }
+                    }
+                    else
+                    {
+                        dbSV.CTKhaoSats.Add(new CTKhaoSat
+                        {
+                            IDSV = IDSV,
+                            IDOT = phoneOptionId,
+                            IDNV = IDNV,
+                            IDGroup = phoneGroup.ID,
+                            GhiChu = phoneAnswer
+                        });
+                    }
+                    dbSV.SaveChanges();
+
+                    var selectedGroupIds = newItems.Select(x => x.Item1.ID).ToList();
+                    var registrationsToRemove = dbSV.CTKhaoSats
+                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup.HasValue
+                            && competitionGroupIds.Contains(x.IDGroup.Value))
+                        .ToList()
+                        .Where(x => !selectedGroupIds.Contains(x.IDGroup.Value))
+                        .ToList();
+                    if (registrationsToRemove.Any())
+                    {
+                        dbSV.CTKhaoSats.RemoveRange(registrationsToRemove);
+                        dbSV.SaveChanges();
+                    }
+
                     dbSV.EmployeeServey_updateOT(IDNV, IDSV, 0);
-                    foreach (var item in newItems)
+                    foreach (var item in newItems.Where(x => !existingGroupIds.Contains(x.Item1.ID)))
                     {
                         dbSV.CTKhaoSat_insert(IDSV, item.Item2.IDOT, IDNV, item.Item1.ID);
                     }
@@ -1036,7 +1204,14 @@ namespace EPORTAL.Areas.Servey.Controllers
                 {
                     var registration = dbSV.CTKhaoSats.FirstOrDefault(x => x.ID == id
                         && x.IDNV == IDNV && x.IDSV == IDSV);
-                    if (registration == null)
+                    var competitionGroupIds = dbSV.GroupKhaoSats
+                        .Where(x => x.IDSV == IDSV)
+                        .ToList()
+                        .Where(x => !IsPickleballSurveyGroup(x))
+                        .Select(x => x.ID)
+                        .ToList();
+                    if (registration == null || !registration.IDGroup.HasValue
+                        || !competitionGroupIds.Contains(registration.IDGroup.Value))
                     {
                         transaction.Rollback();
                         TempData["msgError"] = "<script>alert('Không tìm thấy nội dung đăng ký cần xóa.');</script>";
@@ -1048,7 +1223,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                     dbSV.CTKhaoSats.RemoveRange(registrations);
                     dbSV.SaveChanges();
 
-                    if (!dbSV.CTKhaoSats.Any(x => x.IDNV == IDNV && x.IDSV == IDSV))
+                    if (!dbSV.CTKhaoSats.Any(x => x.IDNV == IDNV && x.IDSV == IDSV
+                        && x.IDGroup.HasValue && competitionGroupIds.Contains(x.IDGroup.Value)))
                     {
                         dbSV.EmployeeServey_updateOT(IDNV, IDSV, null);
                     }
@@ -1077,8 +1253,15 @@ namespace EPORTAL.Areas.Servey.Controllers
             {
                 using (var transaction = dbSV.Database.BeginTransaction(IsolationLevel.Serializable))
                 {
+                    var competitionGroupIds = dbSV.GroupKhaoSats
+                        .Where(x => x.IDSV == IDSV)
+                        .ToList()
+                        .Where(x => !IsPickleballSurveyGroup(x))
+                        .Select(x => x.ID)
+                        .ToList();
                     var registrations = dbSV.CTKhaoSats
-                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV)
+                        .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.IDGroup.HasValue
+                            && competitionGroupIds.Contains(x.IDGroup.Value))
                         .ToList();
                     if (registrations.Any())
                     {
@@ -1644,6 +1827,66 @@ namespace EPORTAL.Areas.Servey.Controllers
         }
 
         // ─── PICKLEBALL ──────────────────────────────────────────────────────────
+
+        private bool IsPickleballExperienceGroup(GroupKhaoSat group)
+        {
+            return NormalizePickleballGroupName(group != null ? group.TenNhom : null)
+                .Contains("tapluyenmonpickleballduocbaolau");
+        }
+
+        private bool IsPickleballPhoneGroup(GroupKhaoSat group)
+        {
+            return NormalizePickleballGroupName(group != null ? group.TenNhom : null)
+                .Contains("sodienthoai");
+        }
+
+        private bool IsPickleballTournamentGroup(GroupKhaoSat group)
+        {
+            var groupName = NormalizePickleballGroupName(group != null ? group.TenNhom : null);
+            return groupName.Contains("thamgiagiaidau")
+                || groupName.Contains("kinhnghiemthamgiathidaupickleball");
+        }
+
+        private bool IsPickleballSurveyGroup(GroupKhaoSat group)
+        {
+            return IsPickleballExperienceGroup(group)
+                || IsPickleballTournamentGroup(group)
+                || IsPickleballPhoneGroup(group);
+        }
+
+        private string NormalizePickleballGroupName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            var normalized = value
+                .Replace('đ', 'd')
+                .Replace('Đ', 'D')
+                .Normalize(System.Text.NormalizationForm.FormD);
+            var compact = new string(normalized
+                .Where(x => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(x)
+                    != System.Globalization.UnicodeCategory.NonSpacingMark && char.IsLetterOrDigit(x))
+                .ToArray())
+                .ToLowerInvariant();
+
+            return compact;
+        }
+
+        private string NormalizePickleballPhone(string value)
+        {
+            return (value ?? string.Empty)
+                .Trim()
+                .Replace(" ", string.Empty)
+                .Replace(".", string.Empty)
+                .Replace("-", string.Empty);
+        }
+
+        private bool IsValidPickleballPhone(string value)
+        {
+            return System.Text.RegularExpressions.Regex.IsMatch(value ?? string.Empty, @"^\+?[0-9]{8,15}$");
+        }
 
         private string GetLoaiDoi(string tenNhom)
         {
