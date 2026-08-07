@@ -44,140 +44,513 @@
 }
 
 <style>
-    .pknew-page { color: #14264d; }
-    .pknew-page * { box-sizing: border-box; }
+    .pknew-page {
+        color: #14264d;
+    }
+
+    .pknew-page * {
+        box-sizing: border-box;
+    }
+
     .pknew-back {
-        display: inline-flex; align-items: center; gap: 8px; min-height: 42px;
-        margin-bottom: 14px; padding: 9px 18px; border: 1px solid #d5dff2;
-        border-radius: 8px; background: #fff; color: #0754c6; font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 42px;
+        margin-bottom: 14px;
+        padding: 9px 18px;
+        border: 1px solid #d5dff2;
+        border-radius: 8px;
+        background: #fff;
+        color: #0754c6;
+        font-weight: 600;
     }
-    .pknew-back:hover { color: #003f9e; text-decoration: none; border-color: #8eb3f3; }
-    .pknew-navigation { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
-    .pknew-navigation .pknew-back { margin-bottom: 0; }
-    .pknew-next-link, .pknew-last-activity { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 42px; padding: 9px 16px; border-radius: 8px; font-size: .92rem; font-weight: 700; }
-    .pknew-next-link { border: 1px solid #0754c6; background: linear-gradient(135deg, #0866e8, #0648b2); color: #fff; box-shadow: 0 4px 10px rgba(7,84,198,.2); transition: transform .18s ease, box-shadow .18s ease; }
-    .pknew-next-link:hover, .pknew-next-link:focus { color: #fff; text-decoration: none; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(7,84,198,.27); }
-    .pknew-last-activity { border: 1px solid #bde9cf; background: #effaf4; color: #187643; }
-    .pknew-last-activity i { color: #0baa5b; font-size: 1.05rem; }
+
+    .pknew-back:hover {
+        color: #003f9e;
+        text-decoration: none;
+        border-color: #8eb3f3;
+    }
+
+    .pknew-navigation {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .pknew-navigation .pknew-back {
+        margin-bottom: 0;
+    }
+
+    .pknew-next-link,
+    .pknew-last-activity {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 42px;
+        padding: 9px 16px;
+        border-radius: 8px;
+        font-size: .92rem;
+        font-weight: 700;
+    }
+
+    .pknew-next-link {
+        border: 1px solid #0754c6;
+        background: linear-gradient(135deg, #0866e8, #0648b2);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(7, 84, 198, .2);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .pknew-next-link:hover,
+    .pknew-next-link:focus {
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(7, 84, 198, .27);
+    }
+
+    .pknew-last-activity {
+        border: 1px solid #bde9cf;
+        background: #effaf4;
+        color: #187643;
+    }
+
+    .pknew-last-activity i {
+        color: #0baa5b;
+        font-size: 1.05rem;
+    }
+
     .pknew-shell {
-        padding: 22px 30px 30px; border: 1px solid #d7e2f4; border-radius: 10px;
-        background: #fff; box-shadow: 0 3px 14px rgba(16,57,126,.05);
+        padding: 22px 30px 30px;
+        border: 1px solid #d7e2f4;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 3px 14px rgba(16, 57, 126, .05);
     }
+
     .pknew-header {
-        display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
-        padding: 0 4px 20px; border-bottom: 1px solid #dce5f4;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 0 4px 20px;
+        border-bottom: 1px solid #dce5f4;
     }
+
     .pknew-title {
-        margin: 0 0 12px; color: #073d98; font-size: 22px; font-weight: 800;
-        line-height: 1.35; text-transform: uppercase;
+        margin: 0 0 12px;
+        color: #073d98;
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.35;
+        text-transform: uppercase;
     }
-    .pknew-header-actions { display: flex; align-items: center; gap: 20px; padding-top: 7px; }
+
+    .pknew-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding-top: 7px;
+    }
+
     .pknew-delete-all {
-        display: inline-flex; align-items: center; justify-content: center;
-        min-height: 42px; padding: 9px 17px; border: 0; border-radius: 7px;
-        background: #e81027; color: #fff; font-weight: 700; text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 9px 17px;
+        border: 0;
+        border-radius: 7px;
+        background: #e81027;
+        color: #fff;
+        font-weight: 700;
+        text-transform: uppercase;
     }
-    .pknew-trash-icon { width: 17px; height: 17px; display: inline-block; vertical-align: -3px; color: #fff; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .pknew-section { margin-top: 20px; }
+
+    .pknew-trash-icon {
+        width: 17px;
+        height: 17px;
+        display: inline-block;
+        vertical-align: -3px;
+        color: #fff;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .pknew-section {
+        margin-top: 20px;
+    }
+
     .pknew-notice {
-        display: flex; align-items: center; gap: 10px; margin: 0 0 18px; padding: 12px 16px;
-        border: 0; border-radius: 0; background: #eef5ff;
-        color: #344768; font-size: 14px; font-weight: 400; line-height: 1.55;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 18px;
+        padding: 12px 16px;
+        border: 0;
+        border-radius: 0;
+        background: #eef5ff;
+        color: #344768;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.55;
     }
-    .pknew-notice i { flex: 0 0 auto; margin-top: 3px; color: #075ee0; font-size: 1.05rem; }
-    .pknew-notice strong { color: #163d7a; font-weight: 800; }
-    .pknew-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+
+    .pknew-notice i {
+        flex: 0 0 auto;
+        margin-top: 3px;
+        color: #075ee0;
+        font-size: 1.05rem;
+    }
+
+    .pknew-notice strong {
+        color: #163d7a;
+        font-weight: 800;
+    }
+
+    .pknew-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+    }
+
     .pknew-card {
-        position: relative; display: flex; align-items: center; min-height: 132px; margin: 0;
-        padding: 18px 46px 18px 20px; border: 1.5px solid #d3dff1; border-radius: 9px;
-        background: #fff; cursor: pointer; transition: .18s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: 132px;
+        margin: 0;
+        padding: 18px 46px 18px 20px;
+        border: 1.5px solid #d3dff1;
+        border-radius: 9px;
+        background: #fff;
+        cursor: pointer;
+        transition: .18s ease;
     }
-    .pknew-card:hover { transform: translateY(-1px); border-color: #82aef4; box-shadow: 0 5px 16px rgba(7,84,198,.08); }
-    .pknew-card.selected { border-color: var(--pk-color); box-shadow: 0 0 0 1px color-mix(in srgb, var(--pk-color) 15%, transparent); }
-    .pknew-card input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+    .pknew-card:hover {
+        transform: translateY(-1px);
+        border-color: #82aef4;
+        box-shadow: 0 5px 16px rgba(7, 84, 198, .08);
+    }
+
+    .pknew-card.selected {
+        border-color: var(--pk-color);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--pk-color) 15%, transparent);
+    }
+
+    .pknew-card input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
     .pknew-check {
-        position: absolute; top: 14px; right: 14px; display: flex; align-items: center; justify-content: center;
-        width: 25px; height: 25px; border: 2px solid #64748e; border-radius: 5px; color: transparent;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        height: 25px;
+        border: 2px solid #64748e;
+        border-radius: 5px;
+        color: transparent;
     }
-    .pknew-card.selected .pknew-check { border-color: var(--pk-color); background: var(--pk-color); color: #fff; }
+
+    .pknew-card.selected .pknew-check {
+        border-color: var(--pk-color);
+        background: var(--pk-color);
+        color: #fff;
+    }
+
     .pknew-card-icon {
-        display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
-        width: 78px; height: 78px; margin-right: 22px; border-radius: 50%;
-        background: linear-gradient(145deg, var(--pk-color-light), var(--pk-color)); color: #fff;
-        box-shadow: 0 8px 18px color-mix(in srgb, var(--pk-color) 24%, transparent), inset 0 1px 0 rgba(255,255,255,.3);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 78px;
+        height: 78px;
+        margin-right: 22px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, var(--pk-color-light), var(--pk-color));
+        color: #fff;
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--pk-color) 24%, transparent), inset 0 1px 0 rgba(255, 255, 255, .3);
     }
-    .pknew-card.doi-nam { --pk-color: #0754d7; --pk-color-light: #1684ff; }
-    .pknew-card.doi-nu { --pk-color: #7621a8; --pk-color-light: #b43bd2; }
-    .pknew-card.hon-hop { --pk-color: #058f6d; --pk-color-light: #18c69a; }
-    .pknew-card.team-dong-doi { --pk-color: #087aa8; --pk-color-light: #25a9d8; }
-    .pknew-card.hon-hop-trinh-cao, .pknew-card.hon-hop-nam { --pk-color: #f07800; --pk-color-light: #ffae22; }
-    .pknew-card.khac { --pk-color: #f07800; --pk-color-light: #ffae22; }
-    .pknew-pictogram { display: inline-flex; align-items: center; justify-content: center; gap: 3px; color: #fff; line-height: 1; }
-    .pknew-pictogram .fa { font-size: 2.15rem; }
-    .pknew-pictogram .fa-star { margin-left: -1px; font-size: 1.55rem; }
-    .pknew-pictogram.pknew-high-mixed { gap: 1px; }
-    .pknew-pictogram.pknew-high-mixed .fa { font-size: 1.85rem; }
-    .pknew-pictogram.pknew-high-mixed .fa-star { font-size: 1.25rem; }
-    .pknew-card-name { display: block; margin-bottom: 8px; color: #143b7c; font-size: 16px; font-weight: 800; }
-    .pknew-card-desc { display: block; color: #66758f; font-size: 13px; font-weight: 400; }
-    .pknew-survey-grid { display: grid; gap: 14px; margin-bottom: 22px; }
+
+    .pknew-card.doi-nam {
+        --pk-color: #0754d7;
+        --pk-color-light: #1684ff;
+    }
+
+    .pknew-card.doi-nu {
+        --pk-color: #7621a8;
+        --pk-color-light: #b43bd2;
+    }
+
+    .pknew-card.hon-hop {
+        --pk-color: #058f6d;
+        --pk-color-light: #18c69a;
+    }
+
+    .pknew-card.team-dong-doi {
+        --pk-color: #087aa8;
+        --pk-color-light: #25a9d8;
+    }
+
+    .pknew-card.hon-hop-trinh-cao,
+    .pknew-card.hon-hop-nam {
+        --pk-color: #f07800;
+        --pk-color-light: #ffae22;
+    }
+
+    .pknew-card.khac {
+        --pk-color: #f07800;
+        --pk-color-light: #ffae22;
+    }
+
+    .pknew-pictogram {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        color: #fff;
+        line-height: 1;
+    }
+
+    .pknew-pictogram .fa {
+        font-size: 2.15rem;
+    }
+
+    .pknew-pictogram .fa-star {
+        margin-left: -1px;
+        font-size: 1.55rem;
+    }
+
+    .pknew-pictogram.pknew-high-mixed {
+        gap: 1px;
+    }
+
+    .pknew-pictogram.pknew-high-mixed .fa {
+        font-size: 1.85rem;
+    }
+
+    .pknew-pictogram.pknew-high-mixed .fa-star {
+        font-size: 1.25rem;
+    }
+
+    .pknew-card-name {
+        display: block;
+        margin-bottom: 8px;
+        color: #143b7c;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .pknew-card-desc {
+        display: block;
+        color: #66758f;
+        font-size: 13px;
+        font-weight: 400;
+    }
+
+    .pknew-survey-grid {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
     .pknew-survey-row {
-        display: grid; grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.2fr);
-        align-items: center; gap: 20px; padding: 15px 18px; border: 1px solid #d6e2f4;
-        border-radius: 8px; background: #f8faff;
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.2fr);
+        align-items: center;
+        gap: 20px;
+        padding: 15px 18px;
+        border: 1px solid #d6e2f4;
+        border-radius: 8px;
+        background: #f8faff;
     }
-    .pknew-survey-row .pknew-survey-question { margin: 0; }
-    .pknew-survey-question { margin-bottom: 14px; color: #163d7a; font-size: 17px; font-weight: 800; line-height: 1.4; }
-    .pknew-required { margin-left: 4px; color: #e20d2f; font-size: 19px; font-weight: 800; line-height: 1; }
-    .pknew-select-wrap { position: relative; width: 100%; max-width: 360px; }
+
+    .pknew-survey-row .pknew-survey-question {
+        margin: 0;
+    }
+
+    .pknew-survey-question {
+        margin-bottom: 14px;
+        color: #163d7a;
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .pknew-required {
+        margin-left: 4px;
+        color: #e20d2f;
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .pknew-select-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+    }
+
     .pknew-select-wrap::after {
-        position: absolute; top: 50%; right: 15px; transform: translateY(-50%);
-        color: #0754c6; content: "\f078"; font-family: FontAwesome; font-size: 13px;
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #0754c6;
+        content: "\f078";
+        font-family: FontAwesome;
+        font-size: 13px;
         pointer-events: none;
     }
+
     .pknew-experience-select {
-        width: 100%; min-height: 48px; padding: 10px 42px 10px 15px;
-        border: 1px solid #b7c9e5; border-radius: 8px;
+        width: 100%;
+        min-height: 48px;
+        padding: 10px 42px 10px 15px;
+        border: 1px solid #b7c9e5;
+        border-radius: 8px;
         background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
-        box-shadow: 0 2px 6px rgba(22,61,122,.07); color: #20375f;
-        font: inherit; font-weight: 600; cursor: pointer;
-        appearance: none; -webkit-appearance: none; -moz-appearance: none;
+        box-shadow: 0 2px 6px rgba(22, 61, 122, .07);
+        color: #20375f;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
     }
-    .pknew-experience-select:hover { border-color: #7ea5df; }
+
+    .pknew-experience-select:hover {
+        border-color: #7ea5df;
+    }
+
     .pknew-experience-select:focus {
-        border-color: #0754c6; outline: 0;
-        box-shadow: 0 0 0 3px rgba(7,84,198,.12), 0 3px 8px rgba(22,61,122,.08);
+        border-color: #0754c6;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(7, 84, 198, .12), 0 3px 8px rgba(22, 61, 122, .08);
     }
+
     .pknew-phone-input {
-        width: 100%; max-width: 360px; min-height: 46px; padding: 10px 13px;
-        border: 1px solid #9eb4d5; border-radius: 7px; background: #fff;
-        color: #14264d; font-size: 1rem;
+        width: 100%;
+        max-width: 360px;
+        min-height: 46px;
+        padding: 10px 13px;
+        border: 1px solid #9eb4d5;
+        border-radius: 7px;
+        background: #fff;
+        color: #14264d;
+        font-size: 1rem;
     }
-    .pknew-phone-input:focus { border-color: #0754c6; outline: 0; box-shadow: 0 0 0 3px rgba(7,84,198,.12); }
+
+    .pknew-phone-input:focus {
+        border-color: #0754c6;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(7, 84, 198, .12);
+    }
+
     .pknew-category-title {
-        margin: 26px 0 9px; padding-bottom: 8px; border-bottom: 1px dashed #c9d8ef;
-        color: #06439b; font-size: 20px; font-weight: 800; line-height: 1.35; text-transform: none;
+        margin: 26px 0 9px;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed #c9d8ef;
+        color: #06439b;
+        font-size: 20px;
+        font-weight: 800;
+        line-height: 1.35;
+        text-transform: none;
     }
-    .pknew-category-note { margin: 0 0 13px; color: #687791; font-style: normal; font-weight: 400; }
-    .pknew-options-team { max-width: 380px; }
-    .pknew-submit-row { display: flex; justify-content: flex-end; margin-top: 22px; }
+
+    .pknew-category-note {
+        margin: 0 0 13px;
+        color: #687791;
+        font-style: normal;
+        font-weight: 400;
+    }
+
+    .pknew-options-team {
+        max-width: 380px;
+    }
+
+    .pknew-submit-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 22px;
+    }
+
     .pknew-submit {
-        min-width: 170px; min-height: 52px; border: 0; border-radius: 8px;
-        background: #0754c6; color: #fff; font-size: 1.03rem; font-weight: 700;
+        min-width: 170px;
+        min-height: 52px;
+        border: 0;
+        border-radius: 8px;
+        background: #0754c6;
+        color: #fff;
+        font-size: 1.03rem;
+        font-weight: 700;
     }
+
     @@media (max-width: 1100px) {
-        .pknew-header { flex-direction: column; }
-        .pknew-header-actions { width: 100%; justify-content: space-between; }
+        .pknew-header {
+            flex-direction: column;
+        }
+
+        .pknew-header-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
     }
+
     @@media (max-width: 767px) {
-        .pknew-navigation { align-items: flex-start; flex-direction: column; }
-        .pknew-navigation .pknew-back, .pknew-next-link, .pknew-last-activity { width: 100%; }
-        .pknew-shell { padding: 17px 14px 22px; }
-        .pknew-title { font-size: 1.3rem; }
-        .pknew-header-actions { align-items: stretch; flex-direction: column; }
-        .pknew-options { grid-template-columns: 1fr; }
-        .pknew-survey-row { grid-template-columns: 1fr; gap: 12px; }
-        .pknew-phone-input, .pknew-select-wrap { max-width: none; }
+        .pknew-navigation {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .pknew-navigation .pknew-back,
+        .pknew-next-link,
+        .pknew-last-activity {
+            width: 100%;
+        }
+
+        .pknew-shell {
+            padding: 17px 14px 22px;
+        }
+
+        .pknew-title {
+            font-size: 1.3rem;
+        }
+
+        .pknew-header-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .pknew-options {
+            grid-template-columns: 1fr;
+        }
+
+        .pknew-survey-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .pknew-phone-input,
+        .pknew-select-wrap {
+            max-width: none;
+        }
     }
 </style>
 
@@ -208,11 +581,14 @@
                 <div class="pknew-header-actions">
                     @if (myPairs.Any())
                     {
-                    using (Html.BeginForm("DeleteAllPickleball", "ServeyID", FormMethod.Post))
+                        using (Html.BeginForm("DeleteAllPickleball", "ServeyID", FormMethod.Post))
                         {
                             <input type="hidden" name="IDSV" value="@IDSV" />
-                            <button type="submit" class="pknew-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký Pickleball?');">
-                                <svg class="pknew-trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path></svg>&nbsp; Xóa đăng ký
+                            <button type="submit" class="pknew-delete-all"
+                                    onclick="return confirm('Xóa toàn bộ đăng ký Pickleball?');">
+                                <svg class="pknew-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
+                                </svg>&nbsp; Xóa đăng ký
                             </button>
                         }
                     }
@@ -222,200 +598,236 @@
             <section class="pknew-section">
                 <div class="pknew-notice">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    <div><strong>Lưu ý:</strong> Đây là thông tin <strong>đăng ký hạng mục thi đấu</strong> của các vận động viên. Việc <strong>chia đội và bốc thăm thi đấu</strong> sẽ được Ban Tổ chức thực hiện theo thể lệ chương trình.</div>
-                </div>
-                @if (!experienceConfigured || !tournamentConfigured || !phoneConfigured)
-                {
-                    <div class="alert alert-danger">Các câu hỏi thời gian tập luyện, kinh nghiệm thi đấu và số điện thoại Zalo chưa được cấu hình đầy đủ.</div>
-                }
-                else
-                {
-                    using (Html.BeginForm("ConfirmPickleball", "ServeyID", FormMethod.Post, new { id = "pknewForm" }))
+                    <div><strong>Lưu ý:</strong> Đây là thông tin <strong>đăng ký hạng mục thi đấu</strong> của các vận
+                        động viên. Việc <strong>chia đội và bốc thăm thi đấu</strong> sẽ được Ban Tổ chức thực hiện theo
+                        thể lệ chương trình.</div>
+                    </div>
+                    @if (!experienceConfigured || !tournamentConfigured || !phoneConfigured)
                     {
-                        <input type="hidden" name="IDSV" value="@IDSV" />
+                        <div class="alert alert-danger">Các câu hỏi thời gian tập luyện, kinh nghiệm thi đấu và số điện thoại
+                            Zalo chưa được cấu hình đầy đủ.</div>
+                        }
+                else
+                        {
+                            using (Html.BeginForm("ConfirmPickleball", "ServeyID", FormMethod.Post, new { id = "pknewForm" }))
+                            {
+                                <input type="hidden" name="IDSV" value="@IDSV" />
 
-                        <div class="pknew-survey-grid">
-                            <div class="pknew-survey-row">
-                                <label class="pknew-survey-question" for="pickleballExperience">
-                                    @experienceGroup.TenNhom <span class="pknew-required" title="Bắt buộc">*</span>
-                                </label>
-                                <div class="pknew-select-wrap">
-                                    <select class="pknew-experience-select" id="pickleballExperience"
-                                            name="answer_@experienceGroup.IDGroup" required>
-                                        @if (!experienceGroup.SelectedOptionId.HasValue)
+                                <div class="pknew-survey-grid">
+                                    <div class="pknew-survey-row">
+                                        <label class="pknew-survey-question" for="pickleballExperience">
+                                            @experienceGroup.TenNhom <span class="pknew-required" title="Bắt buộc">*</span>
+                                        </label>
+                                        <div class="pknew-select-wrap">
+                                            <select class="pknew-experience-select" id="pickleballExperience"
+                                                    name="answer_@experienceGroup.IDGroup" required>
+                                                @if (!experienceGroup.SelectedOptionId.HasValue)
+                                                {
+                                                    <option value="" selected="selected">-- Chọn thời gian tập luyện --</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="">-- Chọn thời gian tập luyện --</option>
+                                                }
+                                                @foreach (var option in experienceOptions)
+                                                {
+                                                    if (experienceGroup.SelectedOptionId == option.IDOT)
+                                                    {
+                                                        <option value="@option.IDOT" selected="selected">@option.ContentOT</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@option.IDOT">@option.ContentOT</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="pknew-survey-row">
+                                        <label class="pknew-survey-question" for="pickleballTournament">
+                                            Kinh nghiệm tham gia thi đấu Pickleball của Anh/Chị là <span class="pknew-required"
+                                                                                                         title="Bắt buộc">*</span>
+                                        </label>
+                                        <div class="pknew-select-wrap">
+                                            <select class="pknew-experience-select pknew-tournament-select" id="pickleballTournament"
+                                                    name="answer_@tournamentGroup.IDGroup" required>
+                                                @if (!tournamentGroup.SelectedOptionId.HasValue)
+                                                {
+                                                    <option value="" selected="selected">-- Chọn câu trả lời --</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="">-- Chọn câu trả lời --</option>
+                                                }
+                                                @foreach (var option in tournamentOptions)
+                                                {
+                                                    if (tournamentGroup.SelectedOptionId == option.IDOT)
+                                                    {
+                                                        <option value="@option.IDOT" selected="selected">@option.ContentOT</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@option.IDOT">@option.ContentOT</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="pknew-survey-row">
+                                        <div class="pknew-survey-question">
+                                            @phoneGroup.TenNhom <span class="pknew-required" title="Bắt buộc">*</span>
+                                        </div>
+                                        <div>
+                                            <input class="pknew-phone-input" type="tel" inputmode="tel" maxlength="20"
+                                                   name="phone_@phoneGroup.IDGroup" value="@phoneGroup.TextAnswer"
+                                                   placeholder="Điền số điện thoại" autocomplete="tel" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h4 class="pknew-category-title">I. Hạng mục thi đấu đôi</h4>
+                                <p class="pknew-category-note">Mỗi CBNV được đăng ký tối đa @maxSlots nội dung thi đấu dưới đây:</p>
+                                if (!availablePairGroups.Any())
+                                {
+                                    <div class="alert alert-info">Không còn nội dung thi đấu đôi phù hợp để đăng ký.</div>
+                                }
+                                else
+                                {
+                                    <div class="pknew-options">
+                                        @foreach (var group in availablePairGroups)
                                         {
-                                            <option value="" selected="selected">-- Chọn thời gian tập luyện --</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="">-- Chọn thời gian tập luyện --</option>
-                                        }
-                                    @foreach (var option in experienceOptions)
+                                            var positiveOption = group.Options.First(x => x.isShow == 1);
+                                            string cardClass = group.LoaiDoi == "DoiNam" ? "doi-nam" : group.LoaiDoi == "DoiNu" ? "doi-nu" :
+                            group.LoaiDoi == "HonHop" ? "hon-hop" : group.LoaiDoi == "HonHopTrinhCao" ? "hon-hop-trinh-cao" :
+                            group.LoaiDoi == "TeamDongDoi" ? "team-dong-doi" : group.LoaiDoi == "HonHopNam" ? "hon-hop-nam" :
+                            "khac";
+                                            string description = group.LoaiDoi == "DoiNam" ? "Nội dung dành cho vận động viên nam" :
+                            group.LoaiDoi == "DoiNu" ? "Nội dung dành cho vận động viên nữ" : group.LoaiDoi == "HonHop" ? "Nội dung thi đấu đôi nam - nữ" : group.LoaiDoi == "HonHopTrinhCao" ? "Nội dung thi đấu đôi hỗn hợp trình độ cao" : group.LoaiDoi == "TeamDongDoi" ? "Nội dung thi đấu đồng đội" : group.LoaiDoi ==
+            "HonHopNam" ? "VĐV nam trình độ cao" : "Nội dung thi đấu Pickleball";
+                                            <label class="pknew-card pknew-slot-card @cardClass @(group.IsRegistered ? "selected" : "")"
+                                                   data-group-id="@group.IDGroup">
+                                                @if (group.IsRegistered)
+                                                {
+                                                    <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT"
+                                                           data-group-id="@group.IDGroup" checked="checked" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT"
+                                                           data-group-id="@group.IDGroup" />
+                                                }
+                                                <span class="pknew-check"><i class="fa fa-check"></i></span>
+                                                <span class="pknew-card-icon">
+                                                    <span class="pknew-pictogram @(group.LoaiDoi == "HonHopTrinhCao" ? "pknew-high-mixed" : "")"
+                                                          aria-hidden="true">
+                                                        @if (group.LoaiDoi == "DoiNu")
+                                                        {
+                                                            <i class="fa fa-female"></i><i class="fa fa-female"></i>
+                                                        }
+                                                        else if (group.LoaiDoi == "HonHop")
+                                                        {
+
+                                                            <i class="fa fa-male"></i><i class="fa fa-female"></i>
+                                                        }
+                                                        else if (group.LoaiDoi == "HonHopTrinhCao")
+                                                        {
+
+                                                            <i class="fa fa-male"></i><i class="fa fa-female"></i><i class="fa fa-star"></i>
+                                                        }
+                                                        else if (group.LoaiDoi == "TeamDongDoi")
+                                                        {
+
+                                                            <i class="fa fa-users"></i>
+                                                        }
+                                                        else if (group.LoaiDoi == "HonHopNam")
+                                                        {
+
+                                                            <i class="fa fa-male"></i><i class="fa fa-star"></i>
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <i class="fa fa-male"></i><i class="fa fa-male"></i>
+                                                        }
+                                                    </span>
+                                                </span>
+                                                <span><span class="pknew-card-name">@group.TenNhom</span><span
+                                                    class="pknew-card-desc">@description</span></span>
+                                                </label>
+                                            }
+                                        </div>
+                                    }
+
+                                    <h4 class="pknew-category-title">II. Hạng mục thi đấu Đồng đội</h4>
+                                    <p class="pknew-category-note">CBNV có thể lựa chọn đăng ký hoặc không đăng ký nội dung này.</p>
+                                    if (!availableTeamGroups.Any())
                                     {
-                                        if (experienceGroup.SelectedOptionId == option.IDOT)
-                                        {
-                                            <option value="@option.IDOT" selected="selected">@option.ContentOT</option>
+                                        <div class="alert alert-info">Bạn đã đăng ký hoặc hiện không có nội dung thi đấu đồng đội phù hợp.</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="pknew-options pknew-options-team">
+                                            @foreach (var group in availableTeamGroups)
+                                            {
+                                                var positiveOption = group.Options.First(x => x.isShow == 1);
+                                                <label class="pknew-card pknew-team-card team-dong-doi @(group.IsRegistered ? "selected" : "")"
+                                                       data-group-id="@group.IDGroup">
+                                                    @if (group.IsRegistered)
+                                                    {
+                                                        <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT"
+                                                               data-group-id="@group.IDGroup" checked="checked" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT"
+                                                               data-group-id="@group.IDGroup" />
+                                                    }
+                                                    <span class="pknew-check"><i class="fa fa-check"></i></span>
+                                                    <span class="pknew-card-icon">
+                                                        <span class="pknew-pictogram" aria-hidden="true"><i class="fa fa-users"></i></span>
+                                                    </span>
+                                                    <span><span class="pknew-card-name">@group.TenNhom</span><span class="pknew-card-desc">Nội dung
+                                                        thi đấu theo đội</span></span>
+                                                    </label>
+                                                }
+                                            </div>
                                         }
-                                        else
+
+                                        if (canSubmit)
                                         {
-                                            <option value="@option.IDOT">@option.ContentOT</option>
+                                            <div class="pknew-submit-row"><button type="submit" class="pknew-submit" id="pknewSubmit"><i
+                                                class="fa fa-paper-plane"></i>&nbsp; Đăng ký</button></div>
+                                            }
                                         }
                                     }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="pknew-survey-row">
-                                <label class="pknew-survey-question" for="pickleballTournament">
-                                    Kinh nghiệm tham gia thi đấu Pickleball của Anh/Chị là <span class="pknew-required" title="Bắt buộc">*</span>
-                                </label>
-                                <div class="pknew-select-wrap">
-                                    <select class="pknew-experience-select pknew-tournament-select" id="pickleballTournament"
-                                            name="answer_@tournamentGroup.IDGroup" required>
-                                        @if (!tournamentGroup.SelectedOptionId.HasValue)
-                                        {
-                                            <option value="" selected="selected">-- Chọn câu trả lời --</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="">-- Chọn câu trả lời --</option>
-                                        }
-                                    @foreach (var option in tournamentOptions)
-                                    {
-                                        if (tournamentGroup.SelectedOptionId == option.IDOT)
-                                        {
-                                            <option value="@option.IDOT" selected="selected">@option.ContentOT</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@option.IDOT">@option.ContentOT</option>
-                                        }
-                                    }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="pknew-survey-row">
-                                <div class="pknew-survey-question">
-                                    @phoneGroup.TenNhom <span class="pknew-required" title="Bắt buộc">*</span>
-                                </div>
-                                <div>
-                                    <input class="pknew-phone-input" type="tel" inputmode="tel" maxlength="20"
-                                           name="phone_@phoneGroup.IDGroup" value="@phoneGroup.TextAnswer"
-                                           placeholder="Điền số điện thoại" autocomplete="tel" />
-                                </div>
+                                </section>
+
                             </div>
                         </div>
+                    </div>
 
-                        <h4 class="pknew-category-title">I. Hạng mục thi đấu đôi</h4>
-                        <p class="pknew-category-note">Mỗi CBNV được đăng ký tối đa @maxSlots nội dung thi đấu dưới đây:</p>
-                        if (!availablePairGroups.Any())
-                        {
-                            <div class="alert alert-info">Không còn nội dung thi đấu đôi phù hợp để đăng ký.</div>
-                        }
-                        else
-                        {
-                            <div class="pknew-options">
-                                @foreach (var group in availablePairGroups)
-                                {
-                                    var positiveOption = group.Options.First(x => x.isShow == 1);
-                                    string cardClass = group.LoaiDoi == "DoiNam" ? "doi-nam" : group.LoaiDoi == "DoiNu" ? "doi-nu" : group.LoaiDoi == "HonHop" ? "hon-hop" : group.LoaiDoi == "HonHopTrinhCao" ? "hon-hop-trinh-cao" : group.LoaiDoi == "TeamDongDoi" ? "team-dong-doi" : group.LoaiDoi == "HonHopNam" ? "hon-hop-nam" : "khac";
-                                    string description = group.LoaiDoi == "DoiNam" ? "Nội dung dành cho vận động viên nam" : group.LoaiDoi == "DoiNu" ? "Nội dung dành cho vận động viên nữ" : group.LoaiDoi == "HonHop" ? "Nội dung thi đấu đôi nam - nữ" : group.LoaiDoi == "HonHopTrinhCao" ? "Nội dung thi đấu đôi hỗn hợp trình độ cao" : group.LoaiDoi == "TeamDongDoi" ? "Nội dung thi đấu đồng đội" : group.LoaiDoi == "HonHopNam" ? "VĐV nam trình độ cao" : "Nội dung thi đấu Pickleball";
-                                    <label class="pknew-card pknew-slot-card @cardClass @(group.IsRegistered ? "selected" : "")" data-group-id="@group.IDGroup">
-                                        @if (group.IsRegistered)
-                                        {
-                                            <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT" data-group-id="@group.IDGroup" checked="checked" />
-                                        }
-                                        else
-                                        {
-                                            <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT" data-group-id="@group.IDGroup" />
-                                        }
-                                        <span class="pknew-check"><i class="fa fa-check"></i></span>
-                                        <span class="pknew-card-icon">
-                                            <span class="pknew-pictogram @(group.LoaiDoi == "HonHopTrinhCao" ? "pknew-high-mixed" : "")" aria-hidden="true">
-                                                @if (group.LoaiDoi == "DoiNu")
-                                                { <i class="fa fa-female"></i><i class="fa fa-female"></i> }
-                                                else if (group.LoaiDoi == "HonHop")
-                                                { <i class="fa fa-male"></i><i class="fa fa-female"></i> }
-                                                else if (group.LoaiDoi == "HonHopTrinhCao")
-                                                { <i class="fa fa-male"></i><i class="fa fa-female"></i><i class="fa fa-star"></i> }
-                                                else if (group.LoaiDoi == "TeamDongDoi")
-                                                { <i class="fa fa-users"></i> }
-                                                else if (group.LoaiDoi == "HonHopNam")
-                                                { <i class="fa fa-male"></i><i class="fa fa-star"></i> }
-                                                else
-                                                { <i class="fa fa-male"></i><i class="fa fa-male"></i> }
-                                            </span>
-                                        </span>
-                                        <span><span class="pknew-card-name">@group.TenNhom</span><span class="pknew-card-desc">@description</span></span>
-                                    </label>
+                    <script>
+                        $(document).ready(function () {
+                            var maxSlots = @maxSlots;
+                            $(document).on('change', '.pknew-card input', function () {
+                                if ($(this).closest('.pknew-slot-card').length
+                                    && $('.pknew-slot-card input:checked').length > maxSlots) {
+                                    $(this).prop('checked', false);
+                                    alert('Bạn chỉ được chọn tối đa ' + maxSlots + ' nội dung thi đấu đôi.');
                                 }
-                            </div>
-                        }
+                                var checked = $(this).prop('checked');
+                                $(this).closest('.pknew-card').toggleClass('selected', checked);
+                            });
 
-                        <h4 class="pknew-category-title">II. Hạng mục thi đấu đồng đội</h4>
-                        <p class="pknew-category-note">CBNV có thể lựa chọn đăng ký hoặc không đăng ký nội dung này.</p>
-                        if (!availableTeamGroups.Any())
-                        {
-                            <div class="alert alert-info">Bạn đã đăng ký hoặc hiện không có nội dung thi đấu đồng đội phù hợp.</div>
-                        }
-                        else
-                        {
-                            <div class="pknew-options pknew-options-team">
-                                @foreach (var group in availableTeamGroups)
-                                {
-                                    var positiveOption = group.Options.First(x => x.isShow == 1);
-                                    <label class="pknew-card pknew-team-card team-dong-doi @(group.IsRegistered ? "selected" : "")" data-group-id="@group.IDGroup">
-                                        @if (group.IsRegistered)
-                                        {
-                                            <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT" data-group-id="@group.IDGroup" checked="checked" />
-                                        }
-                                        else
-                                        {
-                                            <input type="checkbox" name="answer_@group.IDGroup" value="@positiveOption.IDOT" data-group-id="@group.IDGroup" />
-                                        }
-                                        <span class="pknew-check"><i class="fa fa-check"></i></span>
-                                        <span class="pknew-card-icon">
-                                            <span class="pknew-pictogram" aria-hidden="true"><i class="fa fa-users"></i></span>
-                                        </span>
-                                        <span><span class="pknew-card-name">@group.TenNhom</span><span class="pknew-card-desc">Nội dung thi đấu theo đội</span></span>
-                                    </label>
-                                }
-                            </div>
-                        }
-
-                        if (canSubmit)
-                        {
-                            <div class="pknew-submit-row"><button type="submit" class="pknew-submit" id="pknewSubmit"><i class="fa fa-paper-plane"></i>&nbsp; Đăng ký</button></div>
-                        }
-                    }
-                }
-            </section>
-
-        </div>
-    </div>
-</div>
-
-<script>
-    $(document).ready(function () {
-        var maxSlots = @maxSlots;
-        $(document).on('change', '.pknew-card input', function () {
-            if ($(this).closest('.pknew-slot-card').length
-                && $('.pknew-slot-card input:checked').length > maxSlots) {
-                $(this).prop('checked', false);
-                alert('Bạn chỉ được chọn tối đa ' + maxSlots + ' nội dung thi đấu đôi.');
-            }
-            var checked = $(this).prop('checked');
-            $(this).closest('.pknew-card').toggleClass('selected', checked);
-        });
-
-        $('#pknewForm').on('submit', function (event) {
-            var experience = $('#pickleballExperience').val();
-            if (!experience) { event.preventDefault(); alert('Vui lòng chọn thời gian bạn đã tập luyện môn Pickleball.'); return; }
-            if (!$('.pknew-tournament-select').val()) { event.preventDefault(); alert('Vui lòng chọn kinh nghiệm tham gia thi đấu Pickleball.'); return; }
-            var phone = ($('.pknew-phone-input').val() || '').replace(/[.\s-]/g, '');
-            if (!/^\+?[0-9]{8,15}$/.test(phone)) { event.preventDefault(); alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.'); return; }
-            var $checked = $('.pknew-card input:checked');
-            if (!$checked.length) { event.preventDefault(); alert('Vui lòng chọn ít nhất một nội dung thi đấu.'); return; }
-            $('#pknewSubmit').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp; Đang đăng ký');
-        });
-    });
-</script>
+                            $('#pknewForm').on('submit', function (event) {
+                                var experience = $('#pickleballExperience').val();
+                                if (!experience) { event.preventDefault(); alert('Vui lòng chọn thời gian bạn đã tập luyện môn Pickleball.'); return; }
+                                if (!$('.pknew-tournament-select').val()) { event.preventDefault(); alert('Vui lòng chọn kinh nghiệm tham gia thi đấu Pickleball.'); return; }
+                                var phone = ($('.pknew-phone-input').val() || '').replace(/[.\s-]/g, '');
+                                if (!/^\+?[0-9]{8,15}$/.test(phone)) { event.preventDefault(); alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.'); return; }
+                                var $checked = $('.pknew-card input:checked');
+                                if (!$checked.length) { event.preventDefault(); alert('Vui lòng chọn ít nhất một nội dung thi đấu.'); return; }
+                                $('#pknewSubmit').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp; Đang đăng ký');
+                            });
+                        });
+                    </script>
