@@ -1090,7 +1090,10 @@ namespace EPORTAL.Areas.Servey.Controllers
                                TenPhongBan = b.PhongBan.TenPhongBan,
                                LSPart = Ls.Where(x => x.IDNV == a.IDNV).ToList(),
                                MenuOT = a.MenuOT,
-                               LyDo = DsLyDo.Where(x => x.IDNV == a.IDNV).Count() != 0?DsLyDo.Where(x => x.IDNV == a.IDNV).FirstOrDefault()?.GhiChu:"",
+                               LyDo = DsLyDo.Where(x => x.IDNV == a.IDNV && x.GhiChu != null)
+                                   .OrderBy(x => x.ID)
+                                   .Select(x => x.GhiChu)
+                                   .FirstOrDefault() ?? "",
                            }).ToList();
              
                 // ketqua Dang ky
@@ -1140,6 +1143,16 @@ namespace EPORTAL.Areas.Servey.Controllers
                         cell2 = cell2.CellRight();
                         dem++;
                     }
+
+                    var noteColumnNumber = cell.Address.ColumnNumber;
+                    var noteHeaderRange = Worksheet.Range(2, noteColumnNumber, 3, noteColumnNumber);
+                    noteHeaderRange.Merge();
+                    noteHeaderRange.FirstCell().Value = "Ghi Chú";
+                    noteHeaderRange.Style.Font.Bold = true;
+                    noteHeaderRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    noteHeaderRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                    noteHeaderRange.Style.Alignment.WrapText = true;
+                    Worksheet.Column(noteColumnNumber).Width = 24;
                    
                     foreach (var item in res)
                     {
@@ -1197,7 +1210,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                             selec.Value = data;
                             selec = selec.CellRight(); // Di chuyển sang ô bên phải
                         }
-                        selec.Value = item.LyDo;
+                        selec.SetValue<string>(item.LyDo ?? "");
+                        selec.Style.NumberFormat.Format = "@";
 
                         if (item.LSPart.Count > 0)
                         {
@@ -1407,6 +1421,12 @@ namespace EPORTAL.Areas.Servey.Controllers
                     Worksheet.Range("A2:O" + (row)).Style.Font.SetFontSize(10);
                     Worksheet.Range("A2:O" + (row)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                     Worksheet.Range("A2:O" + (row)).Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                    var noteRange = Worksheet.Range(2, noteColumnNumber, row, noteColumnNumber);
+                    noteRange.Style.Font.SetFontName("Arial");
+                    noteRange.Style.Font.SetFontSize(10);
+                    noteRange.Style.NumberFormat.Format = "@";
+                    noteRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    noteRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
                     //Worksheet.Column("D").AdjustToContents();
                     Workbook.SaveAs(fileNameMauTemp);
                     byte[] fileBytes = System.IO.File.ReadAllBytes(fileNameMauTemp);
