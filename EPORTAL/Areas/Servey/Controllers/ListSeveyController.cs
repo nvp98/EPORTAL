@@ -1312,7 +1312,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                                     var selecCom = Worksheet.Cell("P" + row); // Lấy ô bắt đầu
                                                                            // Chèn dữ liệu từ danh sách vào các ô liên tiếp trong hàng
-                                    foreach (string data in item.ListSelectKhac)  // điền chọn điểm đăng ký theo người đăng ký
+                                    foreach (string data in pa.ListSelect)  // điền chọn điểm đăng ký theo người thân (ChiTietDKNTs)
                                     {
                                         selecCom.Value = data;
                                         selecCom = selecCom.CellRight(); // Di chuyển sang ô bên phải
@@ -1403,7 +1403,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                                     var selecCom = Worksheet.Cell("P" + row); // Lấy ô bắt đầu
                                                                               // Chèn dữ liệu từ danh sách vào các ô liên tiếp trong hàng
-                                    foreach (string data in item.ListSelectKhac) // chèn đúng select của người đăng ký
+                                    foreach (string data in pa.ListSelect) // chèn đúng select của người thân (ChiTietDKNTs)
                                     {
                                         selecCom.Value = data;
                                         selecCom = selecCom.CellRight(); // Di chuyển sang ô bên phải
