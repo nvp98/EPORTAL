@@ -16,10 +16,10 @@ namespace EPORTAL.Areas.Servey.Controllers
 {
     public class ServeyIDController : Controller
     {
-        private const int SingingSurveyId = 13;
+        private const int SingingSurveyId = 15;
         private const int SingingMaxSlots = 2;
         private const string SingingRelationType = "Singing";
-        private const int PickleballSurveyId = 12;
+        private const int PickleballSurveyId = 14;
         private const int PickleballMaxSlots = 2;
 
         // GET: Servey/ServeyID
@@ -324,13 +324,13 @@ namespace EPORTAL.Areas.Servey.Controllers
             var activeSorted2 = dbSV.ListServeys
                 .Where(x => allActiveSV2.Contains(x.IDSV)
                          && x.StartTime <= DateTime.Now
-                         && x.EndTime   >= DateTime.Now
-                         && x.StatusSV  == true)
+                         && x.EndTime >= DateTime.Now
+                         && x.StatusSV == true)
                 .OrderBy(x => x.StartTime).ThenBy(x => x.IDSV)
                 .Select(x => x.IDSV)
                 .ToList();
             int currentIdx2 = activeSorted2.IndexOf((int)IDSV);
-            int? nextIDSV2  = (currentIdx2 >= 0 && currentIdx2 < activeSorted2.Count - 1)
+            int? nextIDSV2 = (currentIdx2 >= 0 && currentIdx2 < activeSorted2.Count - 1)
                               ? activeSorted2[currentIdx2 + 1]
                               : (int?)null;
             ViewBag.NextIDSV = nextIDSV2;
@@ -1646,13 +1646,27 @@ namespace EPORTAL.Areas.Servey.Controllers
                     foreach (var option in newOptions)
                     {
                         dbSV.CTKhaoSat_insert(request.IDSV, option.IDOT, IDNV, option.IDGroup);
+                        var singingRow = dbSV.CTKhaoSats
+                            .Where(x => x.IDSV == request.IDSV
+                                && x.IDNV == IDNV
+                                && x.IDOT == option.IDOT
+                                && x.IDGroup == option.IDGroup)
+                            .OrderByDescending(x => x.ID)
+                            .FirstOrDefault();
+                        if (singingRow != null)
+                        {
+                            singingRow.GhiChu = request.RegistrantPhone;
+                        }
+
                         if (option.RequiresPartner)
                         {
                             ObjectParameter IDNTOut = new ObjectParameter("ID", typeof(int));
-                            dbSV.CTDKNguoiThan_insert(IDNV, partner.ID, null, null, request.IDSV, 1,
+                            dbSV.CTDKNguoiThan_insert(IDNV, partner.ID, null, request.RegistrantPhone, request.IDSV, 1,
                                 null, null, null, SingingRelationType, option.Content, IDNTOut);
                         }
                     }
+
+                    dbSV.SaveChanges();
 
                     transaction.Commit();
                 }
@@ -1950,13 +1964,13 @@ namespace EPORTAL.Areas.Servey.Controllers
 
             var IDNV = MyAuthentication.ID;
             var currentUser = db.NhanViens.FirstOrDefault(x => x.ID == IDNV);
-            var groups   = dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV).OrderBy(x => x.MaNhom).ToList();
-            var options  = dbSV.OptionServeys.Where(x => x.IDSV == IDSV).ToList();
-            var LSNV     = db.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
-            var pb       = db.PhongBans.ToList();
+            var groups = dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV).OrderBy(x => x.MaNhom).ToList();
+            var options = dbSV.OptionServeys.Where(x => x.IDSV == IDSV).ToList();
+            var LSNV = db.NhanViens.Where(x => x.IDTinhTrangLV == 1).ToList();
+            var pb = db.PhongBans.ToList();
 
             var myPairs = dbSV.CTDKNguoiThans
-                .Where(x => x.IDNV == IDNV  && x.IDSV == IDSV && x.isCom == 1)
+                .Where(x => x.IDNV == IDNV && x.IDSV == IDSV && x.isCom == 1)
                 .ToList();
 
             var myPairsView = (from a in myPairs
@@ -1966,15 +1980,15 @@ namespace EPORTAL.Areas.Servey.Controllers
                                    ?? groups.FirstOrDefault(g => IsSamePickleballType(GetLoaiDoi(g.TenNhom ?? ""), a.QuanHe))
                                select new PartTogetherValidation
                                {
-                                   ID          = a.ID,
-                                   HoTen       = b != null ? b.HoTen : "",
-                                   MaNV        = b != null ? b.MaNV  : "",
+                                   ID = a.ID,
+                                   HoTen = b != null ? b.HoTen : "",
+                                   MaNV = b != null ? b.MaNV : "",
                                    IDNguoiThan = a.IDNguoiThan,
-                                   IDSV        = a.IDSV,
-                                   IDGroup     = matchedGroup != null ? (int?)matchedGroup.ID : null,
-                                   PhongBan    = b != null ? pb.FirstOrDefault(x => x.IDPhongBan == b.IDPhongBan)?.TenPhongBan : "",
-                                   QuanHe      = matchedGroup != null ? GetLoaiDoi(matchedGroup.TenNhom ?? "") : a.QuanHe,
-                                   Note        = matchedGroup != null ? matchedGroup.TenNhom : a.GhiChu
+                                   IDSV = a.IDSV,
+                                   IDGroup = matchedGroup != null ? (int?)matchedGroup.ID : null,
+                                   PhongBan = b != null ? pb.FirstOrDefault(x => x.IDPhongBan == b.IDPhongBan)?.TenPhongBan : "",
+                                   QuanHe = matchedGroup != null ? GetLoaiDoi(matchedGroup.TenNhom ?? "") : a.QuanHe,
+                                   Note = matchedGroup != null ? matchedGroup.TenNhom : a.GhiChu
                                }).ToList();
 
             var registeredGroupIds = new HashSet<int>(myPairsView
@@ -1994,11 +2008,11 @@ namespace EPORTAL.Areas.Servey.Controllers
                             where g != null
                             select new PartTogetherValidation
                             {
-                                ID          = a.ID,
-                                IDGroup     = g.ID,
-                                Note        = g.TenNhom ?? "",
-                                QuanHe      = loaiDoiS,
-                                IDSV        = IDSV,
+                                ID = a.ID,
+                                IDGroup = g.ID,
+                                Note = g.TenNhom ?? "",
+                                QuanHe = loaiDoiS,
+                                IDSV = IDSV,
                                 IDNguoiThan = null,
                             }).ToList();
             myPairsView.AddRange(soloView);
@@ -2013,19 +2027,19 @@ namespace EPORTAL.Areas.Servey.Controllers
                 string loaiDoi = GetLoaiDoi(g.TenNhom ?? "");
                 return new PickleballGroupView
                 {
-                    IDGroup      = g.ID,
-                    IDSV         = g.IDSV ?? 0,
-                    TenNhom      = g.TenNhom,
-                    LoaiDoi      = loaiDoi,
+                    IDGroup = g.ID,
+                    IDSV = g.IDSV ?? 0,
+                    TenNhom = g.TenNhom,
+                    LoaiDoi = loaiDoi,
                     IsRegistered = registeredGroupIds.Contains(g.ID),
                     ExistingPair = myPairsView.FirstOrDefault(p => p.IDGroup == g.ID),
-                    Options      = options.Where(o => o.MaOT == g.MaNhom)
+                    Options = options.Where(o => o.MaOT == g.MaNhom)
                                          .OrderBy(o => o.OrderBy)
                                          .Select(o => new OptionValidation
                                          {
-                                             IDOT      = o.IDOT,
+                                             IDOT = o.IDOT,
                                              ContentOT = o.ContentOT,
-                                             isShow    = o.isShow
+                                             isShow = o.isShow
                                          }).ToList()
                 };
             }).ToList();
@@ -2049,13 +2063,13 @@ namespace EPORTAL.Areas.Servey.Controllers
                                           from b in ul.DefaultIfEmpty()
                                           select new PartTogetherValidation
                                           {
-                                              ID       = a.ID,
-                                              HoTen    = b != null ? b.HoTen : "",
-                                              MaNV     = b != null ? b.MaNV  : "",
-                                              IDSV     = a.IDSV,
+                                              ID = a.ID,
+                                              HoTen = b != null ? b.HoTen : "",
+                                              MaNV = b != null ? b.MaNV : "",
+                                              IDSV = a.IDSV,
                                               PhongBan = b != null ? pb.FirstOrDefault(x => x.IDPhongBan == b.IDPhongBan)?.TenPhongBan : "",
-                                              QuanHe   = a.QuanHe,
-                                              Note     = a.GhiChu
+                                              QuanHe = a.QuanHe,
+                                              Note = a.GhiChu
                                           }).ToList();
 
             // Dữ liệu Pickleball cũ có thể còn quan hệ đồng đội. Nội dung mà người dùng
@@ -2081,40 +2095,40 @@ namespace EPORTAL.Areas.Servey.Controllers
             var activeSorted = dbSV.ListServeys
                 .Where(x => allActiveSV.Contains(x.IDSV)
                          && x.StartTime <= DateTime.Now
-                         && x.EndTime   >= DateTime.Now
-                         && x.StatusSV  == true)
+                         && x.EndTime >= DateTime.Now
+                         && x.StatusSV == true)
                 .OrderBy(x => x.StartTime).ThenBy(x => x.IDSV)
                 .Select(x => x.IDSV)
                 .ToList();
             int currentIdx = activeSorted.IndexOf((int)IDSV);
-            int? nextIDSV  = (currentIdx >= 0 && currentIdx < activeSorted.Count - 1)
+            int? nextIDSV = (currentIdx >= 0 && currentIdx < activeSorted.Count - 1)
                              ? activeSorted[currentIdx + 1]
                              : (int?)null;
 
-            ViewBag.IDSV                = IDSV;
-            ViewBag.TenDK               = dbSV.ListServeys.FirstOrDefault(x => x.IDSV == IDSV)?.ContentSV;
-            ViewBag.MaxSlots            = PickleballMaxSlots;
-            ViewBag.SlotsRemaining      = Math.Max(0, PickleballMaxSlots - myPairsView.Count - registeredByOthers.Count);
-            ViewBag.MyPairs             = myPairsView;
-            ViewBag.RegistrantCode      = currentUser != null ? currentUser.MaNV : null;
-            ViewBag.RegistrantName      = currentUser != null ? currentUser.HoTen : null;
-            ViewBag.RegistrantPhone     = currentUser != null ? currentUser.DienThoai : null;
+            ViewBag.IDSV = IDSV;
+            ViewBag.TenDK = dbSV.ListServeys.FirstOrDefault(x => x.IDSV == IDSV)?.ContentSV;
+            ViewBag.MaxSlots = PickleballMaxSlots;
+            ViewBag.SlotsRemaining = Math.Max(0, PickleballMaxSlots - myPairsView.Count - registeredByOthers.Count);
+            ViewBag.MyPairs = myPairsView;
+            ViewBag.RegistrantCode = currentUser != null ? currentUser.MaNV : null;
+            ViewBag.RegistrantName = currentUser != null ? currentUser.HoTen : null;
+            ViewBag.RegistrantPhone = currentUser != null ? currentUser.DienThoai : null;
             ViewBag.RegistrantDepartment = currentUser != null
                 ? pb.Where(x => x.IDPhongBan == currentUser.IDPhongBan).Select(x => x.TenPhongBan).FirstOrDefault()
                 : null;
             ViewBag.CurrentUserGioiTinh = userGioiTinh;
-            ViewBag.RegisteredByOthers  = registeredByOthersView;
-            ViewBag.NextIDSV            = nextIDSV;
+            ViewBag.RegisteredByOthers = registeredByOthersView;
+            ViewBag.NextIDSV = nextIDSV;
 
             return View(groupViews);
         }
 
         public JsonResult GetDongDoiPartners(int IDSV, int IDGroup)
         {
-            var IDNV        = MyAuthentication.ID;
+            var IDNV = MyAuthentication.ID;
             var currentUser = db.NhanViens.FirstOrDefault(x => x.ID == IDNV);
-            var group       = dbSV.GroupKhaoSats.FirstOrDefault(x => x.ID == IDGroup);
-            string loaiDoi  = GetLoaiDoi(group?.TenNhom ?? "");
+            var group = dbSV.GroupKhaoSats.FirstOrDefault(x => x.ID == IDGroup);
+            string loaiDoi = GetLoaiDoi(group?.TenNhom ?? "");
 
             var takenPartnerIDs = dbSV.CTDKNguoiThans
                 .Where(x => x.IDSV == IDSV && x.isCom == 1 && x.IDNguoiThan != null)
@@ -2140,7 +2154,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                 candidates = candidates.Where(x => x.IsGioiTinh == 0);
             else if (loaiDoi == "DoiNu")
                 candidates = candidates.Where(x => x.IsGioiTinh == 1);
-            else if(loaiDoi == "HonHop") // HonHop: chọn giới tính ngược với người đăng ký
+            else if (loaiDoi == "HonHop") // HonHop: chọn giới tính ngược với người đăng ký
             {
                 int? oppositeGender = currentUser?.IsGioiTinh == 0 ? (int?)1 : 0;
                 candidates = candidates.Where(x => x.IsGioiTinh == oppositeGender);
@@ -2163,9 +2177,9 @@ namespace EPORTAL.Areas.Servey.Controllers
             try
             {
                 var currentUser = db.NhanViens.FirstOrDefault(x => x.ID == IDNV);
-                var groups      = dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV).ToList();
+                var groups = dbSV.GroupKhaoSats.Where(x => x.IDSV == IDSV).ToList();
 
-                var existingPairs     = dbSV.CTDKNguoiThans
+                var existingPairs = dbSV.CTDKNguoiThans
                     .Where(x => (x.IDNV == IDNV || x.IDNguoiThan == IDNV) && x.IDSV == IDSV && x.isCom == 1).ToList();
                 var registeredLoaiDoi = existingPairs.Select(x => x.QuanHe).ToList();
 
@@ -2180,7 +2194,7 @@ namespace EPORTAL.Areas.Servey.Controllers
                     string selectedOT = collection["answer_" + group.ID];
                     if (selectedOT == null) continue;
 
-                    int idot   = int.Parse(selectedOT);
+                    int idot = int.Parse(selectedOT);
                     var option = dbSV.OptionServeys.FirstOrDefault(x => x.IDOT == idot);
                     if (option == null) continue;
 
@@ -2223,7 +2237,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                 foreach (var item in newItems)
                 {
-                    var group      = item.Item1;
+                    var group = item.Item1;
                     int? idPartner = item.Item3;
                     string loaiDoi = GetLoaiDoi(group.TenNhom ?? "");
 
@@ -2245,7 +2259,7 @@ namespace EPORTAL.Areas.Servey.Controllers
 
                     // Validate giới tính
                     var partner = db.NhanViens.FirstOrDefault(x => x.ID == idPartner.Value);
-                    bool valid  = true;
+                    bool valid = true;
 
                     if (loaiDoi == "DoiNam" && (partner?.IsGioiTinh != 0 || currentUser?.IsGioiTinh != 0))
                         valid = false;
@@ -2265,8 +2279,8 @@ namespace EPORTAL.Areas.Servey.Controllers
                 dbSV.EmployeeServey_updateOT(IDNV, IDSV, 0);
                 foreach (var item in newItems)
                 {
-                    var group      = item.Item1;
-                    int idot       = item.Item2;
+                    var group = item.Item1;
+                    int idot = item.Item2;
                     int? idPartner = item.Item3;
                     string loaiDoi = GetLoaiDoi(group.TenNhom ?? "");
 

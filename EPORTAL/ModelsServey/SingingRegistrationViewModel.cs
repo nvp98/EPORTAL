@@ -45,6 +45,7 @@ namespace EPORTAL.ModelsServey
     public class SingingRegistrationRequest
     {
         public int IDSV { get; set; }
+        public string RegistrantPhone { get; set; }
         public List<int> SelectedOptionIds { get; set; }
         public int? PartnerID { get; set; }
     }

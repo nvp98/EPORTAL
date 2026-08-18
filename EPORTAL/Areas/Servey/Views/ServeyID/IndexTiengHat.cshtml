@@ -194,6 +194,49 @@
         color: #075ee0;
     }
 
+    .singing-section-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 0 0 16px;
+        padding: 14px 16px;
+        border: 1px solid #cddaf0;
+        border-radius: 8px;
+        background: linear-gradient(180deg, #f7faff 0%, #eef4ff 100%);
+        color: #24385f;
+    }
+
+    .singing-section-note i {
+        margin-top: 2px;
+        color: #4d67d8;
+        font-size: 1.2rem;
+        flex: 0 0 auto;
+    }
+
+    .singing-section-note strong {
+        display: block;
+        margin-bottom: 2px;
+        color: #15306b;
+        font-size: 0.98rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .singing-section-note span {
+        display: block;
+        color: #51617f;
+        line-height: 1.45;
+    }
+
+    .singing-section-note span strong {
+        display: inline;
+        margin-bottom: 0;
+        color: #15306b;
+        font-size: inherit;
+        font-weight: 800;
+        text-transform: none;
+    }
+
     .singing-table-wrap {
         overflow-x: auto;
         border: 1px solid #d9e3f3;
@@ -484,6 +527,10 @@
         gap: 20px;
     }
 
+    .singing-registrant-field {
+        margin: 0 0 18px;
+    }
+
     .singing-field label {
         display: block;
         margin-bottom: 7px;
@@ -608,7 +655,7 @@
             <a class="singing-back" href="@Url.Action("Index", "UserServey", new { area = "Servey" })">
                 <i class="fa fa-arrow-left"></i> Trở lại
             </a>
-            @if (nextUrl != null)
+            @* @if (nextUrl != null)
             {
                 <a href="@nextUrl" class="singing-next-link">
                     Hoạt động đăng ký tiếp theo <i class="fa fa-arrow-right"></i>
@@ -619,7 +666,7 @@
                 <span class="singing-last-activity">
                     <i class="fa fa-check-circle"></i> Đây là hoạt động cuối cùng
                 </span>
-            }
+            } *@
         </div>
 
         <div class="singing-shell">
@@ -784,6 +831,16 @@
                     <i class="fa fa-edit section-icon edit"></i> II. Đăng ký mới
                 </h3>
 
+                <div class="singing-section-note" role="note" aria-label="Lưu ý đăng ký nội dung tham gia">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Thí sinh chọn 01 trong 02 nội dung tham gia: Đơn ca hoặc Song ca.</strong>
+                        <span><strong>Đơn ca:</strong> Thí sinh đăng ký và biểu diễn cá nhân.</span>
+                        <span><strong>Song ca:</strong> Chỉ cần  <strong>01 trong 02 thí sinh đại diện đăng ký</strong>. Người đăng ký nhập đầy đủ thông tin của <strong>người hát cùng</strong> vào mục bên dưới.</span>
+                        <span><strong>Lưu ý:</strong> Mỗi thí sinh chỉ đăng ký 01 nội dung dự thi.</span>
+                    </div>
+                </div>
+
                 @if (!Model.IsActive)
                 {
                     <div class="alert alert-warning">Chương trình hiện không nhận đăng ký.</div>
@@ -798,16 +855,23 @@
                 }
                 else
                 {
-                    <p class="singing-help">Chọn tối đa @Model.MaxSlots nội dung. Nội dung có hình thức biểu diễn cùng người khác bắt buộc chọn một người hát cùng.</p>
+                    <p class="singing-help">Chỉ được chọn 01 trong 02 nội dung đăng ký. Nội dung có hình thức biểu diễn cùng người khác bắt buộc chọn một người hát cùng.</p>
                     using (Html.BeginForm("ConfirmSinging", "ServeyID", FormMethod.Post, new { id = "singingRegistrationForm" }))
                     {
                         <input type="hidden" name="IDSV" value="@Model.IDSV" />
+
+                        <div class="singing-field singing-registrant-field">
+                            <label>Số điện thoại Zalo <em>*</em></label>
+                            <input type="tel" class="form-control" id="singingRegistrantPhone" name="RegistrantPhone"
+                                   value="@Model.RegistrantPhone" placeholder="Điền số điện thoại" inputmode="tel"
+                                   maxlength="20" autocomplete="tel" />
+                        </div>
 
                         <div class="singing-options">
                             @foreach (var option in availableOptions)
                             {
                                 <label class="singing-option-card" data-requires-partner="@(option.RequiresPartner ? 1 : 0)">
-                                    <input type="checkbox" name="SelectedOptionIds" value="@option.IDOT"
+                                    <input type="radio" name="SelectedOptionIds" value="@option.IDOT"
                                            data-option-id="@option.IDOT" data-option-content="@option.Content"
                                            data-requires-partner="@(option.RequiresPartner ? 1 : 0)" />
                                     <span class="singing-option-check"><i class="fa fa-check"></i></span>
@@ -826,7 +890,7 @@
                                     <span>
                                         <span class="singing-option-name">@option.Content</span>
                                         <span class="singing-option-description">
-                                            @(option.RequiresPartner ? "Nội dung biểu diễn cùng người hát khác" : "Nội dung biểu diễn cá nhân")
+                                            @(option.RequiresPartner ? "Hát song ca (1 Người đăng ký cho cả nhóm)" : "Hát một mình (1 Thí sinh)")
                                         </span>
                                     </span>
                                 </label>
@@ -955,11 +1019,6 @@
 
         function refreshSelection(changedCheckbox) {
             var $checked = $('.singing-option-card input:checked');
-            if ($checked.length > slotsRemaining) {
-                $(changedCheckbox).prop('checked', false);
-                alert('Bạn chỉ được chọn tối đa ' + slotsRemaining + ' nội dung.');
-                $checked = $('.singing-option-card input:checked');
-            }
 
             $('.singing-option-card').each(function () {
                 $(this).toggleClass('selected', $(this).find('input').prop('checked'));
@@ -1045,10 +1104,17 @@
         });
 
         $('#singingRegistrationForm').on('submit', function (event) {
+            var phone = ($('#singingRegistrantPhone').val() || '').replace(/[.\s-]/g, '');
+            if (!/^\+?[0-9]{8,15}$/.test(phone)) {
+                event.preventDefault();
+                alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.');
+                return;
+            }
+
             var $checked = $('.singing-option-card input:checked');
             if (!$checked.length) {
                 event.preventDefault();
-                alert('Vui lòng chọn ít nhất một nội dung.');
+                alert('Vui lòng chọn 01 nội dung.');
                 return;
             }
             if ($checked.filter('[data-requires-partner="1"]').length && !$partnerSelect.val()) {
