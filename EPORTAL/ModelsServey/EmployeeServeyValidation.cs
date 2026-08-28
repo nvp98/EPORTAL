@@ -41,5 +41,7 @@ namespace EPORTAL.ModelsServey
         public Nullable<int> MenuOT { get; set; }
         public List<String> ListSelect { get; set; }
         public List<String> ListSelectKhac { get; set; }
+        public string BaiHat1 { get; set; }
+        public string BaiHat2 { get; set; }
     }
 }

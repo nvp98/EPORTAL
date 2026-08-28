@@ -10,6 +10,8 @@ namespace EPORTAL.ModelsServey
         public string RegistrantCode { get; set; }
         public string RegistrantName { get; set; }
         public string RegistrantPhone { get; set; }
+        public string RegistrantBaiHat1 { get; set; }
+        public string RegistrantBaiHat2 { get; set; }
         public string RegistrantDepartment { get; set; }
         public int MaxSlots { get; set; }
         public int SlotsRemaining { get; set; }
@@ -46,6 +48,8 @@ namespace EPORTAL.ModelsServey
     {
         public int IDSV { get; set; }
         public string RegistrantPhone { get; set; }
+        public string RegistrantBaiHat1 { get; set; }
+        public string RegistrantBaiHat2 { get; set; }
         public List<int> SelectedOptionIds { get; set; }
         public int? PartnerID { get; set; }
     }

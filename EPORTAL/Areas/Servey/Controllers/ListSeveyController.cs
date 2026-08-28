@@ -1096,6 +1096,25 @@ namespace EPORTAL.Areas.Servey.Controllers
                                    .FirstOrDefault() ?? "",
                            }).ToList();
              
+                // Với IDSV=15 (Tiếng hát): parse GhiChu => phone_baihat1_baihat2
+                if (id == 15)
+                {
+                    foreach (var item in res)
+                    {
+                        var ghiChu = ctKS
+                            .Where(x => x.IDNV == item.IDNV && !string.IsNullOrWhiteSpace(x.GhiChu))
+                            .OrderByDescending(x => x.ID)
+                            .Select(x => x.GhiChu)
+                            .FirstOrDefault();
+                        var parts = !string.IsNullOrWhiteSpace(ghiChu)
+                            ? ghiChu.Split(new[] { '_' }, 3)
+                            : new string[0];
+                        item.LyDo   = parts.Length > 0 ? parts[0] : "";
+                        item.BaiHat1 = parts.Length > 1 ? parts[1] : "";
+                        item.BaiHat2 = parts.Length > 2 ? parts[2] : "";
+                    }
+                }
+
                 // ketqua Dang ky
                 foreach (var item in res)
                 {
@@ -1147,12 +1166,35 @@ namespace EPORTAL.Areas.Servey.Controllers
                     var noteColumnNumber = cell.Address.ColumnNumber;
                     var noteHeaderRange = Worksheet.Range(2, noteColumnNumber, 3, noteColumnNumber);
                     noteHeaderRange.Merge();
-                    noteHeaderRange.FirstCell().Value = "Ghi Chú";
+                    noteHeaderRange.FirstCell().Value = id == 15 ? "SĐT Zalo" : "Ghi Chú";
                     noteHeaderRange.Style.Font.Bold = true;
                     noteHeaderRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                     noteHeaderRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                     noteHeaderRange.Style.Alignment.WrapText = true;
                     Worksheet.Column(noteColumnNumber).Width = 24;
+
+                    if (id == 15)
+                    {
+                        var bh1Col = noteColumnNumber + 1;
+                        var bh1Header = Worksheet.Range(2, bh1Col, 3, bh1Col);
+                        bh1Header.Merge();
+                        bh1Header.FirstCell().Value = "Tên bài hát 1";
+                        bh1Header.Style.Font.Bold = true;
+                        bh1Header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        bh1Header.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                        bh1Header.Style.Alignment.WrapText = true;
+                        Worksheet.Column(bh1Col).Width = 28;
+
+                        var bh2Col = noteColumnNumber + 2;
+                        var bh2Header = Worksheet.Range(2, bh2Col, 3, bh2Col);
+                        bh2Header.Merge();
+                        bh2Header.FirstCell().Value = "Tên bài hát 2";
+                        bh2Header.Style.Font.Bold = true;
+                        bh2Header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        bh2Header.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                        bh2Header.Style.Alignment.WrapText = true;
+                        Worksheet.Column(bh2Col).Width = 28;
+                    }
                    
                     foreach (var item in res)
                     {
@@ -1212,6 +1254,16 @@ namespace EPORTAL.Areas.Servey.Controllers
                         }
                         selec.SetValue<string>(item.LyDo ?? "");
                         selec.Style.NumberFormat.Format = "@";
+
+                        if (id == 15)
+                        {
+                            var selecBh1 = selec.CellRight();
+                            selecBh1.SetValue<string>(item.BaiHat1 ?? "");
+                            selecBh1.Style.NumberFormat.Format = "@";
+                            var selecBh2 = selecBh1.CellRight();
+                            selecBh2.SetValue<string>(item.BaiHat2 ?? "");
+                            selecBh2.Style.NumberFormat.Format = "@";
+                        }
 
                         if (item.LSPart.Count > 0)
                         {
@@ -1427,6 +1479,20 @@ namespace EPORTAL.Areas.Servey.Controllers
                     noteRange.Style.NumberFormat.Format = "@";
                     noteRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                     noteRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+                    if (id == 15)
+                    {
+                        foreach (var bhCol in new[] { noteColumnNumber + 1, noteColumnNumber + 2 })
+                        {
+                            var bhRange = Worksheet.Range(2, bhCol, row, bhCol);
+                            bhRange.Style.Font.SetFontName("Arial");
+                            bhRange.Style.Font.SetFontSize(10);
+                            bhRange.Style.NumberFormat.Format = "@";
+                            bhRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                            bhRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                        }
+                    }
+
                     //Worksheet.Column("D").AdjustToContents();
                     Workbook.SaveAs(fileNameMauTemp);
                     byte[] fileBytes = System.IO.File.ReadAllBytes(fileNameMauTemp);

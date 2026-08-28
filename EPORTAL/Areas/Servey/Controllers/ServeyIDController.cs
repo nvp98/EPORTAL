@@ -1390,7 +1390,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                     RequiresPartner = definition.RequiresPartner,
                     PairID = pair != null ? (int?)pair.ID : null,
                     CanManage = true,
-                    RegistrationOwnerPhone = registrant != null ? registrant.DienThoai : null,
+                    RegistrationOwnerPhone = !string.IsNullOrWhiteSpace(row.GhiChu)
+                        ? row.GhiChu.Split(new[] { '_' }, 2)[0]
+                        : (registrant != null ? registrant.DienThoai : null),
                     PartnerCode = definition.RequiresPartner
                         ? (partner != null ? partner.MaNV : null)
                         : (registrant != null ? registrant.MaNV : null),
@@ -1464,6 +1466,14 @@ namespace EPORTAL.Areas.Servey.Controllers
                 ? (int?)activeSurveyIds[currentSurveyIndex + 1]
                 : null;
 
+            var existingGhiChu = registrationRows.Select(x => x.GhiChu).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            var ghiChuParts = !string.IsNullOrWhiteSpace(existingGhiChu)
+                ? existingGhiChu.Split(new[] { '_' }, 3)
+                : new string[0];
+            var parsedPhone = ghiChuParts.Length > 0 ? ghiChuParts[0] : null;
+            var parsedBaiHat1 = ghiChuParts.Length > 1 ? ghiChuParts[1] : null;
+            var parsedBaiHat2 = ghiChuParts.Length > 2 ? ghiChuParts[2] : null;
+
             var now = DateTime.Now;
             var model = new SingingRegistrationViewModel
             {
@@ -1474,7 +1484,9 @@ namespace EPORTAL.Areas.Servey.Controllers
                     && (!survey.EndTime.HasValue || survey.EndTime.Value >= now),
                 RegistrantCode = registrant != null ? registrant.MaNV : null,
                 RegistrantName = registrant != null ? registrant.HoTen : null,
-                RegistrantPhone = registrant != null ? registrant.DienThoai : null,
+                RegistrantPhone = !string.IsNullOrWhiteSpace(parsedPhone) ? parsedPhone : (registrant != null ? registrant.DienThoai : null),
+                RegistrantBaiHat1 = parsedBaiHat1,
+                RegistrantBaiHat2 = parsedBaiHat2,
                 RegistrantDepartment = registrantDepartment != null ? registrantDepartment.TenPhongBan : null,
                 MaxSlots = SingingMaxSlots,
                 SlotsRemaining = Math.Max(0, SingingMaxSlots - registrationRows.Count - incomingPairs.Count),
@@ -1550,21 +1562,21 @@ namespace EPORTAL.Areas.Servey.Controllers
             }
 
             var IDNV = MyAuthentication.ID;
-            var selectedIds = (request.SelectedOptionIds ?? new List<int>()).Distinct().ToList();
-            if (selectedIds.Count == 0)
+
+            var phone = (request.RegistrantPhone ?? "").Replace(".", "").Replace(" ", "").Replace("-", "");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^\+?[0-9]{8,15}$"))
             {
-                TempData["msgError"] = "<script>alert('Vui lòng chọn ít nhất một nội dung.');</script>";
+                TempData["msgError"] = "<script>alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.');</script>";
                 return RedirectToAction("Index", new { IDSV = request.IDSV });
             }
+            var ghiChu = phone + "_" + (request.RegistrantBaiHat1 ?? "") + "_" + (request.RegistrantBaiHat2 ?? "");
 
             var survey = dbSV.ListServeys.FirstOrDefault(x => x.IDSV == request.IDSV);
             var now = DateTime.Now;
             var isActive = survey != null && survey.StatusSV == true
                 && (!survey.StartTime.HasValue || survey.StartTime.Value <= now)
                 && (!survey.EndTime.HasValue || survey.EndTime.Value >= now);
-            var employeeSurvey = dbSV.EmployeeServeys
-                .FirstOrDefault(x => x.IDNV == IDNV && x.IDSV == request.IDSV);
-            if (!isActive || employeeSurvey == null)
+            if (!isActive)
             {
                 TempData["msgError"] = "<script>alert('Chương trình hiện không nhận đăng ký.');</script>";
                 return RedirectToAction("Index", new { IDSV = request.IDSV });
@@ -1572,12 +1584,37 @@ namespace EPORTAL.Areas.Servey.Controllers
 
             var singingOptions = GetSingingOptions(request.IDSV);
             var singingOptionIds = singingOptions.Select(x => x.IDOT).ToList();
-            var validOptions = singingOptions
-                .Where(x => selectedIds.Contains(x.IDOT))
-                .ToList();
-            if (validOptions.Count != selectedIds.Count)
+
+            // UPDATE PATH: nếu đã có đăng ký → chỉ cập nhật GhiChu
+            try
             {
-                TempData["msgError"] = "<script>alert('Nội dung đăng ký không hợp lệ.');</script>";
+                var existingRows = dbSV.CTKhaoSats
+                    .Where(x => x.IDNV == IDNV && x.IDSV == request.IDSV && x.IDOT != null)
+                    .ToList()
+                    .Where(x => singingOptionIds.Contains(x.IDOT.Value))
+                    .ToList();
+
+                if (existingRows.Any())
+                {
+                    foreach (var r in existingRows)
+                        r.GhiChu = ghiChu;
+                    dbSV.SaveChanges();
+                    TempData["msgSuccess"] = "<script>alert('Cập nhật thông tin thành công.');</script>";
+                    return RedirectToAction("Index", new { IDSV = request.IDSV });
+                }
+            }
+            catch (Exception)
+            {
+                TempData["msgError"] = "<script>alert('Cập nhật không thành công, vui lòng thử lại.');</script>";
+                return RedirectToAction("Index", new { IDSV = request.IDSV });
+            }
+
+            // NEW REGISTRATION PATH: chưa có đăng ký → tự động chọn nội dung đơn ca đầu tiên
+            var employeeSurvey = dbSV.EmployeeServeys
+                .FirstOrDefault(x => x.IDNV == IDNV && x.IDSV == request.IDSV);
+            if (employeeSurvey == null)
+            {
+                TempData["msgError"] = "<script>alert('Chương trình hiện không nhận đăng ký.');</script>";
                 return RedirectToAction("Index", new { IDSV = request.IDSV });
             }
 
@@ -1594,80 +1631,36 @@ namespace EPORTAL.Areas.Servey.Controllers
                         .Where(x => singingOptionIds.Contains(x))
                         .Distinct()
                         .ToList();
-                    var newOptions = validOptions
-                        .Where(x => !existingOptionIds.Contains(x.IDOT))
-                        .ToList();
-                    if (newOptions.Count == 0)
+
+                    if (existingOptionIds.Count + incomingRegistrationCount >= SingingMaxSlots)
                     {
                         transaction.Rollback();
-                        TempData["msgError"] = "<script>alert('Các nội dung đã được đăng ký trước đó.');</script>";
-                        return RedirectToAction("Index", new { IDSV = request.IDSV });
-                    }
-                    if (incomingRegistrationCount > 0 && newOptions.Any(x => x.RequiresPartner))
-                    {
-                        transaction.Rollback();
-                        TempData["msgError"] = "<script>alert('Bạn đã được đăng ký Song ca với nhân viên khác. Bạn chỉ có thể đăng ký thêm Đơn ca.');</script>";
-                        return RedirectToAction("Index", new { IDSV = request.IDSV });
-                    }
-                    if (existingOptionIds.Count + incomingRegistrationCount + newOptions.Count > SingingMaxSlots)
-                    {
-                        transaction.Rollback();
-                        TempData["msgError"] = "<script>alert('Bạn chỉ được đăng ký tối đa 2 nội dung.');</script>";
+                        TempData["msgError"] = "<script>alert('Bạn đã đăng ký đủ số lượng nội dung.');</script>";
                         return RedirectToAction("Index", new { IDSV = request.IDSV });
                     }
 
-                    var partnerOptions = newOptions.Where(x => x.RequiresPartner).ToList();
-                    EPORTAL.ModelsView360.NhanVien partner = null;
-                    if (partnerOptions.Any())
-                    {
-                        if (!request.PartnerID.HasValue || request.PartnerID.Value == IDNV)
-                        {
-                            transaction.Rollback();
-                            TempData["msgError"] = "<script>alert('Vui lòng chọn người hát cùng hợp lệ.');</script>";
-                            return RedirectToAction("Index", new { IDSV = request.IDSV });
-                        }
+                    var autoOption = singingOptions
+                        .Where(x => !existingOptionIds.Contains(x.IDOT) && !x.RequiresPartner)
+                        .FirstOrDefault();
 
-                        partner = db.NhanViens.FirstOrDefault(x => x.ID == request.PartnerID.Value && x.IDTinhTrangLV == 1);
-                        var currentUserAlreadyUsed = dbSV.CTDKNguoiThans.Any(x => x.IDSV == request.IDSV
-                            && x.isCom == 1
-                            && (x.IDNguoiThan == IDNV || x.IDNV == IDNV));
-                        var partnerAlreadyUsed = dbSV.CTDKNguoiThans.Any(x => x.IDSV == request.IDSV
-                            && x.isCom == 1
-                            && (x.IDNguoiThan == request.PartnerID.Value || x.IDNV == request.PartnerID.Value));
-                        if (partner == null || currentUserAlreadyUsed || partnerAlreadyUsed)
-                        {
-                            transaction.Rollback();
-                            TempData["msgError"] = "<script>alert('Người hát cùng đã được đăng ký hoặc không còn khả dụng.');</script>";
-                            return RedirectToAction("Index", new { IDSV = request.IDSV });
-                        }
+                    if (autoOption == null)
+                    {
+                        transaction.Rollback();
+                        TempData["msgError"] = "<script>alert('Không còn nội dung phù hợp để đăng ký.');</script>";
+                        return RedirectToAction("Index", new { IDSV = request.IDSV });
                     }
 
                     dbSV.EmployeeServey_updateOT(IDNV, request.IDSV, 0);
-                    foreach (var option in newOptions)
-                    {
-                        dbSV.CTKhaoSat_insert(request.IDSV, option.IDOT, IDNV, option.IDGroup);
-                        var singingRow = dbSV.CTKhaoSats
-                            .Where(x => x.IDSV == request.IDSV
-                                && x.IDNV == IDNV
-                                && x.IDOT == option.IDOT
-                                && x.IDGroup == option.IDGroup)
-                            .OrderByDescending(x => x.ID)
-                            .FirstOrDefault();
-                        if (singingRow != null)
-                        {
-                            singingRow.GhiChu = request.RegistrantPhone;
-                        }
-
-                        if (option.RequiresPartner)
-                        {
-                            ObjectParameter IDNTOut = new ObjectParameter("ID", typeof(int));
-                            dbSV.CTDKNguoiThan_insert(IDNV, partner.ID, null, request.RegistrantPhone, request.IDSV, 1,
-                                null, null, null, SingingRelationType, option.Content, IDNTOut);
-                        }
-                    }
+                    dbSV.CTKhaoSat_insert(request.IDSV, autoOption.IDOT, IDNV, autoOption.IDGroup);
+                    var singingRow = dbSV.CTKhaoSats
+                        .Where(x => x.IDSV == request.IDSV && x.IDNV == IDNV
+                            && x.IDOT == autoOption.IDOT && x.IDGroup == autoOption.IDGroup)
+                        .OrderByDescending(x => x.ID)
+                        .FirstOrDefault();
+                    if (singingRow != null)
+                        singingRow.GhiChu = ghiChu;
 
                     dbSV.SaveChanges();
-
                     transaction.Commit();
                 }
 

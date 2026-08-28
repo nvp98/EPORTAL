@@ -680,11 +680,11 @@
                         using (Html.BeginForm("DeleteAllSinging", "ServeyID", FormMethod.Post, new { @class = "singing-delete-all-form" }))
                         {
                             <input type="hidden" name="IDSV" value="@Model.IDSV" />
-                            <button type="submit" class="singing-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký tiếng hát?');">
+                            @* <button type="submit" class="singing-delete-all" onclick="return confirm('Xóa toàn bộ đăng ký tiếng hát?');">
                                 <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
                                 </svg>&nbsp; Xóa đăng ký
-                            </button>
+                            </button> *@
                         }
                     }
                 </div>
@@ -708,7 +708,8 @@
                                             <th>Họ tên</th>
                                             <th>Số điện thoại</th>
                                             <th>Bộ phận</th>
-                                            <th>Thao tác</th>
+                                            <th>Tên bài hát 1</th>
+                                            <th>Tên bài hát 2</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -725,18 +726,8 @@
                                                 <td>@item.PartnerName</td>
                                                 <td>@(string.IsNullOrWhiteSpace(item.RegistrationOwnerPhone) ? "--" : item.RegistrationOwnerPhone)</td>
                                                 <td>@item.PartnerDepartment</td>
-                                                <td>
-                                                    @using (Html.BeginForm("DeleteSingingItem", "ServeyID", FormMethod.Post, new { @class = "singing-delete-item-form" }))
-                                                    {
-                                                        <input type="hidden" name="IDSV" value="@Model.IDSV" />
-                                                        <input type="hidden" name="CTKhaoSatID" value="@item.CTKhaoSatID" />
-                                                        <button type="submit" class="singing-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');">
-                                                            <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                                <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
-                                                            </svg>
-                                                        </button>
-                                                    }
-                                                </td>
+                                                <td>@(string.IsNullOrWhiteSpace(Model.RegistrantBaiHat1) ? "--" : Model.RegistrantBaiHat1)</td>
+                                                <td>@(string.IsNullOrWhiteSpace(Model.RegistrantBaiHat2) ? "--" : Model.RegistrantBaiHat2)</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -758,6 +749,8 @@
                                             <th>SĐT của bạn</th>
                                             <th>SĐT người hát cùng</th>
                                             <th>Bộ phận người hát cùng</th>
+                                            <th>Tên bài hát 1</th>
+                                            <th>Tên bài hát 2</th>
                                             <th>Thao tác</th>
                                         </tr>
                                     </thead>
@@ -780,6 +773,8 @@
                                                 <td>@(string.IsNullOrWhiteSpace(Model.RegistrantPhone) ? "--" : Model.RegistrantPhone)</td>
                                                 <td>@(string.IsNullOrWhiteSpace(item.PartnerPhone) ? "--" : item.PartnerPhone)</td>
                                                 <td>@item.PartnerDepartment</td>
+                                                <td>@(string.IsNullOrWhiteSpace(Model.RegistrantBaiHat1) ? "--" : Model.RegistrantBaiHat1)</td>
+                                                <td>@(string.IsNullOrWhiteSpace(Model.RegistrantBaiHat2) ? "--" : Model.RegistrantBaiHat2)</td>
                                                 <td>
                                                     <div class="singing-actions">
                                                         @if (item.CanManage && item.PairID.HasValue)
@@ -793,20 +788,7 @@
                                                                 <i class="fa fa-pencil"></i>
                                                             </button>
                                                         }
-                                                        @if (item.CanManage)
-                                                        {
-                                                            using (Html.BeginForm("DeleteSingingItem", "ServeyID", FormMethod.Post, new { @class = "singing-delete-item-form" }))
-                                                            {
-                                                                <input type="hidden" name="IDSV" value="@Model.IDSV" />
-                                                                <input type="hidden" name="CTKhaoSatID" value="@item.CTKhaoSatID" />
-                                                                <button type="submit" class="singing-row-delete" title="Xóa nội dung" onclick="return confirm('Xóa nội dung đăng ký này?');">
-                                                                    <svg class="singing-trash-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                                        <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M9 10v7M15 10v7"></path>
-                                                                    </svg>
-                                                                </button>
-                                                            }
-                                                        }
-                                                        else
+                                                        @if (!item.CanManage)
                                                         {
                                                             <span class="text-muted">Đã được đăng ký cùng</span>
                                                         }
@@ -826,6 +808,10 @@
                 }
             </section>
 
+            @*
+            =====================================================================
+            FORM CŨ (chọn đơn ca / song ca) — đã tắt, giữ lại để tham khảo
+            =====================================================================
             <section class="singing-section">
                 <h3 class="singing-section-title">
                     <i class="fa fa-edit section-icon edit"></i> II. Đăng ký mới
@@ -865,6 +851,19 @@
                             <input type="tel" class="form-control" id="singingRegistrantPhone" name="RegistrantPhone"
                                    value="@Model.RegistrantPhone" placeholder="Điền số điện thoại" inputmode="tel"
                                    maxlength="20" autocomplete="tel" />
+                        </div>
+
+                         <div class="singing-field singing-registrant-field">
+                            <label> Tên bài hát 1 </label>
+                            <input type="text" class="form-control" id="singingRegistrantBaiHat1" name="RegistrantBaiHat1"
+                                   value="@Model.RegistrantBaiHat1" placeholder="Điền tên bài hát 1" inputmode="text"
+                                   maxlength="100" autocomplete="off" />
+                        </div>
+                        <div class="singing-field singing-registrant-field">
+                            <label> Tên bài hát 2 (Nếu có) </label>
+                            <input type="text" class="form-control" id="singingRegistrantBaiHat2" name="RegistrantBaiHat2"
+                                   value="@Model.RegistrantBaiHat2" placeholder="Điền tên bài hát 2" inputmode="text"
+                                   maxlength="100" autocomplete="off" />
                         </div>
 
                         <div class="singing-options">
@@ -921,6 +920,61 @@
                         <div class="singing-submit-row">
                             <button type="submit" class="singing-submit" id="singingSubmitButton">
                                 <i class="fa fa-paper-plane"></i>&nbsp; Đăng ký
+                            </button>
+                        </div>
+                    }
+                }
+            </section>
+            =====================================================================
+            *@
+
+            <section class="singing-section">
+                <h3 class="singing-section-title">
+                    <i class="fa fa-edit section-icon edit"></i> II. Đăng ký / Cập nhật bài hát
+                </h3>
+
+                <div class="singing-section-note" role="note">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <div>
+                        <strong>Điền thông tin đăng ký bài hát tham gia.</strong>
+                        <span>Nhập <strong>số điện thoại Zalo</strong> và <strong>tên bài hát</strong> sẽ biểu diễn.</span>
+                        <span><strong>Lưu ý:</strong> Mỗi thí sinh chỉ đăng ký 01 nội dung dự thi.</span>
+                    </div>
+                </div>
+
+                @if (!Model.IsActive)
+                {
+                    <div class="alert alert-warning">Chương trình hiện không nhận đăng ký.</div>
+                }
+                else
+                {
+                    using (Html.BeginForm("ConfirmSinging", "ServeyID", FormMethod.Post, new { id = "singingRegistrationForm" }))
+                    {
+                        <input type="hidden" name="IDSV" value="@Model.IDSV" />
+
+                        <div class="singing-field singing-registrant-field">
+                            <label>Số điện thoại Zalo <em>*</em></label>
+                            <input type="tel" class="form-control" id="singingRegistrantPhone" name="RegistrantPhone"
+                                   value="@Model.RegistrantPhone" placeholder="Điền số điện thoại" inputmode="tel"
+                                   maxlength="20" autocomplete="tel" />
+                        </div>
+
+                        <div class="singing-field singing-registrant-field">
+                            <label>Tên bài hát 1</label>
+                            <input type="text" class="form-control" id="singingRegistrantBaiHat1" name="RegistrantBaiHat1"
+                                   value="@Model.RegistrantBaiHat1" placeholder="Điền tên bài hát 1" inputmode="text"
+                                   maxlength="100" autocomplete="off" />
+                        </div>
+                        <div class="singing-field singing-registrant-field">
+                            <label>Tên bài hát 2 (Nếu có)</label>
+                            <input type="text" class="form-control" id="singingRegistrantBaiHat2" name="RegistrantBaiHat2"
+                                   value="@Model.RegistrantBaiHat2" placeholder="Điền tên bài hát 2" inputmode="text"
+                                   maxlength="100" autocomplete="off" />
+                        </div>
+
+                        <div class="singing-submit-row">
+                            <button type="submit" class="singing-submit" id="singingSubmitButton">
+                                <i class="fa fa-paper-plane"></i>&nbsp; Đăng ký / Cập nhật
                             </button>
                         </div>
                     }
@@ -1103,6 +1157,9 @@
             $('#singingEditSubmit').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang lưu');
         });
 
+        /* =====================================================================
+           JS CŨ (validate chọn đơn ca / song ca + partner) — đã tắt
+           =====================================================================
         $('#singingRegistrationForm').on('submit', function (event) {
             var phone = ($('#singingRegistrantPhone').val() || '').replace(/[.\s-]/g, '');
             if (!/^\+?[0-9]{8,15}$/.test(phone)) {
@@ -1110,7 +1167,6 @@
                 alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.');
                 return;
             }
-
             var $checked = $('.singing-option-card input:checked');
             if (!$checked.length) {
                 event.preventDefault();
@@ -1123,6 +1179,17 @@
                 return;
             }
             $('#singingSubmitButton').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp; Đang đăng ký');
+        });
+        ===================================================================== */
+
+        $('#singingRegistrationForm').on('submit', function (event) {
+            var phone = ($('#singingRegistrantPhone').val() || '').replace(/[.\s-]/g, '');
+            if (!/^\+?[0-9]{8,15}$/.test(phone)) {
+                event.preventDefault();
+                alert('Vui lòng nhập số điện thoại đăng ký Zalo hợp lệ.');
+                return;
+            }
+            $('#singingSubmitButton').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>&nbsp; Đang xử lý');
         });
     });
 </script>
